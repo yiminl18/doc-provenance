@@ -1,0 +1,44 @@
+{
+    "title": "Understanding My Data, Myself: Supporting Self-reflection with Ubicomp Technologies",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2011"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc2_q0_divide_and_conquer.json",
+    "context_size": 13064,
+    "time": 73.91849899291992,
+    "tokens": [
+        13081,
+        2
+    ],
+    "provenance_ids": [
+        1,
+        15,
+        16,
+        58,
+        110,
+        158,
+        206,
+        266,
+        312,
+        357,
+        410
+    ],
+    "provenance": [
+        "UbiComp'11 / Beijing, China\n\nUnderstanding My Data, Myself:\nSupporting Self-Reflection with Ubicomp Technologies\n\nIan Li’, Anind K. Dey’, Jodi Forlizzi'”\n'Human Computer Interaction Institute, “School of Design\nCarnegie Mellon University, Pittsburgh, PA 15213\nianli@cmu.edu, {anind, forlizzi}@cs.cmu.edu\n\nABSTRACT\n\nWe live in a world where many kinds of data about us can\nbe collected and more will be collected as Ubicomp\ntechnologies mature.",
+        "UbiComp’11, September 17-21, 2011, Beijing, China.",
+        "Copyright 2011 ACM 978-1-4503-0630-0/11/09...$10.00.",
+        "The model also highlights that the\n\n406\n\nUbiComp'11 / Beijing, China\n\nstages are inter-related, i.e., problems from the earlier\nstages affect the later stages.",
+        "407\n\nUbiComp'11 / Beijing, China\n\nRESULTS\n\nWe transcribed the interview recordings.",
+        "For some kinds of data, participants did not use a device to\nmeasure their current status; instead, they used their own\n\n408\n\nUbiComp'11 / Beijing, China\n\nsenses.",
+        "She still\n\n409\n\nUbiComp'11 / Beijing, China\n\ntracks her blood sugar level, but she just takes mental notes\nof the meal, physical activity, and sleep quality prior to her\nblood sugar level measurement.",
+        "Using different\n\n410\n\nUbiComp'11 / Beijing, China\n\ntools for different types of data exacerbated this problem.",
+        "Several participants who were in the Maintenance phase at\nthe time of the interviews were in the Discovery phase\n\n411\n\nUbiComp'11 / Beijing, China\n\nearlier in their self-tracking regimen.",
+        "During the other times you were active, you\ndecided to walk your dog around the neighborhood.”\n\n412\n\nUbiComp'11 / Beijing, China\n\nSupporting the Discovery Phase\n\nThere are many opportunities for support in the Discovery\nphase because 1) there are many questions that are asked\nduring this phase; 2) some questions require data collected\nover a long time; and 3) some questions can be answered\nusing multiple types of data.",
+        "413\n\nUbiComp'11 / Beijing, China\n\nHelp users transition from Discovery to Maintenance quickly\nThe Discovery phase is data intensive and can be\nburdensome to users."
+    ],
+    "provenance_size": 513
+}

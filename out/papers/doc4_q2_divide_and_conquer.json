@@ -1,0 +1,20 @@
+{
+    "title": "Why We Use and Abandon Smart Devices",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. "
+    ],
+    "answers": [
+        "UbiComp"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc4_q2_divide_and_conquer.json",
+    "context_size": 14092,
+    "time": 1.1898012161254883,
+    "tokens": [
+        14106,
+        3
+    ],
+    "provenance_ids": [],
+    "provenance": [],
+    "provenance_size": 0
+}

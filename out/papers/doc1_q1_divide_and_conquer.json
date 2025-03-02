@@ -1,0 +1,20 @@
+{
+    "title": "Expense Control: A Gamified, Semi-Automated, Crowd-Based Approach For Receipt Capturing",
+    "question": [
+        "Who are the authors of this paper?",
+        "Return only a list of strings, seperated by |"
+    ],
+    "answers": [
+        "[\"Maximilian Altmeyer\", \"Pascal Lessel\", \"Antonio Krüger\"]"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc1_q1_divide_and_conquer.json",
+    "context_size": 16907,
+    "time": 1.3600490093231201,
+    "tokens": [
+        16925,
+        20
+    ],
+    "provenance_ids": [],
+    "provenance": [],
+    "provenance_size": 0
+}

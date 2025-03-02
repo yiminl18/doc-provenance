@@ -1,0 +1,42 @@
+{
+    "title": "Why We Use and Abandon Smart Devices",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2015"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc4_q0_divide_and_conquer.json",
+    "context_size": 14092,
+    "time": 58.955363750457764,
+    "tokens": [
+        14109,
+        2
+    ],
+    "provenance_ids": [
+        0,
+        14,
+        15,
+        16,
+        57,
+        61,
+        138,
+        223,
+        312,
+        396
+    ],
+    "provenance": [
+        "\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\nWhy We Use and Abandon Smart Devices\n\nAmanda Lazar\nUniversity of Washington\nalaz@uw.edu\n\nJoshua Tanenbaum\n\nUniversity of California, Irvine\n\ntanenbaj@uci.edu\n\nABSTRACT\n\nSmart devices are becoming increasingly commercially\navailable.",
+        "UbiComp '15, September 7-11, 2015, Osaka, Japan.",
+        "Copyright 2015 © ACM 978-1-4503-3574-4/15/09...$15.00.",
+        "http://dx.doi.org/10.1145/2750858.2804288\n\n635\n\nChristian Koehler\nCarnegie Mellon University\nckoehler@andrew.cmu.edu\n\nDavid H. Nguyen\nNokia\ndavid.h.nguyen@nokia.com\n\ninformation about one’s activities will result in behavior\nchange.",
+        "Activity trackers and mHealth devices utilize\na variety of strategies to encourage users: Klasnja et al.",
+        "Another approach is\n\n636\n\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\nto utilize a combination of commercially available and\nprototype interfaces.",
+        "For example,\nregarding whether her devices advanced her toward her\n\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\ngoal of increasing physical activity, P12 said, “...",
+        "Tight\n\n640\n\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\ndevices were perceived as even more uncomfortable when\nbands were made of rubber and participants sweat in them.",
+        "The\ndevices had varying functionalities and affordances and\ntherefore impacted the experiences of participants\n\n642\n\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\ndifferently.",
+        "While not appropriate for all users and all\n\n644\n\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\ndevices, short-term use is appropriate for those interested in\ndevices to satisfy curiosity as well as those who wish to\nalter routines or behaviors."
+    ],
+    "provenance_size": 467
+}

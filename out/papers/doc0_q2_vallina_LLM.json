@@ -1,0 +1,17 @@
+{
+    "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. "
+    ],
+    "answers": [
+        "31st European Conference on Cognitive Ergonomics (ECCE 2019)"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc0_q2_vallina_LLM.json",
+    "time": 1.5439789295196533,
+    "provenance": "Cecile Boulard, Stefania Castellani, Tommaso Colombino and Antonietta Grasso. 2019. “I Don’t Understand...” Issues in Self-Quantifying Commuting. In Proceedings of 31st European Conference on Cognitive Ergonomics (ECCE 2019), September 10-13, 2019, BELFAST, <, United Kingdom. ACM, New York, NY, USA, 4 pages.",
+    "tokens": [
+        6008,
+        94
+    ]
+}

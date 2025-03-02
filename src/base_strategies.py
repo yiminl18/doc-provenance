@@ -1,6 +1,8 @@
 from pdfminer.high_level import extract_text
 import os,sys,nltk,time,json
 import tiktoken
+import data_digestion
+
 nltk.download("punkt")
 
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
@@ -43,10 +45,10 @@ def count_tokens(text, model="gpt-4o-mini"):
     return len(tokens)
 
 
-def QA(question, context, type = 'list'):
+def QA(question, context):
     prompt = (question[0] + question[1], context)
     response = model(model_name, prompt)
-    if(type == 'list'):
+    if('|' in response):
         ans = [o.strip() for o in response.split('|')]
     else:
         ans = [response.strip()]
@@ -88,13 +90,34 @@ def equal(res1, res2, metric = 'string'):
                 return True
             return False
 
+def evaluate(answers, question, ids, sentences):
+    context = ''
+    #print(ids)
+    for id in ids:
+        context += sentences[id]
+    #print(count_tokens(context))
+    #print(context[:100])
+    pred_ans, input_tokens, output_tokens = QA(question, context)
+    #print(pred_ans)
+    #print(answers)
+    if(equal(pred_ans, answers)):
+        #print('True')
+        return True, input_tokens, output_tokens
+    else:
+        #print('False')
+        return False, input_tokens, output_tokens
 
-def vallina_LLM(answers, question, context, path):
+def vallina_LLM(question, context, title, path):
+    answers, input_tokens, output_tokens = QA(question,context)
+    print(answers)
+
     out = {}
+    out['title'] = title
     out['question'] = question
     out['answers'] = answers
     out['path'] = path
-
+    out['context_size'] = count_tokens(context)
+    
     st = time.time()
     """
         Directly invoke LLM to return the provenance of ``answers'' to ``question'' in a given ``context''
@@ -105,20 +128,23 @@ def vallina_LLM(answers, question, context, path):
     et = time.time()
     out['time'] = et-st
     out['provenance'] = response
+    out['provenance_size'] = count_tokens(response)
     input_tokens = count_tokens(instruction + context)
     output_tokens = count_tokens(response)
     out['tokens'] = (input_tokens, output_tokens)
     write_json_to_file(path, out)
     return out
 
-def sequential_greedy(question, context, path, type = 'list'):
-    answers, input_tokens, output_tokens = QA(question,context,type)
+def sequential_greedy(question, context, title, path):
+    answers, input_tokens, output_tokens = QA(question,context)
     print(answers)
 
     out = {}
+    out['title'] = title
     out['question'] = question
     out['answers'] = answers
     out['path'] = path
+    out['context_size'] = count_tokens(context)
 
     st = time.time()
 
@@ -138,7 +164,7 @@ def sequential_greedy(question, context, path, type = 'list'):
                 continue
             remaining_sentences_id.append(j)
         
-        eval_result, input_token, output_token = evaluate(answers, question, remaining_sentences_id, sentences, type = type)
+        eval_result, input_token, output_token = evaluate(answers, question, remaining_sentences_id, sentences)
         input_tokens += input_token
         output_tokens += output_token
         if eval_result == True:#if removing this sentence does not change the final answers, then this sentence can be removed 
@@ -155,48 +181,54 @@ def sequential_greedy(question, context, path, type = 'list'):
     et = time.time()
     out['time'] = et-st
     out['provenance'] = provenance
+    out['provenance_size'] = count_tokens(''.join(provenance))
     out['tokens'] = (input_tokens, output_tokens)
     out['provenance_ids'] = provenance_id 
     write_json_to_file(path, out)
 
     return out 
-    
-def evaluate(answers, question, ids, sentences, type = 'list'):
-    context = ''
-    print(ids)
-    for id in ids:
-        context += sentences[id]
-    pred_ans, input_tokens, output_tokens = QA(question, context, type)
-    print(pred_ans)
-    print(answers)
-    if(equal(pred_ans, answers)):
-        return True, input_tokens, output_tokens
-    else:
-        return False, input_tokens, output_tokens
 
-def divide_and_conquer(answers, question, text, path, type = 'list'):
+binary_out_ids = []
+sum_input_tokens = 0
+sum_output_tokens = 0
+
+def divide_and_conquer(question, text, title, path):
+    global binary_out_ids,sum_input_tokens,sum_output_tokens
+    sum_input_tokens = 0
+    sum_output_tokens = 0
+    binary_out_ids = []
+    answers, input_tokens, output_tokens = QA(question,text)
+    print(answers)
+
     out = {}
+    out['title'] = title
     out['question'] = question
     out['answers'] = answers
     out['path'] = path
+    out['context_size'] = count_tokens(text)
+
     st = time.time()
     ids = []
     sentences = extract_sentences_from_pdf(text)
     for i in range(len(sentences)):
         ids.append(i)
-    provenance_id, input_tokens, output_tokens = divide_and_conquer_core(answers, question, ids, sentences, type)
+    divide_and_conquer_core(answers, question, ids, sentences)
+    binary_out_ids = list(set(binary_out_ids))
+    binary_out_ids = sorted(binary_out_ids)
+    print(binary_out_ids)
     et = time.time()
     out['time'] = et-st
     out['tokens'] = (input_tokens, output_tokens)
-    out['provenance_ids'] = provenance_id 
+    out['provenance_ids'] = binary_out_ids 
     provenance = []
-    for id in provenance_id:
+    for id in binary_out_ids:
         provenance.append(sentences[id])
     out['provenance'] = provenance
+    out['provenance_size'] = count_tokens(''.join(provenance))
     write_json_to_file(path, out)
 
 
-def divide_and_conquer_core(answers, question, ids, sentences, type = 'list'):
+def divide_and_conquer_core(answers, question, ids, sentences):
     
     """
     Attempt to find a smaller subset of `sentences` that returns True for H,
@@ -204,74 +236,55 @@ def divide_and_conquer_core(answers, question, ids, sentences, type = 'list'):
     
     Returns a (not guaranteed fully minimal) subset for which H is still True.
     """
+    global binary_out_ids,sum_input_tokens,sum_output_tokens
     # If the entire set somehow doesn't trigger True, nothing to return
-    eval_result, input_token, output_token = evaluate(answers, question, ids, sentences, type)
+    eval_result, input_token, output_token = evaluate(answers, question, ids, sentences)
     # Start accumulating total token usage
-    sum_input_tokens = input_token
-    sum_output_tokens = output_token
-    if not eval_result:
-        return [], sum_input_tokens, sum_output_tokens
+    sum_input_tokens += input_token
+    sum_output_tokens += output_token
     
-    # If there's only 0 or 1 sentence, we can't reduce further
-    if len(ids) <= 1:
-        return ids,sum_input_tokens,sum_output_tokens
+    if not eval_result:
+        return 
+    else:
+        # If there's only 0 or 1 sentence, we can't reduce further
+        if len(ids) <= 1:
+            binary_out_ids += ids
+            return 
     
     # Split into two halves
     mid = len(ids) // 2
     left = ids[:mid]
     right = ids[mid:]
+
+    divide_and_conquer_core(answers, question, left, sentences)
+    divide_and_conquer_core(answers, question, right, sentences)
     
-    left_sub = None
-    right_sub = None
-    
-    # Check if the left half alone satisfies H
-    eval_result_left, input_token, output_token = evaluate(answers, question, left, sentences, type = type)
-    # Accumulate tokens
-    sum_input_tokens += input_token
-    sum_output_tokens += output_token
-
-    # Check if the right half alone satisfies H
-    eval_result_right, input_token, output_token = evaluate(answers, question, right, sentences, type = type)
-    sum_input_tokens += right_in_tokens
-    sum_output_tokens += right_out_tokens
-
-    if (not eval_result_left) and (not eval_result_right):
-        return ids, sum_input_tokens, sum_output_tokens
-    elif eval_result_left and (not eval_result_right):
-        left_sub, left_in_tokens, left_out_tokens = divide_and_conquer_core(answers, question, left, sentences, type)
-        return left_sub, sum_input_tokens + left_in_tokens, sum_output_tokens + left_out_tokens
-    elif (not eval_result_left) and eval_result_right:
-        right_sub, right_in_tokens, right_out_tokens = divide_and_conquer_core(answers, question, right, sentences, type)
-        return right_sub, sum_input_tokens + right_in_tokens, sum_output_tokens + right_out_tokens
-    else: #left and right are both true, which won't happen if G is not empty 
-        left_sub, left_in_tokens, left_out_tokens = divide_and_conquer_core(answers, question, left, sentences, type)
-        right_sub, right_in_tokens, right_out_tokens = divide_and_conquer_core(answers, question, right, sentences, type)
-        sum_input_tokens += (left_in_tokens + right_in_tokens)
-        sum_output_tokens += (left_out_tokens + right_out_tokens)
-
-        combined = left_sub + right_sub
-        eval_result, input_token, output_token = evaluate(answers, question, combined, sentences, type = type)
-        if(eval_result):
-            return divide_and_conquer_core(answers, question, combined, sentences, type)
-        else:
-            return ids, sum_input_tokens, sum_output_tokens
-    
-
 if __name__ == "__main__":
-    data_path = parent_directory + '/data/https:www.malibucity.org:AgendaCenter:ViewFile:Agenda:_05252022-1908 (dragged).pdf'
-    folder_path = create_data_folder(data_path)
-    question = ('What the capitol improvement projects starting later than 2022?',' Return only the names of project, seperated by |.')
-    text = extract_text_from_pdf(data_path)
-    
+    data_path = parent_directory + '/data/papers.json'
+    folder_path = parent_directory + '/out/papers'
+    paper_objects = data_digestion.digest_paper_dataset(data_path)
+    sample_paper_questions = data_digestion.sample_paper_questions()
 
     strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer']
     strategy = 'sequential_greedy'
-    path = folder_path + '/' + strategy + '.json'
-    if strategy == 'vallina_LLM':
-        vallina_LLM(question, text, path)
-    elif strategy == 'sequential_greedy':
-        sequential_greedy(question, text, path, type = 'list') 
-    elif strategy == 'divide_and_conquer': 
-        divide_and_conquer(question, text, path, type = 'list')
-        
-    
+    doc_num = 4
+
+    for q_id in range(len(sample_paper_questions)):
+        q = sample_paper_questions[q_id]
+        for p_id in range(len(paper_objects)):
+            paper = paper_objects[p_id]
+            path = folder_path + '/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
+            if os.path.isfile(path):
+                continue
+            text = paper['text']
+            title = paper['title']
+            print(title)
+            if strategy == 'vallina_LLM':
+                vallina_LLM(q, text, title, path)
+            elif strategy == 'sequential_greedy':
+                sequential_greedy(q, text, title, path) 
+            elif strategy == 'divide_and_conquer': 
+                divide_and_conquer(q, text, title, path)
+            if(p_id >= doc_num):
+                break
+        #break

@@ -1,0 +1,17 @@
+{
+    "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2019"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc0_q0_vallina_LLM.json",
+    "time": 5.104101896286011,
+    "provenance": "Cecile Boulard, Stefania Castellani, Tommaso Colombino and Antonietta Grasso. 2019. “I Don’t Understand...” Issues in Self-Quantifying Commuting. In Proceedings of 31st European Conference on Cognitive Ergonomics (ECCE 2019), September 10-13, 2019, BELFAST, <, United Kingdom. ACM, New York, NY, USA, 4 pages.  \n© 2019 Association for Computing Machinery.  \nECCE 2019, September 10-13, 2019, BELFAST, <, United Kingdom.  \nThe research presented in this paper illustrates a situation where data of self-behaviors put the users at unease.  \nThe difficulties that can be encountered by individuals when facing data of self-behaviors can be grouped in two main categories: understanding data and accepting data.  \nA main reason why the eco-calculator model was leading to inconsistencies was that there was an implicit intent that the model should have supported explicitly [18] and that we discovered was not doing that so well.  \nThe intent of the eco-calculator was to support the adoption of greener practices.  \nWhat appeared as an outcome was that, for several participants, the use of the bus led to more COz emissions than car-sharing or moped.  \nThis conclusion would be very likely in opposition to what public authorities and common sense perceive as green transportation practices.  \nWe believe that this work can be inspiring for the quantified-self community about ways to answer to the need to better contextualize tracked data [6].  \nThe results of this study are very specific, but the highlighted issues raised in this paper are directly aligned with the current open questions on the “Explainable, Accountable and Intelligible Systems” [1].  \nThere is a need to provide users with tools for understanding the underlying models or algorithms supporting decision-making processes or figures that directly target them.",
+    "tokens": [
+        5995,
+        398
+    ]
+}

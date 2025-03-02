@@ -1,0 +1,20 @@
+{
+    "title": "Why We Use and Abandon Smart Devices",
+    "question": [
+        "Who are the authors of this paper?",
+        "Return only a list of strings, seperated by |"
+    ],
+    "answers": [
+        "Amanda Lazar",
+        "Joshua Tanenbaum",
+        "Christian Koehler",
+        "David H. Nguyen"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc4_q1_vallina_LLM.json",
+    "time": 1.4657518863677979,
+    "provenance": "Amanda Lazar  \nJoshua Tanenbaum  \nChristian Koehler  \nDavid H. Nguyen  ",
+    "tokens": [
+        14188,
+        17
+    ]
+}

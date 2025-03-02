@@ -1,0 +1,40 @@
+{
+    "title": "Understanding My Data, Myself: Supporting Self-reflection with Ubicomp Technologies",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2011"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc2_q0_sequential_greedy.json",
+    "context_size": 13064,
+    "time": 497.10144305229187,
+    "provenance": [
+        "We believe that this work will help developers and\ndesigners more appropriately build personal informatics\ntools and take better advantage of Ubicomp technologies to\nhelp users self-reflect.",
+        "REFERENCES\n\n1.",
+        "2.",
+        "Souvenir\nPress: London, 1984.",
+        "“The New Examined Life.” Wall\nStreet Journal, 6 Dec 2008.",
+        "Morgan Kaufman: 1999.",
+        "Carver, C. & Scheier, M.F.",
+        "CHT’09, pp.",
+        "UbiComp'11 / Beijing, China\n\n."
+    ],
+    "provenance_size": 108,
+    "tokens": [
+        3158153,
+        1118
+    ],
+    "provenance_ids": [
+        438,
+        441,
+        446,
+        448,
+        451,
+        455,
+        457,
+        462,
+        491
+    ]
+}

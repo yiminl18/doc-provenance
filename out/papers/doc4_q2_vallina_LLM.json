@@ -1,0 +1,17 @@
+{
+    "title": "Why We Use and Abandon Smart Devices",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. "
+    ],
+    "answers": [
+        "UbiComp"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc4_q2_vallina_LLM.json",
+    "time": 2.497969150543213,
+    "provenance": "1. \"UBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\"\n2. \"Smart devices have been an area of focus for UbiComp and HCI for many years.\"\n3. \"UbiComp '15, September 7-11, 2015, Osaka, Japan.\"",
+    "tokens": [
+        14175,
+        72
+    ]
+}

@@ -1,0 +1,17 @@
+{
+    "title": "Why We Use and Abandon Smart Devices",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2015"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc4_q0_vallina_LLM.json",
+    "time": 1.955186128616333,
+    "provenance": "UBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\nCopyright 2015 © ACM 978-1-4503-3574-4/15/09...$15.00.\nhttp://dx.doi.org/10.1145/2750858.2804288\n\nUbiComp '15, September 7-11, 2015, Osaka, Japan.",
+    "tokens": [
+        14175,
+        92
+    ]
+}

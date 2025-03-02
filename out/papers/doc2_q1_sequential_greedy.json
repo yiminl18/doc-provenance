@@ -1,0 +1,28 @@
+{
+    "title": "Understanding My Data, Myself: Supporting Self-reflection with Ubicomp Technologies",
+    "question": [
+        "Who are the authors of this paper?",
+        "Return only a list of strings, seperated by |"
+    ],
+    "answers": [
+        "Ian Li",
+        "Anind K. Dey",
+        "Jodi Forlizzi"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc2_q1_sequential_greedy.json",
+    "context_size": 13064,
+    "time": 557.9115619659424,
+    "provenance": [
+        "\nPaper Session: How Healthy?",
+        "UbiComp'11 / Beijing, China\n\nUnderstanding My Data, Myself:\nSupporting Self-Reflection with Ubicomp Technologies\n\nIan Li’, Anind K. Dey’, Jodi Forlizzi'”\n'Human Computer Interaction Institute, “School of Design\nCarnegie Mellon University, Pittsburgh, PA 15213\nianli@cmu.edu, {anind, forlizzi}@cs.cmu.edu\n\nABSTRACT\n\nWe live in a world where many kinds of data about us can\nbe collected and more will be collected as Ubicomp\ntechnologies mature."
+    ],
+    "provenance_size": 127,
+    "tokens": [
+        3217455,
+        8402
+    ],
+    "provenance_ids": [
+        0,
+        1
+    ]
+}

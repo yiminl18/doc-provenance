@@ -1,0 +1,42 @@
+{
+    "title": "Expense Control: A Gamified, Semi-Automated, Crowd-Based Approach For Receipt Capturing",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. "
+    ],
+    "answers": [
+        "IUI 2016"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc1_q2_divide_and_conquer.json",
+    "context_size": 16907,
+    "time": 94.09059834480286,
+    "tokens": [
+        16921,
+        5
+    ],
+    "provenance_ids": [
+        0,
+        20,
+        32,
+        72,
+        113,
+        154,
+        257,
+        306,
+        344,
+        384
+    ],
+    "provenance": [
+        "\nIUI 2016 * Social Media\n\nMarch 7-10, 2016, Sonoma, CA, USA\n\nExpense Control: A Gamified, Semi-Automated,\nCrowd-Based Approach For Receipt Capturing\n\nMaximilian Altmeyer'’, Pascal Lessel?",
+        "IUI’16, March 07-10, 2016, Sonoma, CA, USA.",
+        "Our goal is not solely to correct spelling\nerrors, as done in existing work [1, 6, 12, 26] but also se-\nmantically enhance OCR results and attach meaningful meta-\n\n\nIUI 2016 * Social Media\n\ndata by the use of designated microtasks solved by an unpaid\ncrowd.",
+        "C2: Identification of articles and extraction of their prices\nThe layout examination of articles and corresponding prices\nrevealed that it is not possible to simply match prices with\n\n\nIUI 2016 * Social Media\n\nU.096 kg xX 3.99 EUR/kg= q\n4x 0,89\n\nVOLLMILCH 3,8% 3.56 7\nMINI DICKMANNES 1.59 7\n\nFigure 3: Article name (red rectangle on the left) and cor-\nresponding price (red rectangle on the right)\n\nwords of the same line to extract the article name because\nthere is no consistent format or structure given (cf.",
+        "The extracted words are those\n\n\nIUI 2016 * Social Media\n\nthat are unrecognizable by OCR.",
+        "IUI 2016 * Social Media\n\nConcept\n\nWe designed the concept of our prototype based on the results\npresented in the last sections.",
+        "IUI 2016 * Social Media\n\nexpense expense\n\n* 40 |\n\n@ You need only 40 p\nrank\n\nTask finished\n\n*+10P unlocked!",
+        "H2 builds on the assumption\n\n\nIUI 2016 * Social Media\n\nthat our approach using the outcomes of crowd-solved micro-\ntasks lowers the error rate, compared to a baseline without\nany crowd-based data, when extracting relevant information\nfrom captured receipts.",
+        "To obtain an error ratio\nfor each receipt, we analyzed every captured receipt again,\nusing the outcome of all microtasks (classifications and cor-\nrections) solved by the crowd (crowd-enhanced algorithm,\nCE), and compared the result with an approach that solely\n\n\nIUI 2016 * Social Media\n\nrelies on assumptions concluded by the receipt analysis with-\nout considering the crowd (baseline algorithm).",
+        "It also shows that the number of solved tasks decreases\n\n\nIUI 2016 * Social Media\n\n1400\n1200\n1000\n\n8\n\n6\n4\n1 2 3 4 5 6 7 8 9 10 11 12\n\nParticipants\n WEEK2 @WEEK3\n\nNumber of solved tasks\n° ° co}\nao oO oO\n\nfs}\noO\n\n© WEEK 1\n\nFigure 9: Solved microtasks for each participant/week."
+    ],
+    "provenance_size": 618
+}

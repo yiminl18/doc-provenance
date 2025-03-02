@@ -25,6 +25,26 @@ def digest_paper_dataset(file_path):
         paper_data.append(o)
     return paper_data
 
+def digest_hotpotQA_dataset(file_path):
+    hotpots = []
+    with open(file_path, "r", encoding="utf-8") as file:
+        data = json.load(file)  # Load entire JSON file
+    entries = data['entries']
+    i = 0
+    for entry in entries:
+        hotpot = {}
+        context = ''
+        for c in entry['context']:
+            content = ''.join(c[1])
+            context += content 
+        hotpot['question'] = entry['question']
+        hotpot['answer'] = entry['answer']
+        hotpot['document_name'] = entry['document_name']
+        hotpot['context'] = context
+        hotpots.append(hotpot)
+    return hotpots
+
+
 def sample_paper_questions():
     questions = []
     questions.append(('In what year was this paper published?','Return only a number. Do not add explanations.'))
@@ -37,12 +57,15 @@ def sample_paper_questions():
 
 if __name__ == "__main__":
     paper_data_path = parent_directory + '/data/papers.json'
-    paper_data = digest_paper_dataset(paper_data_path)
-    for i in range(3):
-        o = paper_data[i]
-        print(o['title'])
-        #print(o['text'][:10])
-        for i in range(3):
-            print(o['question_answer'][i])
+    #paper_data = digest_paper_dataset(paper_data_path)
+    # for i in range(3):
+    #     o = paper_data[i]
+    #     print(o['title'])
+    #     #print(o['text'][:10])
+    #     for i in range(3):
+    #         print(o['question_answer'][i])
+    hotpot_data_path = parent_directory + '/data/hotpotQA_hotpot_dev_fullwiki_v1.json'
+    hotpot = digest_hotpotQA_dataset(hotpot_data_path)
+
         
 

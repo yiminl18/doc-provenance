@@ -1,0 +1,17 @@
+{
+    "title": "Expense Control: A Gamified, Semi-Automated, Crowd-Based Approach For Receipt Capturing",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2016"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc1_q0_vallina_LLM.json",
+    "time": 4.292468786239624,
+    "provenance": "1. \"IUI 2016 * Social Media\"\n2. \"March 7-10, 2016, Sonoma, CA, USA.\"\n3. \"Copyright © 2016 ACM ISBN 978-1-4503-4137-0/16/03$15.00.\"\n4. \"In a three-week-long user study (N=12), we found that our system is appreciated, that our approach reduces the error rate of captured receipts significantly, and that the gamification provided additional motivation to contribute more and thereby enrich the database.\"\n5. \"In this paper we investigated a crowd-based approach to enhance the outcome of optical character recognition in the domain of receipt capturing to keep track of expenses.\"\n6. \"We developed a budgeting application (cf. Figure 1) for smartphones that allows for tracking expenses by taking pictures of receipts to extract relevant entities such as the total sum, store name, single articles and their corresponding prices, and a categorization of both the receipt and each article.\"\n7. \"The paper is structured as follows: we first review the challenges in performing OCR in the receipt analysis domain by inspecting German receipts from different stores, and report the results of an online study.\"\n8. \"To evaluate our approach, we developed a smartphone application based on a receipt analysis and an online questionnaire in which users are able to track expenses by taking photos of receipts, and solve microtasks to enhance the recognition.\"",
+    "tokens": [
+        16990,
+        290
+    ]
+}

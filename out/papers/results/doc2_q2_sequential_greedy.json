@@ -1,0 +1,58 @@
+{
+    "title": "Understanding My Data, Myself: Supporting Self-reflection with Ubicomp Technologies",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. "
+    ],
+    "answers": [
+        "UbiComp'11"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc2_q2_sequential_greedy.json",
+    "context_size": 13064,
+    "time": 406.94143176078796,
+    "provenance": [
+        "Tools can vary by form factor\n(paper, web sites, devices, etc.)",
+        "Identifying these\nquestions is important because they require different\nanswers and different kinds of data, which have\nimplications on how tools should support them.",
+        "Again, Ubicomp can play a\nbig role here supporting the different information demands\nof the two phases and the transitions between them.",
+        "Andrews, D. The IRG Solution - Hierarchical\nIncompetence and How to Overcome It.",
+        "Brophy-Warren, J.",
+        "Readings in information visualization: using vision to\nthink.",
+        "5.",
+        "Carver, C. & Scheier, M.F.",
+        "American Journal of Health\nBehavior, 25(3), 2000, pp.",
+        "217-227.",
+        "Endsley, M.R.",
+        "Naturalistic Decision\nMaking, 1997, pp.",
+        "Froehlich, J., Dillahunt, T., Klasnja, P., Mankoff, J.,\nConsolvo, S., Harrison, B., & Landay, J.A.",
+        "UbiComp'11 / Beijing, China\n\n.",
+        "CHI’/0, pp.",
+        "927-936.\n\n.",
+        "Hodges, S., Williams, L., Berry, E., et al.",
+        "Schunk, D. H., & Swartz, C. W. Goals and progress\nfeedback: Effects on self-efficacy and writing\nachievement."
+    ],
+    "provenance_size": 279,
+    "tokens": [
+        3176498,
+        2766
+    ],
+    "provenance_ids": [
+        45,
+        421,
+        428,
+        447,
+        450,
+        454,
+        456,
+        457,
+        466,
+        467,
+        469,
+        471,
+        477,
+        491,
+        500,
+        501,
+        502,
+        548
+    ]
+}

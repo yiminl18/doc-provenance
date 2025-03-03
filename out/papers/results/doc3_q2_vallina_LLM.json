@@ -1,0 +1,17 @@
+{
+    "title": "Sundroid: Solar Radiation Awareness with Smartphones",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. "
+    ],
+    "answers": [
+        "UbiComp'11"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc3_q2_vallina_LLM.json",
+    "time": 1.255012035369873,
+    "provenance": "UbiComp'11 / Beijing, China\n\nUbiComp’11, September 17-21, 2011, Beijing, China.",
+    "tokens": [
+        12414,
+        30
+    ]
+}

@@ -1,0 +1,46 @@
+{
+    "title": "Closing the Gap: Supporting Patients' Transition to Self-Management After Hospitalization",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2016"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc8_q0_divide_and_conquer.json",
+    "context_size": 16447,
+    "time": 75.14022970199585,
+    "tokens": [
+        16464,
+        2
+    ],
+    "provenance_ids": [
+        0,
+        18,
+        19,
+        50,
+        88,
+        132,
+        170,
+        209,
+        251,
+        292,
+        320,
+        356
+    ],
+    "provenance": [
+        "\nDesign for Health Care\n\n#chi4good, CHI 2016, San Jose, CA, USA\n\nClosing the Gap: Supporting Patients’ Transition\nto Self-Management after Hospitalization\n\nAri H Pollack’”, Uba Backonj a‘, Andrew D. Miller’, Sonali R. Mishra* » Maher Khelifi‘,\nLogan Kendall’, and Wanda Pratt’\n\n'Department of Pediatrics\nSchool of Medicine\nUniversity of Washington\nSeattle, WA, USA\n\n“Division of Nephrology\nSeattle Children’s Hospital\nSeattle, WA, USA\n\n>The Information School,\n‘Biomedical and Health Informatics\nUniversity of Washington\nSeattle, WA, USA\n\n{apollack; backonja; millerad, srmishra; khelifi; kendall5; wpratt}@uw.edu\n\nABSTRACT\n\nPatients going home after a hospitalization face many\nchallenges.",
+        "'16, May 07-12, 2016, San Jose, CA, USA\n\n© 2016 ACM.",
+        "ISBN 978-1-4503-3362-7/16/05...$15.00\n\nDOI: http://dx.doi.org/10.1145/2858036.2858240\n\n5324\n\none such risk, has been identified as a major issue within\nthe United States health care system, impacting | out of 5\nMedicare beneficiaries, leading to $17.4 billion each year in\nunnecessary spending [35].",
+        "5325\n\n#chi4good, CHI 2016, San Jose, CA, USA\n\nGiven that behavior change is a key component of self-\nmanagement as individuals need to learn how to adapt their\nlifestyle as a result living with a chronic illness, Social\nCognitive Theory [6] provides a useful lens to help\nunderstand and guide the patients’ actions post-discharge.",
+        "5326\n\n#chi4good, CHI 2016, San Jose, CA, USA\n\nMamykina and colleagues have proposed a sensemaking\nframework for chronic-disease self-management [46].",
+        "Adult\n\n5327\n\n#chi4good, CHI 2016, San Jose, CA, USA\n\npatients had a range of educational levels, with most having\nhad at least some college.",
+        "Often, the lack of expertise\n\n#chi4good, CHI 2016, San Jose, CA, USA\n\nrelates to the ability to track important metrics or\nparameters required for self-management.",
+        "5329\n\n#chi4good, CHI 2016, San Jose, CA, USA\n\nKnowledge (\\ Resources\n\nFigure 1.",
+        "I mean,\n\n5330\n\n#chi4good, CHI 2016, San Jose, CA, USA\n\nbasically it was good.",
+        "This gap leads to challenges for patients\n\n5331\n\n#chi4good, CHI 2016, San Jose, CA, USA\n\nHospital oe\nManagement\n\nSelf-\n\n“\"+.. |Management\n\nDischarge\n\nFigure 2.",
+        "Preliminary work [31,41] has shown the\npotential in cataloging and archiving previous patients’\n\n5332\n\n#chi4good, CHI 2016, San Jose, CA, USA\n\npersonal histories, experiences, challenges, and solutions in a\nvariety of different formats (e.g.",
+        "5333\n\n#chi4good, CHI 2016, San Jose, CA, USA\n\nLimitations and future work\n\nAlthough our work provides insight into the challenges\nfacing patients around the time of discharge from a\nhospitalization, we need to recognize its limitations."
+    ],
+    "provenance_size": 742
+}

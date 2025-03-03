@@ -2,7 +2,12 @@ from pdfminer.high_level import extract_text
 import os,sys,nltk,time,json
 import tiktoken
 import data_digestion
-
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
+from openai import OpenAI
+client = OpenAI()
+embedding_model = "text-embedding-3-small"
 nltk.download("punkt")
 
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
@@ -90,11 +95,10 @@ def equal(res1, res2, metric = 'string'):
                 return True
             return False
 
-def evaluate(answers, question, ids, sentences):
-    context = ''
-    #print(ids)
-    for id in ids:
-        context += sentences[id]
+def evaluate(answers, question, ids, sentences, context = ''):
+    if(context == ''):
+        for id in ids:
+            context += sentences[id]
     #print(count_tokens(context))
     #print(context[:100])
     pred_ans, input_tokens, output_tokens = QA(question, context)
@@ -135,9 +139,9 @@ def vallina_LLM(question, context, title, path):
     write_json_to_file(path, out)
     return out
 
-def sequential_greedy(question, context, title, path):
+def sequential_greedy(question, context, title, path, sorted_idx = []):
     answers, input_tokens, output_tokens = QA(question,context)
-    print(answers)
+    #print(answers)
 
     out = {}
     out['title'] = title
@@ -153,9 +157,13 @@ def sequential_greedy(question, context, title, path):
     removed_sentences = []
     input_tokens = 0
     output_tokens = 0
-    for i in range(len(sentences)):
+
+    if len(sorted_idx) == 0:
+        sorted_idx = list(enumerate(sentences))
+
+    for i in sorted_idx:
         print('Iterating sentence ',i, len(sentences))
-        print(sentences[i])
+        #print(sentences[i])
         remaining_sentences_id = []
         for j in range(len(sentences)):
             if j in removed_sentences:
@@ -259,32 +267,103 @@ def divide_and_conquer_core(answers, question, ids, sentences):
     divide_and_conquer_core(answers, question, left, sentences)
     divide_and_conquer_core(answers, question, right, sentences)
     
+def cosine_sim(vec1, vec2):
+    return cosine_similarity([vec1], [vec2])[0][0]
+
+def get_embedding(text, model=embedding_model):
+    text = text.replace("\n", " ")
+    return client.embeddings.create(input = [text], model=model).data[0].embedding
+
+def save_embeddings(filename, embeddings):
+    # Extract the directory from the filename
+    directory = os.path.dirname(filename)
+    
+    # Check if the directory exists; if not, create it
+    if directory and not os.path.exists(directory):
+        os.makedirs(directory)
+    
+    # Save the embeddings to the specified file
+    np.save(filename, embeddings)
+
+def load_embeddings(filename):
+    return np.load(filename, allow_pickle=True).item()
+
+def sort_sentences_by_similarity(question, text, file_path):
+    print(question)
+    sentences = extract_sentences_from_pdf(text)
+    # Get embedding for the question
+    question_embedding = get_embedding(question)
+
+    try:
+        # Load existing embeddings
+        embeddings = load_embeddings(file_path)
+    except FileNotFoundError:
+        embeddings = {}
+    
+    # Compute embeddings and similarity scores for each sentence
+    similarity_scores = {}
+    for sentence in sentences:
+        if sentence not in embeddings:
+            embeddings[sentence] = get_embedding(sentence)
+        sentence_embedding = embeddings[sentence]
+        similarity = cosine_sim(question_embedding, sentence_embedding)
+        similarity_scores[sentence] = similarity
+
+    # Save updated embeddings
+    save_embeddings(file_path, embeddings)
+
+    # Pair each sentence with its index and similarity score
+    indexed_sentences = list(enumerate(sentences))
+
+    # Sort sentences based on similarity scores in descending order
+    sorted_indexed_sentences = sorted(indexed_sentences, key=lambda x: similarity_scores[x[1]], reverse=True)
+
+    # Extract the sorted sentences and their original indices
+    sorted_sentences = [sentence for index, sentence in sorted_indexed_sentences]
+    sorted_indices = [index for index, sentence in sorted_indexed_sentences]
+
+    # Output the sorted sentences and their original indices
+    # for idx, sentence in zip(sorted_indices, sorted_sentences):
+    #     print(f"Original Index: {idx}, Sentence: '{sentence}', similarity: '{similarity_scores[sentence]}'")
+
+    return sorted_sentences, sorted_indices, similarity_scores
+
+def heuristic_greedy(question, text, title, path):
+    sorted_sentences, sorted_indices, similarity_scores = sort_sentences_by_similarity(question, text, path)
+    sequential_greedy(question, text, title, path, sorted_idx = sorted_indices)
+
+    
+
 if __name__ == "__main__":
     data_path = parent_directory + '/data/papers.json'
     folder_path = parent_directory + '/out/papers'
     paper_objects = data_digestion.digest_paper_dataset(data_path)
     sample_paper_questions = data_digestion.sample_paper_questions()
 
-    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer']
-    strategy = 'sequential_greedy'
+    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
+    strategy = 'heuristic_greedy'
     doc_num = 4
 
     for q_id in range(len(sample_paper_questions)):
         q = sample_paper_questions[q_id]
         for p_id in range(len(paper_objects)):
             paper = paper_objects[p_id]
-            path = folder_path + '/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
+            path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
             if os.path.isfile(path):
                 continue
             text = paper['text']
             title = paper['title']
             print(title)
+            embedding_path = folder_path + '/embeddings/' + 'doc' + str(p_id) + '_embeddings.npy'
+            sort_sentences_by_similarity(q[0], text, embedding_path)
             if strategy == 'vallina_LLM':
                 vallina_LLM(q, text, title, path)
             elif strategy == 'sequential_greedy':
                 sequential_greedy(q, text, title, path) 
             elif strategy == 'divide_and_conquer': 
                 divide_and_conquer(q, text, title, path)
-            if(p_id >= doc_num):
-                break
-        #break
+            elif strategy == 'heuristic_greedy':
+                heuristic_greedy(q, text, title, path) 
+            #if(p_id >= doc_num):
+            break
+        break

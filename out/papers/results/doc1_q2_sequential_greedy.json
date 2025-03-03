@@ -1,0 +1,32 @@
+{
+    "title": "Expense Control: A Gamified, Semi-Automated, Crowd-Based Approach For Receipt Capturing",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. "
+    ],
+    "answers": [
+        "IUI 2016"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc1_q2_sequential_greedy.json",
+    "context_size": 16907,
+    "time": 527.8473269939423,
+    "provenance": [
+        "100g 0,69 8 1,03 B\n\nWhat is depicted in the image?",
+        "IUI 2016 * Social Media\n\nREFERENCES\n\n1.",
+        "(2014),\n1921-1926.",
+        "DOL:\n\nhttp: //dx.doi.org/10.1145/2559206.2581288\n\nPascal Lessel, Maximilian Altmeyer, and Antonio\nKriiger.",
+        "Don’t Whip\nMe With Your Games - Investigating Bottom-Up\nGamification."
+    ],
+    "provenance_size": 103,
+    "tokens": [
+        4604797,
+        3438
+    ],
+    "provenance_ids": [
+        208,
+        419,
+        559,
+        560,
+        568
+    ]
+}

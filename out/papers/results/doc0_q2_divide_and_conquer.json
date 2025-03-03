@@ -1,0 +1,20 @@
+{
+    "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. "
+    ],
+    "answers": [
+        "31st European Conference on Cognitive Ergonomics (ECCE 2019)"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc0_q2_divide_and_conquer.json",
+    "context_size": 5912,
+    "time": 11.171376705169678,
+    "tokens": [
+        5926,
+        16
+    ],
+    "provenance_ids": [],
+    "provenance": [],
+    "provenance_size": 0
+}

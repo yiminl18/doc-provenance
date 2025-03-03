@@ -1,7 +1,14 @@
-import json, os
+import json, os, sys
 
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
+sys.path.append(current_file_directory)
+from model import model #[gpt4o, gpt4vision, gpt4omini]
+model_name = 'gpt4omini'
+
+def write_json(data, file_path):
+    with open(file_path, "w") as file:
+        json.dump(data, file, indent=4)
 
 def digest_paper_dataset(file_path):
     paper_data = []
@@ -42,8 +49,22 @@ def digest_hotpotQA_dataset(file_path):
         hotpot['document_name'] = entry['document_name']
         hotpot['context'] = context
         hotpots.append(hotpot)
-    return hotpots
+    return hotpots 
 
+def add_instructions(hotpots):
+    prompt = "Generate an instruction based on the given question and answer to specify how the output should be formatted. For example: If the answer is 'yes' or 'no,' the instruction should be: 'Only return yes or no. Do not add explanations.'If the answer is a single phrase, the instruction should be: 'Only return the answer. Do not add explanations.'If the answer is a list of phrases, the instruction should be: 'Return a list of phrases.'"
+
+
+    for e in hotpots:
+        question = e['question']
+        answer = e['answer']
+        context = 'This is the question: ' + question + ' This is the answer: ' + answer
+        instruction = model(model_name, (prompt, context))
+        print(question, answer)
+        print(instruction)
+        e['instruction'] = instruction
+    
+    write_json(hotpots, parent_directory + '/data/hotpotQA_fullwiki.json')
 
 def sample_paper_questions():
     questions = []
@@ -65,7 +86,8 @@ if __name__ == "__main__":
     #     for i in range(3):
     #         print(o['question_answer'][i])
     hotpot_data_path = parent_directory + '/data/hotpotQA_hotpot_dev_fullwiki_v1.json'
-    hotpot = digest_hotpotQA_dataset(hotpot_data_path)
+    hotpots = digest_hotpotQA_dataset(hotpot_data_path)
+    add_instructions(hotpots)
 
         
 

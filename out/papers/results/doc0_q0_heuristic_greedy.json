@@ -1,0 +1,30 @@
+{
+    "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2019"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc0_q0_heuristic_greedy.json",
+    "context_size": 1178,
+    "time": 19.571133375167847,
+    "provenance": [
+        "https://doi.org/10.1145/3335082.3335100\n\n1 Introduction\n\nGlobal warming is a topic that raises many concerns at all levels\nin society.",
+        "The majority of self-tracking practices target the\ndomain of health and well-being [11], where models are fairly\nsimple: a step is a step, the number of heart pulsations, and the\nnumber of calories burned.",
+        "If a user commutes with her car every day,\nhow are we going to compute a fixed amount of money that is\nspent each day to go to work by driving a car?",
+        "Then we\nshould also add the cost associated to the fuel used for that\nspecific trip."
+    ],
+    "provenance_size": 138,
+    "tokens": [
+        18954,
+        72
+    ],
+    "provenance_ids": [
+        9,
+        22,
+        25,
+        30
+    ]
+}

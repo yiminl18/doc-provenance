@@ -292,7 +292,7 @@ def sort_sentences_by_similarity(question, text, file_path):
     print(question)
     sentences = extract_sentences_from_pdf(text)
     # Get embedding for the question
-    question_embedding = get_embedding(question)
+    question_embedding = get_embedding(question[0])
 
     try:
         # Load existing embeddings
@@ -328,9 +328,13 @@ def sort_sentences_by_similarity(question, text, file_path):
 
     return sorted_sentences, sorted_indices, similarity_scores
 
-def heuristic_greedy(question, text, title, path):
-    sorted_sentences, sorted_indices, similarity_scores = sort_sentences_by_similarity(question, text, path)
-    sequential_greedy(question, text, title, path, sorted_idx = sorted_indices)
+def heuristic_greedy(question, text, title, result_path, embedding_path):
+    print(embedding_path)
+    print(result_path)
+    sorted_sentences, sorted_indices, similarity_scores = sort_sentences_by_similarity(question, text, embedding_path)
+    k = 100
+    top_k_idx = sorted_indices[:k]
+    sequential_greedy(question, text, title, result_path, sorted_idx = top_k_idx)
 
     
 
@@ -351,11 +355,10 @@ if __name__ == "__main__":
             path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
             if os.path.isfile(path):
                 continue
-            text = paper['text']
+            text = paper['text'][:5000]
             title = paper['title']
             print(title)
             embedding_path = folder_path + '/embeddings/' + 'doc' + str(p_id) + '_embeddings.npy'
-            sort_sentences_by_similarity(q[0], text, embedding_path)
             if strategy == 'vallina_LLM':
                 vallina_LLM(q, text, title, path)
             elif strategy == 'sequential_greedy':
@@ -363,7 +366,7 @@ if __name__ == "__main__":
             elif strategy == 'divide_and_conquer': 
                 divide_and_conquer(q, text, title, path)
             elif strategy == 'heuristic_greedy':
-                heuristic_greedy(q, text, title, path) 
+                heuristic_greedy(q, text, title, path, embedding_path) 
             #if(p_id >= doc_num):
             break
         break

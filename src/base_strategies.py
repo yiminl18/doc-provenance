@@ -98,6 +98,7 @@ def equal(res1, res2, metric = 'string'):
             return False
 
 def evaluate(answers, question, ids, sentences, context = ''):
+    ids = sorted(ids)
     if(context == ''):
         for id in ids:
             context += sentences[id]
@@ -141,7 +142,7 @@ def vallina_LLM(question, context, title, path):
     write_json_to_file(path, out)
     return out
 
-def sequential_greedy(question, context, title, path, sorted_idx = []):
+def sequential_greedy(question, context, title, path, sorted_idx = [], extra_input_tokens = 0, extra_output_tokens = 0):
     answers, input_tokens, output_tokens = QA(question,context)
     print(answers)
 
@@ -187,7 +188,7 @@ def sequential_greedy(question, context, title, path, sorted_idx = []):
             print('Sentence ',i, ' is removed!')
     provenance = []
     provenance_id = []
-    for i in range(len(sentences)):
+    for i in sorted_idx:
         if i in removed_sentences:
             continue
         provenance_id.append(i)
@@ -197,7 +198,7 @@ def sequential_greedy(question, context, title, path, sorted_idx = []):
     out['time'] = et-st
     out['provenance'] = provenance
     out['provenance_size'] = count_tokens(''.join(provenance))
-    out['tokens'] = (input_tokens, output_tokens)
+    out['tokens'] = (input_tokens + extra_input_tokens, output_tokens + extra_output_tokens)
     out['provenance_ids'] = provenance_id 
     write_json_to_file(path, out)
 
@@ -402,16 +403,37 @@ def sort_sentences_by_similarity(question, text, file_path):
 
     return sorted_sentences, sorted_indices, similarity_scores
 
+def pick_k_binary(question, text, sorted_indices):
+    answers, input_tokens, output_tokens = QA(question,text)
+    sentences = extract_sentences_from_pdf(text)
+    queue = deque()
+    queue.append(len(sorted_indices))
+    last_k = len(sorted_indices)
+    sum_input_tokens = 0
+    sum_output_tokens = 0
+
+    while queue:
+        current_k = int(queue.popleft())
+        eval_result, input_tokens, output_tokens = evaluate(answers, question, sorted_indices[:current_k], sentences)
+        sum_input_tokens += input_tokens
+        sum_output_tokens += output_tokens
+        if eval_result:
+            mid = current_k / 2
+            queue.append(mid)
+            last_k = current_k
+        else:
+            return last_k, sum_input_tokens, sum_output_tokens
+            
+    return last_k, sum_input_tokens, sum_output_tokens
+
+
 def heuristic_greedy(question, text, title, result_path, embedding_path):
     print(embedding_path)
     print(result_path)
     sorted_sentences, sorted_indices, similarity_scores = sort_sentences_by_similarity(question, text, embedding_path)
-    sentences = extract_sentences_from_pdf(text)
-    k = max(50, len(sentences)/10)
-    k = int(min(k, len(sentences)))
-    #print(sorted_indices)
-    top_k_idx = sorted_indices[:k]
-    sequential_greedy(question, text, title, result_path, sorted_idx = top_k_idx)
+    k, input_tokens, output_tokens = pick_k_binary(question, text, sorted_indices)
+    #print(k, len(sorted_indices))
+    sequential_greedy(question, text, title, result_path, sorted_idx = sorted_indices[:k], extra_input_tokens=input_tokens, extra_output_tokens=output_tokens)
 
 def test_paper_pipeline():
     data_path = parent_directory + '/data/papers.json'
@@ -428,8 +450,10 @@ def test_paper_pipeline():
         for p_id in range(len(paper_objects)):
             paper = paper_objects[p_id]
             path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
-            if os.path.isfile(path):
-                continue
+            # if os.path.isfile(path):
+            #     continue
+            # if p_id!=3 or q_id != 0:
+            #     continue
             if(p_id >= doc_num):
                 break
             text = paper['text']

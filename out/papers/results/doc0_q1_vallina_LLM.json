@@ -12,6 +12,8 @@
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc0_q1_vallina_LLM.json",
     "time": 0.8695640563964844,
+    "context_size": 5912,
+    "provenance_size": 24,
     "provenance": "Cecile Boulard  \nStefania Castellani  \nTommaso Colombino  \nAntonietta Grasso  ",
     "tokens": [
         6014,

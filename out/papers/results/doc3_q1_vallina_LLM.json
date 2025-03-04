@@ -9,6 +9,8 @@
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc3_q1_vallina_LLM.json",
     "time": 1.2522027492523193,
+    "context_size": 12329,
+    "provenance_size": 22,
     "provenance": "\"Thomas Fahrni, Michael Kuhn, Philipp Sommer, Roger Wattenhofer, and Samuel Welten\"",
     "tokens": [
         12434,

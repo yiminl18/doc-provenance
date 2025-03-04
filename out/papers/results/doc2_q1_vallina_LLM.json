@@ -11,6 +11,8 @@
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc2_q1_vallina_LLM.json",
     "time": 1.678605079650879,
+    "context_size": 13064,
+    "provenance_size": 58,
     "provenance": "Ian Li’, Anind K. Dey’, Jodi Forlizzi'”  \n'Human Computer Interaction Institute, “School of Design Carnegie Mellon University, Pittsburgh, PA 15213 ianli@cmu.edu, {anind, forlizzi}@cs.cmu.edu",
     "tokens": [
         13158,

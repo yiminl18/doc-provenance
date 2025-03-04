@@ -9,6 +9,8 @@
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc2_q2_vallina_LLM.json",
     "time": 1.215120792388916,
+    "context_size": 13064,
+    "provenance_size": 30,
     "provenance": "UbiComp'11 / Beijing, China\n\nUbiComp’11, September 17-21, 2011, Beijing, China.",
     "tokens": [
         13149,

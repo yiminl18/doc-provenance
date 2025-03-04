@@ -66,9 +66,10 @@ def QA(question, context):
 def equal(res1, res2, metric = 'string'):
     res1 = sorted(res1)
     res2 = sorted(res2)
+    print(len(res1), len(res2))
     #res1 and res2 are both list of strings 
     if(metric == 'string'):
-        if(res1 != res2):
+        if(len(res1) != len(res2)):
             return False
         res1_lower = []
         for r in res1:
@@ -106,12 +107,12 @@ def evaluate(answers, question, ids, sentences, context = ''):
     #print(context[:100])
     pred_ans, input_tokens, output_tokens = QA(question, context)
     print(pred_ans)
-    print(answers)
+    #print(answers)
     if(equal(pred_ans, answers)):
-        #print('True')
+        print('True')
         return True, input_tokens, output_tokens
     else:
-        #print('False')
+        print('False')
         return False, input_tokens, output_tokens
 
 def vallina_LLM(question, context, title, path):
@@ -450,6 +451,46 @@ def heuristic_greedy(question, text, title, result_path, embedding_path):
     write_json_to_file(result_path, out)
     return out
 
+def read_json(path):
+    with open(path, "r", encoding="utf-8") as file:
+        data = json.load(file)
+    return data
+
+def verification():
+    data_path = parent_directory + '/out/papers/results/'
+    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
+
+    doc_num = 4
+    q_num = 3
+    runs = {}
+    for d_id in range(doc_num):
+        for q_id in range(q_num):
+            #this is one run 
+            for strategy in strategies:
+                file_path = data_path + 'doc' + str(d_id) + '_q' + str(q_id) + '_' + strategy + '.json'
+                result = read_json(file_path)
+                if strategy not in runs:
+                    runs[strategy] = []
+                runs[strategy].append(result) 
+
+    for strategy in strategies:
+        accuracy = 0
+        if strategy == 'vallina_LLM':
+            for o in runs[strategy]:
+                print(o['path'])
+                answers = o['answers']
+                if isinstance(o['provenance'], list):
+                    provenance = "".join(o['provenance'])
+                else:
+                    provenance = o['provenance']
+                question = o['question']
+                print(answers, question)
+                eval, in_tokens, out_tokens = evaluate(answers, question, [],[], context=provenance)
+                
+
+        #print(strategy, accuracy, len(runs[strategy]))
+        
+
 def test_paper_pipeline():
     data_path = parent_directory + '/data/papers.json'
     folder_path = parent_directory + '/out/papers'
@@ -457,7 +498,7 @@ def test_paper_pipeline():
     sample_paper_questions = data_digestion.sample_paper_questions()
 
     strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
-    strategy = 'heuristic_greedy'
+    strategy = 'vallina_LLM'
     doc_num = 5
 
     for q_id in range(len(sample_paper_questions)):
@@ -482,6 +523,7 @@ def test_paper_pipeline():
             elif strategy == 'heuristic_greedy':
                 heuristic_greedy(q, text, title, path, embedding_path) 
             
+    
         #break
 
 def test_hotpot_pipeline():
@@ -522,4 +564,5 @@ def test_hotpot_pipeline():
 
 
 if __name__ == "__main__":
-    test_hotpot_pipeline()
+    #test_paper_pipeline()
+    verification()

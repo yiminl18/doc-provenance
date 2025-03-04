@@ -9,6 +9,7 @@
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc5_q0_vallina_LLM.json",
     "time": 1.1740789413452148,
+    "context_size": 6576,
     "provenance": "© Springer Nature Switzerland AG 2019  \nS. Bagnara et al. (Eds.): IEA 2018, AISC 822, pp. 431-440, 2019.  \nhttps://doi.org/10.1007/978-3-3 19-96077-7_46",
     "tokens": [
         6659,

@@ -450,10 +450,8 @@ def test_paper_pipeline():
         for p_id in range(len(paper_objects)):
             paper = paper_objects[p_id]
             path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
-            # if os.path.isfile(path):
-            #     continue
-            # if p_id!=3 or q_id != 0:
-            #     continue
+            if os.path.isfile(path):
+                continue
             if(p_id >= doc_num):
                 break
             text = paper['text']

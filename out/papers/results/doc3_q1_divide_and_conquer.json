@@ -7,9 +7,9 @@
     "answers": [
         "[\"Thomas Fahrni\", \"Michael Kuhn\", \"Philipp Sommer\", \"Roger Wattenhofer\", \"Samuel Welten\"]"
     ],
-    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc3_q1_divide_and_conquer.json",
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc3_q1_divide_and_conquer.json",
     "context_size": 12329,
-    "time": 1.2301650047302246,
+    "time": 1.0455560684204102,
     "tokens": [
         12347,
         26

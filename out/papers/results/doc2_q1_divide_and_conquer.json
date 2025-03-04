@@ -9,9 +9,9 @@
         "Anind K. Dey",
         "Jodi Forlizzi"
     ],
-    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc2_q1_divide_and_conquer.json",
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc2_q1_divide_and_conquer.json",
     "context_size": 13064,
-    "time": 15.346274137496948,
+    "time": 17.347920894622803,
     "tokens": [
         13082,
         15

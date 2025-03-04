@@ -5,11 +5,11 @@
         "Return only a list of strings, seperated by |"
     ],
     "answers": [
-        "[\"Maximilian Altmeyer\", \"Pascal Lessel\", \"Antonio Krüger\"]"
+        "[\"Maximilian Altmeyer\", \"Pascal Lessel\", \"Antonio Kriiger\"]"
     ],
-    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc1_q1_divide_and_conquer.json",
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc1_q1_divide_and_conquer.json",
     "context_size": 16907,
-    "time": 1.3600490093231201,
+    "time": 1.6742990016937256,
     "tokens": [
         16925,
         20

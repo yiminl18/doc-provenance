@@ -7,14 +7,20 @@
     "answers": [
         "31st European Conference on Cognitive Ergonomics (ECCE 2019)"
     ],
-    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc0_q2_divide_and_conquer.json",
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc0_q2_divide_and_conquer.json",
     "context_size": 5912,
-    "time": 11.171376705169678,
+    "time": 11.692995071411133,
     "tokens": [
         5926,
         16
     ],
-    "provenance_ids": [],
-    "provenance": [],
-    "provenance_size": 0
+    "provenance_ids": [
+        7,
+        8
+    ],
+    "provenance": [
+        "In Proceedings of 31st European Conference on Cognitive\nErgonomics (ECCE 2019), September 10-13, 2019, BELFAST, <, United\nKingdom.",
+        "ACM, New York, NY, USA, 4 pages."
+    ],
+    "provenance_size": 55
 }

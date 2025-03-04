@@ -7,9 +7,9 @@
     "answers": [
         "2015"
     ],
-    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc4_q0_divide_and_conquer.json",
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc4_q0_divide_and_conquer.json",
     "context_size": 14092,
-    "time": 58.955363750457764,
+    "time": 63.36915397644043,
     "tokens": [
         14109,
         2
@@ -22,6 +22,10 @@
         57,
         61,
         138,
+        192,
+        193,
+        194,
+        195,
         223,
         312,
         396
@@ -34,9 +38,13 @@
         "Activity trackers and mHealth devices utilize\na variety of strategies to encourage users: Klasnja et al.",
         "Another approach is\n\n636\n\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\nto utilize a combination of commercially available and\nprototype interfaces.",
         "For example,\nregarding whether her devices advanced her toward her\n\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\ngoal of increasing physical activity, P12 said, “...",
+        "Having to provide input to the device\nfrequently (such as calibrating the LumoBack posture\nsensor or entering food into a food diary connected to the\nJawbone) was also mentioned as an obstacle.",
+        "Participants\nconsidered benefits when determining how much work they\nwere willing to do; P5 questioned the value of smart\ndevices, “... years ago, you [wore] a watch that you\n[wouldn’t] have to charge for a whole year.",
+        "We are going\nback.",
+        "It's okay [with the phone] because it replaces [your]\nlaptop partially... What is that on the wearable that would\noffset that inconvenience of recharging every few days...?”\nSome participants turned off the “smart” functions to\nreduce the need to charge devices.",
         "Tight\n\n640\n\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\ndevices were perceived as even more uncomfortable when\nbands were made of rubber and participants sweat in them.",
         "The\ndevices had varying functionalities and affordances and\ntherefore impacted the experiences of participants\n\n642\n\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\ndifferently.",
         "While not appropriate for all users and all\n\n644\n\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\ndevices, short-term use is appropriate for those interested in\ndevices to satisfy curiosity as well as those who wish to\nalter routines or behaviors."
     ],
-    "provenance_size": 467
+    "provenance_size": 624
 }

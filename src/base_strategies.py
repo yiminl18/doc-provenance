@@ -408,7 +408,8 @@ def heuristic_greedy(question, text, title, result_path, embedding_path):
     sorted_sentences, sorted_indices, similarity_scores = sort_sentences_by_similarity(question, text, embedding_path)
     sentences = extract_sentences_from_pdf(text)
     k = max(50, len(sentences)/10)
-    k = min(k, len(sentences))
+    k = int(min(k, len(sentences)))
+    #print(sorted_indices)
     top_k_idx = sorted_indices[:k]
     sequential_greedy(question, text, title, result_path, sorted_idx = top_k_idx)
 
@@ -420,7 +421,7 @@ def test_paper_pipeline():
 
     strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
     strategy = 'heuristic_greedy'
-    doc_num = 4
+    doc_num = 5
 
     for q_id in range(len(sample_paper_questions)):
         q = sample_paper_questions[q_id]
@@ -429,7 +430,9 @@ def test_paper_pipeline():
             path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
             if os.path.isfile(path):
                 continue
-            text = paper['text'][:5000]
+            if(p_id >= doc_num):
+                break
+            text = paper['text']
             title = paper['title']
             print(title)
             embedding_path = folder_path + '/embeddings/' + 'doc' + str(p_id) + '_embeddings.npy'
@@ -441,9 +444,8 @@ def test_paper_pipeline():
                 divide_and_conquer(q, text, title, path)
             elif strategy == 'heuristic_greedy':
                 heuristic_greedy(q, text, title, path, embedding_path) 
-            #if(p_id >= doc_num):
-            break
-        break
+            
+        #break
 
 def test_hotpot_pipeline():
     data_path = parent_directory + '/data/hotpotQA_fullwiki.json'
@@ -483,4 +485,4 @@ def test_hotpot_pipeline():
 
 
 if __name__ == "__main__":
-    test_hotpot_pipeline()
+    test_paper_pipeline()

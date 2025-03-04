@@ -7,9 +7,9 @@
     "answers": [
         "2019"
     ],
-    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/doc5_q0_divide_and_conquer.json",
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc5_q0_divide_and_conquer.json",
     "context_size": 6576,
-    "time": 12.055732011795044,
+    "time": 13.741794109344482,
     "tokens": [
         6593,
         2

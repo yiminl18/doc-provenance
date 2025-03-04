@@ -1,0 +1,19 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "The \"Starbound\" trilogy by Amie Kaufman and Meagan Spooner."
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q3_vallina_LLM.json",
+    "context_size": 1426,
+    "time": 0.6789569854736328,
+    "provenance": "The context provided does not contain any relevant sentences that support the answer regarding \"The Starbound trilogy by Amie Kaufman and Meagan Spooner.\" Therefore, there are no sentences to extract.",
+    "provenance_size": 39,
+    "tokens": [
+        1544,
+        39
+    ]
+}

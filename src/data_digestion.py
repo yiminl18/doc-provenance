@@ -32,7 +32,7 @@ def digest_paper_dataset(file_path):
         paper_data.append(o)
     return paper_data
 
-def digest_hotpotQA_dataset(file_path):
+def digest_hotpotQA_dataset_raw(file_path):
     hotpots = []
     with open(file_path, "r", encoding="utf-8") as file:
         data = json.load(file)  # Load entire JSON file
@@ -45,10 +45,16 @@ def digest_hotpotQA_dataset(file_path):
             content = ''.join(c[1])
             context += content 
         hotpot['question'] = entry['question']
+        hotpot['instruction'] = entry['instruction'] 
         hotpot['answer'] = entry['answer']
         hotpot['document_name'] = entry['document_name']
         hotpot['context'] = context
         hotpots.append(hotpot)
+    return hotpots 
+
+def digest_hotpotQA_dataset(file_path):
+    with open(file_path, "r", encoding="utf-8") as file:
+        hotpots = json.load(file)  # Load entire JSON file
     return hotpots 
 
 def add_instructions(hotpots):
@@ -85,9 +91,10 @@ if __name__ == "__main__":
     #     #print(o['text'][:10])
     #     for i in range(3):
     #         print(o['question_answer'][i])
-    hotpot_data_path = parent_directory + '/data/hotpotQA_hotpot_dev_fullwiki_v1.json'
+    hotpot_data_path = parent_directory + '/data/hotpotQA_fullwiki.json'
     hotpots = digest_hotpotQA_dataset(hotpot_data_path)
-    add_instructions(hotpots)
+    print(hotpots[0])
+    
 
         
 

@@ -1,0 +1,19 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "The director of the romantic comedy \"Big Stone Gap\" is based in what New York city?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "New York City"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q5_vallina_LLM.json",
+    "context_size": 1270,
+    "time": 5.359046936035156,
+    "provenance": "Big Stone Gap is a 2014 American drama romantic comedy film written and directed by Adriana Trigiani and produced by Donna Gigliotti for Altar Identity Studios, a subsidiary of Media Society. The film had its world premiere at the Virginia Film Festival on November 6, 2014. I Love NY, also known as I Love New Year, is an Indian romantic comedy film directed by Radhika Rao and Vinay Sapru starring Sunny Deol and Kangana Ranaut in lead roles. The film was extensively shot in Mumbai, New York City and Bangkok. Just Another Romantic Wrestling Comedy is a 2006 film starring April Hunter and Joanie Laurer. This Romantic comedy film was premiered at New Jersey and New York City on December 1, 2006 and was released on DVD in the United States and the United Kingdom on April 17, 2007. Hamish & Andy's Gap Year is a Logie Award winning comedy series following Hamish Blake and Andy Lee, a pair of Australian comedians, on their trips to various international locations. The first season saw the boys visiting America for ten episodes and broadcast their show weekly from New York City. Sex and the City (advertised as Sex and the City: The Movie) is a 2008 American romantic comedy film written and directed by Michael Patrick King in his feature film directorial debut, and a sequel to the 1998-2004 HBO comedy series of the same name (itself based on the book of the same name by Candace Bushnell) about four female friends: Carrie Bradshaw (Sarah Jessica Parker), Samantha Jones (Kim Cattrall), Charlotte York Goldenblatt (Kristin Davis), and Miranda Hobbes (Cynthia Nixon), dealing with their lives as single women in New York City. Nola is a 2003 American romantic comedy film written and directed by Alan Hruska. It depicts the struggle of a young woman trying to survive in New York City while looking for her birth father. The New York Society of Model Engineers (NYSME) was originally incorporated in 1926 in New York City.",
+    "provenance_size": 430,
+    "tokens": [
+        1364,
+        430
+    ]
+}

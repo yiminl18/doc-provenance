@@ -1,0 +1,50 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "The \"Starbound\" trilogy by Amie Kaufman and Meagan Spooner."
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q2_sequential_greedy.json",
+    "context_size": 1426,
+    "time": 24.95549702644348,
+    "provenance": [
+        "Animorphs is a science fantasy series of young adult books written by Katherine Applegate and her husband Michael Grant, writing together under the name K. A. Applegate, and published by Scholastic.",
+        "Walter Gillings was editor for the first two issues, and was then replaced by John Carnell, the editor of \"New Worlds\", as a cost-saving measure.",
+        "The title was changed again to \"SF Impulse\" for the last few issues.",
+        "The books have been translated into French, German, Spanish, Finnish, Chinese, Japanese, Portuguese, Italian, Romanian and Dutch.",
+        "Interior illustrations are by Ted Dewan.The Kazon are a fictional alien race in the \"Star Trek\" franchise.",
+        "The award is presented along with the Nebula Awards and follows the same rules for nominations and voting; as the awards are separate, works may be simultaneously nominated for both the Andre Norton award and a Nebula Award.Etiquette & Espionage is a young adult steampunk novel by Gail Carriger.",
+        "It is her first young adult novel, and is set in the same universe as her bestselling Parasol Protectorate adult series.Dozens of Square Enix companion books have been produced since 1998, when video game developer Square began to produce books that focused on artwork, developer interviews, and background information on the fictional worlds and characters in its games rather than on gameplay details.",
+        "The first series of these books was the \"Perfect Works\" series, written and published by Square subsidiary DigiCube.",
+        "They produced three books between 1998 and 1999 before the line was stopped in favor of the \"Ultimania\" (アルティマニア , Arutimania ) series, a portmanteau of ultimate and mania.",
+        "Square merged with video game publisher Enix on April 1, 2003 to form Square Enix, which resumed publication of the companion books.",
+        "\"Left Behind: The Kids (stylized as LEFT BEHIND >THE KIDS<)\" is a series written by Jerry B. Jenkins, Tim LaHaye, and Chris Fabry.",
+        "The series consists of 40 short novels aimed primarily at the young adult market based on the adult series Left Behind also written by Jerry B. Jenkins.",
+        "Like the adult series, the books were published by Tyndale House Publishing, and released over the 7 year period of 1997-2004.",
+        "The series has sold over 11 million copies worldwide."
+    ],
+    "provenance_size": 482,
+    "tokens": [
+        35403,
+        598
+    ],
+    "provenance_ids": [
+        0,
+        3,
+        6,
+        10,
+        11,
+        28,
+        29,
+        30,
+        31,
+        34,
+        35,
+        36,
+        38,
+        39
+    ]
+}

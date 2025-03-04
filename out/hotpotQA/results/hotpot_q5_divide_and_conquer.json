@@ -1,0 +1,32 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "2014 S/S is the debut album of a South Korean boy group that was formed by who?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "FNC Entertainment"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q5_divide_and_conquer.json",
+    "context_size": 1354,
+    "time": 3.4556870460510254,
+    "tokens": [
+        1384,
+        3
+    ],
+    "provenance_ids": [
+        0,
+        1,
+        2,
+        3,
+        4
+    ],
+    "provenance": [
+        "SF9 (Korean: 에스에프나인 ; shortened from Sensational Feeling 9) is a South Korean boy group formed by FNC Entertainment.",
+        "SF9 is the company's first dance boy group to ever debut.",
+        "SF9 debuted on October 5, 2016 with the release of their first single album \"Feeling Sensation\".Cha Sun-woo (born September 5, 1992), better known by his stage name Baro, is a South Korean singer, rapper, and actor.",
+        "He is the main rapper of South Korean boy group B1A4 and debuted alongside with the group on the stage of MBC \"Show!",
+        "Music Core\" on April 23, 2011."
+    ],
+    "provenance_size": 144
+}

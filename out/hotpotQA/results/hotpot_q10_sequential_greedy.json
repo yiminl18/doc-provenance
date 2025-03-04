@@ -1,0 +1,24 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "What is the name of the fight song of the university whose main campus is in Lawrence, Kansas and whose branch campuses are in the Kansas City metropolitan area?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "\"Rock Chalk, Jayhawk\""
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q10_sequential_greedy.json",
+    "context_size": 1585,
+    "time": 20.269283771514893,
+    "provenance": [
+        "Alongside Kansas City, the area includes a number of other cities and suburbs, the largest being Overland Park, Kansas; Kansas City, Kansas; Olathe, Kansas; and Independence, Missouri; each over 100,000 in population."
+    ],
+    "provenance_size": 50,
+    "tokens": [
+        31796,
+        286
+    ],
+    "provenance_ids": [
+        9
+    ]
+}

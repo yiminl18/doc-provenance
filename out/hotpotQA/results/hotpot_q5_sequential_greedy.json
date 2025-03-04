@@ -1,0 +1,26 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "2014 S/S is the debut album of a South Korean boy group that was formed by who?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "FNC Entertainment"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q5_sequential_greedy.json",
+    "context_size": 1354,
+    "time": 23.354149103164673,
+    "provenance": [
+        "SF9 is the company's first dance boy group to ever debut.",
+        "Also following the success of the lead single it was also nominated for Song of the Year at the 2012 Mnet Asian Music Awards.History (Korean: 히스토리 ) was a South Korean boy group formed by LOEN Entertainment in 2013."
+    ],
+    "provenance_size": 67,
+    "tokens": [
+        32338,
+        146
+    ],
+    "provenance_ids": [
+        1,
+        14
+    ]
+}

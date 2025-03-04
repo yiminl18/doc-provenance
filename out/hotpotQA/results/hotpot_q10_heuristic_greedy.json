@@ -1,0 +1,30 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "What is the name of the fight song of the university whose main campus is in Lawrence, Kansas and whose branch campuses are in the Kansas City metropolitan area?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "\"Rock Chalk, Jayhawk\""
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q10_heuristic_greedy.json",
+    "context_size": 1585,
+    "time": 23.15229296684265,
+    "provenance": [
+        "The project's cost was $43 million.",
+        "Of that amount, the Federal Highway Administration (FHWA) contributed 80-90 percent of the project cost.",
+        "), and the system also has cameras on those billboards to automatically detect traffic problems.",
+        "Since the project's beginning, it has expanded greatly, and will continue to expand."
+    ],
+    "provenance_size": 62,
+    "tokens": [
+        29522,
+        283
+    ],
+    "provenance_ids": [
+        31,
+        32,
+        35,
+        38
+    ]
+}

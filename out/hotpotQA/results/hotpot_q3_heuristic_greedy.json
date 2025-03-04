@@ -1,0 +1,26 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "Are the Laleli Mosque and Esma Sultan Mansion located in the same neighborhood?",
+        "Only return yes or no. Do not add explanations."
+    ],
+    "answers": [
+        "No."
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q3_heuristic_greedy.json",
+    "context_size": 861,
+    "time": 12.672338962554932,
+    "provenance": [
+        "She was the adoptive mother of Bezmiâlem Sultan and Rahime Perestu Sultan.The Laleli Mosque (Turkish: \"Laleli Camii, or Tulip Mosque\" ) is an 18th-century Ottoman imperial mosque located in Laleli, Fatih, Istanbul, Turkey.Gevheri Kadın (8 July 1856 – 6 September 1884) was the fifth wife of 32nd Ottoman Sultan Abdülaziz.",
+        "It sits next to the Hagia Sophia, another popular tourist site.Esma Sultan (21 March 1873 – 7 May 1899) was an Ottoman princess, the daughter of Sultan Abdülaziz and his wife Gevheri Kadın, herself the daughter of Salih Bey Svatnba."
+    ],
+    "provenance_size": 156,
+    "tokens": [
+        9375,
+        37
+    ],
+    "provenance_ids": [
+        1,
+        16
+    ]
+}

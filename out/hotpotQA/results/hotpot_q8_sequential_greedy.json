@@ -1,0 +1,42 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "Who is older, Annie Morton or Terry Richardson?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "Terry Richardson"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q8_sequential_greedy.json",
+    "context_size": 1293,
+    "time": 17.096391916275024,
+    "provenance": [
+        "Gumbo is the fourth and first self-released studio album by American singer-songwriter PJ Morton.",
+        "It was released on April 14, 2017, by Morton Records, as the follow-up to his third studio album \"New Orleans\" (2013).",
+        "In recent editions the book had features on artists such as Anton Corbijn, Larry Sultan, Matthew Barney, Terry Richardson, Ron Mueck, Alberto Garcia-Alix, Peter Lindbergh, Albert Watson, Desiree Dolron, Bettina Rheims, Diana Scheunemann, Timothy Greenfield-Sanders and Andres Serrano.James Joseph Richardson (born December 12, 1935) is an African-American man who was wrongly convicted in 1968 for the October 1967 murders of his seven children.",
+        "As a result of the United States Supreme Court's 1972 \"Furman v. Georgia\" decision finding the death penalty unconstitutional, his sentence was reduced to life imprisonment; he was then exonerated in 1989, after 21 years, when his case was revisited by appointed Miami-Dade County prosecutor Janet Reno.",
+        "The former Club Kid has appeared in advertising for numerous companies.",
+        "In addition to famous personalities, the publication also featured a mix of interviews with not so-famous New York personalities such as Queen Itchie or Ducky Doolittle.Madonna is a biography by English author Andrew Morton, chronicling the life of American recording artist Madonna.",
+        "The release was announced in April 2001 by St. Martin's Press.",
+        "President and publisher Sally Richardson described the biography to contain details about Madonna's ambitions, her relationships and her lifestyle.Annie Morton (born October 8, 1970) is an American model born in Pennsylvania.",
+        "She has appeared on the covers of \"British Vogue\", \"ID\", \"Marie Claire\", and other magazines.",
+        "She has been photographed by Helmut Newton; Peter Lindbergh; Annie Leibovitz; Richard Avedon; Juergen Teller; Paul Jasmin, Mary Ellen Mark and Terry Richardson, and modeled for Donna Karan, Givenchy, Guerlain, Chanel, \"Harper's Bazaar\", \"Sports Illustrated\" and Victoria's Secret."
+    ],
+    "provenance_size": 434,
+    "tokens": [
+        26288,
+        108
+    ],
+    "provenance_ids": [
+        0,
+        1,
+        11,
+        15,
+        17,
+        24,
+        27,
+        28,
+        29,
+        30
+    ]
+}

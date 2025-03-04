@@ -1,0 +1,56 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "The \"Starbound\" trilogy by Amie Kaufman and Meagan Spooner."
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q2_heuristic_greedy.json",
+    "context_size": 1426,
+    "time": 25.204934120178223,
+    "provenance": [
+        "Animorphs is a science fantasy series of young adult books written by Katherine Applegate and her husband Michael Grant, writing together under the name K. A. Applegate, and published by Scholastic.",
+        "It is told in first person, with all six main characters taking turns narrating the books through their own perspectives.",
+        "Carnell edited both magazines until Nova went out of business in early 1964.",
+        "The three books are \"The Divide\" (2002), \"Back to The Divide\" (2005), and \"Jinx on The Divide\" (2006).",
+        "The books have been translated into French, German, Spanish, Finnish, Chinese, Japanese, Portuguese, Italian, Romanian and Dutch.",
+        "Interior illustrations are by Ted Dewan.The Kazon are a fictional alien race in the \"Star Trek\" franchise.",
+        "Developed by \"\" series' co-creators Rick Berman, Michael Piller, and Jeri Taylor, the Kazon serve as the primary antagonists during the show's first two seasons.",
+        "They are represented as a nomadic species divided into eighteen separate sects, and characterized by their reliance on violence.",
+        "It follows Sierra Santiago, an Afro-Boricua teenager living in Brooklyn.",
+        "She is the granddaughter of a \"shadowshaper\", or a person who infuses art with ancestral spirits.",
+        "It is named to honor prolific science fiction and fantasy author Andre Norton (1912–2005), and it was established by then SFWA president Catherine Asaro and the SFWA Young Adult Fiction committee and announced on February 20, 2005.",
+        "There is no limit on word count.",
+        "It is her first young adult novel, and is set in the same universe as her bestselling Parasol Protectorate adult series.Dozens of Square Enix companion books have been produced since 1998, when video game developer Square began to produce books that focused on artwork, developer interviews, and background information on the fictional worlds and characters in its games rather than on gameplay details.",
+        "They produced three books between 1998 and 1999 before the line was stopped in favor of the \"Ultimania\" (アルティマニア , Arutimania ) series, a portmanteau of ultimate and mania.",
+        "This series of books is written by Studio BentStuff, which had previously written game guides for Square for \"Final Fantasy VII\".",
+        "\"Left Behind: The Kids (stylized as LEFT BEHIND >THE KIDS<)\" is a series written by Jerry B. Jenkins, Tim LaHaye, and Chris Fabry.",
+        "Like the adult series, the books were published by Tyndale House Publishing, and released over the 7 year period of 1997-2004."
+    ],
+    "provenance_size": 531,
+    "tokens": [
+        34487,
+        652
+    ],
+    "provenance_ids": [
+        0,
+        1,
+        4,
+        8,
+        10,
+        11,
+        12,
+        13,
+        22,
+        23,
+        25,
+        27,
+        29,
+        31,
+        32,
+        35,
+        38
+    ]
+}

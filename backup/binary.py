@@ -36,3 +36,46 @@
     #         return left_sub, sum_input_tokens, sum_output_tokens
     #     else:
     #         return right_sub, sum_input_tokens, sum_output_tokens
+
+
+def divide_and_conquer_core(answers, question, ids, sentences):
+    
+    """
+    Attempt to find a smaller subset of `sentences` that returns True for H,
+    using a simple divide-and-conquer approach.
+    
+    Returns a (not guaranteed fully minimal) subset for which H is still True.
+    """
+    global binary_out_ids,sum_input_tokens,sum_output_tokens
+    # If the entire set somehow doesn't trigger True, nothing to return
+    eval_result, input_token, output_token = evaluate(answers, question, ids, sentences)
+    # Start accumulating total token usage
+    sum_input_tokens += input_token
+    sum_output_tokens += output_token
+    
+    if not eval_result:
+        return False 
+    else:
+        # If there's only 0 or 1 sentence, we can't reduce further
+        if len(ids) <= 1:
+            binary_out_ids += ids
+            return True 
+    
+    # Split into two halves
+    mid = len(ids) // 2
+    left = ids[:mid]
+    right = ids[mid:]
+
+    left_eval_result, left_input_token, left_output_token = evaluate(answers, question, left, sentences)
+    sum_input_tokens += left_input_token
+    sum_output_tokens += left_output_token
+    right_eval_result, right_input_token, right_output_token = evaluate(answers, question, left, sentences)
+    sum_input_tokens += right_input_token
+    sum_output_tokens += right_output_token
+
+    if not left_eval_result and not right_eval_result and eval_result:
+        binary_out_ids += ids
+        return True 
+    
+    divide_and_conquer_core(answers, question, left, sentences)
+    divide_and_conquer_core(answers, question, right, sentences)

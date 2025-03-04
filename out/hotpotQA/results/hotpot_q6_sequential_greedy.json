@@ -1,0 +1,24 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "Who was known by his stage name Aladin and helped organizations improve their performance as a consultant?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "Eenasul Fateh"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q6_sequential_greedy.json",
+    "context_size": 1739,
+    "time": 24.05543279647827,
+    "provenance": [
+        "In 1996, he won a Grammy Award for Best Rap Performance by a Duo or Group, for \"I'll Be There for You/You're All I Need to Get By\", with American R&B singer-songwriter Mary J. Blige.Eenasul Fateh (Bengali: ঈনাসুল ফাতেহ ; born 3 April 1959), also known by his stage name Aladin, is a Bangladeshi-British cultural practitioner, magician, live artist and former international management consultant.Christopher Nicholas Sarantakos (born December 19, 1967), known by the stage name Criss Angel, is an American magician, illusionist and musician."
+    ],
+    "provenance_size": 139,
+    "tokens": [
+        41230,
+        212
+    ],
+    "provenance_ids": [
+        28
+    ]
+}

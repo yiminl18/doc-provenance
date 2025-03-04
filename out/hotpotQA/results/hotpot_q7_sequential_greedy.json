@@ -1,0 +1,26 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "The arena where the Lewiston Maineiacs played their home games can seat how many people?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "3,500"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q7_sequential_greedy.json",
+    "context_size": 2763,
+    "time": 54.59775996208191,
+    "provenance": [
+        "The team played its home games at the Androscoggin Bank Colisée.",
+        "When Boston University left the America East Conference for the Patriot League in July 2013, they announced that all home men's basketball conference games would be played at Agganis Arena, with the non-conference games to be played at Case.The Billings Bulls were a junior ice hockey organization based in Billings, Montana."
+    ],
+    "provenance_size": 78,
+    "tokens": [
+        92956,
+        220
+    ],
+    "provenance_ids": [
+        3,
+        65
+    ]
+}

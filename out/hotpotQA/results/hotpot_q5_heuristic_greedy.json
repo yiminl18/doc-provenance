@@ -1,0 +1,30 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "2014 S/S is the debut album of a South Korean boy group that was formed by who?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "FNC Entertainment"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q5_heuristic_greedy.json",
+    "context_size": 1354,
+    "time": 19.551681995391846,
+    "provenance": [
+        "SF9 (Korean: 에스에프나인 ; shortened from Sensational Feeling 9) is a South Korean boy group formed by FNC Entertainment.",
+        "SF9 is the company's first dance boy group to ever debut.",
+        "\"Lucifer\" also won the Disk Bonsang Award at the 25th Golden Disk Awards as well as the Popularity Award.",
+        "the Ballad."
+    ],
+    "provenance_size": 75,
+    "tokens": [
+        30477,
+        149
+    ],
+    "provenance_ids": [
+        0,
+        1,
+        12,
+        27
+    ]
+}

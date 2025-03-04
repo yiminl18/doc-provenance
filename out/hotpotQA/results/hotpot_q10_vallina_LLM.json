@@ -1,0 +1,19 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "Are Local H and For Against both from the United States?",
+        "Only return yes or no. Do not add explanations."
+    ],
+    "answers": [
+        "Yes"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q10_vallina_LLM.json",
+    "context_size": 1484,
+    "time": 2.045095205307007,
+    "provenance": "1. \"Ophur was a rock band from the Chicago suburbs in DuPage County.\"\n2. \"Suffrajett is a United States rock band from New York City, currently based in Chicago, Illinois.\"\n3. \"Hallelujah! I'm A Bum is the seventh studio album by Chicago-based rock band Local H.\"\n4. \"The E.R. Hays House, also known as Bybee & Davis Funeral Home, is a historic building located in Knoxville, Iowa, United States.\"\n5. \"The Cresco Opera House, also known as the Cresco Theater, is a historic building located in Cresco, Iowa, United States.\"\n6. \"The Wilford H. Fawcett House is a house in Breezy Point, Minnesota, United States, listed on the National Register of Historic Places.\"\n7. \"The William H. Cook Water Tank House is a water tank house located southeast of Jerome, Idaho, United States.\"\n8. \"Amherst ( ) is a town in Hampshire County, Massachusetts, United States, in the Connecticut River valley.\"",
+    "provenance_size": 218,
+    "tokens": [
+        1569,
+        218
+    ]
+}

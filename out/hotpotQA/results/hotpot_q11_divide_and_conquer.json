@@ -1,0 +1,24 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "What screenwriter with credits for \"Evolution\" co-wrote a film starring Nicolas Cage and Téa Leoni?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "David Diamond"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q11_divide_and_conquer.json",
+    "context_size": 1114,
+    "time": 3.9205331802368164,
+    "tokens": [
+        1147,
+        2
+    ],
+    "provenance_ids": [
+        9
+    ],
+    "provenance": [
+        "It is based on the novel with the same name written by Ennio Flaiano.The Family Man is a 2000 American romantic comedy-drama film directed by Brett Ratner, written by David Diamond and David Weissman, and starring Nicolas Cage and Téa Leoni."
+    ],
+    "provenance_size": 55
+}

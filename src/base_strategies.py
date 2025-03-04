@@ -8,6 +8,8 @@ import pandas as pd
 from openai import OpenAI
 client = OpenAI()
 embedding_model = "text-embedding-3-small"
+from collections import deque
+
 nltk.download("punkt")
 
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
@@ -102,8 +104,8 @@ def evaluate(answers, question, ids, sentences, context = ''):
     #print(count_tokens(context))
     #print(context[:100])
     pred_ans, input_tokens, output_tokens = QA(question, context)
-    #print(pred_ans)
-    #print(answers)
+    print(pred_ans)
+    print(answers)
     if(equal(pred_ans, answers)):
         #print('True')
         return True, input_tokens, output_tokens
@@ -141,7 +143,7 @@ def vallina_LLM(question, context, title, path):
 
 def sequential_greedy(question, context, title, path, sorted_idx = []):
     answers, input_tokens, output_tokens = QA(question,context)
-    #print(answers)
+    print(answers)
 
     out = {}
     out['title'] = title
@@ -158,21 +160,26 @@ def sequential_greedy(question, context, title, path, sorted_idx = []):
     input_tokens = 0
     output_tokens = 0
 
+    #print(len(sentences))
     if len(sorted_idx) == 0:
-        sorted_idx = list(enumerate(sentences))
+        sorted_idx = list(range(len(sentences)))
+
+    #print(sorted_idx)
 
     for i in sorted_idx:
-        print('Iterating sentence ',i, len(sentences))
+        print('Iterating sentence ',i, len(sorted_idx))
         #print(sentences[i])
         remaining_sentences_id = []
-        for j in range(len(sentences)):
+        for j in sorted_idx:
             if j in removed_sentences:
                 continue
             if i == j:
                 continue
             remaining_sentences_id.append(j)
+
+        sorted_remaining_sentences_id = sorted(remaining_sentences_id)
         
-        eval_result, input_token, output_token = evaluate(answers, question, remaining_sentences_id, sentences)
+        eval_result, input_token, output_token = evaluate(answers, question, sorted_remaining_sentences_id, sentences)
         input_tokens += input_token
         output_tokens += output_token
         if eval_result == True:#if removing this sentence does not change the final answers, then this sentence can be removed 
@@ -220,10 +227,10 @@ def divide_and_conquer(question, text, title, path):
     sentences = extract_sentences_from_pdf(text)
     for i in range(len(sentences)):
         ids.append(i)
-    divide_and_conquer_core(answers, question, ids, sentences)
+    divide_and_conquer_iterative_with_cache(answers, question, ids, sentences)
     binary_out_ids = list(set(binary_out_ids))
     binary_out_ids = sorted(binary_out_ids)
-    print(binary_out_ids)
+    #print(binary_out_ids)
     et = time.time()
     out['time'] = et-st
     out['tokens'] = (input_tokens, output_tokens)
@@ -236,37 +243,104 @@ def divide_and_conquer(question, text, title, path):
     write_json_to_file(path, out)
 
 
-def divide_and_conquer_core(answers, question, ids, sentences):
-    
+
+
+def divide_and_conquer_iterative_with_cache(answers, question, ids, sentences):
     """
     Attempt to find a smaller subset of `sentences` that returns True for H,
-    using a simple divide-and-conquer approach.
+    using a divide-and-conquer approach but in a non-recursive (queue-based) way.
+    Adds a caching mechanism to avoid re-evaluating the same subsets.
     
-    Returns a (not guaranteed fully minimal) subset for which H is still True.
+    Returns:
+        True if the entire input `ids` subset is True under `evaluate`,
+        False otherwise.
+    
+    Side-effects:
+        - Appends to the global list `binary_out_ids` those IDs that
+          we deem necessary.
+        - Accumulates token usage in `sum_input_tokens` and `sum_output_tokens`.
     """
-    global binary_out_ids,sum_input_tokens,sum_output_tokens
-    # If the entire set somehow doesn't trigger True, nothing to return
-    eval_result, input_token, output_token = evaluate(answers, question, ids, sentences)
-    # Start accumulating total token usage
-    sum_input_tokens += input_token
-    sum_output_tokens += output_token
+    global binary_out_ids, sum_input_tokens, sum_output_tokens
     
-    if not eval_result:
-        return 
-    else:
-        # If there's only 0 or 1 sentence, we can't reduce further
-        if len(ids) <= 1:
-            binary_out_ids += ids
-            return 
+    # A dictionary to cache evaluation results: { (ids_as_tuple): (eval_result, input_tokens, output_tokens) }
+    eval_cache = {}
     
-    # Split into two halves
-    mid = len(ids) // 2
-    left = ids[:mid]
-    right = ids[mid:]
+    def is_cached(sub_ids):
+        """
+        A helper function to wrap 'evaluate', storing and retrieving results from 'eval_cache'.
+        """
+        # Convert the list of IDs to a tuple so it can be used as a dictionary key
+        key = tuple(sub_ids)
+        
+        # Return cached result if we already have it
+        if key in eval_cache:
+            return eval_cache[key]
+        
+        return 'NULL'
+    
+    def set_cached(sub_ids, result):
+        key = tuple(sub_ids)
+        eval_cache[key] = result 
 
-    divide_and_conquer_core(answers, question, left, sentences)
-    divide_and_conquer_core(answers, question, right, sentences)
-    
+    # Use a queue to perform an iterative, divide-and-conquer approach
+    queue = deque()
+    queue.append(ids)
+
+    while queue:
+        current_ids = queue.popleft()
+
+        # Evaluate the entire set once, storing the result
+        if is_cached(current_ids) == 'NULL':
+            eval_result, input_token, output_token = evaluate(answers, question, current_ids, sentences)
+            sum_input_tokens += input_token
+            sum_output_tokens += output_token
+            set_cached(current_ids, eval_result)
+        else:
+            eval_result = is_cached(current_ids)
+
+        print(current_ids, eval_result)
+        # If the entire set doesn't yield True, no need to proceed
+        if not eval_result:
+            continue
+        if eval_result and len(current_ids) <= 1:
+            binary_out_ids += current_ids
+            continue
+
+        # Split the current subset into two halves
+        mid = len(current_ids) // 2
+        left = current_ids[:mid]
+        right = current_ids[mid:]
+
+        # Evaluate left and right subsets (using cache)
+        if is_cached(left) == 'NULL':
+            eval_result_left, input_token_left, output_token_left = evaluate(answers, question, left, sentences)
+            sum_input_tokens += input_token_left
+            sum_output_tokens += output_token_left
+            set_cached(left, eval_result_left)
+        else:
+            eval_result_left = is_cached(left)
+
+        if is_cached(right) == 'NULL':
+            eval_result_right, input_token_right, output_token_right = evaluate(answers, question, right, sentences)
+            sum_input_tokens += input_token_right
+            sum_output_tokens += output_token_right
+            set_cached(right, eval_result_right)
+        else:
+            eval_result_right = is_cached(right)
+
+        # If both halves fail individually (False) but the entire set was True,
+        # we consider the whole subset as necessary and skip further splitting
+        if (not eval_result_left) and (not eval_result_right) and eval_result:
+            binary_out_ids += current_ids
+            continue
+        
+        if(eval_result_left):
+            queue.append(left)
+        if(eval_result_right):
+            queue.append(right)
+
+
+
 def cosine_sim(vec1, vec2):
     return cosine_similarity([vec1], [vec2])[0][0]
 
@@ -332,13 +406,13 @@ def heuristic_greedy(question, text, title, result_path, embedding_path):
     print(embedding_path)
     print(result_path)
     sorted_sentences, sorted_indices, similarity_scores = sort_sentences_by_similarity(question, text, embedding_path)
-    k = 100
+    sentences = extract_sentences_from_pdf(text)
+    k = max(50, len(sentences)/10)
+    k = min(k, len(sentences))
     top_k_idx = sorted_indices[:k]
     sequential_greedy(question, text, title, result_path, sorted_idx = top_k_idx)
 
-    
-
-if __name__ == "__main__":
+def test_paper_pipeline():
     data_path = parent_directory + '/data/papers.json'
     folder_path = parent_directory + '/out/papers'
     paper_objects = data_digestion.digest_paper_dataset(data_path)
@@ -370,3 +444,43 @@ if __name__ == "__main__":
             #if(p_id >= doc_num):
             break
         break
+
+def test_hotpot_pipeline():
+    data_path = parent_directory + '/data/hotpotQA_fullwiki.json'
+    folder_path = parent_directory + '/out/hotpotQA'
+    hotpot_objects = data_digestion.digest_hotpotQA_dataset(data_path)
+
+    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
+    strategy = 'heuristic_greedy'
+    num_of_case = 10
+
+    i = -1
+    for e in hotpot_objects:
+        i += 1
+        question = e['question']
+        instruction = e['instruction']
+        q = (question, instruction)
+        text = e['context']
+        title = e['document_name']
+        path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + '.json'
+        if not os.path.exists(folder_path + '/results'):
+            os.makedirs(folder_path + '/results')
+        if os.path.isfile(path):
+            continue
+        print(title)
+        embedding_path = folder_path + '/embeddings/' + 'hotpot' + '_q' + str(i) + '_embeddings.npy'
+        if strategy == 'vallina_LLM':
+            vallina_LLM(q, text, title, path)
+        elif strategy == 'sequential_greedy':
+            sequential_greedy(q, text, title, path) 
+        elif strategy == 'divide_and_conquer': 
+            divide_and_conquer(q, text, title, path)
+        elif strategy == 'heuristic_greedy':
+            heuristic_greedy(q, text, title, path, embedding_path) 
+        #break
+        if(i > num_of_case):
+            break
+
+
+if __name__ == "__main__":
+    test_hotpot_pipeline()

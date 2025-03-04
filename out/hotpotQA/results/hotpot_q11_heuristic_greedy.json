@@ -7,18 +7,18 @@
     "answers": [
         "David Diamond"
     ],
-    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q11_heuristic_greedy.json",
     "context_size": 1114,
-    "time": 15.893775939941406,
     "provenance": [
         "It is based on the novel with the same name written by Ennio Flaiano.The Family Man is a 2000 American romantic comedy-drama film directed by Brett Ratner, written by David Diamond and David Weissman, and starring Nicolas Cage and Téa Leoni."
     ],
     "provenance_size": 55,
     "tokens": [
-        17962,
-        65
+        2730,
+        21
     ],
     "provenance_ids": [
         9
-    ]
+    ],
+    "time": 4.916366815567017,
+    "k": 4
 }

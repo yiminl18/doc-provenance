@@ -142,18 +142,25 @@ def vallina_LLM(question, context, title, path):
     write_json_to_file(path, out)
     return out
 
-def sequential_greedy(question, context, title, path, sorted_idx = [], extra_input_tokens = 0, extra_output_tokens = 0):
+def sequential_greedy(question, context, title, path):
+    st = time.time()
+    out = sequential_greedy_score(question, context, title)
+    et = time.time()
+    out['time'] = et-st
+    out['path'] = path
+    write_json_to_file(path, out)
+
+    return out 
+
+def sequential_greedy_score(question, context, title, sorted_idx = []):
     answers, input_tokens, output_tokens = QA(question,context)
-    print(answers)
+    #print(answers)
 
     out = {}
     out['title'] = title
     out['question'] = question
     out['answers'] = answers
-    out['path'] = path
     out['context_size'] = count_tokens(context)
-
-    st = time.time()
 
     sentences = extract_sentences_from_pdf(context)
     print('Number of sentences:', len(sentences)) 
@@ -194,13 +201,10 @@ def sequential_greedy(question, context, title, path, sorted_idx = [], extra_inp
         provenance_id.append(i)
         provenance.append(sentences[i])
 
-    et = time.time()
-    out['time'] = et-st
     out['provenance'] = provenance
     out['provenance_size'] = count_tokens(''.join(provenance))
-    out['tokens'] = (input_tokens + extra_input_tokens, output_tokens + extra_output_tokens)
+    out['tokens'] = (input_tokens, output_tokens)
     out['provenance_ids'] = provenance_id 
-    write_json_to_file(path, out)
 
     return out 
 
@@ -421,6 +425,8 @@ def pick_k_binary(question, text, sorted_indices):
             mid = current_k / 2
             queue.append(mid)
             last_k = current_k
+            if current_k <= 1:
+                return last_k, sum_input_tokens, sum_output_tokens
         else:
             return last_k, sum_input_tokens, sum_output_tokens
             
@@ -430,10 +436,19 @@ def pick_k_binary(question, text, sorted_indices):
 def heuristic_greedy(question, text, title, result_path, embedding_path):
     print(embedding_path)
     print(result_path)
+    st = time.time()
     sorted_sentences, sorted_indices, similarity_scores = sort_sentences_by_similarity(question, text, embedding_path)
-    k, input_tokens, output_tokens = pick_k_binary(question, text, sorted_indices)
+    k, extra_input_tokens, extra_output_tokens = pick_k_binary(question, text, sorted_indices)
     #print(k, len(sorted_indices))
-    sequential_greedy(question, text, title, result_path, sorted_idx = sorted_indices[:k], extra_input_tokens=input_tokens, extra_output_tokens=output_tokens)
+    out = sequential_greedy_score(question, text, title, sorted_idx = sorted_indices[:k])
+    et = time.time()
+    out['time'] = et-st
+    out['k'] = k 
+    (input_tokens, output_tokens) = out['tokens']
+    out['tokens'] = (input_tokens + extra_input_tokens, output_tokens + extra_output_tokens)
+
+    write_json_to_file(result_path, out)
+    return out
 
 def test_paper_pipeline():
     data_path = parent_directory + '/data/papers.json'
@@ -507,4 +522,4 @@ def test_hotpot_pipeline():
 
 
 if __name__ == "__main__":
-    test_paper_pipeline()
+    test_hotpot_pipeline()

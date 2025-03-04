@@ -7,24 +7,22 @@
     "answers": [
         "\"Rock Chalk, Jayhawk\""
     ],
-    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q10_heuristic_greedy.json",
     "context_size": 1585,
-    "time": 23.15229296684265,
     "provenance": [
         "The project's cost was $43 million.",
-        "Of that amount, the Federal Highway Administration (FHWA) contributed 80-90 percent of the project cost.",
         "), and the system also has cameras on those billboards to automatically detect traffic problems.",
-        "Since the project's beginning, it has expanded greatly, and will continue to expand."
+        "Of that amount, the Federal Highway Administration (FHWA) contributed 80-90 percent of the project cost."
     ],
-    "provenance_size": 62,
+    "provenance_size": 46,
     "tokens": [
-        29522,
-        283
+        32018,
+        297
     ],
     "provenance_ids": [
         31,
-        32,
         35,
-        38
-    ]
+        32
+    ],
+    "time": 29.701659202575684,
+    "k": 41
 }

@@ -98,7 +98,7 @@ def equal(res1, res2, metric = 'string'):
                 return True
             return False
 
-def evaluate(answers, question, ids, sentences, context = ''):
+def evaluate(answers, question, ids, sentences, context = '', metric = 'string'):
     ids = sorted(ids)
     if(context == ''):
         for id in ids:
@@ -108,7 +108,7 @@ def evaluate(answers, question, ids, sentences, context = ''):
     pred_ans, input_tokens, output_tokens = QA(question, context)
     print(pred_ans)
     #print(answers)
-    if(equal(pred_ans, answers)):
+    if(equal(pred_ans, answers, metric)):
         print('True')
         return True, input_tokens, output_tokens
     else:
@@ -153,7 +153,7 @@ def sequential_greedy(question, context, title, path):
 
     return out 
 
-def sequential_greedy_score(question, context, title, sorted_idx = []):
+def sequential_greedy_score(question, context, title, sorted_idx = [], metric = 'string'):
     answers, input_tokens, output_tokens = QA(question,context)
     #print(answers)
 
@@ -173,7 +173,7 @@ def sequential_greedy_score(question, context, title, sorted_idx = []):
     if len(sorted_idx) == 0:
         sorted_idx = list(range(len(sentences)))
 
-    #print(sorted_idx)
+    print(sorted_idx)
 
     for i in sorted_idx:
         print('Iterating sentence ',i, len(sorted_idx))
@@ -188,7 +188,7 @@ def sequential_greedy_score(question, context, title, sorted_idx = []):
 
         sorted_remaining_sentences_id = sorted(remaining_sentences_id)
         
-        eval_result, input_token, output_token = evaluate(answers, question, sorted_remaining_sentences_id, sentences)
+        eval_result, input_token, output_token = evaluate(answers, question, sorted_remaining_sentences_id, sentences, metric)
         input_tokens += input_token
         output_tokens += output_token
         if eval_result == True:#if removing this sentence does not change the final answers, then this sentence can be removed 
@@ -213,7 +213,7 @@ binary_out_ids = []
 sum_input_tokens = 0
 sum_output_tokens = 0
 
-def divide_and_conquer(question, text, title, path):
+def divide_and_conquer(question, text, title, path,metric = 'string'):
     global binary_out_ids,sum_input_tokens,sum_output_tokens
     sum_input_tokens = 0
     sum_output_tokens = 0
@@ -233,7 +233,7 @@ def divide_and_conquer(question, text, title, path):
     sentences = extract_sentences_from_pdf(text)
     for i in range(len(sentences)):
         ids.append(i)
-    divide_and_conquer_iterative_with_cache(answers, question, ids, sentences)
+    divide_and_conquer_iterative_with_cache(answers, question, ids, sentences, metric)
     binary_out_ids = list(set(binary_out_ids))
     binary_out_ids = sorted(binary_out_ids)
     #print(binary_out_ids)
@@ -251,7 +251,7 @@ def divide_and_conquer(question, text, title, path):
 
 
 
-def divide_and_conquer_iterative_with_cache(answers, question, ids, sentences):
+def divide_and_conquer_iterative_with_cache(answers, question, ids, sentences, metric = 'string'):
     """
     Attempt to find a smaller subset of `sentences` that returns True for H,
     using a divide-and-conquer approach but in a non-recursive (queue-based) way.
@@ -297,7 +297,7 @@ def divide_and_conquer_iterative_with_cache(answers, question, ids, sentences):
 
         # Evaluate the entire set once, storing the result
         if is_cached(current_ids) == 'NULL':
-            eval_result, input_token, output_token = evaluate(answers, question, current_ids, sentences)
+            eval_result, input_token, output_token = evaluate(answers, question, current_ids, sentences, metric)
             sum_input_tokens += input_token
             sum_output_tokens += output_token
             set_cached(current_ids, eval_result)
@@ -319,7 +319,7 @@ def divide_and_conquer_iterative_with_cache(answers, question, ids, sentences):
 
         # Evaluate left and right subsets (using cache)
         if is_cached(left) == 'NULL':
-            eval_result_left, input_token_left, output_token_left = evaluate(answers, question, left, sentences)
+            eval_result_left, input_token_left, output_token_left = evaluate(answers, question, left, sentences, metric)
             sum_input_tokens += input_token_left
             sum_output_tokens += output_token_left
             set_cached(left, eval_result_left)
@@ -327,7 +327,7 @@ def divide_and_conquer_iterative_with_cache(answers, question, ids, sentences):
             eval_result_left = is_cached(left)
 
         if is_cached(right) == 'NULL':
-            eval_result_right, input_token_right, output_token_right = evaluate(answers, question, right, sentences)
+            eval_result_right, input_token_right, output_token_right = evaluate(answers, question, right, sentences, metric)
             sum_input_tokens += input_token_right
             sum_output_tokens += output_token_right
             set_cached(right, eval_result_right)
@@ -344,8 +344,6 @@ def divide_and_conquer_iterative_with_cache(answers, question, ids, sentences):
             queue.append(left)
         if(eval_result_right):
             queue.append(right)
-
-
 
 def cosine_sim(vec1, vec2):
     return cosine_similarity([vec1], [vec2])[0][0]
@@ -408,7 +406,7 @@ def sort_sentences_by_similarity(question, text, file_path):
 
     return sorted_sentences, sorted_indices, similarity_scores
 
-def pick_k_binary(question, text, sorted_indices):
+def pick_k_binary(question, text, sorted_indices,metric = 'string'):
     answers, input_tokens, output_tokens = QA(question,text)
     sentences = extract_sentences_from_pdf(text)
     queue = deque()
@@ -419,7 +417,7 @@ def pick_k_binary(question, text, sorted_indices):
 
     while queue:
         current_k = int(queue.popleft())
-        eval_result, input_tokens, output_tokens = evaluate(answers, question, sorted_indices[:current_k], sentences)
+        eval_result, input_tokens, output_tokens = evaluate(answers, question, sorted_indices[:current_k], sentences, metric)
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
         if eval_result:
@@ -456,7 +454,7 @@ def read_json(path):
         data = json.load(file)
     return data
 
-def verification():
+def verification(metric='string'):
     data_path = parent_directory + '/out/papers/results/'
     strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
 
@@ -485,7 +483,7 @@ def verification():
                     provenance = o['provenance']
                 question = o['question']
                 print(answers, question)
-                eval, in_tokens, out_tokens = evaluate(answers, question, [],[], context=provenance)
+                eval, in_tokens, out_tokens = evaluate(answers, question, [],[], context=provenance, metric='string')
                 
 
         #print(strategy, accuracy, len(runs[strategy]))
@@ -532,7 +530,7 @@ def test_hotpot_pipeline():
     hotpot_objects = data_digestion.digest_hotpotQA_dataset(data_path)
 
     strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
-    strategy = 'vallina_LLM'
+    strategy = 'sequential_greedy'
     num_of_case = 10
 
     i = -1
@@ -543,12 +541,14 @@ def test_hotpot_pipeline():
         q = (question, instruction)
         text = e['context']
         title = e['document_name']
-        path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + '.json'
+        path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + 'v1.json'
         if not os.path.exists(folder_path + '/results'):
             os.makedirs(folder_path + '/results')
+        if question != 'What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?':
+            continue
         # if os.path.isfile(path):
         #     continue
-        print(title)
+        print(question)
         embedding_path = folder_path + '/embeddings/' + 'hotpot' + '_q' + str(i) + '_embeddings.npy'
         if strategy == 'vallina_LLM':
             vallina_LLM(q, text, title, path)

@@ -1,19 +1,19 @@
 {
     "title": "hotpot_dev_fullwiki_v1.json",
     "question": [
-        "Who was known by his stage name Aladin and helped organizations improve their performance as a consultant?",
+        "The arena where the Lewiston Maineiacs played their home games can seat how many people?",
         "Only return the answer. Do not add explanations."
     ],
     "answers": [
-        "Eenasul Fateh"
+        "3,200"
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q7_vallina_LLM.json",
-    "context_size": 1739,
-    "time": 0.955955982208252,
-    "provenance": "Eenasul Fateh (Bengali: ঈনাসুল ফাতেহ ; born 3 April 1959), also known by his stage name Aladin, is a Bangladeshi-British cultural practitioner, magician, live artist and former international management consultant.",
-    "provenance_size": 57,
+    "context_size": 2763,
+    "time": 0.7080509662628174,
+    "provenance": "The Lewiston Maineiacs were a junior ice hockey team of the Quebec Major Junior Hockey League based in Lewiston, Maine. The team played its home games at the Androscoggin Bank Colisée.",
+    "provenance_size": 42,
     "tokens": [
-        1835,
-        57
+        2858,
+        42
     ]
 }

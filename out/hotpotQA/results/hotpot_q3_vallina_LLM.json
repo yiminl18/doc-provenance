@@ -1,19 +1,19 @@
 {
     "title": "hotpot_dev_fullwiki_v1.json",
     "question": [
-        "What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?",
-        "Only return the answer. Do not add explanations."
+        "Are the Laleli Mosque and Esma Sultan Mansion located in the same neighborhood?",
+        "Only return yes or no. Do not add explanations."
     ],
     "answers": [
-        "The \"Starbound\" trilogy by Amie Kaufman and Meagan Spooner."
+        "No."
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q3_vallina_LLM.json",
-    "context_size": 1426,
-    "time": 0.6789569854736328,
-    "provenance": "The context provided does not contain any relevant sentences that support the answer regarding \"The Starbound trilogy by Amie Kaufman and Meagan Spooner.\" Therefore, there are no sentences to extract.",
-    "provenance_size": 39,
+    "context_size": 861,
+    "time": 2.557485818862915,
+    "provenance": "The Laleli Mosque (Turkish: \"Laleli Camii, or Tulip Mosque\" ) is an 18th-century Ottoman imperial mosque located in Laleli, Fatih, Istanbul, Turkey. The Esma Sultan Mansion (Turkish: \"Esma Sultan Yalısı\" ), a historical yalı (English: waterside mansion ) located at Bosphorus in Ortaköy neighborhood of Istanbul, Turkey and named after its original owner Esma Sultan, is used today as a cultural center after being redeveloped.",
+    "provenance_size": 108,
     "tokens": [
-        1544,
-        39
+        950,
+        108
     ]
 }

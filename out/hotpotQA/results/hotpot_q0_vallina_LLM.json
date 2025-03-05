@@ -9,11 +9,11 @@
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q0_vallina_LLM.json",
     "context_size": 1124,
-    "time": 3.147857189178467,
-    "provenance": "- Adam Collis is an American filmmaker and actor.\n- Ed Wood is a 1994 American biographical period comedy-drama film directed and produced by Tim Burton.\n- Tyler Bates (born June 5, 1965) is an American musician, music producer, and composer for films, television, and video games.\n- Doctor Strange is a 2016 American superhero film based on the Marvel Comics character of the same name, produced by Marvel Studios and distributed by Walt Disney Studios Motion Pictures.\n- Hellraiser: Inferno (also known as Hellraiser V: Inferno) is a 2000 American horror film.\n- Sinister is a 2012 supernatural horror film directed by Scott Derrickson and written by Derrickson and C. Robert Cargill.\n- Deliver Us from Evil is a 2014 American supernatural horror film directed by Scott Derrickson and produced by Jerry Bruckheimer.\n- Woodson is a census-designated place (CDP) in Pulaski County, Arkansas, in the United States.\n- Conrad Brooks (born Conrad Biedrzycki on January 3, 1931 in Baltimore, Maryland) is an American actor.\n- The Exorcism of Emily Rose is a 2005 American legal drama horror film directed by Scott Derrickson and starring Laura Linney and Tom Wilkinson.",
-    "provenance_size": 269,
+    "time": 2.651353120803833,
+    "provenance": "- Adam Collis is an American filmmaker and actor.\n- Ed Wood is a 1994 American biographical period comedy-drama film directed and produced by Tim Burton.\n- Tyler Bates (born June 5, 1965) is an American musician, music producer, and composer for films, television, and video games.\n- Doctor Strange is a 2016 American superhero film based on the Marvel Comics character of the same name.\n- Hellraiser: Inferno (also known as Hellraiser V: Inferno) is a 2000 American horror film.\n- Sinister is a 2012 supernatural horror film directed by Scott Derrickson.\n- Deliver Us from Evil is a 2014 American supernatural horror film directed by Scott Derrickson.\n- Woodson is a census-designated place (CDP) in Pulaski County, Arkansas, in the United States.\n- Conrad Brooks (born Conrad Biedrzycki on January 3, 1931 in Baltimore, Maryland) is an American actor.\n- The Exorcism of Emily Rose is a 2005 American legal drama horror film directed by Scott Derrickson.",
+    "provenance_size": 229,
     "tokens": [
         1209,
-        269
+        229
     ]
 }

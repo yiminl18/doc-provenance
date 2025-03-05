@@ -532,7 +532,7 @@ def test_hotpot_pipeline():
     hotpot_objects = data_digestion.digest_hotpotQA_dataset(data_path)
 
     strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
-    strategy = 'heuristic_greedy'
+    strategy = 'vallina_LLM'
     num_of_case = 10
 
     i = -1
@@ -546,8 +546,8 @@ def test_hotpot_pipeline():
         path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + '.json'
         if not os.path.exists(folder_path + '/results'):
             os.makedirs(folder_path + '/results')
-        if os.path.isfile(path):
-            continue
+        # if os.path.isfile(path):
+        #     continue
         print(title)
         embedding_path = folder_path + '/embeddings/' + 'hotpot' + '_q' + str(i) + '_embeddings.npy'
         if strategy == 'vallina_LLM':
@@ -565,4 +565,4 @@ def test_hotpot_pipeline():
 
 if __name__ == "__main__":
     #test_paper_pipeline()
-    verification()
+    test_hotpot_pipeline()

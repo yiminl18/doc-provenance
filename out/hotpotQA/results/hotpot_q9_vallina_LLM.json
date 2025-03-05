@@ -1,19 +1,19 @@
 {
     "title": "hotpot_dev_fullwiki_v1.json",
     "question": [
-        "Who is older, Annie Morton or Terry Richardson?",
-        "Only return the answer. Do not add explanations."
+        "Are Local H and For Against both from the United States?",
+        "Only return yes or no. Do not add explanations."
     ],
     "answers": [
-        "Terry Richardson"
+        "Yes"
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q9_vallina_LLM.json",
-    "context_size": 1293,
-    "time": 1.3720018863677979,
-    "provenance": "James Joseph Richardson (born December 12, 1935) is an African-American man who was wrongly convicted in 1968 for the October 1967 murders of his seven children. At the time of the murders Richardson, a migrant farm worker, was living in Arcadia, Florida, with his wife Annie Mae Richardson and the children. Annie Morton (born October 8, 1970) is an American model born in Pennsylvania.",
-    "provenance_size": 89,
+    "context_size": 1484,
+    "time": 1.7597260475158691,
+    "provenance": "1. \"Ophur was a rock band from the Chicago suburbs in DuPage County.\"\n2. \"Suffrajett is a United States rock band from New York City, currently based in Chicago, Illinois.\"\n3. \"Hallelujah! I'm A Bum is the seventh studio album by Chicago-based rock band Local H.\"\n4. \"Mendocino County, California, was the first jurisdiction in the United States to ban the cultivation, production or distribution of genetically modified organisms (GMOs).\"",
+    "provenance_size": 103,
     "tokens": [
-        1377,
-        89
+        1569,
+        103
     ]
 }

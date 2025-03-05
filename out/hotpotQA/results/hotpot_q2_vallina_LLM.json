@@ -1,19 +1,19 @@
 {
     "title": "hotpot_dev_fullwiki_v1.json",
     "question": [
-        "What government position was held by the woman who portrayed Corliss Archer in the film Kiss and Tell?",
+        "What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?",
         "Only return the answer. Do not add explanations."
     ],
     "answers": [
-        "Janet Marie Waldo held the position of Secretary of State for Constitutional Affairs."
+        "The \"Starbound\" trilogy by Amie Kaufman and Meagan Spooner."
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q2_vallina_LLM.json",
-    "context_size": 1187,
-    "time": 5.425085067749023,
-    "provenance": "Janet Marie Waldo (February 4, 1920 – June 12, 2016) was an American radio and voice actress. She is best known in animation for voicing Judy Jetson, Nancy in \"Shazzan\", Penelope Pitstop, and Josie in \"Josie and the Pussycats\", and on radio as the title character in \"Meet Corliss Archer\". The office of Secretary of State for Constitutional Affairs was a British Government position, created in 2003. Certain functions of the Lord Chancellor which related to the Lord Chancellor's Department were transferred to the Secretary of State. At a later date further functions were also transferred to the Secretary of State for Constitutional Affairs from the First Secretary of State, a position within the government held by the Deputy Prime Minister.",
-    "provenance_size": 163,
+    "context_size": 1426,
+    "time": 1.2216441631317139,
+    "provenance": "The context provided does not contain any relevant sentences that support the answer regarding \"The Starbound trilogy by Amie Kaufman and Meagan Spooner.\" Therefore, there are no sentences to extract.",
+    "provenance_size": 39,
     "tokens": [
-        1294,
-        163
+        1544,
+        39
     ]
 }

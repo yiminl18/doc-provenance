@@ -143,9 +143,9 @@ def vallina_LLM(question, context, title, path):
     write_json_to_file(path, out)
     return out
 
-def sequential_greedy(question, context, title, path):
+def sequential_greedy(question, context, title, path, metric = 'string'):
     st = time.time()
-    out = sequential_greedy_score(question, context, title)
+    out = sequential_greedy_score(question, context, title, metric = metric)
     et = time.time()
     out['time'] = et-st
     out['path'] = path
@@ -154,8 +154,9 @@ def sequential_greedy(question, context, title, path):
     return out 
 
 def sequential_greedy_score(question, context, title, sorted_idx = [], metric = 'string'):
+    print(metric)
     answers, input_tokens, output_tokens = QA(question,context)
-    #print(answers)
+    print(answers)
 
     out = {}
     out['title'] = title
@@ -188,7 +189,7 @@ def sequential_greedy_score(question, context, title, sorted_idx = [], metric = 
 
         sorted_remaining_sentences_id = sorted(remaining_sentences_id)
         
-        eval_result, input_token, output_token = evaluate(answers, question, sorted_remaining_sentences_id, sentences, metric)
+        eval_result, input_token, output_token = evaluate(answers, question, sorted_remaining_sentences_id, sentences, metric = metric)
         input_tokens += input_token
         output_tokens += output_token
         if eval_result == True:#if removing this sentence does not change the final answers, then this sentence can be removed 
@@ -432,7 +433,7 @@ def pick_k_binary(question, text, sorted_indices,metric = 'string'):
     return last_k, sum_input_tokens, sum_output_tokens
 
 
-def heuristic_greedy(question, text, title, result_path, embedding_path):
+def heuristic_greedy(question, text, title, result_path, embedding_path, metric = 'string'):
     print(embedding_path)
     print(result_path)
     st = time.time()
@@ -496,16 +497,18 @@ def test_paper_pipeline():
     sample_paper_questions = data_digestion.sample_paper_questions()
 
     strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
-    strategy = 'vallina_LLM'
+    strategy = 'heuristic_greedy'
     doc_num = 5
 
     for q_id in range(len(sample_paper_questions)):
         q = sample_paper_questions[q_id]
         for p_id in range(len(paper_objects)):
             paper = paper_objects[p_id]
-            path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
-            if os.path.isfile(path):
+            path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + 'v1.json'
+            if p_id != 0 or q_id != 0:
                 continue
+            # if os.path.isfile(path):
+            #     continue
             if(p_id >= doc_num):
                 break
             text = paper['text']
@@ -541,7 +544,7 @@ def test_hotpot_pipeline():
         q = (question, instruction)
         text = e['context']
         title = e['document_name']
-        path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + 'v1.json'
+        path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + 'v2.json'
         if not os.path.exists(folder_path + '/results'):
             os.makedirs(folder_path + '/results')
         if question != 'What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?':
@@ -553,7 +556,7 @@ def test_hotpot_pipeline():
         if strategy == 'vallina_LLM':
             vallina_LLM(q, text, title, path)
         elif strategy == 'sequential_greedy':
-            sequential_greedy(q, text, title, path) 
+            sequential_greedy(q, text, title, path, metric = 'LLM') 
         elif strategy == 'divide_and_conquer': 
             divide_and_conquer(q, text, title, path)
         elif strategy == 'heuristic_greedy':
@@ -564,5 +567,5 @@ def test_hotpot_pipeline():
 
 
 if __name__ == "__main__":
-    #test_paper_pipeline()
-    test_hotpot_pipeline()
+    test_paper_pipeline()
+    #test_hotpot_pipeline()

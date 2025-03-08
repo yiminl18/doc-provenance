@@ -63,28 +63,33 @@ def QA(question, context):
     output_tokens = count_tokens(response)
     return ans, input_tokens, output_tokens
 
+def equal_string(res1, res2):
+    if(len(res1) != len(res2)):
+        return False
+    res1_lower = []
+    for r in res1:
+        res1_lower.append(r)
+    res2_lower = []
+    for r in res2:
+        res2_lower.append(r)
+    for r in res1_lower:
+        if r not in res2_lower:
+            return False
+    for r in res2_lower:
+        if r not in res1_lower:
+            return False
+    return True
+
 def equal(res1, res2, metric = 'string'):
     res1 = sorted(res1)
     res2 = sorted(res2)
     print(len(res1), len(res2))
     #res1 and res2 are both list of strings 
     if(metric == 'string'):
-        if(len(res1) != len(res2)):
-            return False
-        res1_lower = []
-        for r in res1:
-            res1_lower.append(r)
-        res2_lower = []
-        for r in res2:
-            res2_lower.append(r)
-        for r in res1_lower:
-            if r not in res2_lower:
-                return False
-        for r in res2_lower:
-            if r not in res1_lower:
-                return False
-        return True
+        return equal_string(res1, res2)
     else:
+        if equal_string(res1, res2):
+            return True
         if(len(res1) > 1 or len(res2) > 1):
             instruction = 'Given the following two lists of strings, determine whether they are equivalent. Equivalence is defined as being mostly semantically similar, even if they do not match exactly. For example, 2017/02 should be considered the same as 2017 Feb. If the two lists are equivalent, return True; otherwise, return False. List 1 is: ' + " ".join(res1) + ' List 2 is: ' + " ".join(res2) 
             response = model(model_name, (instruction, ''))
@@ -619,5 +624,5 @@ def test_hotpot_pipeline():
 
 
 if __name__ == "__main__":
-    test_paper_pipeline()
-    #test_hotpot_pipeline()
+    #test_paper_pipeline()
+    test_hotpot_pipeline()

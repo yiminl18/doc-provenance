@@ -367,15 +367,20 @@ def save_embeddings(filename, embeddings):
 def load_embeddings(filename):
     return np.load(filename, allow_pickle=True).item()
 
-def sort_sentences_by_similarity(question, text, file_path):
+def sort_sentences_by_similarity(question, answers, text, file_path):
     #print(question)
+    #print(answers)
+    answer_str = ''.join(answers)
     sentences = extract_sentences_from_pdf(text)
-    # Get embedding for the question
-    question_embedding = get_embedding(question[0])
+    # Get embedding for the question and answers
+    question_embedding = get_embedding(question[0]+answer_str)
+    exist = False
 
     try:
         # Load existing embeddings
         embeddings = load_embeddings(file_path)
+        exist = True
+        #print('load')
     except FileNotFoundError:
         embeddings = {}
     
@@ -389,7 +394,8 @@ def sort_sentences_by_similarity(question, text, file_path):
         similarity_scores[sentence] = similarity
 
     # Save updated embeddings
-    save_embeddings(file_path, embeddings)
+    if not exist:
+        save_embeddings(file_path, embeddings)
 
     # Pair each sentence with its index and similarity score
     indexed_sentences = list(enumerate(sentences))
@@ -405,10 +411,14 @@ def sort_sentences_by_similarity(question, text, file_path):
     # for idx, sentence in zip(sorted_indices, sorted_sentences):
     #     print(f"Original Index: {idx}, Sentence: '{sentence}', similarity: '{similarity_scores[sentence]}'")
 
-    return sorted_sentences, sorted_indices, similarity_scores
+    for idx in sorted_indices:
+        print(idx, sentences[idx], similarity_scores[sentences[idx]])
 
-def pick_k_binary(question, text, sorted_indices,metric = 'string'):
+    return sorted_indices, similarity_scores
+
+def pick_k_binary(question, text, sorted_indices, metric = 'string'):
     answers, input_tokens, output_tokens = QA(question,text)
+    print(answers)
     sentences = extract_sentences_from_pdf(text)
     queue = deque()
     queue.append(len(sorted_indices))
@@ -435,10 +445,10 @@ def pick_k_binary(question, text, sorted_indices,metric = 'string'):
 def heuristic_topk(question, text, title, result_path, embedding_path, metric = 'string'):
     # print(embedding_path)
     # print(result_path)
-    answers = QA(question, text)
+    answers, in_tokens, out_tokens = QA(question, text)
     out = {}
-    st = time.time()
-    sorted_sentences, sorted_indices, similarity_scores = sort_sentences_by_similarity(question, text, embedding_path)
+    st = time.time() 
+    sorted_indices, similarity_scores = sort_sentences_by_similarity(question, answers, text, embedding_path)
     k, input_tokens, output_tokens = pick_k_binary(question, text, sorted_indices)
 
     et = time.time()
@@ -468,8 +478,9 @@ def heuristic_topk(question, text, title, result_path, embedding_path, metric = 
 def heuristic_greedy(question, text, title, result_path, embedding_path, metric = 'string'):
     print(embedding_path)
     print(result_path)
+    answers = QA(question, text)
     st = time.time()
-    sorted_sentences, sorted_indices, similarity_scores = sort_sentences_by_similarity(question, text, embedding_path)
+    sorted_indices, similarity_scores = sort_sentences_by_similarity(question, answers, text, embedding_path)
     k, extra_input_tokens, extra_output_tokens = pick_k_binary(question, text, sorted_indices)
     #print(k, len(sorted_indices))
     out = sequential_greedy_score(question, text, title, sorted_idx = sorted_indices[:k])
@@ -564,8 +575,8 @@ def test_hotpot_pipeline():
     folder_path = parent_directory + '/out/hotpotQA'
     hotpot_objects = data_digestion.digest_hotpotQA_dataset(data_path)
 
-    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
-    strategy = 'sequential_greedy'
+    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk']
+    strategy = 'heuristic_topk'
     num_of_case = 10
 
     i = -1
@@ -576,14 +587,14 @@ def test_hotpot_pipeline():
         q = (question, instruction)
         text = e['context']
         title = e['document_name']
-        path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + 'v2.json'
+        path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + '.json'
         if not os.path.exists(folder_path + '/results'):
             os.makedirs(folder_path + '/results')
-        if question != 'What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?':
-            continue
         # if os.path.isfile(path):
         #     continue
-        print(question)
+        # if i != 5:
+        #     continue
+        #print(question)
         embedding_path = folder_path + '/embeddings/' + 'hotpot' + '_q' + str(i) + '_embeddings.npy'
         if strategy == 'vallina_LLM':
             vallina_LLM(q, text, title, path)
@@ -593,11 +604,13 @@ def test_hotpot_pipeline():
             divide_and_conquer(q, text, title, path)
         elif strategy == 'heuristic_greedy':
             heuristic_greedy(q, text, title, path, embedding_path) 
+        elif strategy == 'heuristic_topk':
+            heuristic_topk(q, text, title, path, embedding_path)
         #break
         if(i > num_of_case):
             break
 
 
 if __name__ == "__main__":
-    test_paper_pipeline()
-    #test_hotpot_pipeline()
+    #test_paper_pipeline()
+    test_hotpot_pipeline()

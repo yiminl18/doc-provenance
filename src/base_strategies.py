@@ -368,7 +368,7 @@ def load_embeddings(filename):
     return np.load(filename, allow_pickle=True).item()
 
 def sort_sentences_by_similarity(question, text, file_path):
-    print(question)
+    #print(question)
     sentences = extract_sentences_from_pdf(text)
     # Get embedding for the question
     question_embedding = get_embedding(question[0])
@@ -432,6 +432,38 @@ def pick_k_binary(question, text, sorted_indices,metric = 'string'):
             
     return last_k, sum_input_tokens, sum_output_tokens
 
+def heuristic_topk(question, text, title, result_path, embedding_path, metric = 'string'):
+    # print(embedding_path)
+    # print(result_path)
+    answers = QA(question, text)
+    out = {}
+    st = time.time()
+    sorted_sentences, sorted_indices, similarity_scores = sort_sentences_by_similarity(question, text, embedding_path)
+    k, input_tokens, output_tokens = pick_k_binary(question, text, sorted_indices)
+
+    et = time.time()
+    out['time'] = et-st
+    out['k'] = k 
+    out['tokens'] = (input_tokens, output_tokens)
+    out['title'] = title
+    out['question'] = question
+    out['answers'] = answers
+    out['context_size'] = count_tokens(text)
+
+    provenance_ids = sorted_indices[:k]
+    provenance_ids = sorted(provenance_ids)
+    provenance = []
+    sentences = extract_sentences_from_pdf(text)
+
+    for id in provenance_ids:
+        provenance.append(sentences[id])
+
+    out['provenance'] = provenance
+    out['provenance_size'] = count_tokens(''.join(provenance))
+    out['provenance_ids'] = provenance_ids 
+
+    write_json_to_file(result_path, out)
+    return out
 
 def heuristic_greedy(question, text, title, result_path, embedding_path, metric = 'string'):
     print(embedding_path)

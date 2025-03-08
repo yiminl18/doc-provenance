@@ -1,0 +1,24 @@
+{
+    "time": 10.018442869186401,
+    "k": 1,
+    "tokens": [
+        31762,
+        50
+    ],
+    "title": "Expense Control: A Gamified, Semi-Automated, Crowd-Based Approach For Receipt Capturing",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. "
+    ],
+    "answers": [
+        "IUI 2016"
+    ],
+    "context_size": 16907,
+    "provenance": [
+        "http: //dl.acm.org/citation.cfm?id=2361381\n\n\nIUI 2016 * Social Media\n\n20."
+    ],
+    "provenance_size": 28,
+    "provenance_ids": [
+        543
+    ]
+}

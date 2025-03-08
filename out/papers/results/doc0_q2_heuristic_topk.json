@@ -1,0 +1,28 @@
+{
+    "time": 8.27903413772583,
+    "k": 3,
+    "tokens": [
+        11872,
+        126
+    ],
+    "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. "
+    ],
+    "answers": [
+        "31st European Conference on Cognitive Ergonomics (ECCE 2019)"
+    ],
+    "context_size": 5912,
+    "provenance": [
+        "In Proceedings of 31st European Conference on Cognitive\nErgonomics (ECCE 2019), September 10-13, 2019, BELFAST, <, United\nKingdom.",
+        "Ergonomics, 56\n(3), 389-398.",
+        "In Extended Abstracts of the 2018 CHI\nConference on Human Factors in Computing Systems ACM."
+    ],
+    "provenance_size": 77,
+    "provenance_ids": [
+        7,
+        214,
+        201
+    ]
+}

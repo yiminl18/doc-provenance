@@ -103,16 +103,18 @@ def evaluate(answers, question, ids, sentences, context = '', metric = 'string')
     if(context == ''):
         for id in ids:
             context += sentences[id]
-    #print(count_tokens(context))
-    #print(context[:100])
+    #print('tokens:', count_tokens(context))
+    #print('context:',context[:10])
+    #print(len(ids))
+    #print(ids)
     pred_ans, input_tokens, output_tokens = QA(question, context)
     print(pred_ans)
-    #print(answers)
+    print(answers)
     if(equal(pred_ans, answers, metric)):
-        print('True')
+        #print('True')
         return True, input_tokens, output_tokens
     else:
-        print('False')
+        #print('False')
         return False, input_tokens, output_tokens
 
 def vallina_LLM(question, context, title, path):
@@ -373,7 +375,9 @@ def sort_sentences_by_similarity(question, answers, text, file_path):
     answer_str = ''.join(answers)
     sentences = extract_sentences_from_pdf(text)
     # Get embedding for the question and answers
-    question_embedding = get_embedding(question[0]+answer_str)
+    
+    question_embedding = get_embedding(question[0] + ' ' + answer_str)
+    
     exist = False
 
     try:
@@ -411,14 +415,14 @@ def sort_sentences_by_similarity(question, answers, text, file_path):
     # for idx, sentence in zip(sorted_indices, sorted_sentences):
     #     print(f"Original Index: {idx}, Sentence: '{sentence}', similarity: '{similarity_scores[sentence]}'")
 
-    for idx in sorted_indices:
-        print(idx, sentences[idx], similarity_scores[sentences[idx]])
+    # for idx in sorted_indices[:20]:
+    #     print(idx, sentences[idx], similarity_scores[sentences[idx]])
 
     return sorted_indices, similarity_scores
 
-def pick_k_binary(question, text, sorted_indices, metric = 'string'):
+def pick_k_binary(question, text, sorted_indices, metric = 'LLM'):
     answers, input_tokens, output_tokens = QA(question,text)
-    print(answers)
+    #print(answers)
     sentences = extract_sentences_from_pdf(text)
     queue = deque()
     queue.append(len(sorted_indices))
@@ -428,7 +432,8 @@ def pick_k_binary(question, text, sorted_indices, metric = 'string'):
 
     while queue:
         current_k = int(queue.popleft())
-        eval_result, input_tokens, output_tokens = evaluate(answers, question, sorted_indices[:current_k], sentences, metric)
+        #print(sorted_indices[:current_k])
+        eval_result, input_tokens, output_tokens = evaluate(answers, question, sorted_indices[:current_k], sentences, context = '', metric = metric)
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
         if eval_result:
@@ -442,15 +447,15 @@ def pick_k_binary(question, text, sorted_indices, metric = 'string'):
             
     return last_k, sum_input_tokens, sum_output_tokens
 
-def heuristic_topk(question, text, title, result_path, embedding_path, metric = 'string'):
+def heuristic_topk(question, text, title, result_path, embedding_path, metric = 'LLM'):
     # print(embedding_path)
     # print(result_path)
     answers, in_tokens, out_tokens = QA(question, text)
     out = {}
     st = time.time() 
     sorted_indices, similarity_scores = sort_sentences_by_similarity(question, answers, text, embedding_path)
-    k, input_tokens, output_tokens = pick_k_binary(question, text, sorted_indices)
-
+    k, input_tokens, output_tokens = pick_k_binary(question, text, sorted_indices, metric = metric)
+    #print(sorted_indices)
     et = time.time()
     out['time'] = et-st
     out['k'] = k 
@@ -461,9 +466,9 @@ def heuristic_topk(question, text, title, result_path, embedding_path, metric = 
     out['context_size'] = count_tokens(text)
 
     provenance_ids = sorted_indices[:k]
-    provenance_ids = sorted(provenance_ids)
     provenance = []
     sentences = extract_sentences_from_pdf(text)
+    print(k,len(sentences))
 
     for id in provenance_ids:
         provenance.append(sentences[id])
@@ -481,7 +486,7 @@ def heuristic_greedy(question, text, title, result_path, embedding_path, metric 
     answers = QA(question, text)
     st = time.time()
     sorted_indices, similarity_scores = sort_sentences_by_similarity(question, answers, text, embedding_path)
-    k, extra_input_tokens, extra_output_tokens = pick_k_binary(question, text, sorted_indices)
+    k, extra_input_tokens, extra_output_tokens = pick_k_binary(question, text, sorted_indices, metric = metric)
     #print(k, len(sorted_indices))
     out = sequential_greedy_score(question, text, title, sorted_idx = sorted_indices[:k])
     et = time.time()
@@ -539,16 +544,16 @@ def test_paper_pipeline():
     paper_objects = data_digestion.digest_paper_dataset(data_path)
     sample_paper_questions = data_digestion.sample_paper_questions()
 
-    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy']
-    strategy = 'heuristic_greedy'
+    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk']
+    strategy = 'heuristic_topk'
     doc_num = 5
 
     for q_id in range(len(sample_paper_questions)):
         q = sample_paper_questions[q_id]
         for p_id in range(len(paper_objects)):
             paper = paper_objects[p_id]
-            path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + 'v1.json'
-            if p_id != 0 or q_id != 0:
+            path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
+            if p_id != 4 or q_id != 2:
                 continue
             # if os.path.isfile(path):
             #     continue
@@ -556,7 +561,7 @@ def test_paper_pipeline():
                 break
             text = paper['text']
             title = paper['title']
-            print(title)
+            print(title,q)
             embedding_path = folder_path + '/embeddings/' + 'doc' + str(p_id) + '_embeddings.npy'
             if strategy == 'vallina_LLM':
                 vallina_LLM(q, text, title, path)
@@ -566,8 +571,10 @@ def test_paper_pipeline():
                 divide_and_conquer(q, text, title, path)
             elif strategy == 'heuristic_greedy':
                 heuristic_greedy(q, text, title, path, embedding_path) 
-            
+            elif strategy == 'heuristic_topk':
+                heuristic_topk(q, text, title, path, embedding_path)
     
+            #break
         #break
 
 def test_hotpot_pipeline():
@@ -612,5 +619,5 @@ def test_hotpot_pipeline():
 
 
 if __name__ == "__main__":
-    #test_paper_pipeline()
-    test_hotpot_pipeline()
+    test_paper_pipeline()
+    #test_hotpot_pipeline()

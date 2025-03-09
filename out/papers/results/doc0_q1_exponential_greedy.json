@@ -1,0 +1,25 @@
+{
+    "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
+    "question": [
+        "Who are the authors of this paper?",
+        "Return only a list of strings, seperated by |"
+    ],
+    "answers": [
+        "Cecile Boulard",
+        "Stefania Castellani",
+        "Tommaso Colombino",
+        "Antonietta Grasso"
+    ],
+    "context_size": 5912,
+    "provenance": [
+        "ACM Reference format:\n\nCecile Boulard, Stefania Castellani, Tommaso Colombino and Antonietta\nGrasso."
+    ],
+    "provenance_size": 29,
+    "tokens": [
+        64233,
+        320
+    ],
+    "provenance_ids": [
+        4
+    ]
+}

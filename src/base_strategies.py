@@ -55,6 +55,8 @@ def count_tokens(text, model="gpt-4o-mini"):
 def QA(question, context):
     prompt = (question[0] + question[1], context)
     response = model(model_name, prompt)
+    # print('Prompt is:', prompt[0])
+    # print('QA response is:', response)
     if('|' in response):
         ans = [o.strip() for o in response.split('|')]
     else:
@@ -63,15 +65,26 @@ def QA(question, context):
     output_tokens = count_tokens(response)
     return ans, input_tokens, output_tokens
 
+
+def eval_equivelance_rules(s):
+    if 'Kriiger' in s:
+        s = s.replace('Kriiger','Krüger')
+    s = s.strip('.')
+    return s
+
 def equal_string(res1, res2):
     if(len(res1) != len(res2)):
         return False
     res1_lower = []
+    print('before:',res1)
+    print('before:',res2)
     for r in res1:
-        res1_lower.append(r)
+        res1_lower.append(eval_equivelance_rules(r).lower())
     res2_lower = []
     for r in res2:
-        res2_lower.append(r)
+        res2_lower.append(eval_equivelance_rules(r).lower())
+    print('after:',res1_lower)
+    print('after:',res2_lower)
     for r in res1_lower:
         if r not in res2_lower:
             return False
@@ -83,22 +96,33 @@ def equal_string(res1, res2):
 def equal(res1, res2, metric = 'string'):
     res1 = sorted(res1)
     res2 = sorted(res2)
-    print(len(res1), len(res2))
+    #print(len(res1), len(res2))
     #res1 and res2 are both list of strings 
     if(metric == 'string'):
         return equal_string(res1, res2)
     else:
+        instruct_prompt = 'Determine if two strings are equivalent in meaning, not just in format. Lists must contain the same elements, allowing for alternative spellings, transliterations, or equivalent name variations. Missing or extra elements make them unequal. Dates in different formats should be considered equivalent if they represent the same time. Ignore case, punctuation, and spacing unless they change meaning. Return True if the strings are equivalent and False otherwise. Do not add explanations. ' 
         if equal_string(res1, res2):
             return True
+        if len(res1) != len(res2):
+            return False 
         if(len(res1) > 1 or len(res2) > 1):
-            instruction = 'Given the following two lists of strings, determine whether they are equivalent. Equivalence is defined as being mostly semantically similar, even if they do not match exactly. For example, 2017/02 should be considered the same as 2017 Feb. If the two lists are equivalent, return True; otherwise, return False. List 1 is: ' + " ".join(res1) + ' List 2 is: ' + " ".join(res2) 
+            print('LLM evaluation1')
+            instruction = instruct_prompt + ' String 1 is: ' + " ".join(res1) + ' String 2 is: ' + " ".join(res2)
             response = model(model_name, (instruction, ''))
             if('true' in response.lower()):
                 return True
             return False
         if(len(res1) == 1 and len(res2) == 1):
-            instruction = 'Given the following two strings, '  + res1[0] + ', ' + res2[0] + '. Determine whether they are equivalent. Equivalence is defined as being mostly semantically similar, even if they do not match exactly. For example, 2017/02 should be considered the same as 2017 Feb. If the two strings are equivalent, return True; otherwise, return False.'
+            str1 = res1[0]
+            str2 = res2[0]
+            if len(str1) > 2*len(str2) or len(str2) > 2*len(str1):
+                print('length mis-match')
+                return False
+            print('LLM evaluation2')
+            instruction = 'Given the following two strings, String 1 is: '  + res1[0] + '. String 2 is: ' + res2[0] + '. ' + instruct_prompt
             response = model(model_name, (instruction, ''))
+            #print(instruction)
             if('true' in response.lower()):
                 return True
             return False
@@ -116,10 +140,10 @@ def evaluate(answers, question, ids, sentences, context = '', metric = 'string')
     print(pred_ans)
     print(answers)
     if(equal(pred_ans, answers, metric)):
-        #print('True')
+        print('True')
         return True, input_tokens, output_tokens
     else:
-        #print('False')
+        print('False')
         return False, input_tokens, output_tokens
 
 def vallina_LLM(question, context, title, path):
@@ -157,6 +181,80 @@ def sequential_greedy(question, context, title, path, metric = 'string'):
     out['time'] = et-st
     out['path'] = path
     write_json_to_file(path, out)
+
+    return out 
+
+def enumerate_skip_ids(cur_ids):
+    new_len = len(cur_ids) * 2
+    new_ids = []
+    st_id = cur_ids[len(cur_ids)-1] + 1
+    for i in range(new_len):
+        new_ids.append(st_id)
+        st_id += 1
+    return new_ids
+
+def exponential_greedy(question, text, title, result_path, metric = 'string'):
+    out = {}
+    answers, input_tokens, output_tokens = QA(question,text)
+    sentences = extract_sentences_from_pdf(text)
+
+    out['title'] = title
+    out['question'] = question
+    out['answers'] = answers
+    out['context_size'] = count_tokens(text)
+
+    removed_sentences = []
+    input_tokens = 0
+    output_tokens = 0
+
+    skip_ids = [0]
+    i = 0
+
+    while True:#iterate sentences stored in skip_ids to check if delete
+        if skip_ids[0] >= len(sentences):
+            break
+        remaining_sentences_id = []
+
+        for i in range(len(sentences)):#get remaining sentences for evaluation
+            if i in skip_ids:
+                continue
+            if i in removed_sentences:
+                continue
+            remaining_sentences_id.append(i)
+
+        sorted_remaining_sentences_id = sorted(remaining_sentences_id)
+        
+        eval_result, input_token, output_token = evaluate(answers, question, sorted_remaining_sentences_id, sentences, metric = metric)
+        input_tokens += input_token
+        output_tokens += output_token
+
+        print(skip_ids, eval_result)
+
+        if eval_result == True:#if removing this sentence does not change the final answers, then these sentences can be removed 
+            removed_sentences += skip_ids
+            #get an exponential large skip_ids
+            skip_ids = enumerate_skip_ids(skip_ids)
+        else: #sentences in current skip ids cannot be removed 
+            if len(skip_ids) == 1: #if an unit sentence cannot be removed, iterate the next sentence 
+                skip_ids = [skip_ids[0] + 1]
+            else:
+                skip_ids = [skip_ids[0]] #reset to be the start of current skip ids, with initial step 
+
+
+    provenance = []
+    provenance_id = []
+    for i in range(len(sentences)):
+        if i in removed_sentences:
+            continue
+        provenance_id.append(i)
+        provenance.append(sentences[i])
+
+    out['provenance'] = provenance
+    out['provenance_size'] = count_tokens(''.join(provenance))
+    out['tokens'] = (input_tokens, output_tokens)
+    out['provenance_ids'] = provenance_id  
+
+    write_json_to_file(result_path, out)
 
     return out 
 
@@ -485,6 +583,9 @@ def heuristic_topk(question, text, title, result_path, embedding_path, metric = 
     write_json_to_file(result_path, out)
     return out
 
+
+    
+
 def heuristic_greedy(question, text, title, result_path, embedding_path, metric = 'string'):
     print(embedding_path)
     print(result_path)
@@ -502,6 +603,8 @@ def heuristic_greedy(question, text, title, result_path, embedding_path, metric 
 
     write_json_to_file(result_path, out)
     return out
+
+
 
 def read_json(path):
     with open(path, "r", encoding="utf-8") as file:
@@ -543,14 +646,16 @@ def verification(metric='string'):
         #print(strategy, accuracy, len(runs[strategy]))
         
 
+
+
 def test_paper_pipeline():
     data_path = parent_directory + '/data/papers.json'
     folder_path = parent_directory + '/out/papers'
     paper_objects = data_digestion.digest_paper_dataset(data_path)
     sample_paper_questions = data_digestion.sample_paper_questions()
 
-    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk']
-    strategy = 'heuristic_topk'
+    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk','exponential_greedy']
+    strategy = 'exponential_greedy'
     doc_num = 5
 
     for q_id in range(len(sample_paper_questions)):
@@ -558,14 +663,15 @@ def test_paper_pipeline():
         for p_id in range(len(paper_objects)):
             paper = paper_objects[p_id]
             path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
-            if p_id != 4 or q_id != 2:
+            if p_id == 3 or q_id == 1:
                 continue
-            # if os.path.isfile(path):
-            #     continue
+            if os.path.isfile(path):
+                continue
             if(p_id >= doc_num):
                 break
             text = paper['text']
             title = paper['title']
+            print(path)
             print(title,q)
             embedding_path = folder_path + '/embeddings/' + 'doc' + str(p_id) + '_embeddings.npy'
             if strategy == 'vallina_LLM':
@@ -578,17 +684,19 @@ def test_paper_pipeline():
                 heuristic_greedy(q, text, title, path, embedding_path) 
             elif strategy == 'heuristic_topk':
                 heuristic_topk(q, text, title, path, embedding_path)
+            elif strategy == 'exponential_greedy':
+                exponential_greedy(q, text, title, path)
     
-            #break
-        #break
+        #     break
+        # break
 
 def test_hotpot_pipeline():
     data_path = parent_directory + '/data/hotpotQA_fullwiki.json'
     folder_path = parent_directory + '/out/hotpotQA'
     hotpot_objects = data_digestion.digest_hotpotQA_dataset(data_path)
 
-    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk']
-    strategy = 'heuristic_topk'
+    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk','exponential_greedy']
+    strategy = 'exponential_greedy'
     num_of_case = 10
 
     i = -1
@@ -602,8 +710,8 @@ def test_hotpot_pipeline():
         path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + '.json'
         if not os.path.exists(folder_path + '/results'):
             os.makedirs(folder_path + '/results')
-        # if os.path.isfile(path):
-        #     continue
+        if os.path.isfile(path):
+            continue
         # if i != 5:
         #     continue
         #print(question)
@@ -618,6 +726,8 @@ def test_hotpot_pipeline():
             heuristic_greedy(q, text, title, path, embedding_path) 
         elif strategy == 'heuristic_topk':
             heuristic_topk(q, text, title, path, embedding_path)
+        elif strategy == 'exponential_greedy':
+            exponential_greedy(q, text, title, path)
         #break
         if(i > num_of_case):
             break

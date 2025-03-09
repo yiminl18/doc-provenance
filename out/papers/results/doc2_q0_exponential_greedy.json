@@ -1,0 +1,36 @@
+{
+    "title": "Understanding My Data, Myself: Supporting Self-reflection with Ubicomp Technologies",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2011"
+    ],
+    "context_size": 13064,
+    "provenance": [
+        "We believe that this work will help developers and\ndesigners more appropriately build personal informatics\ntools and take better advantage of Ubicomp technologies to\nhelp users self-reflect.",
+        "REFERENCES\n\n1.",
+        "2.",
+        "On the self-regulation of\nbehavior.",
+        "Cambridge University Press, 2001.",
+        "6.",
+        "CHT’09, pp.",
+        "UbiComp'11 / Beijing, China\n\n."
+    ],
+    "provenance_size": 79,
+    "tokens": [
+        210492,
+        170
+    ],
+    "provenance_ids": [
+        438,
+        441,
+        446,
+        458,
+        459,
+        460,
+        462,
+        491
+    ]
+}

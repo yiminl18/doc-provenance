@@ -1,0 +1,30 @@
+{
+    "title": "Why We Use and Abandon Smart Devices",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. Do not add explanations."
+    ],
+    "answers": [
+        "UbiComp"
+    ],
+    "context_size": 14092,
+    "provenance": [
+        "\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\nWhy We Use and Abandon Smart Devices\n\nAmanda Lazar\nUniversity of Washington\nalaz@uw.edu\n\nJoshua Tanenbaum\n\nUniversity of California, Irvine\n\ntanenbaj@uci.edu\n\nABSTRACT\n\nSmart devices are becoming increasingly commercially\navailable.",
+        "To advance an\nunderstanding of the ways users benefit from, are\nchallenged by, and abandon smart devices, we asked a\ngroup of users to purchase smart sensing devices to advance\nthemselves towards a personal, self-defined goal.",
+        "Participants used\ndevices because they had developed routines and because\ndevices were useful, satisfied curiosity, and held hope for\npotential benefit to them.",
+        "We propose ways to reduce\nbarriers, motivate use, and argue for envisioning an\nadditional function of these devices for short-term\ninterventions, in addition to standard long-term use.",
+        "This reasoning follows the line of thought that more\n\nPermission to make digital or hard copies of all or part of this work for\npersonal or classroom use is granted without fee provided that copies are\nnot made or distributed for profit or commercial advantage and that copies\nbear this notice and the full citation on the first page."
+    ],
+    "provenance_size": 257,
+    "tokens": [
+        262512,
+        79
+    ],
+    "provenance_ids": [
+        0,
+        2,
+        4,
+        5,
+        9
+    ]
+}

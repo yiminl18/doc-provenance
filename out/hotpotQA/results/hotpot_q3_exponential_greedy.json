@@ -1,0 +1,18 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "Are the Laleli Mosque and Esma Sultan Mansion located in the same neighborhood?",
+        "Only return yes or no. Do not add explanations."
+    ],
+    "answers": [
+        "No."
+    ],
+    "context_size": 861,
+    "provenance": [],
+    "provenance_size": 0,
+    "tokens": [
+        2343,
+        8
+    ],
+    "provenance_ids": []
+}

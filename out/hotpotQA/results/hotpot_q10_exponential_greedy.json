@@ -1,0 +1,18 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "What is the name of the fight song of the university whose main campus is in Lawrence, Kansas and whose branch campuses are in the Kansas City metropolitan area?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "\"Rock Chalk, Jayhawk\""
+    ],
+    "context_size": 1585,
+    "provenance": [],
+    "provenance_size": 0,
+    "tokens": [
+        5689,
+        42
+    ],
+    "provenance_ids": []
+}

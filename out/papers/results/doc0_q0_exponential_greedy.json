@@ -1,0 +1,22 @@
+{
+    "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2019"
+    ],
+    "context_size": 5912,
+    "provenance": [
+        "The difficulties\nthat can be encountered by individuals when facing data of self-\n\n\nECCE 2019, September 10-13, 2019, BELFAST, <, United Kingdom\n\nbehaviors can be grouped in two main categories: understanding\ndata and accepting data."
+    ],
+    "provenance_size": 57,
+    "tokens": [
+        88320,
+        68
+    ],
+    "provenance_ids": [
+        118
+    ]
+}

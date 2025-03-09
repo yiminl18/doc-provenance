@@ -1,0 +1,24 @@
+{
+    "title": "Expense Control: A Gamified, Semi-Automated, Crowd-Based Approach For Receipt Capturing",
+    "question": [
+        "Who are the authors of this paper?",
+        "Return only the author names. Do not add explanations."
+    ],
+    "answers": [
+        "Maximilian Altmeyer, Pascal Lessel, Antonio Krüger"
+    ],
+    "context_size": 16907,
+    "provenance": [
+        "\nIUI 2016 * Social Media\n\nMarch 7-10, 2016, Sonoma, CA, USA\n\nExpense Control: A Gamified, Semi-Automated,\nCrowd-Based Approach For Receipt Capturing\n\nMaximilian Altmeyer'’, Pascal Lessel?",
+        "*, Antonio Kriiger”'\n‘Saarland University, 7 DFKI GmbH, *Saarbriicken Graduate School of Computer Science\nSaarbriicken, Germany\n{first name}."
+    ],
+    "provenance_size": 104,
+    "tokens": [
+        151694,
+        164
+    ],
+    "provenance_ids": [
+        0,
+        1
+    ]
+}

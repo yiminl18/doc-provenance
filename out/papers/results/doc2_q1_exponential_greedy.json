@@ -1,0 +1,22 @@
+{
+    "title": "Understanding My Data, Myself: Supporting Self-reflection with Ubicomp Technologies",
+    "question": [
+        "Who are the authors of this paper?",
+        "Return only the author names. Do not add explanations."
+    ],
+    "answers": [
+        "Ian Li, Anind K. Dey, Jodi Forlizzi"
+    ],
+    "context_size": 13064,
+    "provenance": [
+        "UbiComp'11 / Beijing, China\n\nUnderstanding My Data, Myself:\nSupporting Self-Reflection with Ubicomp Technologies\n\nIan Li’, Anind K. Dey’, Jodi Forlizzi'”\n'Human Computer Interaction Institute, “School of Design\nCarnegie Mellon University, Pittsburgh, PA 15213\nianli@cmu.edu, {anind, forlizzi}@cs.cmu.edu\n\nABSTRACT\n\nWe live in a world where many kinds of data about us can\nbe collected and more will be collected as Ubicomp\ntechnologies mature."
+    ],
+    "provenance_size": 120,
+    "tokens": [
+        127779,
+        196
+    ],
+    "provenance_ids": [
+        1
+    ]
+}

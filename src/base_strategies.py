@@ -53,6 +53,10 @@ def count_tokens(text, model="gpt-4o-mini"):
 
 
 def QA(question, context):
+    #intruction = ' If answers are not found, return NULL.'
+    print(len(context))
+    if len(context) == 0:
+        return ['NULL'], 0, 0
     prompt = (question[0] + question[1], context)
     response = model(model_name, prompt)
     # print('Prompt is:', prompt[0])
@@ -76,15 +80,22 @@ def equal_string(res1, res2):
     if(len(res1) != len(res2)):
         return False
     res1_lower = []
-    print('before:',res1)
-    print('before:',res2)
+    for r in res1:
+        if 'null' in r.lower():
+            return False
+    for r in res2:
+        if 'null' in r.lower():
+            return False
+    # print('before:',res1)
+    # print('before:',res2)
     for r in res1:
         res1_lower.append(eval_equivelance_rules(r).lower())
+        
     res2_lower = []
     for r in res2:
         res2_lower.append(eval_equivelance_rules(r).lower())
-    print('after:',res1_lower)
-    print('after:',res2_lower)
+    # print('after:',res1_lower)
+    # print('after:',res2_lower)
     for r in res1_lower:
         if r not in res2_lower:
             return False
@@ -197,6 +208,7 @@ def exponential_greedy(question, text, title, result_path, metric = 'string'):
     out = {}
     answers, input_tokens, output_tokens = QA(question,text)
     sentences = extract_sentences_from_pdf(text)
+    #print(len(sentences))
 
     out['title'] = title
     out['question'] = question
@@ -223,6 +235,7 @@ def exponential_greedy(question, text, title, result_path, metric = 'string'):
             remaining_sentences_id.append(i)
 
         sorted_remaining_sentences_id = sorted(remaining_sentences_id)
+        #print(sorted_remaining_sentences_id)
         
         eval_result, input_token, output_token = evaluate(answers, question, sorted_remaining_sentences_id, sentences, metric = metric)
         input_tokens += input_token
@@ -710,10 +723,10 @@ def test_hotpot_pipeline():
         path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + '.json'
         if not os.path.exists(folder_path + '/results'):
             os.makedirs(folder_path + '/results')
-        if os.path.isfile(path):
-            continue
-        # if i != 5:
+        # if os.path.isfile(path):
         #     continue
+        if i != 10:
+            continue
         #print(question)
         embedding_path = folder_path + '/embeddings/' + 'hotpot' + '_q' + str(i) + '_embeddings.npy'
         if strategy == 'vallina_LLM':

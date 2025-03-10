@@ -8,11 +8,15 @@
         "Yes"
     ],
     "context_size": 1484,
-    "provenance": [],
-    "provenance_size": 0,
-    "tokens": [
-        6072,
-        7
+    "provenance": [
+        "The name of the town is pronounced without the \"h\" (\"AM-erst\"), giving rise to the local saying, \"only the 'h' is silent\", in reference both to the pronunciation and to the town's politically active populace."
     ],
-    "provenance_ids": []
+    "provenance_size": 48,
+    "tokens": [
+        8030,
+        13
+    ],
+    "provenance_ids": [
+        49
+    ]
 }

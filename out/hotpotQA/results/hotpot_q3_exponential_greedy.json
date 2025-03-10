@@ -8,11 +8,15 @@
         "No."
     ],
     "context_size": 861,
-    "provenance": [],
-    "provenance_size": 0,
-    "tokens": [
-        2343,
-        8
+    "provenance": [
+        "He was a \"damat\" (\"bridegroom\") to the Ottoman dynasty after he married an Ottoman princess, Esma Sultan.The Esma Sultan Mansion (Turkish: \"Esma Sultan Yalısı\" ), a historical yalı (English: waterside mansion ) located at Bosphorus in Ortaköy neighborhood of Istanbul, Turkey and named after its original owner Esma Sultan, is used today as a cultural center after being redeveloped."
     ],
-    "provenance_ids": []
+    "provenance_size": 93,
+    "tokens": [
+        2711,
+        9
+    ],
+    "provenance_ids": [
+        18
+    ]
 }

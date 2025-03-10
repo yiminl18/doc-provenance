@@ -8,11 +8,17 @@
         "\"Rock Chalk, Jayhawk\""
     ],
     "context_size": 1585,
-    "provenance": [],
-    "provenance_size": 0,
-    "tokens": [
-        5689,
-        42
+    "provenance": [
+        "Since it would be too expensive to cover all the major highways in the Kansas City metro (which has more miles of highway per person than any other metropolitan area in the United States), studies were conducted to determine which highways or segments of highways have priority due to higher accident rates.",
+        "It was named after the iconic Kansas City Scout Statue that exists in Penn Valley Park, overlooking Downtown Kansas City."
     ],
-    "provenance_ids": []
+    "provenance_size": 76,
+    "tokens": [
+        7317,
+        107
+    ],
+    "provenance_ids": [
+        37,
+        40
+    ]
 }

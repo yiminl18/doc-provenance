@@ -209,7 +209,7 @@ def exponential_greedy(question, text, title, result_path, metric = 'string'):
     answers, input_tokens, output_tokens = QA(question,text)
     sentences = extract_sentences_from_pdf(text)
     #print(len(sentences))
-
+    st = time.time()
     out['title'] = title
     out['question'] = question
     out['answers'] = answers
@@ -262,10 +262,13 @@ def exponential_greedy(question, text, title, result_path, metric = 'string'):
         provenance_id.append(i)
         provenance.append(sentences[i])
 
+    et = time.time()
+
     out['provenance'] = provenance
     out['provenance_size'] = count_tokens(''.join(provenance))
     out['tokens'] = (input_tokens, output_tokens)
     out['provenance_ids'] = provenance_id  
+    out['time'] = et-st
 
     write_json_to_file(result_path, out)
 
@@ -676,10 +679,10 @@ def test_paper_pipeline():
         for p_id in range(len(paper_objects)):
             paper = paper_objects[p_id]
             path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
-            if p_id == 3 or q_id == 1:
-                continue
-            if os.path.isfile(path):
-                continue
+            # if p_id == 3 or q_id == 1:
+            #     continue
+            # if os.path.isfile(path):
+            #     continue
             if(p_id >= doc_num):
                 break
             text = paper['text']
@@ -725,8 +728,8 @@ def test_hotpot_pipeline():
             os.makedirs(folder_path + '/results')
         # if os.path.isfile(path):
         #     continue
-        if i != 10:
-            continue
+        # if i != 10:
+        #     continue
         #print(question)
         embedding_path = folder_path + '/embeddings/' + 'hotpot' + '_q' + str(i) + '_embeddings.npy'
         if strategy == 'vallina_LLM':
@@ -747,5 +750,5 @@ def test_hotpot_pipeline():
 
 
 if __name__ == "__main__":
-    #test_paper_pipeline()
-    test_hotpot_pipeline()
+    test_paper_pipeline()
+    #test_hotpot_pipeline()

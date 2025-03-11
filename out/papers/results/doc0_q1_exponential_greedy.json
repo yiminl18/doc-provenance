@@ -2,24 +2,24 @@
     "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
     "question": [
         "Who are the authors of this paper?",
-        "Return only a list of strings, seperated by |"
+        "Return only the author names. Do not add explanations."
     ],
     "answers": [
-        "Cecile Boulard",
-        "Stefania Castellani",
-        "Tommaso Colombino",
-        "Antonietta Grasso"
+        "Cecile Boulard, Stefania Castellani, Tommaso Colombino, Antonietta Grasso"
     ],
     "context_size": 5912,
     "provenance": [
-        "ACM Reference format:\n\nCecile Boulard, Stefania Castellani, Tommaso Colombino and Antonietta\nGrasso."
+        "ACM Reference format:\n\nCecile Boulard, Stefania Castellani, Tommaso Colombino and Antonietta\nGrasso.",
+        "In Proceedings of 31st European Conference on Cognitive\nErgonomics (ECCE 2019), September 10-13, 2019, BELFAST, <, United\nKingdom."
     ],
-    "provenance_size": 29,
+    "provenance_size": 70,
     "tokens": [
-        64233,
-        320
+        91224,
+        434
     ],
     "provenance_ids": [
-        4
-    ]
+        4,
+        7
+    ],
+    "time": 15.511403799057007
 }

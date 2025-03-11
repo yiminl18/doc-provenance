@@ -1,0 +1,23 @@
+{
+    "title": "Sundroid: Solar Radiation Awareness with Smartphones",
+    "question": [
+        "Who are the authors of this paper?",
+        "Return only the author names. Do not add explanations."
+    ],
+    "answers": [
+        "Thomas Fahrni, Michael Kuhn, Philipp Sommer, Roger Wattenhofer, Samuel Welten"
+    ],
+    "context_size": 12329,
+    "provenance": [
+        "UbiComp'11 / Beijing, China\n\nSundroid: Solar Radiation Awareness with Smartphones’\n\nThomas Fahrni, Michael Kuhn, Philipp Sommer, Roger Wattenhofer, and Samuel Welten\nComputer Engineering and Networks Laboratory\nETH Zurich, Switzerland\nfirstname.lastname @tik.ee.ethz.ch\n\nABSTRACT\n\nWhile the sun is important for our health, overexposure to\nsunlight carries significant health risks ranging from sunburn\nto skin cancer."
+    ],
+    "provenance_size": 93,
+    "tokens": [
+        119818,
+        16624
+    ],
+    "provenance_ids": [
+        1
+    ],
+    "time": 56.0441930294037
+}

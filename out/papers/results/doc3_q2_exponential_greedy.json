@@ -1,29 +1,37 @@
 {
     "title": "Sundroid: Solar Radiation Awareness with Smartphones",
     "question": [
-        "In what year was this paper published?",
-        "Return only a number. Do not add explanations."
+        "In which conference was this paper published?",
+        "Return only the conference name. Do not add explanations."
     ],
     "answers": [
-        "2011"
+        "UbiComp'11"
     ],
     "context_size": 12329,
     "provenance": [
         "We\nare convinced that technological advances will empower the\nseamless integration of a variety of sensors in clothing and\naccessories, making systems such as Sundroid a ubiquitous\npart of our daily life.",
-        "ACKNOWLEDGMENTS\n\nWe would like to thank Dr. Giinter Hofbauer from the De-\npartment of Dermatology at the University Hospital Zurich\nfor his useful advice and feedback on the prototype platform.",
         "REFERENCES\n1.",
+        "Cancer research, 53(1):53, 1993.",
+        "8.",
+        "British Journal of\nDermatology, 97(4):407-410, 1977.",
+        "10.",
+        "Paper Session: How Healthy?",
         "UbiComp'11 / Beijing, China\n\nM. Moron, J. Luque, A. Botella, E. Cuberos,\n\nE. Casilari, and A. Diaz-Estrella."
     ],
-    "provenance_size": 132,
+    "provenance_size": 137,
     "tokens": [
-        202655,
-        138
+        228220,
+        395
     ],
     "provenance_ids": [
         367,
-        368,
         370,
+        394,
+        395,
+        401,
+        402,
+        406,
         474
     ],
-    "time": 52.23362588882446
+    "time": 75.70608496665955
 }

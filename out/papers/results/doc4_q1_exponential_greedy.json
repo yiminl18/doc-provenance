@@ -1,0 +1,25 @@
+{
+    "title": "Why We Use and Abandon Smart Devices",
+    "question": [
+        "Who are the authors of this paper?",
+        "Return only the author names. Do not add explanations."
+    ],
+    "answers": [
+        "Amanda Lazar, Joshua Tanenbaum, Christian Koehler, David H. Nguyen"
+    ],
+    "context_size": 14092,
+    "provenance": [
+        "\nUBICOMP '15, SEPTEMBER 7-11, 2015, OSAKA, JAPAN\n\nWhy We Use and Abandon Smart Devices\n\nAmanda Lazar\nUniversity of Washington\nalaz@uw.edu\n\nJoshua Tanenbaum\n\nUniversity of California, Irvine\n\ntanenbaj@uci.edu\n\nABSTRACT\n\nSmart devices are becoming increasingly commercially\navailable.",
+        "http://dx.doi.org/10.1145/2750858.2804288\n\n635\n\nChristian Koehler\nCarnegie Mellon University\nckoehler@andrew.cmu.edu\n\nDavid H. Nguyen\nNokia\ndavid.h.nguyen@nokia.com\n\ninformation about one’s activities will result in behavior\nchange."
+    ],
+    "provenance_size": 148,
+    "tokens": [
+        189564,
+        230
+    ],
+    "provenance_ids": [
+        0,
+        16
+    ],
+    "time": 15.858618021011353
+}

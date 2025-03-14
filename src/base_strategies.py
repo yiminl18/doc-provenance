@@ -54,7 +54,7 @@ def count_tokens(text, model="gpt-4o-mini"):
 
 def QA(question, context):
     #intruction = ' If answers are not found, return NULL.'
-    print(len(context))
+    #print(len(context))
     if len(context) == 0:
         return ['NULL'], 0, 0
     prompt = (question[0] + question[1], context)
@@ -140,21 +140,22 @@ def equal(res1, res2, metric = 'string'):
 
 def evaluate(answers, question, ids, sentences, context = '', metric = 'string'):
     ids = sorted(ids)
+    #print(ids)
     if(context == ''):
         for id in ids:
             context += sentences[id]
-    #print('tokens:', count_tokens(context))
+    #print('tokens:', context)
     #print('context:',context[:10])
     #print(len(ids))
     #print(ids)
     pred_ans, input_tokens, output_tokens = QA(question, context)
-    print(pred_ans)
-    print(answers)
+    # print(pred_ans)
+    # print(answers)
     if(equal(pred_ans, answers, metric)):
-        print('True')
+        #print('True')
         return True, input_tokens, output_tokens
     else:
-        print('False')
+        #print('False')
         return False, input_tokens, output_tokens
 
 def vallina_LLM(question, context, title, path):
@@ -334,6 +335,186 @@ def sequential_greedy_score(question, context, title, sorted_idx = [], metric = 
 binary_out_ids = []
 sum_input_tokens = 0
 sum_output_tokens = 0
+
+def block_labeler(sentences, question, answers, blk_num):
+    blocks = []
+    blocks_sentences_id = []
+    block_size = len(sentences)/blk_num
+    bid = 0
+    block = []
+    ids = []
+    for i in range(len(sentences)):
+        if(bid < block_size):
+            block.append(sentences[i])
+            ids.append(i)
+            bid += 1
+        else:
+            bid = 0
+            block_content = ''.join(block)
+            blocks.append(block_content)
+            blocks_sentences_id.append(ids)
+            ids = []
+            block = []
+    instruction = 'Given the following question: ' + question[0] + ' and a list of text blocks, the corresponding answers are: ' + ','.join(answers) +  '. Your task is to assign a score (from 1 to 10) to each block based on how likely it is to contain context relevant to answering the question. The text blocks are listed below, each starting with Block i: followed by its content. Return only a comma-separated list of scores corresponding to each block, in the order they are given. Do not include any explanations or additional text. '
+    context = ''
+    print(len(blocks))
+    for id in range(len(blocks)):
+        context += 'Block ' + str(id) + ': ' + blocks[id] + '\n'
+    prompt = (instruction, context)
+    response = model(model_name, prompt)
+    #print(response)
+    scores = [int(num.strip()) for num in response.split(",")]
+    block_scores = {}
+    if len(scores) != len(blocks_sentences_id):
+        print('Labeler does not score for each block!') 
+        for id in range(len(blocks_sentences_id)):
+            block_scores[id] = 1
+    else:
+        print('Labeler scores for each block!')
+        for id in range(len(blocks_sentences_id)):
+            block_scores[id] = scores[id]
+
+    return block_scores, blocks_sentences_id
+
+
+def divide_and_conquer_progressive(question, text, title, path, k, stop_sentence_length = 5,  metric = 'string'):
+    #k: the length of sentnces in the interval to stop iteration, k can be decided based on the cost of divide_and_conquer and greedy on last mile, in different scenarios  
+    global binary_out_ids,sum_input_tokens,sum_output_tokens
+    sum_input_tokens = 0
+    sum_output_tokens = 0
+    binary_out_ids = []
+    print(len(text))
+    answers, input_tokens, output_tokens = QA(question,text)
+    sentences = extract_sentences_from_pdf(text)
+    print(answers)
+    blk_num = len(sentences)/k
+    blk_num = min(20, blk_num)
+    #print(blk_num, len(sentences))
+    block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
+
+    # for id, score in block_scores.items():
+    #     print(blocks_sentences_id[id], score)
+
+    out = {}
+    out['title'] = title
+    out['question'] = question
+    out['answers'] = answers
+    out['path'] = path
+    out['context_size'] = count_tokens(text)
+
+    
+    ids = []
+    
+    for i in range(len(sentences)):
+        ids.append(i)
+    divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric)
+    # binary_out_ids = list(set(binary_out_ids))
+    # binary_out_ids = sorted(binary_out_ids)
+    # #print(binary_out_ids)
+    # et = time.time()
+    # out['time'] = et-st
+    # out['tokens'] = (input_tokens, output_tokens)
+    # out['provenance_ids'] = binary_out_ids 
+    # provenance = []
+    # for id in binary_out_ids:
+    #     provenance.append(sentences[id])
+    # out['provenance'] = provenance
+    # out['provenance_size'] = count_tokens(''.join(provenance))
+    #write_json_to_file(path, out)
+
+def block_decider(left_ids, right_ids):
+    return left_ids
+
+topk_provenance_id = 0
+
+def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric = 'string'):
+    """
+    Attempt to find a smaller subset of `sentences` that returns True for H,
+    using a divide-and-conquer approach but in a non-recursive (queue-based) way.
+    Adds a caching mechanism to avoid re-evaluating the same subsets.
+    
+    Returns:
+        True if the entire input `ids` subset is True under `evaluate`,
+        False otherwise.
+    
+    Side-effects:
+        - Appends to the global list `binary_out_ids` those IDs that
+          we deem necessary.
+        - Accumulates token usage in `sum_input_tokens` and `sum_output_tokens`.
+    """
+    global binary_out_ids, sum_input_tokens, sum_output_tokens, topk_provenance_id
+    
+    # A dictionary to cache evaluation results: { (ids_as_tuple): (eval_result, input_tokens, output_tokens) }
+    eval_cache = {}
+    st = time.time()
+    
+    def is_cached(sub_ids):
+        """
+        A helper function to wrap 'evaluate', storing and retrieving results from 'eval_cache'.
+        """
+        # Convert the list of IDs to a tuple so it can be used as a dictionary key
+        key = tuple(sub_ids)
+        
+        # Return cached result if we already have it
+        if key in eval_cache:
+            return eval_cache[key]
+        
+        return 'NULL'
+    
+    def set_cached(sub_ids, result):
+        key = tuple(sub_ids)
+        eval_cache[key] = result 
+
+    # Use a queue to perform an iterative, divide-and-conquer approach
+    stack = [ids]
+
+    # current_ids has alredy been runed, set its status 
+    #set_cached(ids, True)
+
+    while stack:
+        current_ids = stack.pop()
+        if topk_provenance_id >= k:
+            continue
+
+        # Evaluate the entire set once, storing the result
+        if is_cached(current_ids) == 'NULL':
+            eval_result, input_token, output_token = evaluate(answers, question, current_ids, sentences, metric = metric)
+            sum_input_tokens += input_token
+            sum_output_tokens += output_token
+            set_cached(current_ids, eval_result)
+        else:
+            eval_result = is_cached(current_ids)
+
+        #print(current_ids, eval_result)
+        # If the entire set doesn't yield True, no need to proceed
+        if not eval_result:
+            continue
+        if eval_result and len(current_ids) <= stop_sentence_length: #k is the length of sentences in the interval to stop iteration 
+            print('Top-'+ str(topk_provenance_id),' provenance:',current_ids)
+            print('Input tokens:', sum_input_tokens)
+            print('Output tokens:', sum_output_tokens)
+            print('Time:', time.time() - st)
+            topk_provenance_id += 1
+            continue
+
+        # Split the current subset into two halves
+        mid = len(current_ids) // 2
+        left = current_ids[:mid]
+        right = current_ids[mid:]
+        ids_togo = block_decider(left, right)
+
+        if ids_togo == left: #last in, first out 
+            if is_cached(right) == 'NULL':
+                stack.append(right)
+            if is_cached(left) == 'NULL':
+                stack.append(left) 
+        else:
+            if is_cached(left) == 'NULL':
+                stack.append(left)
+            if is_cached(right) == 'NULL':
+                stack.append(right)
+            
+        
 
 def divide_and_conquer(question, text, title, path,metric = 'string'):
     global binary_out_ids,sum_input_tokens,sum_output_tokens
@@ -670,8 +851,8 @@ def test_paper_pipeline():
     paper_objects = data_digestion.digest_paper_dataset(data_path)
     sample_paper_questions = data_digestion.sample_paper_questions()
 
-    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk','exponential_greedy']
-    strategy = 'exponential_greedy'
+    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk','exponential_greedy','divide_and_conquer_progressive']
+    strategy = 'divide_and_conquer_progressive'
     doc_num = 5
 
     for q_id in range(len(sample_paper_questions)):
@@ -696,6 +877,8 @@ def test_paper_pipeline():
                 sequential_greedy(q, text, title, path) 
             elif strategy == 'divide_and_conquer': 
                 divide_and_conquer(q, text, title, path)
+            elif strategy == 'divide_and_conquer_progressive': 
+                divide_and_conquer_progressive(q, text, title, path, 5)
             elif strategy == 'heuristic_greedy':
                 heuristic_greedy(q, text, title, path, embedding_path) 
             elif strategy == 'heuristic_topk':
@@ -703,8 +886,8 @@ def test_paper_pipeline():
             elif strategy == 'exponential_greedy':
                 exponential_greedy(q, text, title, path)
     
-        #     break
-        # break
+            break
+        break
 
 def test_hotpot_pipeline():
     data_path = parent_directory + '/data/hotpotQA_fullwiki.json'

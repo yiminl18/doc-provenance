@@ -388,18 +388,24 @@ def block_labeler(sentences, question, answers, blk_num):
     bid = 0
     block = []
     ids = []
+    print(block_size)
     for i in range(len(sentences)):
-        if(bid < block_size):
-            block.append(sentences[i])
-            ids.append(i)
-            bid += 1
-        else:
+        block.append(sentences[i])
+        ids.append(i)
+        bid += 1
+        if(bid > block_size):
             bid = 0
             block_content = ''.join(block)
             blocks.append(block_content)
             blocks_sentences_id.append(ids)
             ids = []
             block = []
+        else:
+            if i == len(sentences) - 1:
+                # add last block
+                block_content = ''.join(block)
+                blocks.append(block_content)
+                blocks_sentences_id.append(ids)
     instruction = 'Given the following question: ' + question[0] + ' and a list of text blocks, the corresponding answers are: ' + ','.join(answers) +  '. Your task is to assign a score (from 1 to 10) to each block based on how likely it is to contain context relevant to answering the question. The text blocks are listed below, each starting with Block i: followed by its content. Return only a comma-separated list of scores corresponding to each block, in the order they are given. Do not include any explanations or additional text. '
     context = ''
     print(len(blocks))
@@ -407,16 +413,23 @@ def block_labeler(sentences, question, answers, blk_num):
         context += 'Block ' + str(id) + ': ' + blocks[id] + '\n'
     prompt = (instruction, context)
     response = model(model_name, prompt)
-    #print(response)
+    print(response)
     scores = [int(num.strip()) for num in response.split(",")]
     block_scores = {}
-    if len(scores) != len(blocks_sentences_id):
+    print(scores)
+    print(len(scores), len(blocks), len(blocks_sentences_id))
+    if len(scores) != len(blocks):
         print('Labeler does not score for each block!') 
-        for id in range(len(blocks_sentences_id)):
-            block_scores[id] = 1
+        id = 0
+        while id < len(blocks):
+            if id < len(scores):
+                block_scores[id] = scores[id]
+            else:
+                block_scores[id] = 1
+            id += 1
     else:
         print('Labeler scores for each block!')
-        for id in range(len(blocks_sentences_id)):
+        for id in range(len(blocks)):
             block_scores[id] = scores[id]
 
     return block_scores, blocks_sentences_id
@@ -467,7 +480,41 @@ def divide_and_conquer_progressive(question, text, title, path, k, stop_sentence
     # out['provenance_size'] = count_tokens(''.join(provenance))
     #write_json_to_file(path, out)
 
-def block_decider(left_ids, right_ids):
+def block_decider(left_ids, right_ids, block_scores, blocks_sentences_id):
+    print(left_ids)
+    print(right_ids)
+    for block_id, score in block_scores.items():
+        print(blocks_sentences_id[block_id], score)
+    # find the set of blocks overlapping with left_ids and right_ids
+    left_ids_left = left_ids[0]
+    left_ids_right = left_ids[len(left_ids)-1]
+
+    right_ids_left = right_ids[0]
+    right_ids_right = right_ids[len(right_ids)-1]
+
+    left_blocks = []
+    right_blocks = []
+
+    left_block_start = 0
+    left_block_end = 0
+    right_block_start = 0
+    right_block_end = 0
+
+    for i in range(len(blocks_sentences_id)):
+        block_ids = blocks_sentences_id[i]
+        if left_ids_left in block_ids:
+            left_block_start = i
+        if left_ids_right in block_ids: 
+            left_block_end = i
+        if right_ids_left in block_ids:
+            right_block_start = i
+        if right_ids_right in block_ids:
+            right_block_end = i
+    
+    print(left_block_start, left_block_end)
+    print(right_block_start, right_block_end)
+
+
     return left_ids
 
 topk_provenance_id = 0
@@ -553,7 +600,8 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
         mid = len(current_ids) // 2
         left = current_ids[:mid]
         right = current_ids[mid:]
-        ids_togo = block_decider(left, right)
+        ids_togo = block_decider(left, right, block_scores, blocks_sentences_id)
+        continue
 
         if ids_togo == left: #last in, first out 
             if is_cached(right) == 'NULL':
@@ -987,6 +1035,6 @@ def test_hotpot_pipeline():
 
 
 if __name__ == "__main__":
-    #test_paper_pipeline()
-    test_hotpot_pipeline()
+    test_paper_pipeline()
+    #test_hotpot_pipeline()
     #print(len('ACM, New York, NY, USA, 4 pages.'))

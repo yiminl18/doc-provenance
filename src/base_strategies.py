@@ -21,11 +21,59 @@ model_name = 'gpt4omini'
 def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path)
 
+def merge_short_sentences(sentences, length = 40):
+    merged = []
+    i = 0
+    n = len(sentences)
+    
+    while i < n:
+        current = sentences[i]
+        
+        # If the sentence isn't short, just push it into merged
+        if len(current) >= length:
+            merged.append(current)
+            i += 1
+        
+        else:
+            # current sentence is short
+            # Case A: If merged is empty and there's at least one more sentence, merge forward
+            if not merged and i < n - 1:
+                # Merge with the next sentence in the original list
+                sentences[i + 1] = current + " " + sentences[i + 1]
+                i += 1  # We skip adding current to merged
+            # Case B: If it's the last sentence or there's no next to merge with
+            elif i == n - 1:
+                # If there's something in merged, merge with the last item in merged
+                if merged:
+                    merged[-1] = merged[-1] + " " + current
+                else:
+                    # Edge case: only one short sentence in the entire list
+                    merged.append(current)
+                i += 1
+            else:
+                # We have both a previous (in merged) and a next (in sentences)
+                previous = merged[-1] if merged else ""  # Should not be empty logically here
+                next_sent = sentences[i + 1]
+                
+                if len(previous) <= len(next_sent):
+                    # Merge short sentence with previous
+                    merged[-1] = previous + " " + current
+                    i += 1
+                else:
+                    # Merge short sentence with next
+                    sentences[i + 1] = current + " " + next_sent
+                    i += 1
+                # Notice we do not add `current` to `merged` because it was merged away
+
+    return merged
+
+
 def extract_sentences_from_pdf(text):
     # Split text into sentences using nltk
     sentences = nltk.sent_tokenize(text)
-    # Alternatively, a regex-based approach
-    # sentences = re.split(r'(?<=[.!?])\s+', text)
+    #print(len(sentences))
+    sentences = merge_short_sentences(sentences)
+    #print(len(sentences))
     return sentences
 
 def write_list_to_file(filename, lines):
@@ -188,10 +236,13 @@ def vallina_LLM(question, context, title, path):
 
 def sequential_greedy(question, context, title, path, metric = 'string'):
     st = time.time()
-    out = sequential_greedy_score(question, context, title, metric = metric)
+    answers = QA(question, context)
+    sentences = extract_sentences_from_pdf(context)
+    out = sequential_greedy_score(question, answers, sentences, title, metric = metric)
     et = time.time()
     out['time'] = et-st
     out['path'] = path
+    out['context_size'] = count_tokens(context)
     write_json_to_file(path, out)
 
     return out 
@@ -275,19 +326,13 @@ def exponential_greedy(question, text, title, result_path, metric = 'string'):
 
     return out 
 
-def sequential_greedy_score(question, context, title, sorted_idx = [], metric = 'string'):
-    print(metric)
-    answers, input_tokens, output_tokens = QA(question,context)
-    print(answers)
-
+def sequential_greedy_score(question, answers, sentences, title, sorted_idx = [], metric = 'string'):
     out = {}
     out['title'] = title
     out['question'] = question
     out['answers'] = answers
-    out['context_size'] = count_tokens(context)
-
-    sentences = extract_sentences_from_pdf(context)
-    print('Number of sentences:', len(sentences)) 
+    
+    #print('Number of sentences:', len(sentences)) 
     removed_sentences = []
     input_tokens = 0
     output_tokens = 0
@@ -296,10 +341,10 @@ def sequential_greedy_score(question, context, title, sorted_idx = [], metric = 
     if len(sorted_idx) == 0:
         sorted_idx = list(range(len(sentences)))
 
-    print(sorted_idx)
+    #print(sorted_idx)
 
     for i in sorted_idx:
-        print('Iterating sentence ',i, len(sorted_idx))
+        #print('Iterating sentence ',i, len(sorted_idx))
         #print(sentences[i])
         remaining_sentences_id = []
         for j in sorted_idx:
@@ -316,7 +361,7 @@ def sequential_greedy_score(question, context, title, sorted_idx = [], metric = 
         output_tokens += output_token
         if eval_result == True:#if removing this sentence does not change the final answers, then this sentence can be removed 
             removed_sentences.append(i) 
-            print('Sentence ',i, ' is removed!')
+            #print('Sentence ',i, ' is removed!')
     provenance = []
     provenance_id = []
     for i in sorted_idx:
@@ -490,7 +535,14 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
         if not eval_result:
             continue
         if eval_result and len(current_ids) <= stop_sentence_length: #k is the length of sentences in the interval to stop iteration 
-            print('Top-'+ str(topk_provenance_id),' provenance:',current_ids)
+            # send current ids to another operator to produce MP 
+            out = sequential_greedy_score(question, answers, sentences, '', sorted_idx = current_ids)
+            provenance_ids = out['provenance_ids']
+            print('Top-'+ str(topk_provenance_id),' provenance:',provenance_ids)
+            provenance_context = ''
+            for id in provenance_ids:
+                provenance_context += sentences[id]
+            print('Provenance:', provenance_context)
             print('Input tokens:', sum_input_tokens)
             print('Output tokens:', sum_output_tokens)
             print('Time:', time.time() - st)
@@ -791,10 +843,12 @@ def heuristic_greedy(question, text, title, result_path, embedding_path, metric 
     sorted_indices, similarity_scores = sort_sentences_by_similarity(question, answers, text, embedding_path)
     k, extra_input_tokens, extra_output_tokens = pick_k_binary(question, text, sorted_indices, metric = metric)
     #print(k, len(sorted_indices))
-    out = sequential_greedy_score(question, text, title, sorted_idx = sorted_indices[:k])
+    sentences = extract_sentences_from_pdf(text)
+    out = sequential_greedy_score(question, answers, sentences, title, sorted_idx = sorted_indices[:k])
     et = time.time()
     out['time'] = et-st
     out['k'] = k 
+    out['context_size'] = count_tokens(text)
     (input_tokens, output_tokens) = out['tokens']
     out['tokens'] = (input_tokens + extra_input_tokens, output_tokens + extra_output_tokens)
 
@@ -895,7 +949,7 @@ def test_hotpot_pipeline():
     hotpot_objects = data_digestion.digest_hotpotQA_dataset(data_path)
 
     strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk','exponential_greedy']
-    strategy = 'exponential_greedy'
+    strategy = 'vallina_LLM'
     num_of_case = 10
 
     i = -1
@@ -927,11 +981,12 @@ def test_hotpot_pipeline():
             heuristic_topk(q, text, title, path, embedding_path)
         elif strategy == 'exponential_greedy':
             exponential_greedy(q, text, title, path)
-        #break
+        break
         if(i > num_of_case):
             break
 
 
 if __name__ == "__main__":
-    test_paper_pipeline()
-    #test_hotpot_pipeline()
+    #test_paper_pipeline()
+    test_hotpot_pipeline()
+    #print(len('ACM, New York, NY, USA, 4 pages.'))

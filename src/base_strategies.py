@@ -21,7 +21,7 @@ model_name = 'gpt4omini'
 def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path)
 
-def merge_short_sentences(sentences, length = 40):
+def merge_short_sentences(sentences, length = 30):
     merged = []
     i = 0
     n = len(sentences)
@@ -388,7 +388,7 @@ def block_labeler(sentences, question, answers, blk_num):
     bid = 0
     block = []
     ids = []
-    print(block_size)
+    #print(block_size)
     for i in range(len(sentences)):
         block.append(sentences[i])
         ids.append(i)
@@ -408,16 +408,16 @@ def block_labeler(sentences, question, answers, blk_num):
                 blocks_sentences_id.append(ids)
     instruction = 'Given the following question: ' + question[0] + ' and a list of text blocks, the corresponding answers are: ' + ','.join(answers) +  '. Your task is to assign a score (from 1 to 10) to each block based on how likely it is to contain context relevant to answering the question. The text blocks are listed below, each starting with Block i: followed by its content. Return only a comma-separated list of scores corresponding to each block, in the order they are given. Do not include any explanations or additional text. '
     context = ''
-    print(len(blocks))
+    #print(len(blocks))
     for id in range(len(blocks)):
         context += 'Block ' + str(id) + ': ' + blocks[id] + '\n'
     prompt = (instruction, context)
     response = model(model_name, prompt)
-    print(response)
+    #print(response)
     scores = [int(num.strip()) for num in response.split(",")]
     block_scores = {}
-    print(scores)
-    print(len(scores), len(blocks), len(blocks_sentences_id))
+    #print(scores)
+    #print(len(scores), len(blocks), len(blocks_sentences_id))
     if len(scores) != len(blocks):
         print('Labeler does not score for each block!') 
         id = 0
@@ -481,10 +481,10 @@ def divide_and_conquer_progressive(question, text, title, path, k, stop_sentence
     #write_json_to_file(path, out)
 
 def block_decider(left_ids, right_ids, block_scores, blocks_sentences_id):
-    print(left_ids)
-    print(right_ids)
-    for block_id, score in block_scores.items():
-        print(blocks_sentences_id[block_id], score)
+    # print(left_ids)
+    # print(right_ids)
+    # for block_id, score in block_scores.items():
+    #     print(blocks_sentences_id[block_id], score)
     # find the set of blocks overlapping with left_ids and right_ids
     left_ids_left = left_ids[0]
     left_ids_right = left_ids[len(left_ids)-1]
@@ -511,11 +511,26 @@ def block_decider(left_ids, right_ids, block_scores, blocks_sentences_id):
         if right_ids_right in block_ids:
             right_block_end = i
     
-    print(left_block_start, left_block_end)
-    print(right_block_start, right_block_end)
+    # print(left_block_start, left_block_end)
+    # print(right_block_start, right_block_end)
+    left_score = 0
+    right_score = 0
 
+    for i, score in block_scores.items():
+        if i >= left_block_start and i <= left_block_end:
+            left_score += score
+        if i >= right_block_start and i <= right_block_end:
+            right_score += score
+    
+    left_score /= (left_block_end - left_block_start + 1)
+    right_score /= (right_block_end - right_block_start + 1)
 
-    return left_ids
+    #print(left_score, right_score)
+
+    if left_score > right_score:
+        return left_ids
+    
+    return right_ids
 
 topk_provenance_id = 0
 
@@ -601,7 +616,7 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
         left = current_ids[:mid]
         right = current_ids[mid:]
         ids_togo = block_decider(left, right, block_scores, blocks_sentences_id)
-        continue
+        #continue
 
         if ids_togo == left: #last in, first out 
             if is_cached(right) == 'NULL':

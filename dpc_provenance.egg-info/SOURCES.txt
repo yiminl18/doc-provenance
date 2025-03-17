@@ -1,0 +1,15 @@
+README.md
+setup.py
+doc_provenance/__init__.py
+doc_provenance/base_strategies.py
+doc_provenance/data_digestion.py
+doc_provenance/model.py
+doc_provenance/models/__init__.py
+doc_provenance/models/gpt_4_vision.py
+doc_provenance/models/gpt_4o.py
+doc_provenance/models/gpt_4o_mini.py
+dpc_provenance.egg-info/PKG-INFO
+dpc_provenance.egg-info/SOURCES.txt
+dpc_provenance.egg-info/dependency_links.txt
+dpc_provenance.egg-info/requires.txt
+dpc_provenance.egg-info/top_level.txt

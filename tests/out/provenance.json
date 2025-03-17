@@ -1,0 +1,38 @@
+[
+    {
+        "provenance_id": 0,
+        "sentences_ids": [
+            73
+        ],
+        "time": 6.792847156524658,
+        "input_token_size": 18162,
+        "output_token_size": 40
+    },
+    {
+        "provenance_id": 1,
+        "sentences_ids": [
+            32
+        ],
+        "time": 11.480679988861084,
+        "input_token_size": 24010,
+        "output_token_size": 91
+    },
+    {
+        "provenance_id": 2,
+        "sentences_ids": [
+            13
+        ],
+        "time": 16.782247066497803,
+        "input_token_size": 27074,
+        "output_token_size": 142
+    },
+    {
+        "provenance_id": 3,
+        "sentences_ids": [
+            6
+        ],
+        "time": 20.420688152313232,
+        "input_token_size": 28387,
+        "output_token_size": 160
+    }
+]

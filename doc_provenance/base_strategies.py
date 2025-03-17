@@ -1,7 +1,7 @@
 from pdfminer.high_level import extract_text
 import os,sys,nltk,time,json
 import tiktoken
-import data_digestion
+from doc_provenance import data_digestion
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
@@ -435,6 +435,31 @@ def block_labeler(sentences, question, answers, blk_num):
     return block_scores, blocks_sentences_id
 
 
+
+def divide_and_conquer_progressive_API(raw_question, text, result_path, k=5, stop_sentence_length = 5,  metric = 'string'):
+    global binary_out_ids,sum_input_tokens,sum_output_tokens
+    sum_input_tokens = 0
+    sum_output_tokens = 0
+    binary_out_ids = []
+    instruction = 'Only return the answer. Do not add explanations. '
+    question = (raw_question, instruction)
+    answers, input_tokens, output_tokens = QA(question,text)
+    sentences = extract_sentences_from_pdf(text)
+    answer_path = result_path + '/answers.txt'
+    #print(answers)
+    write_string_to_file(answer_path, ''.join(answers))
+    blk_num = len(sentences)/k
+    blk_num = min(20, blk_num)
+    #print(blk_num, len(sentences))
+    block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
+
+    ids = []
+    for i in range(len(sentences)):
+        ids.append(i)
+    
+    provenance_path = result_path + '/provenance.json'
+    divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric = metric, result_path = provenance_path)
+
 def divide_and_conquer_progressive(question, text, title, path, k, stop_sentence_length = 5,  metric = 'string'):
     #k: the length of sentnces in the interval to stop iteration, k can be decided based on the cost of divide_and_conquer and greedy on last mile, in different scenarios  
     global binary_out_ids,sum_input_tokens,sum_output_tokens
@@ -532,9 +557,10 @@ def block_decider(left_ids, right_ids, block_scores, blocks_sentences_id):
     
     return right_ids
 
+provenance_topk_results = []
 topk_provenance_id = 0
 
-def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric = 'string'):
+def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric = 'string', result_path = ''):
     """
     Attempt to find a smaller subset of `sentences` that returns True for H,
     using a divide-and-conquer approach but in a non-recursive (queue-based) way.
@@ -549,7 +575,7 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
           we deem necessary.
         - Accumulates token usage in `sum_input_tokens` and `sum_output_tokens`.
     """
-    global binary_out_ids, sum_input_tokens, sum_output_tokens, topk_provenance_id
+    global binary_out_ids, sum_input_tokens, sum_output_tokens, topk_provenance_id, provenance_topk_results
     
     # A dictionary to cache evaluation results: { (ids_as_tuple): (eval_result, input_tokens, output_tokens) }
     eval_cache = {}
@@ -608,6 +634,16 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
             print('Input tokens:', sum_input_tokens)
             print('Output tokens:', sum_output_tokens)
             print('Time:', time.time() - st)
+
+            provenance_object = {}
+            provenance_object['provenance_id'] = topk_provenance_id
+            provenance_object['sentences_ids'] = provenance_ids
+            provenance_object['time'] = time.time() - st
+            provenance_object['input_token_size'] = sum_input_tokens
+            provenance_object['output_token_size'] = sum_output_tokens
+            provenance_topk_results.append(provenance_object)
+
+            write_json_to_file(result_path, provenance_topk_results)
             topk_provenance_id += 1
             continue
 

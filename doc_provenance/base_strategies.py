@@ -69,11 +69,8 @@ def merge_short_sentences(sentences, length = 30):
 
 
 def extract_sentences_from_pdf(text):
-    # Split text into sentences using nltk
     sentences = nltk.sent_tokenize(text)
-    #print(len(sentences))
     sentences = merge_short_sentences(sentences)
-    #print(len(sentences))
     return sentences
 
 def write_list_to_file(filename, lines):

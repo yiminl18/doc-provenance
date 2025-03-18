@@ -1,0 +1,31 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "Who was known by his stage name Aladin and helped organizations improve their performance as a consultant?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "Eenasul Fateh"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q6_divide_and_conquer_progressive.json",
+    "context_size": 1739,
+    "time": 4.3403379917144775,
+    "time_breakdown": {
+        "0": 2.9472336769104004
+    },
+    "tokens": [
+        5416,
+        35
+    ],
+    "tokens_breakdown": {
+        "0": [
+            3752,
+            25
+        ]
+    },
+    "provenance_ids_breakdown": {
+        "0": [
+            28
+        ]
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "The director of the romantic comedy \"Big Stone Gap\" is based in what New York city?",
+        "Only return the answer. Do not add explanations."
+    ],
+    "answers": [
+        "New York City"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q4_divide_and_conquer_progressive.json",
+    "context_size": 1270,
+    "time": 4.848542928695679,
+    "time_breakdown": {
+        "4": 4.848535060882568
+    },
+    "tokens": [
+        2735,
+        12
+    ],
+    "tokens_breakdown": {
+        "4": [
+            2735,
+            12
+        ]
+    },
+    "provenance_ids_breakdown": {
+        "4": [
+            4
+        ]
+    }
+}

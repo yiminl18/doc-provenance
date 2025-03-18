@@ -187,17 +187,11 @@ def equal(res1, res2, metric = 'string'):
 
 def evaluate(answers, question, ids, sentences, context = '', metric = 'string'):
     ids = sorted(ids)
-    #print(ids)
     if(context == ''):
         for id in ids:
             context += sentences[id]
-    #print('tokens:', context)
-    #print('context:',context[:10])
-    #print(len(ids))
-    #print(ids)
     pred_ans, input_tokens, output_tokens = QA(question, context)
-    print(pred_ans)
-    print(answers)
+    #print(pred_ans, len(context), question)
     if(equal(pred_ans, answers, metric)):
         #print('True')
         return True, input_tokens, output_tokens
@@ -237,7 +231,7 @@ def sequential_greedy(question, context, title, path, metric = 'string'):
     st = time.time()
     answers = QA(question, context)
     sentences = extract_sentences_from_pdf(context)
-    out = sequential_greedy_score(question, answers, sentences, title, metric = metric)
+    out = sequential_greedy_core(question, answers, sentences, title, metric = metric)
     et = time.time()
     out['time'] = et-st
     out['path'] = path
@@ -255,30 +249,29 @@ def enumerate_skip_ids(cur_ids):
         st_id += 1
     return new_ids
 
-def exponential_greedy(question, text, title, result_path, metric = 'string'):
+def exponential_greedy_core(question, answers, sentences, sorted_idx = [], metric = 'string'):
     out = {}
-    answers, input_tokens, output_tokens = QA(question,text)
-    sentences = extract_sentences_from_pdf(text)
-    #print(len(sentences))
-    st = time.time()
-    out['title'] = title
     out['question'] = question
     out['answers'] = answers
-    out['context_size'] = count_tokens(text)
-
     removed_sentences = []
     input_tokens = 0
     output_tokens = 0
 
-    skip_ids = [0]
+    if len(sorted_idx) == 0:
+        sorted_idx = list(range(len(sentences)))
+
+    print(sorted_idx)
+
+    skip_ids = []
+    skip_ids.append(sorted_idx[0])
     i = 0
 
     while True:#iterate sentences stored in skip_ids to check if delete
-        if skip_ids[0] >= len(sentences):
+        if skip_ids[0] > sorted_idx[len(sorted_idx)-1]:
             break
         remaining_sentences_id = []
 
-        for i in range(len(sentences)):#get remaining sentences for evaluation
+        for i in sorted_idx:#get remaining sentences for evaluation
             if i in skip_ids:
                 continue
             if i in removed_sentences:
@@ -313,19 +306,27 @@ def exponential_greedy(question, text, title, result_path, metric = 'string'):
         provenance_id.append(i)
         provenance.append(sentences[i])
 
-    et = time.time()
-
     out['provenance'] = provenance
     out['provenance_size'] = count_tokens(''.join(provenance))
     out['tokens'] = (input_tokens, output_tokens)
     out['provenance_ids'] = provenance_id  
-    out['time'] = et-st
-
-    write_json_to_file(result_path, out)
 
     return out 
 
-def sequential_greedy_score(question, answers, sentences, title, sorted_idx = [], metric = 'string'):
+def exponential_greedy(question, text, title, result_path, metric = 'string'):
+    answers, input_tokens, output_tokens = QA(question,text)
+    sentences = extract_sentences_from_pdf(text)
+    #print(len(sentences))
+    st = time.time()
+    out['title'] = title
+    out['context_size'] = count_tokens(text)
+    out = exponential_greedy_core(question, answers, sentences, metric = metric)
+    et = time.time()
+    out['time'] = et-st
+    write_json_to_file(result_path, out)
+    return out 
+
+def sequential_greedy_core(question, answers, sentences, title, sorted_idx = [], metric = 'string'):
     out = {}
     out['title'] = title
     out['question'] = question
@@ -466,17 +467,15 @@ def divide_and_conquer_progressive(question, text, title, path, k, stop_sentence
     sum_input_tokens = 0
     sum_output_tokens = 0
     binary_out_ids = []
-    print(len(text))
+    
     answers, input_tokens, output_tokens = QA(question,text)
     sentences = extract_sentences_from_pdf(text)
-    print(answers)
+    print(answers, len(text), question)
     blk_num = len(sentences)/k
     blk_num = min(20, blk_num)
-    #print(blk_num, len(sentences))
+    print(blk_num, len(sentences))
     block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
 
-    # for id, score in block_scores.items():
-    #     print(blocks_sentences_id[id], score)
 
     out = {}
     out['title'] = title
@@ -485,7 +484,6 @@ def divide_and_conquer_progressive(question, text, title, path, k, stop_sentence
     out['path'] = path
     out['context_size'] = count_tokens(text)
 
-    
     ids = []
     
     for i in range(len(sentences)):
@@ -558,6 +556,9 @@ def block_decider(left_ids, right_ids, block_scores, blocks_sentences_id):
 provenance_topk_results = []
 topk_provenance_id = 0
 
+def store_provenance():
+    a=0
+
 def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric = 'string', result_path = ''):
     """
     Attempt to find a smaller subset of `sentences` that returns True for H,
@@ -578,6 +579,9 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
     break_down_latency = {}
     break_down_provenance_ids = {}
     break_down_cost = {}
+
+    father = {}
+    rib = {}
     
     # A dictionary to cache evaluation results: { (ids_as_tuple): (eval_result, input_tokens, output_tokens) }
     eval_cache = {}
@@ -608,6 +612,7 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
 
     while stack:
         current_ids = stack.pop()
+        print(current_ids)
         if topk_provenance_id >= k:
             continue
 
@@ -622,11 +627,50 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
 
         #print(current_ids, eval_result)
         # If the entire set doesn't yield True, no need to proceed
+
+        tuple_current_ids = tuple(current_ids)
         if not eval_result:
+            if tuple_current_ids in rib and tuple_current_ids in father:
+                rib_node = rib[tuple_current_ids]
+                father_node = father[tuple_current_ids]
+                #print(father_node, tuple_current_ids, rib_node)
+                eval_rib = is_cached(list(rib_node))
+                if eval_rib == 'NULL':
+                    continue
+                if not eval_rib:
+                    #in this case, father node is true, but both childs are false, add father node into last_mile operator
+                    print('Starting exponential_greedy_core...')
+                    out = exponential_greedy_core(question, answers, sentences, sorted_idx = list(father_node))
+                    provenance_ids = out['provenance_ids']
+                    print('Top-'+ str(topk_provenance_id),' provenance:',provenance_ids)
+                    provenance_context = ''
+                    for id in provenance_ids:
+                        provenance_context += sentences[id]
+                    print('Provenance:', provenance_context)
+                    print('Input tokens:', sum_input_tokens)
+                    print('Output tokens:', sum_output_tokens)
+                    print('Time:', time.time() - st)
+
+                    break_down_latency[topk_provenance_id] = time.time()-st
+                    break_down_cost[topk_provenance_id] = (sum_input_tokens,sum_output_tokens)
+                    break_down_provenance_ids[topk_provenance_id] = provenance_ids
+
+                    provenance_object = {}
+                    provenance_object['provenance_id'] = topk_provenance_id
+                    provenance_object['sentences_ids'] = provenance_ids
+                    provenance_object['time'] = time.time() - st
+                    provenance_object['input_token_size'] = sum_input_tokens
+                    provenance_object['output_token_size'] = sum_output_tokens
+                    provenance_topk_results.append(provenance_object)
+
+                    write_json_to_file(result_path, provenance_topk_results)
+                    topk_provenance_id += 1
+                    continue
             continue
         if eval_result and len(current_ids) <= stop_sentence_length: #k is the length of sentences in the interval to stop iteration 
             # send current ids to another operator to produce MP 
-            out = sequential_greedy_score(question, answers, sentences, '', sorted_idx = current_ids)
+            out = sequential_greedy_core(question, answers, sentences, '', sorted_idx = current_ids)
+
             provenance_ids = out['provenance_ids']
             print('Top-'+ str(topk_provenance_id),' provenance:',provenance_ids)
             provenance_context = ''
@@ -659,6 +703,14 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
         right = current_ids[mid:]
         ids_togo = block_decider(left, right, block_scores, blocks_sentences_id)
         #continue
+
+        tuple_left = tuple(left)
+        tuple_right = tuple(right)
+
+        father[tuple_left] = tuple_current_ids
+        father[tuple_right] = tuple_current_ids
+        rib[tuple_left] = tuple_right
+        rib[tuple_right] = tuple_left
 
         if ids_togo == left: #last in, first out 
             if is_cached(right) == 'NULL':
@@ -951,7 +1003,7 @@ def heuristic_greedy(question, text, title, result_path, embedding_path, metric 
     k, extra_input_tokens, extra_output_tokens = pick_k_binary(question, text, sorted_indices, metric = metric)
     #print(k, len(sorted_indices))
     sentences = extract_sentences_from_pdf(text)
-    out = sequential_greedy_score(question, answers, sentences, title, sorted_idx = sorted_indices[:k])
+    out = sequential_greedy_core(question, answers, sentences, title, sorted_idx = sorted_indices[:k])
     et = time.time()
     out['time'] = et-st
     out['k'] = k 
@@ -1050,13 +1102,19 @@ def test_paper_pipeline():
             #break
         #break
 
+def if_rerun(path):
+    df = read_json(path)
+    if len(df['time_breakdown']) == 0:
+        return False
+    return True
+
 def test_hotpot_pipeline():
     data_path = parent_directory + '/data/hotpotQA_fullwiki.json'
     folder_path = parent_directory + '/out/hotpotQA'
     hotpot_objects = data_digestion.digest_hotpotQA_dataset(data_path)
 
-    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk','exponential_greedy']
-    strategy = 'vallina_LLM'
+    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk','exponential_greedy','divide_and_conquer_progressive']
+    strategy = 'divide_and_conquer_progressive'
     num_of_case = 10
 
     i = -1
@@ -1070,11 +1128,13 @@ def test_hotpot_pipeline():
         path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + '.json'
         if not os.path.exists(folder_path + '/results'):
             os.makedirs(folder_path + '/results')
+        # if if_rerun(path):
+        #     continue
+        if i != 11:
+            continue
         # if os.path.isfile(path):
         #     continue
-        # if i != 10:
-        #     continue
-        #print(question)
+        print(path)
         embedding_path = folder_path + '/embeddings/' + 'hotpot' + '_q' + str(i) + '_embeddings.npy'
         if strategy == 'vallina_LLM':
             vallina_LLM(q, text, title, path)
@@ -1082,18 +1142,20 @@ def test_hotpot_pipeline():
             sequential_greedy(q, text, title, path, metric = 'LLM') 
         elif strategy == 'divide_and_conquer': 
             divide_and_conquer(q, text, title, path)
+        elif strategy == 'divide_and_conquer_progressive': 
+            divide_and_conquer_progressive(q, text, title, path, 5)
         elif strategy == 'heuristic_greedy':
             heuristic_greedy(q, text, title, path, embedding_path) 
         elif strategy == 'heuristic_topk':
             heuristic_topk(q, text, title, path, embedding_path)
         elif strategy == 'exponential_greedy':
             exponential_greedy(q, text, title, path)
-        break
+        #break
         if(i > num_of_case):
             break
 
 
 if __name__ == "__main__":
-    test_paper_pipeline()
-    #test_hotpot_pipeline()
+    #test_paper_pipeline()
+    test_hotpot_pipeline()
     #print(len('ACM, New York, NY, USA, 4 pages.'))

@@ -1,0 +1,36 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "Were Scott Derrickson and Ed Wood of the same nationality?",
+        "Only return yes or no. Do not add explanations."
+    ],
+    "answers": [
+        "Yes"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/hotpotQA/results/hotpot_q0_divide_and_conquer_progressive.json",
+    "context_size": 1124,
+    "time": 16.18074917793274,
+    "time_breakdown": {
+        "0": 16.180735111236572
+    },
+    "tokens": [
+        2277,
+        4
+    ],
+    "tokens_breakdown": {
+        "0": [
+            2277,
+            4
+        ]
+    },
+    "provenance_ids_breakdown": {
+        "0": [
+            6,
+            7,
+            13,
+            27,
+            28,
+            29
+        ]
+    }
+}

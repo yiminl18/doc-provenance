@@ -82,9 +82,11 @@ def write_string_to_file(filename, text):
         file.write(text)
 
 def write_json_to_file(filename, data):
+    if not os.path.exists(filename) or len(filename) == 0:
+        print(filename,'not exist!')
+        return 
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(data, file, indent=4, ensure_ascii=False)
-
 
 def create_data_folder(path):
     data_path = path.replace('data','out').replace('.pdf','')
@@ -487,20 +489,18 @@ def divide_and_conquer_progressive(question, text, title, path, k, stop_sentence
     
     for i in range(len(sentences)):
         ids.append(i)
-    divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric)
-    # binary_out_ids = list(set(binary_out_ids))
-    # binary_out_ids = sorted(binary_out_ids)
-    # #print(binary_out_ids)
-    # et = time.time()
-    # out['time'] = et-st
-    # out['tokens'] = (input_tokens, output_tokens)
-    # out['provenance_ids'] = binary_out_ids 
-    # provenance = []
-    # for id in binary_out_ids:
-    #     provenance.append(sentences[id])
-    # out['provenance'] = provenance
-    # out['provenance_size'] = count_tokens(''.join(provenance))
-    #write_json_to_file(path, out)
+    st = time.time()
+
+    break_down_latency, break_down_cost, break_down_provenance_ids = divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric)
+    et = time.time()
+    out['time'] = et-st
+    out['time_breakdown'] = break_down_latency
+
+    out['tokens'] = (sum_input_tokens, sum_output_tokens)
+    out['tokens_breakdown'] = break_down_cost
+
+    out['provenance_ids_breakdown'] = break_down_provenance_ids 
+    write_json_to_file(path, out)
 
 def block_decider(left_ids, right_ids, block_scores, blocks_sentences_id):
     # print(left_ids)
@@ -573,6 +573,10 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
         - Accumulates token usage in `sum_input_tokens` and `sum_output_tokens`.
     """
     global binary_out_ids, sum_input_tokens, sum_output_tokens, topk_provenance_id, provenance_topk_results
+
+    break_down_latency = {}
+    break_down_provenance_ids = {}
+    break_down_cost = {}
     
     # A dictionary to cache evaluation results: { (ids_as_tuple): (eval_result, input_tokens, output_tokens) }
     eval_cache = {}
@@ -632,6 +636,10 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
             print('Output tokens:', sum_output_tokens)
             print('Time:', time.time() - st)
 
+            break_down_latency[topk_provenance_id] = time.time()-st
+            break_down_cost[topk_provenance_id] = (sum_input_tokens,sum_output_tokens)
+            break_down_provenance_ids[topk_provenance_id] = provenance_ids
+
             provenance_object = {}
             provenance_object['provenance_id'] = topk_provenance_id
             provenance_object['sentences_ids'] = provenance_ids
@@ -661,6 +669,8 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
                 stack.append(left)
             if is_cached(right) == 'NULL':
                 stack.append(right)
+
+    return break_down_latency, break_down_cost, break_down_provenance_ids
             
         
 
@@ -1012,8 +1022,8 @@ def test_paper_pipeline():
             path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
             # if p_id == 3 or q_id == 1:
             #     continue
-            # if os.path.isfile(path):
-            #     continue
+            if os.path.isfile(path):
+                continue
             if(p_id >= doc_num):
                 break
             text = paper['text']

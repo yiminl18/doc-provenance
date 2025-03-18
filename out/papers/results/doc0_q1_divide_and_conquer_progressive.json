@@ -1,0 +1,31 @@
+{
+    "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
+    "question": [
+        "Who are the authors of this paper?",
+        "Return only the author names. Do not add explanations."
+    ],
+    "answers": [
+        "Cecile Boulard, Stefania Castellani, Tommaso Colombino, Antonietta Grasso"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc0_q1_divide_and_conquer_progressive.json",
+    "context_size": 5912,
+    "time": 10.203498125076294,
+    "time_breakdown": {
+        "0": 7.5308287143707275
+    },
+    "tokens": [
+        18143,
+        219
+    ],
+    "tokens_breakdown": {
+        "0": [
+            12579,
+            132
+        ]
+    },
+    "provenance_ids_breakdown": {
+        "0": [
+            4
+        ]
+    }
+}

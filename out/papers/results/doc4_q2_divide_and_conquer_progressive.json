@@ -1,0 +1,63 @@
+{
+    "title": "Why We Use and Abandon Smart Devices",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. Do not add explanations."
+    ],
+    "answers": [
+        "UbiComp '15"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc4_q2_divide_and_conquer_progressive.json",
+    "context_size": 14092,
+    "time": 40.2317099571228,
+    "time_breakdown": {
+        "0": 7.582529067993164,
+        "1": 15.213075160980225,
+        "2": 22.059473991394043,
+        "3": 31.337767124176025,
+        "4": 40.23165702819824
+    },
+    "tokens": [
+        72261,
+        329
+    ],
+    "tokens_breakdown": {
+        "0": [
+            30197,
+            56
+        ],
+        "1": [
+            39939,
+            129
+        ],
+        "2": [
+            45944,
+            188
+        ],
+        "3": [
+            62910,
+            243
+        ],
+        "4": [
+            72261,
+            329
+        ]
+    },
+    "provenance_ids_breakdown": {
+        "0": [
+            58
+        ],
+        "1": [
+            130
+        ],
+        "2": [
+            205
+        ],
+        "3": [
+            375
+        ],
+        "4": [
+            293
+        ]
+    }
+}

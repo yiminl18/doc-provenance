@@ -82,7 +82,7 @@ def write_string_to_file(filename, text):
         file.write(text)
 
 def write_json_to_file(filename, data):
-    if not os.path.exists(filename) or len(filename) == 0:
+    if len(filename) == 0:
         print(filename,'not exist!')
         return 
     with open(filename, "w", encoding="utf-8") as file:
@@ -196,8 +196,8 @@ def evaluate(answers, question, ids, sentences, context = '', metric = 'string')
     #print(len(ids))
     #print(ids)
     pred_ans, input_tokens, output_tokens = QA(question, context)
-    # print(pred_ans)
-    # print(answers)
+    print(pred_ans)
+    print(answers)
     if(equal(pred_ans, answers, metric)):
         #print('True')
         return True, input_tokens, output_tokens
@@ -411,6 +411,7 @@ def block_labeler(sentences, question, answers, blk_num):
     for id in range(len(blocks)):
         context += 'Block ' + str(id) + ': ' + blocks[id] + '\n'
     prompt = (instruction, context)
+    print(count_tokens(context))
     response = model(model_name, prompt)
     #print(response)
     scores = [int(num.strip()) for num in response.split(",")]
@@ -1020,10 +1021,10 @@ def test_paper_pipeline():
         for p_id in range(len(paper_objects)):
             paper = paper_objects[p_id]
             path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
-            # if p_id == 3 or q_id == 1:
-            #     continue
-            if os.path.isfile(path):
+            if p_id != 4 or q_id != 1:
                 continue
+            # if os.path.isfile(path):
+            #     continue
             if(p_id >= doc_num):
                 break
             text = paper['text']
@@ -1046,8 +1047,8 @@ def test_paper_pipeline():
             elif strategy == 'exponential_greedy':
                 exponential_greedy(q, text, title, path)
     
-            break
-        break
+            #break
+        #break
 
 def test_hotpot_pipeline():
     data_path = parent_directory + '/data/hotpotQA_fullwiki.json'

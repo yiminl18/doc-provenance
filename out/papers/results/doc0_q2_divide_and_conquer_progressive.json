@@ -1,0 +1,65 @@
+{
+    "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. Do not add explanations."
+    ],
+    "answers": [
+        "ECCE 2019"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc0_q2_divide_and_conquer_progressive.json",
+    "context_size": 5912,
+    "time": 40.783703088760376,
+    "time_breakdown": {
+        "0": 12.10587191581726,
+        "1": 17.021498918533325,
+        "2": 24.18935799598694,
+        "3": 33.70758295059204,
+        "4": 40.78365898132324
+    },
+    "tokens": [
+        26598,
+        318
+    ],
+    "tokens_breakdown": {
+        "0": [
+            12895,
+            124
+        ],
+        "1": [
+            13883,
+            150
+        ],
+        "2": [
+            15757,
+            213
+        ],
+        "3": [
+            25425,
+            270
+        ],
+        "4": [
+            26598,
+            318
+        ]
+    },
+    "provenance_ids_breakdown": {
+        "0": [
+            5,
+            6,
+            7
+        ],
+        "1": [
+            14
+        ],
+        "2": [
+            32
+        ],
+        "3": [
+            113
+        ],
+        "4": [
+            93
+        ]
+    }
+}

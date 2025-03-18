@@ -1,0 +1,63 @@
+{
+    "title": "Sundroid: Solar Radiation Awareness with Smartphones",
+    "question": [
+        "In which conference was this paper published?",
+        "Return only the conference name. Do not add explanations."
+    ],
+    "answers": [
+        "UbiComp'11"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc3_q2_divide_and_conquer_progressive.json",
+    "context_size": 12329,
+    "time": 38.06829309463501,
+    "time_breakdown": {
+        "0": 7.789639949798584,
+        "1": 15.033282995223999,
+        "2": 21.586835861206055,
+        "3": 28.447901010513306,
+        "4": 38.068262815475464
+    },
+    "tokens": [
+        54846,
+        362
+    ],
+    "tokens_breakdown": {
+        "0": [
+            26254,
+            59
+        ],
+        "1": [
+            33735,
+            126
+        ],
+        "2": [
+            38217,
+            192
+        ],
+        "3": [
+            40817,
+            274
+        ],
+        "4": [
+            54846,
+            362
+        ]
+    },
+    "provenance_ids_breakdown": {
+        "0": [
+            341
+        ],
+        "1": [
+            306
+        ],
+        "2": [
+            265
+        ],
+        "3": [
+            231
+        ],
+        "4": [
+            193
+        ]
+    }
+}

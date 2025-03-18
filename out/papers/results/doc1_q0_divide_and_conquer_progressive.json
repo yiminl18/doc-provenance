@@ -1,0 +1,63 @@
+{
+    "title": "Expense Control: A Gamified, Semi-Automated, Crowd-Based Approach For Receipt Capturing",
+    "question": [
+        "In what year was this paper published?",
+        "Return only a number. Do not add explanations."
+    ],
+    "answers": [
+        "2016"
+    ],
+    "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc1_q0_divide_and_conquer_progressive.json",
+    "context_size": 16907,
+    "time": 18.610977172851562,
+    "time_breakdown": {
+        "0": 4.256409168243408,
+        "1": 7.041366100311279,
+        "2": 10.829507112503052,
+        "3": 13.190688133239746,
+        "4": 18.610926151275635
+    },
+    "tokens": [
+        50564,
+        66
+    ],
+    "tokens_breakdown": {
+        "0": [
+            37589,
+            20
+        ],
+        "1": [
+            39361,
+            30
+        ],
+        "2": [
+            42568,
+            42
+        ],
+        "3": [
+            44641,
+            52
+        ],
+        "4": [
+            50564,
+            66
+        ]
+    },
+    "provenance_ids_breakdown": {
+        "0": [
+            393
+        ],
+        "1": [
+            371
+        ],
+        "2": [
+            358
+        ],
+        "3": [
+            339
+        ],
+        "4": [
+            322
+        ]
+    }
+}

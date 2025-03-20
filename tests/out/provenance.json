@@ -4,35 +4,35 @@
         "sentences_ids": [
             73
         ],
-        "time": 6.792847156524658,
+        "time": 4.244967937469482,
         "input_token_size": 18162,
-        "output_token_size": 40
+        "output_token_size": 29
     },
     {
         "provenance_id": 1,
         "sentences_ids": [
             32
         ],
-        "time": 11.480679988861084,
+        "time": 8.56468915939331,
         "input_token_size": 24010,
-        "output_token_size": 91
+        "output_token_size": 80
     },
     {
         "provenance_id": 2,
         "sentences_ids": [
             13
         ],
-        "time": 16.782247066497803,
+        "time": 13.276899099349976,
         "input_token_size": 27074,
-        "output_token_size": 142
+        "output_token_size": 131
     },
     {
         "provenance_id": 3,
         "sentences_ids": [
             6
         ],
-        "time": 20.420688152313232,
+        "time": 16.153095960617065,
         "input_token_size": 28387,
-        "output_token_size": 160
+        "output_token_size": 149
     }
 ]

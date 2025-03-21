@@ -13,5 +13,5 @@ Classifier: Operating System :: OS Independent
 Requires-Python: >=3.6
 Description-Content-Type: text/markdown
 
-UNKNOWN
+Run 'pip install -e .' to import doc_provenance in test codes
 

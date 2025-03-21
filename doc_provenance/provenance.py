@@ -417,7 +417,7 @@ def embedding_sufficient_bottem_up_operator(question, answers, sentences, embedd
             return current_sentences, (sum_input_tokens, sum_output_tokens)
     return list(range(len(sentences))), (sum_input_tokens, sum_output_tokens)
 
-def divide_and_conquer_operator(question, answers, sentences, sorted_idx, metric = 'string', stop_sentence_length = 5):
+def divide_and_conquer_sufficient_operator(question, answers, sentences, sorted_idx, metric = 'string', stop_sentence_length = 5):
     #sorted_idx: the list of idx for the context to consider 
     global binary_out_ids, sum_input_tokens, sum_output_tokens, topk_provenance_id, provenance_topk_results
 
@@ -623,8 +623,8 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
         sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens) = embedding_sufficient_top_down_operator(question, answers, sentences, metric = metric)
     elif find_sufficient_provenance_strategy == 'embedding_sufficient_bottem_up':
         sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens) = embedding_sufficient_bottem_up_operator(question, answers, sentences, embedding_path, metric = metric)
-    elif find_sufficient_provenance_strategy == 'divide_and_conquer':
-        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens) = divide_and_conquer_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
+    elif find_sufficient_provenance_strategy == 'divide_and_conquer_sufficient':
+        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens) = divide_and_conquer_sufficient_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
     elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_top_down':
         sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens) = LLM_score_sufficient_top_down_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
     elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_bottem_up':

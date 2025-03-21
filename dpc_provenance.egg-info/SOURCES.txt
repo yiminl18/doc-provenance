@@ -4,6 +4,7 @@ doc_provenance/__init__.py
 doc_provenance/base_strategies.py
 doc_provenance/data_digestion.py
 doc_provenance/model.py
+doc_provenance/provenance.py
 doc_provenance/models/__init__.py
 doc_provenance/models/gpt_4_vision.py
 doc_provenance/models/gpt_4o.py

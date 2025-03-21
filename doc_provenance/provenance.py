@@ -562,7 +562,7 @@ def get_block_sentences(block_list, blocks_sentences_id):
         senteces += blocks_sentences_id[block]
     return sentences
 
-def LLM_score_sufficient_top_down_operator(question, answers, sentences, sorted_idx, k=5, metric = 'string'):
+def LLM_score_sufficient_top_down_operator(question, answers, sentences, sorted_idx, metric = 'string', k=5):
     blk_num = len(sentences)/k
     blk_num = min(20, blk_num)
     block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
@@ -595,7 +595,7 @@ def LLM_score_sufficient_top_down_operator(question, answers, sentences, sorted_
         
     return sorted_idx, (sum_input_tokens, sum_output_tokens)
 
-def LLM_score_sufficient_bottem_up_operator(question, answers, sentences, sorted_idx, k=5, metric = 'string'):
+def LLM_score_sufficient_bottem_up_operator(question, answers, sentences, sorted_idx, metric = 'string', k=5):
     blk_num = len(sentences)/k
     blk_num = min(20, blk_num)
     block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
@@ -612,22 +612,53 @@ def LLM_score_sufficient_bottem_up_operator(question, answers, sentences, sorted
         
     return sorted_idx, (sum_input_tokens, sum_output_tokens)
 
-def caller(find_sufficient_provenance_strategy, find_minimal_provenance_strategy):
-    if find_sufficient_provenance_strategy == 'raw':
-        a=0
-    elif find_sufficient_provenance_strategy == 'embedding_sufficient_top_down':
-        a=0
-    elif find_sufficient_provenance_strategy == 'embedding_sufficient_bottem_up':
-        a=0
-    elif find_sufficient_provenance_strategy == 'divide_and_conquer':
-        a=0
-    elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_top_down':
-        a=0
-    elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_bottem_up':
-        a=0 
+def caller(question, answers, sentences, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = ''):
+    sufficient_provenance_ids = []
+    sufficient_input_tokens = 0
+    sufficient_output_tokens = 0
 
+    if find_sufficient_provenance_strategy == 'raw':
+        sufficient_provenance_ids = list(range(len(sentences)))
+    elif find_sufficient_provenance_strategy == 'embedding_sufficient_top_down':
+        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens) = embedding_sufficient_top_down_operator(question, answers, sentences, metric = metric)
+    elif find_sufficient_provenance_strategy == 'embedding_sufficient_bottem_up':
+        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens) = embedding_sufficient_bottem_up_operator(question, answers, sentences, embedding_path, metric = metric)
+    elif find_sufficient_provenance_strategy == 'divide_and_conquer':
+        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens) = divide_and_conquer_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
+    elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_top_down':
+        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens) = LLM_score_sufficient_top_down_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
+    elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_bottem_up':
+        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens) = LLM_score_sufficient_bottem_up_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
+
+    minimal_provenance_ids = []
+    minimal_input_tokens = 0
+    minimal_output_tokens = 0
     if find_minimal_provenance_strategy == 'sequential_greedy':
-        a=0
+        minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens) = sequential_greedy_operator(question, answers, sufficient_provenance_ids, metric = metric)
     elif find_minimal_provenance_strategy == 'exponential_greedy':
-        a=0
+        minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens) = exponential_greedy_operator(question, answers, sentences, sufficient_provenance_ids, metric = metric)
+
+    return minimal_provenance_ids, (sufficient_input_tokens + minimal_input_tokens, sufficient_output_tokens + minimal_output_tokens)
+
+def logger(text, question, title, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = ''):
+    logs = {}
+    logs['title'] = title
+    logs['question'] = question
+    logs['document_size'] = count_tokens(text)
+    sentences = extract_sentences_from_pdf(text)
+    answers, in_token, out_tokens = QA(question, text)
+    st = time.time()
+    provenance_ids, (input_tokens, output_tokens) =  caller(question, answers, sentences, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = metric, embedding_path=embedding_path)
+    et = time.time()
+    logs['answer'] = answers
+    logs['time'] = et-st
+    provenance_ids = sorted(provenance_ids)
+    logs['provenance_ids'] = provenance_ids
+    provenance = []
+    for id in provenance_ids:
+        provenance += sentences[id]
+    logs['provenance'] = provenance
+    logs['provenance_size'] = count_tokens(provenance)
+    logs['tokens'] = (input_tokens, output_tokens)
+    return logs 
 

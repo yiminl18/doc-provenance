@@ -1,7 +1,7 @@
 {
     "title": "\"I Don't Understand...\" Issues in Self-Quantifying Commuting",
     "question": [
-        "In what year was this paper published?",
+        "What is the publication year of this paper?",
         "Return only a number. Do not add explanations."
     ],
     "answers": [
@@ -9,38 +9,38 @@
     ],
     "path": "/Users/yiminglin/Documents/Codebase/doc-provenance/out/papers/results/doc0_q0_divide_and_conquer_progressive.json",
     "context_size": 5912,
-    "time": 18.206860065460205,
+    "time": 20.6335871219635,
     "time_breakdown": {
-        "0": 3.425351142883301,
-        "1": 5.61928915977478,
-        "2": 9.694602966308594,
-        "3": 14.777266263961792,
-        "4": 18.206812143325806
+        "0": 3.913033962249756,
+        "1": 6.266706943511963,
+        "2": 10.46583604812622,
+        "3": 15.923804998397827,
+        "4": 20.633463144302368
     },
     "tokens": [
-        26563,
-        113
+        24770,
+        94
     ],
     "tokens_breakdown": {
         "0": [
-            12887,
+            12895,
             16
         ],
         "1": [
-            13871,
+            13883,
             24
         ],
         "2": [
-            15737,
-            72
+            15757,
+            68
         ],
         "3": [
-            25395,
-            92
+            23597,
+            84
         ],
         "4": [
-            26563,
-            113
+            24770,
+            94
         ]
     },
     "provenance_ids_breakdown": {

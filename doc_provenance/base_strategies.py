@@ -313,7 +313,7 @@ def exponential_greedy_core(question, answers, sentences, sorted_idx = [], metri
 
     return out 
 
-def exponential_greedy(question, text, title, result_path, metric = 'string'):
+def raw_exponential_greedy(question, text, title, result_path, metric = 'string'):
     answers, input_tokens, output_tokens = QA(question,text)
     sentences = extract_sentences_from_pdf(text)
     #print(len(sentences))
@@ -325,6 +325,8 @@ def exponential_greedy(question, text, title, result_path, metric = 'string'):
     out['time'] = et-st
     write_json_to_file(result_path, out)
     return out 
+
+
 
 def sequential_greedy_core(question, answers, sentences, title, sorted_idx = [], metric = 'string'):
     out = {}
@@ -634,42 +636,42 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
 
         tuple_current_ids = tuple(current_ids)
         if not eval_result:
-            # if tuple_current_ids in rib and tuple_current_ids in father:
-            #     rib_node = rib[tuple_current_ids]
-            #     father_node = father[tuple_current_ids]
-            #     #print(father_node, tuple_current_ids, rib_node)
-            #     eval_rib = is_cached(list(rib_node))
-            #     if eval_rib == 'NULL':
-            #         continue
-            #     if not eval_rib:
-            #         #in this case, father node is true, but both childs are false, add father node into last_mile operator
-            #         #print('Starting exponential_greedy_core...')
-            #         out = exponential_greedy_core(question, answers, sentences, sorted_idx = list(father_node))
-            #         provenance_ids = out['provenance_ids']
-            #         print('Top-'+ str(topk_provenance_id),' provenance:',provenance_ids)
-            #         provenance_context = ''
-            #         for id in provenance_ids:
-            #             provenance_context += sentences[id]
-            #         print('Provenance:', provenance_context)
-            #         print('Input tokens:', sum_input_tokens)
-            #         print('Output tokens:', sum_output_tokens)
-            #         print('Time:', time.time() - st)
+            if tuple_current_ids in rib and tuple_current_ids in father:
+                rib_node = rib[tuple_current_ids]
+                father_node = father[tuple_current_ids]
+                #print(father_node, tuple_current_ids, rib_node)
+                eval_rib = is_cached(list(rib_node))
+                if eval_rib == 'NULL':
+                    continue
+                if not eval_rib:
+                    #in this case, father node is true, but both childs are false, add father node into last_mile operator
+                    #print('Starting exponential_greedy_core...')
+                    out = exponential_greedy_core(question, answers, sentences, sorted_idx = list(father_node))
+                    provenance_ids = out['provenance_ids']
+                    print('Top-'+ str(topk_provenance_id),' provenance:',provenance_ids)
+                    provenance_context = ''
+                    for id in provenance_ids:
+                        provenance_context += sentences[id]
+                    print('Provenance:', provenance_context)
+                    print('Input tokens:', sum_input_tokens)
+                    print('Output tokens:', sum_output_tokens)
+                    print('Time:', time.time() - st)
 
-            #         break_down_latency[topk_provenance_id] = time.time()-st
-            #         break_down_cost[topk_provenance_id] = (sum_input_tokens,sum_output_tokens)
-            #         break_down_provenance_ids[topk_provenance_id] = provenance_ids
+                    break_down_latency[topk_provenance_id] = time.time()-st
+                    break_down_cost[topk_provenance_id] = (sum_input_tokens,sum_output_tokens)
+                    break_down_provenance_ids[topk_provenance_id] = provenance_ids
 
-            #         provenance_object = {}
-            #         provenance_object['provenance_id'] = topk_provenance_id
-            #         provenance_object['sentences_ids'] = provenance_ids
-            #         provenance_object['time'] = time.time() - st
-            #         provenance_object['input_token_size'] = sum_input_tokens
-            #         provenance_object['output_token_size'] = sum_output_tokens
-            #         provenance_topk_results.append(provenance_object)
+                    provenance_object = {}
+                    provenance_object['provenance_id'] = topk_provenance_id
+                    provenance_object['sentences_ids'] = provenance_ids
+                    provenance_object['time'] = time.time() - st
+                    provenance_object['input_token_size'] = sum_input_tokens
+                    provenance_object['output_token_size'] = sum_output_tokens
+                    provenance_topk_results.append(provenance_object)
 
-            #         write_json_to_file(result_path, provenance_topk_results)
-            #         topk_provenance_id += 1
-            #         continue
+                    write_json_to_file(result_path, provenance_topk_results)
+                    topk_provenance_id += 1
+                    
             continue
         if eval_result and len(current_ids) <= stop_sentence_length: #k is the length of sentences in the interval to stop iteration 
             # send current ids to another operator to produce MP 
@@ -1058,9 +1060,6 @@ def verification(metric='string'):
                 
 
         #print(strategy, accuracy, len(runs[strategy]))
-        
-
-
 
 def test_paper_pipeline():
     data_path = parent_directory + '/data/papers.json'
@@ -1077,7 +1076,7 @@ def test_paper_pipeline():
         for p_id in range(len(paper_objects)):
             paper = paper_objects[p_id]
             path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
-            if p_id != 4 or q_id != 1:
+            if p_id != 0 or q_id != 0:
                 continue
             # if os.path.isfile(path):
             #     continue
@@ -1158,8 +1157,54 @@ def test_hotpot_pipeline():
         if(i > num_of_case):
             break
 
+def verify_evaluation_equivelance(text, question):
+    out = {}
+    answer, in_tokens, out_tokens = QA(question, text)
+    instruction = 'Based on the context provided below, if the provided answer is the correct answer to below question, return YES, otherwise, return NO. Do not include any explanations. ' + 'Question: ' + question[0]   + ' Answer: ' +  ''.join(answer) + '. Context: '
+    ans, in_tokens, out_tokens = QA((instruction, ''), text)
+    out['answer'] = answer
+    out['question'] = question
+    out['instruction'] = instruction
+    out['eval'] = ans 
+    # print('question:',question)
+    # print('answer:',answer)
+    # print('eval:',ans)
+    # print('instruction:',instruction)
+
+    return out 
+
+
+def verify_evaluation_equivelance_pipeline():
+    data_path = parent_directory + '/data/hotpotQA_fullwiki.json'
+    folder_path = '/Users/yiminglin/Documents/Codebase/doc_provenance_results' + '/eval/hotpotQA'
+    hotpot_objects = data_digestion.digest_hotpotQA_dataset(data_path)
+    i = 0
+    size = 500
+    cnt = 0
+    #print(len(hotpot_objects))
+    for e in hotpot_objects:
+        i += 1
+        question = e['question']
+        instruction = e['instruction']
+        q = (question, instruction)
+        text = e['context']
+        title = e['document_name']
+        path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + 'equivalence' + '.json'
+        if not os.path.exists(folder_path + '/results'):
+            os.makedirs(folder_path + '/results')
+        out = verify_evaluation_equivelance(text, q)
+        out['path'] = path
+        out['title'] = title
+        write_json_to_file(path, out)
+        print(i)
+        if 'yes' not in out['eval'][0].lower():
+            print(out['eval'])
+            cnt += 1
+        if i > size:
+            break
+    print(i, cnt)
 
 if __name__ == "__main__":
     test_paper_pipeline()
     #test_hotpot_pipeline()
-    #print(len('ACM, New York, NY, USA, 4 pages.'))
+    verify_evaluation_equivelance_pipeline()

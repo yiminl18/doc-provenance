@@ -1,5 +1,5 @@
 import provenance
-import data_digestion
+import data_digestion, base_strategies
 import os 
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
@@ -45,5 +45,33 @@ def hotpot_pipeline():
         if i > num_of_case:
             break
 
+def paper_pipeline():
+    data_path = parent_directory + '/data/papers.json'
+    folder_path = parent_directory + '/out/papers'
+    paper_objects = data_digestion.digest_paper_dataset(data_path)
+
+    doc_num = 101
+
+    print(len(paper_objects))
+
+    c = 0
+    for p_id in range(len(paper_objects)):
+        paper = paper_objects[p_id]
+        # if os.path.isfile(path):
+        #     continue
+        text = paper['text']
+        title = paper['title']
+        if len(text) == 0:
+            continue
+        print(c)
+        c += 1
+        embedding_path = folder_path + '/embeddings/' + title + '_embeddings.npy'
+        sentences = base_strategies.extract_sentences_from_pdf(text)
+        merged_setences = base_strategies.group_sentences(sentences, k=5)
+        print(len(sentences), len(merged_setences))
+        for s in merged_setences:
+            print('***',s)
+        break
+
 if __name__ == "__main__":
-    hotpot_pipeline()
+    paper_pipeline()

@@ -887,11 +887,32 @@ def load_embeddings(filename):
     return np.load(filename, allow_pickle=True).item()
 
 
+def group_sentences(sentences, k = 5):
+    #merge k sentneces into a group
+    merged_sentences = []
+    i = 1
+    group_sentence = []
+    id = 0
+    for sentence in sentences:
+        #print(i,k)
+        if i > k:
+            merged_sentences.append(' '.join(group_sentence))
+            i = 1
+            group_sentence = []
+        group_sentence.append(sentence)
+        if id == len(sentences)-1: #last set of sentences 
+            merged_sentences.append(' '.join(group_sentence))
+        i += 1
+        id += 1
+    return merged_sentences
+
 def compute_embeddings(text, file_path):
     if os.path.exists(file_path):
         print('file exist!')
         return 
     sentences = extract_sentences_from_pdf(text)
+    sentences = group_sentences(sentences)
+    #print(len(sentences))
     embeddings = {}
     for sentence in sentences:
         embeddings[sentence] = get_embedding(sentence)

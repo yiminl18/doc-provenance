@@ -886,6 +886,16 @@ def save_embeddings(filename, embeddings):
 def load_embeddings(filename):
     return np.load(filename, allow_pickle=True).item()
 
+
+def compute_embeddings(text, file_path):
+    if os.path.exists(file_path):
+        return 
+    sentences = extract_sentences_from_pdf(text)
+    embeddings = {}
+    for sentence in sentences:
+        embeddings[sentence] = get_embedding(sentence)
+    save_embeddings(file_path, embeddings)
+
 def sort_sentences_by_similarity(question, answers, text, file_path):
     #print(question)
     #print(answers)

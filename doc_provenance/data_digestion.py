@@ -80,8 +80,6 @@ def sample_paper_questions():
     questions.append(('In which conference was this paper published?', 'Return only the conference name. Do not add explanations.'))
 
     return questions
-
-def digest_
     
 
 

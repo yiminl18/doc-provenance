@@ -889,6 +889,7 @@ def load_embeddings(filename):
 
 def compute_embeddings(text, file_path):
     if os.path.exists(file_path):
+        print('file exist!')
         return 
     sentences = extract_sentences_from_pdf(text)
     embeddings = {}

@@ -74,12 +74,17 @@ def add_instructions(hotpots):
 
 def sample_paper_questions():
     questions = []
-    questions.append(('What is the publication year of this paper?','Return only a number. Do not add explanations.'))
-    #questions.append(('In what year was this paper published?','Return only a number. Do not add explanations.'))
+    questions.append(('In what year was this paper published?','Return only a number. Do not add explanations.'))
     questions.append(('Who are the authors of this paper?','Return only the author names. Do not add explanations.'))
     questions.append(('In which conference was this paper published?', 'Return only the conference name. Do not add explanations.'))
 
     return questions
+
+def paper_questions():
+    questions = []
+    questions.append('In what year was this paper published?')
+    questions.append('Who are the authors of this paper?')
+    questions.append('In which conference was this paper published?')
     
 
 

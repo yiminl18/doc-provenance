@@ -7,6 +7,12 @@ parent_directory = os.path.dirname(current_file_directory)
 sufficient_provenance_strategy_pool = ['raw','embedding_sufficient_top_down','embedding_sufficient_bottem_up','divide_and_conquer_sufficient', 'LLM_score_sufficient_top_down', 'LLM_score_sufficient_bottem_up']
 minimal_provenance_strategy_pool = ['sequential_greedy', 'exponential_greedy', 'null']
 
+import json
+def read_json(path):
+    with open(path, "r", encoding="utf-8") as file:
+        data = json.load(file)
+    return data
+
 def hotpot_pipeline():
     data_path = parent_directory + '/data/hotpotQA_fullwiki.json'
     folder_path = parent_directory + '/out/hotpotQA'
@@ -73,5 +79,45 @@ def paper_pipeline():
             print('***',s)
         break
 
+def nl_dev_pipeline():
+    #nl_dev
+    data_path = parent_directory + '/data/natural-questions_nq-dev-full.json'
+    embedding_folder = parent_directory + '/out/nl_dev'
+    folder_path = '/Users/yiminglin/Documents/Codebase/doc_provenance_results/eval' + '/nl_dev/results/'
+
+    objects = read_json(data_path)
+    instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
+
+    num_case = 1
+    
+    for sufficient_provenance_strategy in sufficient_provenance_strategy_pool:
+        for minimal_provenance_strategy in minimal_provenance_strategy_pool:
+            strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
+            
+            if sufficient_provenance_strategy != 'LLM_score_sufficient_top_down':
+                continue
+            if minimal_provenance_strategy != 'null':
+                continue
+
+            print(strategy)
+            i = 0
+
+            for o in objects:
+                embedding_path = embedding_folder + '/embeddings/' + 'nl_' + str(i) + '_embeddings.npy'
+                print(i)
+                text = o['text']
+                q = o['question']
+                question = (q, instruction)
+                title = o['id']
+                print(question)
+                i += 1
+                result_path = folder_path + str(i) + '_' + str(title) + '_'  + strategy + '.json'
+                #print(result_path)
+                # if os.path.isfile(result_path):
+                #     continue
+                logs = provenance.logger(text, question, title, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'string', embedding_path=embedding_path)
+                if(i >= num_case):
+                    break
+
 if __name__ == "__main__":
-    paper_pipeline()
+    nl_dev_pipeline()

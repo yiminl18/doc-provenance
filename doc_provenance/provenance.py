@@ -13,6 +13,8 @@ from difflib import SequenceMatcher
 
 nltk.download("punkt")
 
+question = ''
+
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 sys.path.append(current_file_directory)
@@ -169,14 +171,13 @@ def equal(res1, res2, metric = 'string'):
     if(metric == 'string'):
         return equal_string(res1, res2)
     else:
-        instruct_prompt = 'Determine if two strings are equivalent in meaning, not just in format. Lists must contain the same elements, allowing for alternative spellings, transliterations, or equivalent name variations. Missing or extra elements make them unequal. Dates in different formats should be considered equivalent if they represent the same time. Ignore case, punctuation, and spacing unless they change meaning. Return True if the strings are equivalent and False otherwise. Do not add explanations. ' 
+        instruction = 'I have two answers to the given question. If these two answers are equivalent in meaning, return True; otherwise, return False. Do not provide any explanation. ' + 'Answer 1: ' + ''.join(res1) + ' Answer 2: ' + ''.join(res2) + ' Question: ' + question[0] 
         if equal_string(res1, res2):
             return True
         if len(res1) != len(res2):
             return False 
         if(len(res1) > 1 or len(res2) > 1):
             #print('LLM evaluation1')
-            instruction = instruct_prompt + ' String 1 is: ' + " ".join(res1) + ' String 2 is: ' + " ".join(res2)
             response = model(model_name, (instruction, ''))
             if('true' in response.lower()):
                 return True
@@ -188,7 +189,6 @@ def equal(res1, res2, metric = 'string'):
                 print('length mis-match')
                 return False
             #print('LLM evaluation2')
-            instruction = 'Given the following two strings, String 1 is: '  + res1[0] + '. String 2 is: ' + res2[0] + '. ' + instruct_prompt
             response = model(model_name, (instruction, ''))
             #print(instruction)
             if('true' in response.lower()):
@@ -203,6 +203,7 @@ def evaluate(answers, question, ids, sentences, context = '', metric = 'string')
     pred_ans, input_tokens, output_tokens = QA(question, context)
     print('predicted answer:', pred_ans)
     print('original answer:', answers)
+    print('metric:', metric)
     st = time.time()
     if(equal(pred_ans, answers, metric)):
         et = time.time()
@@ -682,11 +683,13 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
     elif find_minimal_provenance_strategy == 'exponential_greedy':
         minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = exponential_greedy_operator(question, answers, sentences, sufficient_provenance_ids, metric = metric)
     elif find_minimal_provenance_strategy == 'null':
-        minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens)
+        minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), minimal_eval_latency
 
     return minimal_provenance_ids, (sufficient_input_tokens + minimal_input_tokens, sufficient_output_tokens + minimal_output_tokens), sufficient_eval_latency + minimal_eval_latency
 
-def logger(text, question, title, path, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = ''):
+def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = ''):
+    global question
+    question = q 
     logs = {}
     logs['title'] = title
     logs['question'] = question

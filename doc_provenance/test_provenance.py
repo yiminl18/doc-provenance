@@ -115,7 +115,7 @@ def nl_dev_pipeline():
                 #print(result_path)
                 # if os.path.isfile(result_path):
                 #     continue
-                logs = provenance.logger(text, question, title, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'string', embedding_path=embedding_path)
+                logs = provenance.logger(text, question, title, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path)
                 if(i >= num_case):
                     break
 

@@ -177,7 +177,7 @@ def equal_string(res1, res2):
     if len(res1_lower) == 1 and len(res2_lower) == 1:
         str1 = res1_lower[0]
         str2 = res2_lower[0]
-        print('str_similarity:', str_similarity(str1, str2))
+        #print('str_similarity:', str_similarity(str1, str2))
         if len(str1) > 20 and len(str2) > 20 and str_similarity(str1, str2) > 0.9:
             return True
 
@@ -308,9 +308,6 @@ def exponential_greedy_operator(question, answers, sentences, sorted_idx, metric
     output_tokens = 0
     total_eval_latency = 0
 
-    if len(sorted_idx) == 0:
-        sorted_idx = list(range(len(sentences)))
-
     #print(sorted_idx)
 
     skip_ids = []
@@ -330,9 +327,10 @@ def exponential_greedy_operator(question, answers, sentences, sorted_idx, metric
             remaining_sentences_id.append(i)
 
         sorted_remaining_sentences_id = sorted(remaining_sentences_id)
-        #print(sorted_remaining_sentences_id)
+        print('skip_ids:', skip_ids)
         
         eval_result, input_token, output_token, eval_latency = evaluate(answers, question, sorted_remaining_sentences_id, sentences, metric = metric)
+        print('eval:', eval_result)
         total_eval_latency += eval_latency
         input_tokens += input_token
         output_tokens += output_token
@@ -352,7 +350,7 @@ def exponential_greedy_operator(question, answers, sentences, sorted_idx, metric
 
     provenance = []
     provenance_id = []
-    for i in range(len(sentences)):
+    for i in sorted_idx:
         if i in removed_sentences:
             continue
         provenance_id.append(i)
@@ -714,6 +712,8 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
     sufficient_output_tokens = 0
     sufficient_eval_latency = 0
 
+    print('Starting:', find_sufficient_provenance_strategy)
+
     if find_sufficient_provenance_strategy == 'raw':
         sufficient_provenance_ids = list(range(len(sentences)))
     elif find_sufficient_provenance_strategy == 'embedding_sufficient_top_down':
@@ -731,6 +731,8 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
     minimal_input_tokens = 0
     minimal_output_tokens = 0
     minimal_eval_latency = 0 
+
+    print('Starting:', find_minimal_provenance_strategy)
 
     if find_minimal_provenance_strategy == 'sequential_greedy':
         minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = sequential_greedy_operator(question, answers, sentences, sufficient_provenance_ids, metric = metric)

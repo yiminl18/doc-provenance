@@ -14,6 +14,7 @@ from difflib import SequenceMatcher
 nltk.download("punkt")
 
 question = ''
+embedding_sentence_block_size = 1
 
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
@@ -78,6 +79,31 @@ def extract_sentences_from_pdf(text):
     sentences = nltk.sent_tokenize(text)
     sentences = merge_short_sentences(sentences)
     return sentences
+
+def group_sentences(sentences, k = 5):
+    #merge k sentneces into a group
+    merged_sentences = []
+    id_mp = {}
+    i = 1
+    group_sentence = []
+    sid = 0
+    sids = []
+    for sentence in sentences:
+        #print(i,k)
+        if i > k:
+            id_mp[len(merged_sentences)] = sids
+            merged_sentences.append(' '.join(group_sentence))
+            i = 1
+            group_sentence = []
+            sids = []
+        group_sentence.append(sentence)
+        sids.append(id)
+        if sid == len(sentences)-1: #last set of sentences 
+            id_mp[len(merged_sentences)] = sids
+            merged_sentences.append(' '.join(group_sentence))
+        i += 1
+        sid += 1
+    return merged_sentences, id_mp
 
 def write_list_to_file(filename, lines):
     with open(filename, "w", encoding="utf-8") as file:
@@ -171,6 +197,13 @@ def equal(res1, res2, metric = 'string'):
     if(metric == 'string'):
         return equal_string(res1, res2)
     else:
+        #check NULL answer
+        for r in res1:
+            if 'null' in r.lower():
+                return False
+        for r in res2:
+            if 'null' in r.lower():
+                return False
         instruction = 'I have two answers to the given question. If these two answers are equivalent in meaning, return True; otherwise, return False. Do not provide any explanation. ' + 'Answer 1: ' + ''.join(res1) + ' Answer 2: ' + ''.join(res2) + ' Question: ' + question[0] 
         if equal_string(res1, res2):
             return True
@@ -229,7 +262,7 @@ def sequential_greedy_operator(question, answers, sentences, sorted_idx, metric 
     #print(sorted_idx)
 
     for i in sorted_idx:
-        #print('Iterating sentence ',i, len(sorted_idx))
+        print('Iterating sentence ',i, len(sorted_idx))
         #print(sentences[i])
         remaining_sentences_id = []
         for j in sorted_idx:
@@ -247,7 +280,7 @@ def sequential_greedy_operator(question, answers, sentences, sorted_idx, metric 
         output_tokens += output_token
         if eval_result == True:#if removing this sentence does not change the final answers, then this sentence can be removed 
             removed_sentences.append(i) 
-            #print('Sentence ',i, ' is removed!')
+            print('Sentence ',i, ' is removed!')
     provenance = []
     provenance_id = []
     for i in sorted_idx:
@@ -360,12 +393,18 @@ def sort_sentences_by_similarity(question, answers, sentences, file_path):
         # Load existing embeddings
         embeddings = load_embeddings(file_path)
         exist = True
-        #print('load')
     except FileNotFoundError:
+        print('Embedding not found!')
         embeddings = {}
     
     # Compute embeddings and similarity scores for each sentence
     similarity_scores = {}
+    id_mp = {}
+    if embedding_sentence_block_size > 1:
+        sentences, id_mp = group_sentences(sentences)
+    else:
+        for i in range(len(sentences)):
+            id_mp[i] = i
     for sentence in sentences:
         if sentence not in embeddings:
             embeddings[sentence] = get_embedding(sentence)
@@ -387,10 +426,10 @@ def sort_sentences_by_similarity(question, answers, sentences, file_path):
     sorted_sentences = [sentence for index, sentence in sorted_indexed_sentences]
     sorted_indices = [index for index, sentence in sorted_indexed_sentences]
 
-    return sorted_indices, similarity_scores
+    return sorted_indices, similarity_scores, id_mp
 
 def embedding_sufficient_top_down_operator(question, answers, sentences, embedding_path, metric = 'string'):
-    sorted_indices, similarity_scores = sort_sentences_by_similarity(question, answers, sentences, embedding_path)
+    sorted_indices, similarity_scores, id_mp = sort_sentences_by_similarity(question, answers, sentences, embedding_path)
     #print(answers)
     total_eval_latency = 0
     queue = deque()
@@ -401,8 +440,10 @@ def embedding_sufficient_top_down_operator(question, answers, sentences, embeddi
 
     while queue:
         current_k = int(queue.popleft())
-        print(sorted_indices[:current_k])
-        eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, sorted_indices[:current_k], sentences, context = '', metric = metric)
+        current_sentences = []
+        for i in sorted_indices[:current_k]:
+            current_sentences += id_mp[i]
+        eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, current_sentences, sentences, context = '', metric = metric)
         total_eval_latency += eval_latency
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
@@ -418,7 +459,7 @@ def embedding_sufficient_top_down_operator(question, answers, sentences, embeddi
     return sorted_indices[:last_k], (sum_input_tokens, sum_output_tokens),total_eval_latency
 
 def embedding_sufficient_bottem_up_operator(question, answers, sentences, embedding_path, metric = 'string', step = 5):
-    sorted_indices, similarity_scores = sort_sentences_by_similarity(question, answers, sentences, embedding_path)
+    sorted_indices, similarity_scores, id_mp = sort_sentences_by_similarity(question, answers, sentences, embedding_path)
     #print(answers)
     total_eval_latency = 0
     queue = deque()
@@ -431,7 +472,9 @@ def embedding_sufficient_bottem_up_operator(question, answers, sentences, embedd
     id = 0
     while id < len(sorted_indices):
         id += step
-        current_sentences = sorted_indices[:id]
+        current_sentences = []
+        for i in sorted_indices[:id]:
+            current_sentences += id_mp[i]
         eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, current_sentences, sentences, context = '', metric = metric)
         total_eval_latency += eval_latency
         sum_input_tokens += input_tokens
@@ -639,13 +682,24 @@ def LLM_score_sufficient_bottem_up_operator(question, answers, sentences, sorted
     blk_num = len(sentences)/k
     blk_num = min(20, blk_num)
     total_eval_latency = 0
+    sum_input_tokens = 0
+    sum_output_tokens = 0
+
     block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
-    sorted_block = dict(sorted(block_scores.items(), key=lambda item: item[1]))
+    sorted_block_dict = dict(sorted(block_scores.items(), key=lambda item: item[1], reverse=True))
+    sorted_block = []
+    for id, score in sorted_block_dict.items():
+        # print(id, score)
+        # print(blocks_sentences_id[id])
+        sorted_block.append(blocks_sentences_id[id])
     current_block = []
-    for block in sorted_block:
-        current_block += block
-        current_sentences = get_block_sentences(current_block, blocks_sentences_id)
+    for k in range(len(sorted_block)):
+        current_block = sorted_block[:k]
+        print('current_block:', current_block)
+        current_sentences = get_block_sentences(current_block)
+        print('current_sentences:', current_sentences)
         eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, current_sentences, sentences, context = '', metric = metric)
+        print('eval:', eval_result)
         total_eval_latency += eval_latency
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
@@ -679,7 +733,7 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
     minimal_eval_latency = 0 
 
     if find_minimal_provenance_strategy == 'sequential_greedy':
-        minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = sequential_greedy_operator(question, answers, sufficient_provenance_ids, metric = metric)
+        minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = sequential_greedy_operator(question, answers, sentences, sufficient_provenance_ids, metric = metric)
     elif find_minimal_provenance_strategy == 'exponential_greedy':
         minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = exponential_greedy_operator(question, answers, sentences, sufficient_provenance_ids, metric = metric)
     elif find_minimal_provenance_strategy == 'null':

@@ -94,9 +94,9 @@ def nl_dev_pipeline():
         for minimal_provenance_strategy in minimal_provenance_strategy_pool:
             strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
             
-            if sufficient_provenance_strategy != 'LLM_score_sufficient_top_down':
+            if sufficient_provenance_strategy != 'raw':
                 continue
-            if minimal_provenance_strategy != 'null':
+            if minimal_provenance_strategy != 'sequential_greedy':
                 continue
 
             print(strategy)

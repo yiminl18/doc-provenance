@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="dpc_provenance",  # Replace with your library name
+    name="doc_provenance",  # Replace with your library name
     version="0.1.0",  # Initial version
     author="Yiming Lin",
     author_email="yiminglin@berkeley.edu",

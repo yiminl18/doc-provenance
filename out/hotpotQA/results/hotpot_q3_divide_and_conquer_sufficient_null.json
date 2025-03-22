@@ -1,0 +1,29 @@
+{
+    "title": "hotpot_dev_fullwiki_v1.json",
+    "question": [
+        "Are the Laleli Mosque and Esma Sultan Mansion located in the same neighborhood?",
+        "Only return yes or no. Do not add explanations."
+    ],
+    "document_size": 861,
+    "answer": [
+        "No."
+    ],
+    "time": 0.9207768440246582,
+    "provenance_ids": [
+        0,
+        1,
+        2,
+        3
+    ],
+    "provenance": [
+        "Esma Sultan is the name of three daughters of three Ottoman Sultans:Esma Sultan (17 July 1778 – 4 June 1848) was an Ottoman princess, daughter of Sultan Abdul Hamid I, sister of Sultan Mustafa IV and Sultan Mahmud II.",
+        "She was the adoptive mother of Bezmiâlem Sultan and Rahime Perestu Sultan.The Laleli Mosque (Turkish: \"Laleli Camii, or Tulip Mosque\" ) is an 18th-century Ottoman imperial mosque located in Laleli, Fatih, Istanbul, Turkey.Gevheri Kadın (8 July 1856 – 6 September 1884) was the fifth wife of 32nd Ottoman Sultan Abdülaziz.",
+        "She was the mother of Şehzade Mehmed Seyfeddin and Esma Sultan of the Ottoman Empire.Esma Sultan (14 March 1726 – 13 August 1788) was an Ottoman princess, daughter of Sultan Ahmed III and his consort Zeynep Kadın.",
+        "She was the half-sister of Sultan Mustafa III and Abdul Hamid I.The Great Mosque of Algiers (Arabic: الجامع الكبير‎ ‎ , \"Jemaa Kebir\") or “Djama’a al-Kebir” (meaning Great Mosque) is a mosque in Algiers, Algeria, located very close to Algiers Harbor."
+    ],
+    "provenance_size": 281,
+    "tokens": [
+        3184,
+        12
+    ]
+}

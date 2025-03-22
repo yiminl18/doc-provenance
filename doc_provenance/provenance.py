@@ -374,14 +374,14 @@ def embedding_sufficient_top_down_operator(question, answers, sentences, embeddi
     sorted_indices, similarity_scores = sort_sentences_by_similarity(question, answers, sentences, embedding_path)
     #print(answers)
     queue = deque()
-    queue.append(len(sorted_indices))
+    queue.append(len(sorted_indices)/2)
     last_k = len(sorted_indices)
     sum_input_tokens = 0
     sum_output_tokens = 0
 
     while queue:
         current_k = int(queue.popleft())
-        #print(sorted_indices[:current_k])
+        print(sorted_indices[:current_k])
         eval_result, input_tokens, output_tokens = evaluate(answers, question, sorted_indices[:current_k], sentences, context = '', metric = metric)
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
@@ -419,7 +419,8 @@ def embedding_sufficient_bottem_up_operator(question, answers, sentences, embedd
 
 def divide_and_conquer_sufficient_operator(question, answers, sentences, sorted_idx, metric = 'string', stop_sentence_length = 5):
     #sorted_idx: the list of idx for the context to consider 
-    global binary_out_ids, sum_input_tokens, sum_output_tokens, topk_provenance_id, provenance_topk_results
+    sum_input_tokens = 0
+    sum_output_tokens = 0
 
     father = {}
     rib = {}
@@ -446,14 +447,16 @@ def divide_and_conquer_sufficient_operator(question, answers, sentences, sorted_
         eval_cache[key] = result 
 
     # Use a queue to perform an iterative, divide-and-conquer approach
+    
     stack = [sorted_idx]
+    set_cached(sorted_idx, True)
 
     # current_ids has alredy been runed, set its status 
     #set_cached(ids, True)
 
     while stack:
         current_ids = stack.pop()
-        #print(current_ids)
+        
 
         # Evaluate the entire set once, storing the result
         if is_cached(current_ids) == 'NULL':
@@ -464,7 +467,7 @@ def divide_and_conquer_sufficient_operator(question, answers, sentences, sorted_
         else:
             eval_result = is_cached(current_ids)
 
-        #print(current_ids, eval_result)
+        print(current_ids, eval_result)
         # If the entire set doesn't yield True, no need to proceed
 
         tuple_current_ids = tuple(current_ids)
@@ -637,10 +640,12 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
         minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens) = sequential_greedy_operator(question, answers, sufficient_provenance_ids, metric = metric)
     elif find_minimal_provenance_strategy == 'exponential_greedy':
         minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens) = exponential_greedy_operator(question, answers, sentences, sufficient_provenance_ids, metric = metric)
+    elif find_minimal_provenance_strategy == 'null':
+        minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens) = sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens)
 
     return minimal_provenance_ids, (sufficient_input_tokens + minimal_input_tokens, sufficient_output_tokens + minimal_output_tokens)
 
-def logger(text, question, title, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = ''):
+def logger(text, question, title, path, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = ''):
     logs = {}
     logs['title'] = title
     logs['question'] = question
@@ -656,9 +661,14 @@ def logger(text, question, title, find_sufficient_provenance_strategy, find_mini
     logs['provenance_ids'] = provenance_ids
     provenance = []
     for id in provenance_ids:
-        provenance += sentences[id]
+        provenance.append(sentences[id])
     logs['provenance'] = provenance
-    logs['provenance_size'] = count_tokens(provenance)
+    logs['provenance_size'] = count_tokens(''.join(provenance))
     logs['tokens'] = (input_tokens, output_tokens)
+
+    write_json_to_file(path, logs)
+
+    print(provenance_ids)
+    print(input_tokens, output_tokens)
     return logs 
 

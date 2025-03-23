@@ -4,8 +4,9 @@ import os
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 
-sufficient_provenance_strategy_pool = ['raw','embedding_sufficient_top_down','embedding_sufficient_bottem_up','divide_and_conquer_sufficient', 'LLM_score_sufficient_top_down', 'LLM_score_sufficient_bottem_up']
-minimal_provenance_strategy_pool = ['sequential_greedy', 'exponential_greedy', 'null']
+# sufficient_provenance_strategy_pool = ['raw','embedding_sufficient_top_down','embedding_sufficient_bottem_up','divide_and_conquer_sufficient', 'LLM_score_sufficient_top_down', 'LLM_score_sufficient_bottem_up']
+sufficient_provenance_strategy_pool = ['divide_and_conquer_sufficient', 'LLM_score_sufficient_top_down', 'LLM_score_sufficient_bottem_up']
+minimal_provenance_strategy_pool = ['sequential_greedy', 'exponential_greedy']
 
 import json
 def read_json(path):
@@ -88,36 +89,50 @@ def nl_dev_pipeline():
     objects = read_json(data_path)
     instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
 
-    num_case = 1
+    num_case = 100
     
     for sufficient_provenance_strategy in sufficient_provenance_strategy_pool:
         for minimal_provenance_strategy in minimal_provenance_strategy_pool:
             strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
             
-            if sufficient_provenance_strategy != 'LLM_score_sufficient_top_down':
-                continue
-            if minimal_provenance_strategy != 'exponential_greedy':
-                continue
+            # if sufficient_provenance_strategy != 'divide_and_conquer_sufficient':
+            #     continue
+            # if minimal_provenance_strategy != 'exponential_greedy':
+            #     continue
 
             print(strategy)
             i = 0
 
             for o in objects:
                 embedding_path = embedding_folder + '/embeddings/' + 'nl_' + str(i) + '_embeddings.npy'
-                print(i)
+                print(i+1)
+
                 text = o['text']
                 q = o['question']
                 question = (q, instruction)
                 title = o['id']
                 print(question)
                 i += 1
+
+                if i == 82 or i == 72 or i == 89:
+                    continue
+
+                # if sufficient_provenance_strategy == 'divide_and_conquer_sufficient' and minimal_provenance_strategy == 'sequential_greedy':
+                #     if i == 82 or i == 72 or i == 89:
+                #         continue
+                # if sufficient_provenance_strategy == 'divide_and_conquer_sufficient' and minimal_provenance_strategy == 'exponential_greedy':
+                #     if i == 99:
+                #         continue
+                # if sufficient_provenance_strategy == 'LLM_score_sufficient_top_down' and minimal_provenance_strategy == 'sequential_greedy':
+                #     if i == 15 or i==22 or i==25:
+                #         continue
                 result_path = folder_path + str(i) + '_' + str(title) + '_'  + strategy + '.json'
-                #print(result_path)
-                # if os.path.isfile(result_path):
-                #     continue
-                logs = provenance.logger(text, question, title, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path)
+                if os.path.isfile(result_path):
+                    continue
                 if(i >= num_case):
                     break
+                logs = provenance.logger(text, question, title, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path)
+                
 
 if __name__ == "__main__":
     nl_dev_pipeline()

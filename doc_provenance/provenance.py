@@ -206,11 +206,12 @@ def equal(res1, res2, metric = 'string'):
                 return False
         instruction = 'I have two answers to the given question. If these two answers are equivalent in meaning, return True; otherwise, return False. Do not provide any explanation. ' + 'Answer 1: ' + ''.join(res1) + ' Answer 2: ' + ''.join(res2) + ' Question: ' + question[0] 
         if equal_string(res1, res2):
+            print('Return true in string metric')
             return True
         if len(res1) != len(res2):
             return False 
         if(len(res1) > 1 or len(res2) > 1):
-            #print('LLM evaluation1')
+            print('LLM evaluation with different lengths')
             response = model(model_name, (instruction, ''))
             if('true' in response.lower()):
                 return True
@@ -221,7 +222,10 @@ def equal(res1, res2, metric = 'string'):
             if len(str1) > 2*len(str2) or len(str2) > 2*len(str1):
                 print('length mis-match')
                 return False
-            #print('LLM evaluation2')
+            if len(str1) < 20 and len(str2) < 20: 
+                print('Evaluated in string')
+                return equal_string(res1, res2)
+            print('LLM evaluation with same length')
             response = model(model_name, (instruction, ''))
             #print(instruction)
             if('true' in response.lower()):
@@ -262,7 +266,7 @@ def sequential_greedy_operator(question, answers, sentences, sorted_idx, metric 
     #print(sorted_idx)
 
     for i in sorted_idx:
-        print('Iterating sentence ',i, len(sorted_idx))
+        #print('Iterating sentence ',i, len(sorted_idx))
         #print(sentences[i])
         remaining_sentences_id = []
         for j in sorted_idx:
@@ -280,7 +284,7 @@ def sequential_greedy_operator(question, answers, sentences, sorted_idx, metric 
         output_tokens += output_token
         if eval_result == True:#if removing this sentence does not change the final answers, then this sentence can be removed 
             removed_sentences.append(i) 
-            print('Sentence ',i, ' is removed!')
+            #print('Sentence ',i, ' is removed!')
     provenance = []
     provenance_id = []
     for i in sorted_idx:
@@ -532,7 +536,7 @@ def divide_and_conquer_sufficient_operator(question, answers, sentences, sorted_
         else:
             eval_result = is_cached(current_ids)
 
-        print(current_ids, eval_result)
+        #print(current_ids, eval_result)
         # If the entire set doesn't yield True, no need to proceed
 
         tuple_current_ids = tuple(current_ids)
@@ -633,7 +637,7 @@ def get_block_sentences(block_list):
 def LLM_score_sufficient_top_down_operator(question, answers, sentences, sorted_idx, metric = 'string', k=5):
     blk_num = len(sentences)/k
     blk_num = min(20, blk_num)
-    print(blk_num)
+    #print(blk_num)
     total_eval_latency = 0
     block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
     # for id, score in block_scores.items():
@@ -652,17 +656,17 @@ def LLM_score_sufficient_top_down_operator(question, answers, sentences, sorted_
     last_k = len(block_scores) 
     sum_input_tokens = 0
     sum_output_tokens = 0
-    print('block_size:',len(block_scores))
+    #print('block_size:',len(block_scores))
 
     while queue:
         current_k = int(queue.popleft())
-        print('k:',current_k)
-        print(sorted_block[:current_k])
+        # print('k:',current_k)
+        # print(sorted_block[:current_k])
         current_sentences = get_block_sentences(sorted_block[:current_k])
-        print('current sentences:', current_sentences)
+        # print('current sentences:', current_sentences)
         eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, current_sentences, sentences, context = '', metric = metric)
         total_eval_latency += eval_latency
-        print('eval:', eval_result)
+        # print('eval:', eval_result)
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
         if eval_result:
@@ -693,11 +697,11 @@ def LLM_score_sufficient_bottem_up_operator(question, answers, sentences, sorted
     current_block = []
     for k in range(len(sorted_block)):
         current_block = sorted_block[:k]
-        print('current_block:', current_block)
+        #print('current_block:', current_block)
         current_sentences = get_block_sentences(current_block)
-        print('current_sentences:', current_sentences)
+        #print('current_sentences:', current_sentences)
         eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, current_sentences, sentences, context = '', metric = metric)
-        print('eval:', eval_result)
+        #print('eval:', eval_result)
         total_eval_latency += eval_latency
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
@@ -727,6 +731,7 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
     elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_bottem_up':
         sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = LLM_score_sufficient_bottem_up_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
 
+    print('sufficient provenance ids:', sufficient_provenance_ids)
     minimal_provenance_ids = []
     minimal_input_tokens = 0
     minimal_output_tokens = 0
@@ -753,6 +758,7 @@ def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minim
     sentences = extract_sentences_from_pdf(text)
     answers, in_token, out_tokens = QA(question, text)
     answers_str = ''.join(answers)
+    print('answers:', answers)
     if 'null' in answers_str.lower():
         logs['answer'] = answers
         write_json_to_file(path, logs)
@@ -774,7 +780,7 @@ def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minim
 
     write_json_to_file(path, logs)
 
-    print(provenance_ids)
+    print('final provenance ids:', provenance_ids)
     print(input_tokens, output_tokens)
     return logs 
 

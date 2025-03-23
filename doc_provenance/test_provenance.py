@@ -80,6 +80,12 @@ def paper_pipeline():
             print('***',s)
         break
 
+def get_sufficient_result(sufficient_path):
+    if os.path.isfile(sufficient_path):
+        result = read_json(sufficient_path)
+        return result['time'], result['tokens'], result['provenance_ids'], result['eval_time']
+    return -1,(-1,-1), [-1], -1
+
 def nl_dev_pipeline():
     #nl_dev
     data_path = parent_directory + '/data/natural-questions_nq-dev-full.json'
@@ -127,11 +133,14 @@ def nl_dev_pipeline():
                 #     if i == 15 or i==22 or i==25:
                 #         continue
                 result_path = folder_path + str(i) + '_' + str(title) + '_'  + strategy + '.json'
+                sufficient_path = folder_path + str(i) + '_' + str(title) + '_'  + sufficient_provenance_strategy + '_null' + '.json'
+                sufficient_time, sufficient_tokens, sufficient_provenance_ids, sufficient_eval_latency =  get_sufficient_result(sufficient_path)
+
                 if os.path.isfile(result_path):
                     continue
                 if(i >= num_case):
                     break
-                logs = provenance.logger(text, question, title, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path)
+                logs = provenance.logger(text, question, title, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path, sufficient_time = sufficient_time, sufficient_tokens = sufficient_tokens, sufficient_provenance_ids = sufficient_provenance_ids, sufficient_eval_latency = sufficient_eval_latency)
                 
 
 if __name__ == "__main__":

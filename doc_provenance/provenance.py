@@ -710,26 +710,33 @@ def LLM_score_sufficient_bottem_up_operator(question, answers, sentences, sorted
         
     return sorted_idx, (sum_input_tokens, sum_output_tokens),total_eval_latency
 
-def caller(question, answers, sentences, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = ''):
-    sufficient_provenance_ids = []
+def caller(question, answers, sentences, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = '', sufficient_time = -1, sufficient_tokens = (-1,-1), sufficient_provenance_ids = [-1], sufficient_eval_latency  = -1):
+    
     sufficient_input_tokens = 0
     sufficient_output_tokens = 0
     sufficient_eval_latency = 0
 
-    print('Starting:', find_sufficient_provenance_strategy)
+    if sufficient_time == -1:
+        print('Compute sufficient provenance online')
+        #print('Starting:', find_sufficient_provenance_strategy)
+        sufficient_provenance_ids = []
+        if find_sufficient_provenance_strategy == 'raw':
+            sufficient_provenance_ids = list(range(len(sentences)))
+        elif find_sufficient_provenance_strategy == 'embedding_sufficient_top_down':
+            sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = embedding_sufficient_top_down_operator(question, answers, sentences, metric = metric)
+        elif find_sufficient_provenance_strategy == 'embedding_sufficient_bottem_up':
+            sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = embedding_sufficient_bottem_up_operator(question, answers, sentences, embedding_path, metric = metric)
+        elif find_sufficient_provenance_strategy == 'divide_and_conquer_sufficient':
+            sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = divide_and_conquer_sufficient_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
+        elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_top_down':
+            sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = LLM_score_sufficient_top_down_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
+        elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_bottem_up':
+            sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = LLM_score_sufficient_bottem_up_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
+    else: 
+        print('Read sufficient provenance locally')
+        sufficient_input_tokens = sufficient_tokens[0]
+        sufficient_output_tokens = sufficient_tokens[1]
 
-    if find_sufficient_provenance_strategy == 'raw':
-        sufficient_provenance_ids = list(range(len(sentences)))
-    elif find_sufficient_provenance_strategy == 'embedding_sufficient_top_down':
-        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = embedding_sufficient_top_down_operator(question, answers, sentences, metric = metric)
-    elif find_sufficient_provenance_strategy == 'embedding_sufficient_bottem_up':
-        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = embedding_sufficient_bottem_up_operator(question, answers, sentences, embedding_path, metric = metric)
-    elif find_sufficient_provenance_strategy == 'divide_and_conquer_sufficient':
-        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = divide_and_conquer_sufficient_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
-    elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_top_down':
-        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = LLM_score_sufficient_top_down_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
-    elif find_sufficient_provenance_strategy == 'LLM_score_sufficient_bottem_up':
-        sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = LLM_score_sufficient_bottem_up_operator(question, answers, sentences, list(range(len(sentences))), metric = metric)
 
     print('sufficient provenance ids:', sufficient_provenance_ids)
     minimal_provenance_ids = []
@@ -748,7 +755,7 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
 
     return minimal_provenance_ids, (sufficient_input_tokens + minimal_input_tokens, sufficient_output_tokens + minimal_output_tokens), sufficient_eval_latency + minimal_eval_latency
 
-def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = ''):
+def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = '', sufficient_time = -1, sufficient_tokens = (-1,-1), sufficient_provenance_ids = [-1], sufficient_eval_latency = -1):
     global question
     question = q 
     logs = {}
@@ -764,7 +771,7 @@ def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minim
         write_json_to_file(path, logs)
         return logs 
     st = time.time()
-    provenance_ids, (input_tokens, output_tokens), eval_latency =  caller(question, answers, sentences, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = metric, embedding_path=embedding_path)
+    provenance_ids, (input_tokens, output_tokens), eval_latency =  caller(question, answers, sentences, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = metric, embedding_path=embedding_path, sufficient_time = sufficient_time, sufficient_tokens = sufficient_tokens, sufficient_provenance_ids = sufficient_provenance_ids, sufficient_eval_latency = sufficient_eval_latency)
     et = time.time()
     logs['answer'] = answers
     logs['time'] = et-st

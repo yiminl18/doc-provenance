@@ -907,9 +907,9 @@ def group_sentences(sentences, k = 5):
     return merged_sentences
 
 def compute_embeddings(text, file_path):
-    if os.path.exists(file_path):
-        print('file exist!')
-        return 
+    # if os.path.exists(file_path):
+    #     print('file exist!')
+    #     return 
     sentences = extract_sentences_from_pdf(text)
     sentences = group_sentences(sentences)
     #print(len(sentences))

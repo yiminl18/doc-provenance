@@ -20,7 +20,8 @@ current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 sys.path.append(current_file_directory)
 from model import model #[gpt4o, gpt4vision, gpt4omini]
-model_name = 'gpt4omini'
+model_expensive = 'gpt4o'
+model_cheap = 'gpt4omini'
 
 def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path)
@@ -88,18 +89,20 @@ def group_sentences(sentences, k = 5):
     group_sentence = []
     sid = 0
     sids = []
+    gid = 0
     for sentence in sentences:
         #print(i,k)
         if i > k:
-            id_mp[len(merged_sentences)] = sids
+            id_mp[gid] = sids
             merged_sentences.append(' '.join(group_sentence))
             i = 1
             group_sentence = []
             sids = []
+            gid += 1
         group_sentence.append(sentence)
-        sids.append(id)
+        sids.append(sid)
         if sid == len(sentences)-1: #last set of sentences 
-            id_mp[len(merged_sentences)] = sids
+            id_mp[gid] = sids
             merged_sentences.append(' '.join(group_sentence))
         i += 1
         sid += 1
@@ -137,7 +140,7 @@ def QA(question, context):
     if len(context) == 0:
         return ['NULL'], 0, 0
     prompt = (question[0] + question[1], context)
-    response = model(model_name, prompt)
+    response = model(model_cheap, prompt)
     # print('Prompt is:', prompt[0])
     # print('QA response is:', response)
     if('|' in response):
@@ -212,7 +215,7 @@ def equal(res1, res2, metric = 'string'):
             return False 
         if(len(res1) > 1 or len(res2) > 1):
             print('LLM evaluation with different lengths')
-            response = model(model_name, (instruction, ''))
+            response = model(model_cheap, (instruction, ''))
             if('true' in response.lower()):
                 return True
             return False
@@ -226,7 +229,7 @@ def equal(res1, res2, metric = 'string'):
                 print('Evaluated in string')
                 return equal_string(res1, res2)
             print('LLM evaluation with same length')
-            response = model(model_name, (instruction, ''))
+            response = model(model_cheap, (instruction, ''))
             #print(instruction)
             if('true' in response.lower()):
                 return True
@@ -240,7 +243,7 @@ def evaluate(answers, question, ids, sentences, context = '', metric = 'string')
     pred_ans, input_tokens, output_tokens = QA(question, context)
     print('predicted answer:', pred_ans)
     print('original answer:', answers)
-    print('metric:', metric)
+    #print('metric:', metric)
     st = time.time()
     if(equal(pred_ans, answers, metric)):
         et = time.time()
@@ -394,6 +397,7 @@ def sort_sentences_by_similarity(question, answers, sentences, file_path):
     try:
         # Load existing embeddings
         embeddings = load_embeddings(file_path)
+        print('Embeddings found!')
         exist = True
     except FileNotFoundError:
         print('Embedding not found!')
@@ -402,17 +406,16 @@ def sort_sentences_by_similarity(question, answers, sentences, file_path):
     # Compute embeddings and similarity scores for each sentence
     similarity_scores = {}
     id_mp = {}
-    if embedding_sentence_block_size > 1:
-        sentences, id_mp = group_sentences(sentences)
-    else:
-        for i in range(len(sentences)):
-            id_mp[i] = i
+    i = 0
+    sentences, id_mp = group_sentences(sentences, k = 5)
     for sentence in sentences:
+        #print(i)
         if sentence not in embeddings:
             embeddings[sentence] = get_embedding(sentence)
         sentence_embedding = embeddings[sentence]
         similarity = cosine_sim(question_embedding, sentence_embedding)
         similarity_scores[sentence] = similarity
+        i += 1
 
     # Save updated embeddings
     if not exist:
@@ -428,11 +431,14 @@ def sort_sentences_by_similarity(question, answers, sentences, file_path):
     sorted_sentences = [sentence for index, sentence in sorted_indexed_sentences]
     sorted_indices = [index for index, sentence in sorted_indexed_sentences]
 
-    return sorted_indices, similarity_scores, id_mp
+    return sorted_indices, similarity_scores, sentences, id_mp
 
 def embedding_sufficient_top_down_operator(question, answers, sentences, embedding_path, metric = 'string'):
-    sorted_indices, similarity_scores, id_mp = sort_sentences_by_similarity(question, answers, sentences, embedding_path)
-    #print(answers)
+    sorted_indices, similarity_scores, group_sentences, id_mp = sort_sentences_by_similarity(question, answers, sentences, embedding_path)
+    # for idx in sorted_indices[:20]:
+    #     print(idx, group_sentences[idx], similarity_scores[group_sentences[idx]])
+    #     print(id_mp[idx])
+    
     total_eval_latency = 0
     queue = deque()
     queue.append(len(sorted_indices)/2)
@@ -445,23 +451,29 @@ def embedding_sufficient_top_down_operator(question, answers, sentences, embeddi
         current_sentences = []
         for i in sorted_indices[:current_k]:
             current_sentences += id_mp[i]
+        print(current_k, current_sentences)
         eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, current_sentences, sentences, context = '', metric = metric)
+        print(eval_result)
         total_eval_latency += eval_latency
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
+        #print('last_k:', last_k)
         if eval_result:
-            mid = current_k / 2
+            mid = round(current_k / 2)
             queue.append(mid)
             last_k = current_k
             if current_k <= 1:
-                return sorted_indices[:last_k], (sum_input_tokens, sum_output_tokens),total_eval_latency
+                return current_sentences, (sum_input_tokens, sum_output_tokens),total_eval_latency
         else:
-            return sorted_indices[:last_k], (sum_input_tokens, sum_output_tokens),total_eval_latency
+            out_sentences = []
+            for i in sorted_indices[:last_k]:
+                out_sentences += id_mp[i]
+            return out_sentences, (sum_input_tokens, sum_output_tokens),total_eval_latency
             
-    return sorted_indices[:last_k], (sum_input_tokens, sum_output_tokens),total_eval_latency
+    #return sorted_indices[:last_k], (sum_input_tokens, sum_output_tokens),total_eval_latency
 
 def embedding_sufficient_bottem_up_operator(question, answers, sentences, embedding_path, metric = 'string', step = 5):
-    sorted_indices, similarity_scores, id_mp = sort_sentences_by_similarity(question, answers, sentences, embedding_path)
+    sorted_indices, similarity_scores, group_sentences, id_mp = sort_sentences_by_similarity(question, answers, sentences, embedding_path)
     #print(answers)
     total_eval_latency = 0
     queue = deque()
@@ -536,7 +548,7 @@ def divide_and_conquer_sufficient_operator(question, answers, sentences, sorted_
         else:
             eval_result = is_cached(current_ids)
 
-        #print(current_ids, eval_result)
+        print(current_ids, eval_result)
         # If the entire set doesn't yield True, no need to proceed
 
         tuple_current_ids = tuple(current_ids)
@@ -601,12 +613,14 @@ def block_labeler(sentences, question, answers, blk_num):
                 blocks_sentences_id.append(ids)
     instruction = 'Given the following question: ' + question[0] + ' and a list of text blocks, the corresponding answers are: ' + ','.join(answers) +  '. Your task is to assign a score (from 1 to 10) to each block based on how likely it is to contain context relevant to answering the question. The text blocks are listed below, each starting with Block i: followed by its content. Return only a comma-separated list of scores corresponding to each block, in the order they are given. Do not include any explanations or additional text. '
     context = ''
+    #print(instruction)
     #print(len(blocks))
     for id in range(len(blocks)):
         context += 'Block ' + str(id) + ': ' + blocks[id] + '\n'
+    #print(len(context))
     prompt = (instruction, context)
-    print(count_tokens(context))
-    response = model(model_name, prompt)
+    #print(count_tokens(context))
+    response = model(model_expensive, prompt)
     #print(response)
     scores = [int(num.strip()) for num in response.split(",")]
     block_scores = {}
@@ -637,7 +651,7 @@ def get_block_sentences(block_list):
 def LLM_score_sufficient_top_down_operator(question, answers, sentences, sorted_idx, metric = 'string', k=5):
     blk_num = len(sentences)/k
     blk_num = min(20, blk_num)
-    #print(blk_num)
+    print(blk_num)
     total_eval_latency = 0
     block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
     # for id, score in block_scores.items():
@@ -660,13 +674,13 @@ def LLM_score_sufficient_top_down_operator(question, answers, sentences, sorted_
 
     while queue:
         current_k = int(queue.popleft())
-        # print('k:',current_k)
+        print('k:',current_k)
         # print(sorted_block[:current_k])
         current_sentences = get_block_sentences(sorted_block[:current_k])
         # print('current sentences:', current_sentences)
         eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, current_sentences, sentences, context = '', metric = metric)
         total_eval_latency += eval_latency
-        # print('eval:', eval_result)
+        print('eval:', eval_result)
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
         if eval_result:
@@ -697,11 +711,11 @@ def LLM_score_sufficient_bottem_up_operator(question, answers, sentences, sorted
     current_block = []
     for k in range(len(sorted_block)):
         current_block = sorted_block[:k]
-        #print('current_block:', current_block)
+        print('current_block:', current_block)
         current_sentences = get_block_sentences(current_block)
         #print('current_sentences:', current_sentences)
         eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, current_sentences, sentences, context = '', metric = metric)
-        #print('eval:', eval_result)
+        print('eval:', eval_result)
         total_eval_latency += eval_latency
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
@@ -723,7 +737,7 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
         if find_sufficient_provenance_strategy == 'raw':
             sufficient_provenance_ids = list(range(len(sentences)))
         elif find_sufficient_provenance_strategy == 'embedding_sufficient_top_down':
-            sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = embedding_sufficient_top_down_operator(question, answers, sentences, metric = metric)
+            sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = embedding_sufficient_top_down_operator(question, answers, sentences, embedding_path, metric = metric)
         elif find_sufficient_provenance_strategy == 'embedding_sufficient_bottem_up':
             sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), sufficient_eval_latency = embedding_sufficient_bottem_up_operator(question, answers, sentences, embedding_path, metric = metric)
         elif find_sufficient_provenance_strategy == 'divide_and_conquer_sufficient':
@@ -736,6 +750,7 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
         print('Read sufficient provenance locally')
         sufficient_input_tokens = sufficient_tokens[0]
         sufficient_output_tokens = sufficient_tokens[1]
+        sufficient_eval_latency = sufficient_eval_latency
 
 
     print('sufficient provenance ids:', sufficient_provenance_ids)
@@ -751,7 +766,7 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
     elif find_minimal_provenance_strategy == 'exponential_greedy':
         minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = exponential_greedy_operator(question, answers, sentences, sufficient_provenance_ids, metric = metric)
     elif find_minimal_provenance_strategy == 'null':
-        minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = sufficient_provenance_ids, (sufficient_input_tokens, sufficient_output_tokens), minimal_eval_latency
+        minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = sufficient_provenance_ids, (0, 0), 0
 
     return minimal_provenance_ids, (sufficient_input_tokens + minimal_input_tokens, sufficient_output_tokens + minimal_output_tokens), sufficient_eval_latency + minimal_eval_latency
 
@@ -775,6 +790,8 @@ def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minim
     et = time.time()
     logs['answer'] = answers
     logs['time'] = et-st
+    if sufficient_time != -1:# if sufficient provenance has been computed 
+        logs['time'] += sufficient_time
     logs['eval_time'] = eval_latency
     provenance_ids = sorted(provenance_ids)
     logs['provenance_ids'] = provenance_ids
@@ -787,7 +804,8 @@ def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minim
 
     write_json_to_file(path, logs)
 
-    print('final provenance ids:', provenance_ids)
+    print('provenance ids:', provenance_ids)
+    #print('provenance time:', logs['time'])
     print(input_tokens, output_tokens)
     return logs 
 

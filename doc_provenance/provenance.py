@@ -229,7 +229,7 @@ def equal(res1, res2, metric = 'string'):
                 print('Evaluated in string')
                 return equal_string(res1, res2)
             print('LLM evaluation with same length')
-            response = model(model_cheap, (instruction, ''))
+            response = model(model_expensive, (instruction, ''))
             #print(instruction)
             if('true' in response.lower()):
                 return True
@@ -269,7 +269,7 @@ def sequential_greedy_operator(question, answers, sentences, sorted_idx, metric 
     #print(sorted_idx)
 
     for i in sorted_idx:
-        #print('Iterating sentence ',i, len(sorted_idx))
+        print('Iterating sentence ',i, len(sorted_idx))
         #print(sentences[i])
         remaining_sentences_id = []
         for j in sorted_idx:
@@ -287,7 +287,7 @@ def sequential_greedy_operator(question, answers, sentences, sorted_idx, metric 
         output_tokens += output_token
         if eval_result == True:#if removing this sentence does not change the final answers, then this sentence can be removed 
             removed_sentences.append(i) 
-            #print('Sentence ',i, ' is removed!')
+            print('Sentence ',i, ' is removed!')
     provenance = []
     provenance_id = []
     for i in sorted_idx:
@@ -309,7 +309,6 @@ def enumerate_skip_ids(cur_ids):
     return new_ids
 
 def exponential_greedy_operator(question, answers, sentences, sorted_idx, metric = 'string'):
-    out = {}
     removed_sentences = []
     input_tokens = 0
     output_tokens = 0
@@ -472,9 +471,12 @@ def embedding_sufficient_top_down_operator(question, answers, sentences, embeddi
             
     #return sorted_indices[:last_k], (sum_input_tokens, sum_output_tokens),total_eval_latency
 
-def embedding_sufficient_bottem_up_operator(question, answers, sentences, embedding_path, metric = 'string', step = 5):
+def embedding_sufficient_bottem_up_operator(question, answers, sentences, embedding_path, metric = 'string', step = 1):
     sorted_indices, similarity_scores, group_sentences, id_mp = sort_sentences_by_similarity(question, answers, sentences, embedding_path)
     #print(answers)
+    # for idx in sorted_indices[:20]:
+    #     #print(idx, group_sentences[idx], similarity_scores[group_sentences[idx]])
+    #     print(id_mp[idx])
     total_eval_latency = 0
     queue = deque()
     queue.append(len(sorted_indices))
@@ -490,6 +492,7 @@ def embedding_sufficient_bottem_up_operator(question, answers, sentences, embedd
         for i in sorted_indices[:id]:
             current_sentences += id_mp[i]
         eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, current_sentences, sentences, context = '', metric = metric)
+        print(current_sentences, eval_result)
         total_eval_latency += eval_latency
         sum_input_tokens += input_tokens
         sum_output_tokens += output_tokens
@@ -651,7 +654,7 @@ def get_block_sentences(block_list):
 def LLM_score_sufficient_top_down_operator(question, answers, sentences, sorted_idx, metric = 'string', k=5):
     blk_num = len(sentences)/k
     blk_num = min(20, blk_num)
-    print(blk_num)
+    print('block number:',blk_num)
     total_eval_latency = 0
     block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
     # for id, score in block_scores.items():
@@ -754,6 +757,7 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
 
 
     print('sufficient provenance ids:', sufficient_provenance_ids)
+    
     minimal_provenance_ids = []
     minimal_input_tokens = 0
     minimal_output_tokens = 0
@@ -767,7 +771,8 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
         minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = exponential_greedy_operator(question, answers, sentences, sufficient_provenance_ids, metric = metric)
     elif find_minimal_provenance_strategy == 'null':
         minimal_provenance_ids, (minimal_input_tokens, minimal_output_tokens), minimal_eval_latency = sufficient_provenance_ids, (0, 0), 0
-
+    print('sufficient tokens:', (sufficient_input_tokens, sufficient_output_tokens) )
+    print('minimal_tokens:', (minimal_input_tokens, minimal_output_tokens))
     return minimal_provenance_ids, (sufficient_input_tokens + minimal_input_tokens, sufficient_output_tokens + minimal_output_tokens), sufficient_eval_latency + minimal_eval_latency
 
 def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = '', sufficient_time = -1, sufficient_tokens = (-1,-1), sufficient_provenance_ids = [-1], sufficient_eval_latency = -1):
@@ -778,18 +783,36 @@ def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minim
     logs['question'] = question
     logs['document_size'] = count_tokens(text)
     sentences = extract_sentences_from_pdf(text)
-    answers, in_token, out_tokens = QA(question, text)
+    if sufficient_provenance_ids[0] == -1:
+        answers, in_token, out_tokens = QA(question, text)
+    else:
+        context = ''
+        for sid in sufficient_provenance_ids:
+            context += sentences[sid]
+        answers, in_token, out_tokens = QA(question, context)
     answers_str = ''.join(answers)
     print('answers:', answers)
     if 'null' in answers_str.lower():
         logs['answer'] = answers
+        logs['status'] = 'null answers'
         write_json_to_file(path, logs)
         return logs 
+    if len(answers_str) > 300:
+        logs['status'] = 'long answers'
+        write_json_to_file(path, logs)
+        return logs 
+    if len(sufficient_provenance_ids) > 100:
+        print('Sufficient does not prune much, skip')
+        logs['status'] = 'sufficient large'
+        write_json_to_file(path, logs)
+        return logs
+
     st = time.time()
     provenance_ids, (input_tokens, output_tokens), eval_latency =  caller(question, answers, sentences, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = metric, embedding_path=embedding_path, sufficient_time = sufficient_time, sufficient_tokens = sufficient_tokens, sufficient_provenance_ids = sufficient_provenance_ids, sufficient_eval_latency = sufficient_eval_latency)
     et = time.time()
     logs['answer'] = answers
     logs['time'] = et-st
+    print('minimal time:', logs['time'], 'sufficient time:', sufficient_time)
     if sufficient_time != -1:# if sufficient provenance has been computed 
         logs['time'] += sufficient_time
     logs['eval_time'] = eval_latency

@@ -7,7 +7,7 @@ parent_directory = os.path.dirname(current_file_directory)
 
 # sufficient_provenance_strategy_pool = ['raw','embedding_sufficient_top_down','embedding_sufficient_bottem_up','divide_and_conquer_sufficient', 'LLM_score_sufficient_top_down', 'LLM_score_sufficient_bottem_up']
 sufficient_provenance_strategy_pool = ['LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down','embedding_sufficient_top_down','embedding_sufficient_bottem_up', 'divide_and_conquer_sufficient']
-minimal_provenance_strategy_pool = ['exponential_greedy','sequential_greedy'] #
+minimal_provenance_strategy_pool = ['exponential_greedy','sequential_greedy','null'] #
 
 import json
 def read_json(path):
@@ -72,32 +72,62 @@ def hotpot_pipeline():
                 provenance.logger(text, question, title, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path, sufficient_time = sufficient_time, sufficient_tokens = sufficient_tokens, sufficient_provenance_ids = sufficient_provenance_ids, sufficient_eval_latency = sufficient_eval_latency)
 
 def paper_pipeline():
-    data_path = parent_directory + '/data/papers.json'
-    folder_path = parent_directory + '/out/papers'
-    paper_objects = data_digestion.digest_paper_dataset(data_path)
+    data_path = parent_directory + '/data/qasper_sample_papers.json'
+    embedding_folder = parent_directory + '/out/papers'
+    folder_path = '/Users/yiminglin/Documents/Codebase/doc_provenance_results/eval' + '/paper/results/'
 
-    doc_num = 101
+    objects = read_json(data_path)
+    instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
 
-    print(len(paper_objects))
+    num_case = 100
+    
+    for sufficient_provenance_strategy in sufficient_provenance_strategy_pool:
+        for minimal_provenance_strategy in minimal_provenance_strategy_pool:
+            strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
+            
+            if sufficient_provenance_strategy != 'embedding_sufficient_top_down':
+                continue
+            if minimal_provenance_strategy != 'null':
+                continue
 
-    c = 0
-    for p_id in range(len(paper_objects)):
-        paper = paper_objects[p_id]
-        # if os.path.isfile(path):
-        #     continue
-        text = paper['text']
-        title = paper['title']
-        if len(text) == 0:
-            continue
-        print(c)
-        c += 1
-        embedding_path = folder_path + '/embeddings/' + title + '_embeddings.npy'
-        sentences = base_strategies.extract_sentences_from_pdf(text)
-        merged_setences = base_strategies.group_sentences(sentences, k=5)
-        print(len(sentences), len(merged_setences))
-        for s in merged_setences:
-            print('***',s)
-        break
+            i = 0
+            for o in objects:
+                print(strategy)
+                print(i+1)
+
+                text = o['text']
+                q = o['question']
+                question = (q, instruction)
+                pid = o['id']
+                embedding_path = embedding_folder + '/embeddings/' + 'paper_' + str(i) + '_' + pid + '_embeddings.npy'
+                print(question)
+                i += 1
+
+                result_path = folder_path + str(i) + '_' + str(pid) + '_'  + strategy + '.json'
+                sufficient_path = folder_path + str(i) + '_' + str(pid) + '_'  + sufficient_provenance_strategy + '_null' + '.json'
+                sufficient_time, sufficient_tokens, sufficient_provenance_ids, sufficient_eval_latency, sufficient_answers =  get_sufficient_result(sufficient_path)
+
+                print('sufficient_answers:', sufficient_answers)
+
+                if sufficient_answers[0] == 'NULL':
+                    continue
+
+
+                print('result_path:', result_path)
+                print('sufficient_path:', sufficient_path)
+                print('embedding_path:',embedding_path)
+
+                status = 'null'
+                # if not os.path.exists(sufficient_path):
+                #     continue
+
+                if os.path.isfile(result_path):
+                    continue
+
+                if(i >= 5):
+                    break
+                
+                provenance.logger(text, question, str(pid), result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path, sufficient_time = sufficient_time, sufficient_tokens = sufficient_tokens, sufficient_provenance_ids = sufficient_provenance_ids, sufficient_eval_latency = sufficient_eval_latency)
 
 def get_sufficient_result(sufficient_path):
     latency = -1
@@ -105,7 +135,7 @@ def get_sufficient_result(sufficient_path):
     out_tokens = -1
     provenance_ids = [-1]
     eval_time = -1
-    answer = 'NULL'
+    answer = ['']
     if os.path.isfile(sufficient_path):
         result = read_json(sufficient_path)
         if 'time' in result and 'tokens' in result and 'provenance_ids' in result and 'eval_time' in result:
@@ -206,5 +236,5 @@ def nl_dev_pipeline():
                         
 
 if __name__ == "__main__":
-    nl_dev_pipeline()
+    paper_pipeline()
     

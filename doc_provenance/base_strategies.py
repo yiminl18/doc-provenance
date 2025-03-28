@@ -912,7 +912,7 @@ def compute_embeddings(text, file_path):
     #     return 
     sentences = extract_sentences_from_pdf(text)
     sentences = group_sentences(sentences)
-    #print(len(sentences))
+    print(len(sentences))
     embeddings = {}
     for sentence in sentences:
         embeddings[sentence] = get_embedding(sentence)

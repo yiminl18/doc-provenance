@@ -1,5 +1,5 @@
 import json, os, sys
-
+import base_strategies
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 sys.path.append(current_file_directory)
@@ -10,26 +10,49 @@ def write_json(data, file_path):
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 
+def sample_qasper_paper_questions(file_path):
+    paper_data = []
+    with open(file_path, "r", encoding="utf-8") as file:
+        data = json.load(file)  # Load entire JSON file
+    i = 0
+    for d in data:
+        o = {}
+        questions = d['question_info']['question']
+        instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
+        question_id = 0
+        for qid in range(len(questions)):
+            q = questions[qid]
+            question = (q, instruction)
+            answers, in_token, out_tokens = base_strategies.QA(question, d['document_text'])
+            answers_str = ''.join(answers)
+            if 'null' in answers_str.lower() or len(answers_str) > 200:
+                print('invalid:', qid)
+                continue
+            print('valid qid', qid)
+            question_id = qid 
+            break 
+        selected_q = questions[question_id]
+        o['id'] = d['paper_id']
+        o['title'] = d['title']
+        o['question'] = selected_q
+        o['text'] = d['document_text']
+        print(i, o['title'], question_id, selected_q)
+        paper_data.append(o)
+        write_json(paper_data, '/Users/yiminglin/Documents/Codebase/doc-provenance/data/qasper_sample_papers.json')
+        i += 1
+        if i > 501:
+            break
+
 def digest_paper_dataset(file_path):
     paper_data = []
     with open(file_path, "r", encoding="utf-8") as file:
         data = json.load(file)  # Load entire JSON file
-    for doi, details in data.items():
+    for d in data:
         o = {}
-        o['title'] = details['title']
-        o['text'] = details['text']
-        if(len(o['text']) == 0):
-            continue
-        qas = []
-        for q in details['questions']:
-            qa = {}
-            if(q['question'] == 'What is this paper about?'):
-                continue
-            qa['question'] = q['question']
-            qa['answer'] = q['answer']
-            qas.append(qa)
-        o['question_answer'] = qas
-        paper_data.append(o)
+        o['id'] = d['id']
+        o['title'] = d['title']
+        o['text'] = d['document_text']
+        
     return paper_data
 
 def digest_hotpotQA_dataset_raw(file_path):
@@ -89,17 +112,7 @@ def paper_questions():
 
 
 if __name__ == "__main__":
-    paper_data_path = parent_directory + '/data/papers.json'
-    #paper_data = digest_paper_dataset(paper_data_path)
-    # for i in range(3):
-    #     o = paper_data[i]
-    #     print(o['title'])
-    #     #print(o['text'][:10])
-    #     for i in range(3):
-    #         print(o['question_answer'][i])
-    hotpot_data_path = parent_directory + '/data/hotpotQA_fullwiki.json'
-    hotpots = digest_hotpotQA_dataset(hotpot_data_path)
-    print(hotpots[0])
+    sample_qasper_paper_questions('/Users/yiminglin/Documents/Codebase/doc-provenance/data/qasper_all_papers.json')
     
 
         

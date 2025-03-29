@@ -792,6 +792,7 @@ def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minim
         answers, in_token, out_tokens = QA(question, context)
     answers_str = ''.join(answers)
     print('answers:', answers)
+    print('sufficient id size:', len(sufficient_provenance_ids))
     if 'null' in answers_str.lower():
         logs['answer'] = answers
         logs['status'] = 'null answers'

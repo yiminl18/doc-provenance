@@ -7,7 +7,7 @@ parent_directory = os.path.dirname(current_file_directory)
 
 # sufficient_provenance_strategy_pool = ['raw','embedding_sufficient_top_down','embedding_sufficient_bottem_up','divide_and_conquer_sufficient', 'LLM_score_sufficient_top_down', 'LLM_score_sufficient_bottem_up']
 sufficient_provenance_strategy_pool = ['LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down','embedding_sufficient_top_down','embedding_sufficient_bottem_up', 'divide_and_conquer_sufficient']
-minimal_provenance_strategy_pool = ['exponential_greedy','sequential_greedy','null'] #
+minimal_provenance_strategy_pool = ['exponential_greedy','sequential_greedy'] #'exponential_greedy','sequential_greedy',
 
 import json
 def read_json(path):
@@ -79,16 +79,16 @@ def paper_pipeline():
     objects = read_json(data_path)
     instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
 
-    num_case = 100
+    num_case = 500
     
     for sufficient_provenance_strategy in sufficient_provenance_strategy_pool:
         for minimal_provenance_strategy in minimal_provenance_strategy_pool:
             strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
             
-            if sufficient_provenance_strategy != 'embedding_sufficient_top_down':
-                continue
-            if minimal_provenance_strategy != 'null':
-                continue
+            # if sufficient_provenance_strategy != 'embedding_sufficient_top_down':
+            #     continue
+            # if minimal_provenance_strategy != 'null':
+            #     continue
 
             i = 0
             for o in objects:
@@ -109,22 +109,21 @@ def paper_pipeline():
 
                 print('sufficient_answers:', sufficient_answers)
 
-                if sufficient_answers[0] == 'NULL':
-                    continue
+                # if sufficient_answers[0] == 'NULL':
+                #     continue
 
 
                 print('result_path:', result_path)
                 print('sufficient_path:', sufficient_path)
                 print('embedding_path:',embedding_path)
 
-                status = 'null'
                 # if not os.path.exists(sufficient_path):
                 #     continue
 
                 if os.path.isfile(result_path):
                     continue
 
-                if(i >= 5):
+                if(i >= num_case):
                     break
                 
                 provenance.logger(text, question, str(pid), result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path, sufficient_time = sufficient_time, sufficient_tokens = sufficient_tokens, sufficient_provenance_ids = sufficient_provenance_ids, sufficient_eval_latency = sufficient_eval_latency)

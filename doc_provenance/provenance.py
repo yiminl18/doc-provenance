@@ -21,7 +21,7 @@ parent_directory = os.path.dirname(current_file_directory)
 sys.path.append(current_file_directory)
 from model import model #[gpt4o, gpt4vision, gpt4omini]
 model_expensive = 'gpt4o'
-model_cheap = 'gpt4omini'
+model_cheap = 'gpt4o'#gpt4omini
 
 def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path)

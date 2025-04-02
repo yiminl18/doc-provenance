@@ -282,14 +282,16 @@ def pipeline(data, data_path, embedding_folder, result_folder_path):
             #     continue
             if minimal_provenance_strategy == 'null':
                 continue
-            print(strategy)
+            #print(strategy)
             i = 0
             cnt = 0
             for o in objects:
                 #print(strategy)
                 #print(i+1)
-
-                text = o['text']
+                if data == 'hotpotQA':
+                    text = o['context']
+                else: 
+                    text = o['text']
                 q = o['question']
                 question = (q, instruction)
                 i += 1
@@ -299,6 +301,8 @@ def pipeline(data, data_path, embedding_folder, result_folder_path):
                 sufficient_path = get_sufficient_path(data, result_folder_path, i, o, sufficient_provenance_strategy)
 
                 if not os.path.exists(sufficient_path):
+                    # if i <= num_case:
+                    #     print('sufficient_path not exist', sufficient_path)
                     continue 
                 sufficient_time, sufficient_tokens, sufficient_provenance_ids, sufficient_eval_latency, sufficient_answers, sufficient_status =  get_sufficient_result(sufficient_path)
 
@@ -311,7 +315,7 @@ def pipeline(data, data_path, embedding_folder, result_folder_path):
                 if sufficient_answers[0] == 'NULL':
                     continue
 
-                if sufficient_status == 'long answers':
+                if sufficient_status == 'sufficient large':
                     #print('sufficient large:', strategy,i)
                     cnt += 1
 
@@ -322,8 +326,8 @@ def pipeline(data, data_path, embedding_folder, result_folder_path):
             print('number of rerun cases:', cnt, strategy)
 
 if __name__ == "__main__":
-    data = 'paper' 
-    data = 'nl_dev'
+    #data = 'paper' 
+    #data = 'nl_dev'
     data = 'hotpotQA'
     data_folder = ''
     embedding_folder = ''
@@ -336,7 +340,11 @@ if __name__ == "__main__":
         data_folder = parent_directory + '/data/hotpotQA_fullwiki.json'
     
     embedding_folder = parent_directory + '/out/' + data 
-    result_folder_path = '/Users/yiminglin/Documents/Codebase/doc_provenance_results/eval' + '/' + data + '/results_minimal/'
+    result_folder = '/Users/yiminglin/Documents/Codebase/doc_provenance_results/eval' + '/' + data + '/results_minimal/'
+
+    print(data_folder)
+    print(embedding_folder)
+    print(result_folder)
 
     pipeline(data, data_folder, embedding_folder, result_folder)
     

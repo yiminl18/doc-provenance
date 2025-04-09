@@ -199,7 +199,7 @@ def evaluate(answers, question, ids, sentences, context = '', metric = 'string')
         #print('False')
         return False, input_tokens, output_tokens
 
-def vallina_LLM(question, context, title, path):
+def LLM_vanilla(question, context, title, path):
     answers, input_tokens, output_tokens = QA(question,context)
     print(answers)
 

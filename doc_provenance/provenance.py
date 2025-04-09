@@ -734,6 +734,41 @@ def LLM_score_sufficient_bottem_up_operator(question, answers, sentences, sorted
         
     return sorted_idx, (sum_input_tokens, sum_output_tokens),total_eval_latency
 
+
+def LLM_vanilla(question, context, title, path, model_name):
+    answers, input_tokens, output_tokens = QA(question,context)
+    print(question)
+    print(answers)
+    answers_str = ''.join(answers)
+    if 'null' in answers_str.lower():
+        out = {}
+        out['status'] = 'NA'
+        write_json_to_file(path, out)
+        return out 
+    
+    out = {}
+    out['title'] = title
+    out['question'] = question
+    out['answers'] = answers
+    out['context_size'] = count_tokens(context)
+    
+    st = time.time()
+    """
+        Directly invoke LLM to return the provenance of ``answers'' to ``question'' in a given ``context''
+    """
+    instruction = 'Given the following question: ' + question[0] + ', the corresponding answers are: ' + ','.join(answers) +  '. Your task is to extract the set of sentences from the provided context that contribute to generating these answers. Identify the most relevant sentences that support the given answers. Make sure these sentences are raw sentences from the document. Do not add explanations. Do not create new words or sentences. The context is as follows: '
+    prompt = (instruction, context)
+    response = model(model_name, prompt)
+    et = time.time()
+    out['time'] = et-st
+    out['provenance'] = response
+    out['provenance_size'] = count_tokens(response)
+    input_tokens = count_tokens(instruction + context)
+    output_tokens = count_tokens(response)
+    out['tokens'] = (input_tokens, output_tokens)
+    write_json_to_file(path, out)
+    return out
+
 def caller(question, answers, sentences, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = '', sufficient_time = -1, sufficient_tokens = (-1,-1), sufficient_provenance_ids = [-1], sufficient_eval_latency  = -1):
     
     sufficient_input_tokens = 0
@@ -792,6 +827,11 @@ def logger(text, q, title, model_name, path, find_sufficient_provenance_strategy
     logs['question'] = question
     logs['document_size'] = count_tokens(text)
     sentences = extract_sentences_from_pdf(text)
+
+    if find_sufficient_provenance_strategy == 'LLM_vanilla':
+        LLM_vanilla(question, text, title, path, model_name)
+        return 
+    
     if sufficient_provenance_ids[0] == -1:
         answers, in_token, out_tokens = QA(question, text)
     else:
@@ -799,6 +839,7 @@ def logger(text, q, title, model_name, path, find_sufficient_provenance_strategy
         for sid in sufficient_provenance_ids:
             context += sentences[sid]
         answers, in_token, out_tokens = QA(question, context)
+    
     answers_str = ''.join(answers)
     print('answers:', answers)
     print('sufficient id size:', len(sufficient_provenance_ids))

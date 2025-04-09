@@ -5,7 +5,7 @@ import concurrent.futures
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 
-sufficient_provenance_strategy_pool = ['LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down','embedding_sufficient_top_down','embedding_sufficient_bottem_up', 'divide_and_conquer_sufficient']
+sufficient_provenance_strategy_pool = ['LLM_vanilla', 'LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down','embedding_sufficient_top_down','embedding_sufficient_bottem_up', 'divide_and_conquer_sufficient']
 minimal_provenance_strategy_pool = ['null', 'exponential_greedy','sequential_greedy'] 
 
 import json
@@ -70,14 +70,16 @@ def pipeline(data, data_path, embedding_folder, result_folder_path, model_name):
     instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
 
 
-    for i, start in enumerate(range(0, 500, 100)):
+    for j, start in enumerate(range(0, 500, 100)):
         end = start + 99
 
         for sufficient_provenance_strategy in sufficient_provenance_strategy_pool:
+            if sufficient_provenance_strategy != 'LLM_vanilla':
+                continue
             for minimal_provenance_strategy in minimal_provenance_strategy_pool:
                 strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
-                
-                i = 0
+                print(start, end)
+                i = start
                 for o in objects:
                     if data == 'hotpotQA':
                         text = o['context']
@@ -92,17 +94,18 @@ def pipeline(data, data_path, embedding_folder, result_folder_path, model_name):
                     print(start, end, i)
                     print(strategy)
 
-                    if i < start:
-                        continue
                     if i >= end:
                         break
 
-                    if i > 10:
-                        break
+                    # if i > 10:
+                    #     break
 
                     embedding_path = get_embedding_path(data, embedding_folder, i, o)
                     result_path = get_result_path(data, result_folder_path, i, o, strategy, model_name)
                     sufficient_path = get_sufficient_path(data, result_folder_path, i, o, sufficient_provenance_strategy, model_name)
+
+                    if sufficient_provenance_strategy == 'LLM_vanilla' and os.path.exists(sufficient_path):
+                        continue
 
                     if minimal_provenance_strategy != 'null' and not os.path.exists(sufficient_path):
                         continue 
@@ -124,9 +127,9 @@ def pipeline(data, data_path, embedding_folder, result_folder_path, model_name):
                     
                     provenance.logger(text, question, title, model_name, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path, sufficient_time = sufficient_time, sufficient_tokens = sufficient_tokens, sufficient_provenance_ids = sufficient_provenance_ids, sufficient_eval_latency = sufficient_eval_latency)
 
-                break
-            break
-        break
+        #         break
+        #     break
+        # break
 
 def create_folder_if_not_exists(folder_path):
     if not os.path.exists(folder_path):
@@ -135,8 +138,8 @@ def create_folder_if_not_exists(folder_path):
 if __name__ == "__main__":
     #data = 'paper' 
     #data = 'nl_dev'
-    model_name = 'gemini2flash'
-    data = 'paper'
+    model_name = 'gpt4omini'#'gemini2flash'
+    data = 'nl_dev'
     data_folder = ''
     embedding_folder = ''
     result_folder = ''

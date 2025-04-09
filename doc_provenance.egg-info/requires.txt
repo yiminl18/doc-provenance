@@ -1,0 +1,6 @@
+pdfminer
+tiktoken
+sklearn
+pandas
+openai
+numpy

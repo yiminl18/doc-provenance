@@ -719,9 +719,9 @@ def LLM_score_sufficient_bottem_up_operator(question, answers, sentences, sorted
         # print(blocks_sentences_id[id])
         sorted_block.append(blocks_sentences_id[id])
     current_block = []
-    for k in range(len(sorted_block)):
+    for k in range(1,len(sorted_block)):
         current_block = sorted_block[:k]
-        print('current_block:', current_block)
+        print('k, current_block:', k, current_block)
         current_sentences = get_block_sentences(current_block)
         #print('current_sentences:', current_sentences)
         eval_result, input_tokens, output_tokens, eval_latency = evaluate(answers, question, current_sentences, sentences, context = '', metric = metric)

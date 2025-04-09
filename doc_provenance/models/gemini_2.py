@@ -28,7 +28,7 @@ def gemini_api(message_content, temperature=0):
     Returns:
         str: model response text, aka the provenance
     """
-    model = GenerativeModel(model_name="gemini-flash-2.0")
+    model = GenerativeModel(model_name="gemini-2.0-flash")
     response = model.generate_content(
         message_content,
         generation_config={"temperature": temperature}

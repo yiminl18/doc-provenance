@@ -14,7 +14,7 @@ def model(model_name, prompt, image_path = ''):
         return gpt_4o_vision(image_path,prompt)
     if(model_name == 'gpt4omini'):
         return gpt_4o_mini(prompt)
-    if(model_name == 'gemini2'):
+    if(model_name == 'gemini2flash'):
         return gemini_2_flash(prompt)
     return 'input model does not exist'
 

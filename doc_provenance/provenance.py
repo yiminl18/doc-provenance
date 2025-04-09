@@ -23,6 +23,13 @@ from model import model #[gpt4o, gpt4vision, gpt4omini]
 model_expensive = 'gpt4o'
 model_cheap = 'gpt4o'#gpt4omini
 
+
+def set_model(model_name):
+    global model_cheap
+    global model_expensive
+    model_cheap = model_name
+    model_expensive = model_name
+
 def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path)
 
@@ -775,7 +782,9 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
     print('minimal_tokens:', (minimal_input_tokens, minimal_output_tokens))
     return minimal_provenance_ids, (sufficient_input_tokens + minimal_input_tokens, sufficient_output_tokens + minimal_output_tokens), sufficient_eval_latency + minimal_eval_latency
 
-def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = '', sufficient_time = -1, sufficient_tokens = (-1,-1), sufficient_provenance_ids = [-1], sufficient_eval_latency = -1):
+def logger(text, q, title, model_name, path, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = '', sufficient_time = -1, sufficient_tokens = (-1,-1), sufficient_provenance_ids = [-1], sufficient_eval_latency = -1):     
+    set_model(model_name)
+    print('used models:', model_cheap, model_expensive)
     global question
     question = q 
     logs = {}
@@ -795,16 +804,16 @@ def logger(text, q, title, path, find_sufficient_provenance_strategy, find_minim
     print('sufficient id size:', len(sufficient_provenance_ids))
     if 'null' in answers_str.lower():
         logs['answer'] = answers
-        logs['status'] = 'null answers'
+        logs['status'] = 'NA'#null answers
         write_json_to_file(path, logs)
         return logs 
     if len(answers_str) > 300:
-        logs['status'] = 'long answers'
+        logs['status'] = 'LA'#long answers
         write_json_to_file(path, logs)
         return logs 
     if len(sufficient_provenance_ids) > 100:
         print('Sufficient does not prune much, skip')
-        logs['status'] = 'sufficient large'
+        logs['status'] = 'SL'#sufficient large
         write_json_to_file(path, logs)
         return logs
 

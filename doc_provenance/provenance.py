@@ -166,6 +166,7 @@ def eval_equivelance_rules(s):
     return s
 
 def equal_string(res1, res2):
+    print(model_cheap, model_expensive)
     for r in res1:
         if 'null' in r.lower():
             return False
@@ -199,7 +200,8 @@ def equal_string(res1, res2):
             return False
     return True
 
-def equal(res1, res2, metric = 'string'):
+        
+def equal(res1, res2, question, metric = 'string'):
     res1 = sorted(res1)
     res2 = sorted(res2)
     #print(len(res1), len(res2))
@@ -216,12 +218,12 @@ def equal(res1, res2, metric = 'string'):
                 return False
         instruction = 'I have two answers to the given question. If these two answers are equivalent in meaning, return True; otherwise, return False. Do not provide any explanation. ' + 'Answer 1: ' + ''.join(res1) + ' Answer 2: ' + ''.join(res2) + ' Question: ' + question[0] 
         if equal_string(res1, res2):
-            print('Return true in string metric')
+            #print('Return true in string metric')
             return True
         if len(res1) != len(res2):
             return False 
         if(len(res1) > 1 or len(res2) > 1):
-            print('LLM evaluation with different lengths')
+            #print('LLM evaluation with different lengths')
             response = model(model_cheap, (instruction, ''))
             if('true' in response.lower()):
                 return True
@@ -230,13 +232,13 @@ def equal(res1, res2, metric = 'string'):
             str1 = res1[0]
             str2 = res2[0]
             if len(str1) > 2*len(str2) or len(str2) > 2*len(str1):
-                print('length mis-match')
+                #print('length mis-match')
                 return False
             if len(str1) < 20 and len(str2) < 20: 
-                print('Evaluated in string')
+                #print('Evaluated in string')
                 return equal_string(res1, res2)
-            print('LLM evaluation with same length')
-            response = model(model_expensive, (instruction, ''))
+            #print('LLM evaluation with same length')
+            response = model(model_cheap, (instruction, ''))
             #print(instruction)
             if('true' in response.lower()):
                 return True
@@ -252,7 +254,7 @@ def evaluate(answers, question, ids, sentences, context = '', metric = 'string')
     print('original answer:', answers)
     #print('metric:', metric)
     st = time.time()
-    if(equal(pred_ans, answers, metric)):
+    if(equal(pred_ans, answers, question, metric)):
         et = time.time()
         #print('True')
         return True, input_tokens, output_tokens, et-st
@@ -631,7 +633,7 @@ def block_labeler(sentences, question, answers, blk_num):
     prompt = (instruction, context)
     #print(count_tokens(context))
     response = model(model_expensive, prompt)
-    #print(response)
+    print(response)
     scores = [int(num.strip()) for num in response.split(",")]
     block_scores = {}
     #print(scores)

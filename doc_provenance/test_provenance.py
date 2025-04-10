@@ -42,6 +42,7 @@ def write_json_to_file(filename, data):
                 
 def get_embedding_path(data, embedding_folder, id, object):
     embedding_path = ''
+    id = id-1
     if data == 'paper':
         return embedding_folder + '/embeddings/' + 'paper_' + str(id) + '_' + object['id'] + '_embeddings.npy'
     if data == 'nl_dev': 
@@ -69,8 +70,8 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
     objects = read_json(data_path)
     instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
 
-
-    for j, start in enumerate(range(0, 500, 50)):
+    num_case = 100
+    for j, start in enumerate(range(0, num_case, 50)):
         end = start + 50
         print(start, end)
 
@@ -94,9 +95,6 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
                     print(strategy)
 
                     if i > end:
-                        break
-
-                    if i > 5:
                         break
 
                     embedding_path = get_embedding_path(data, embedding_folder, i, o)
@@ -132,8 +130,9 @@ def create_folder_if_not_exists(folder_path):
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
 
+
 if __name__ == "__main__":
-    model_name = 'gemini2flash'#'gemini2flash', gpt4omini
+    model_name = 'gpt4omini'#'gemini2flash', gpt4omini
     data = 'paper'
     data_folder = ''
     embedding_folder = ''

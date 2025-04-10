@@ -5,7 +5,7 @@ import concurrent.futures
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 
-sufficient_provenance_strategy_pool = ['LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down','embedding_sufficient_top_down','embedding_sufficient_bottem_up', 'divide_and_conquer_sufficient']
+sufficient_provenance_strategy_pool = ['embedding_sufficient_top_down','embedding_sufficient_bottem_up']  #'LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down', 'divide_and_conquer_sufficient'
 minimal_provenance_strategy_pool = ['null', 'exponential_greedy','sequential_greedy'] 
 
 import json
@@ -70,59 +70,50 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
     objects = read_json(data_path)
     instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
 
-    num_case = 100
-    for j, start in enumerate(range(0, num_case, 50)):
-        end = start + 50
-        print(start, end)
+    
+    i = 0
+    for o in objects:
+        if data == 'hotpotQA':
+            text = o['context']
+            title = o['document_name']
+        else: 
+            text = o['text']
+            title = o['id']
+        q = o['question']
+        question = (q, instruction)
+        i += 1
 
         for sufficient_provenance_strategy in sufficient_provenance_strategy_pool:
             for minimal_provenance_strategy in minimal_provenance_strategy_pool:
                 strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
-                #print(start, end)
-                i = start
-                for o in objects:
-                    if data == 'hotpotQA':
-                        text = o['context']
-                        title = o['document_name']
-                    else: 
-                        text = o['text']
-                        title = o['id']
-                    q = o['question']
-                    question = (q, instruction)
-                    i += 1
+                #print(i, strategy)
 
-                    print(start, end, i)
-                    print(strategy)
+                embedding_path = get_embedding_path(data, embedding_folder, i, o)
+                result_path = get_result_path(data, result_folder_path, i, o, strategy, model_name)
+                sufficient_path = get_sufficient_path(data, result_folder_path, i, o, sufficient_provenance_strategy, model_name)
 
-                    if i > end:
-                        break
+                if sufficient_provenance_strategy == 'LLM_vanilla' and os.path.exists(sufficient_path):
+                    continue
 
-                    embedding_path = get_embedding_path(data, embedding_folder, i, o)
-                    result_path = get_result_path(data, result_folder_path, i, o, strategy, model_name)
-                    sufficient_path = get_sufficient_path(data, result_folder_path, i, o, sufficient_provenance_strategy, model_name)
-
-                    if sufficient_provenance_strategy == 'LLM_vanilla' and os.path.exists(sufficient_path):
-                        continue
-
-                    if minimal_provenance_strategy != 'null' and not os.path.exists(sufficient_path):
-                        continue 
-                    sufficient_time, sufficient_tokens, sufficient_provenance_ids, sufficient_eval_latency, sufficient_answers, sufficient_status =  get_sufficient_result(sufficient_path)
+                if minimal_provenance_strategy != 'null' and not os.path.exists(sufficient_path):
+                    continue 
+                sufficient_time, sufficient_tokens, sufficient_provenance_ids, sufficient_eval_latency, sufficient_answers, sufficient_status =  get_sufficient_result(sufficient_path)
 
 
-                    # print('result_path:', result_path)
-                    # print('sufficient_path:', sufficient_path)
-                    # print('embedding_path:',embedding_path)
-                    # print('sufficient answers:', sufficient_answers)
-                    if sufficient_status == 'NA' or sufficient_status == 'LA' or sufficient_status == 'SL':
-                        continue
+                # print('result_path:', result_path)
+                # print('sufficient_path:', sufficient_path)
+                print('embedding_path:',embedding_path)
+                # print('sufficient answers:', sufficient_answers)
+                if sufficient_status == 'NA' or sufficient_status == 'LA' or sufficient_status == 'SL':
+                    continue
 
-                    if sufficient_answers[0] == 'NULL':
-                        continue
+                if sufficient_answers[0] == 'NULL':
+                    continue
 
-                    if os.path.isfile(result_path):
-                        continue
-                    
-                    provenance.logger(text, question, title, model_name, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path, sufficient_time = sufficient_time, sufficient_tokens = sufficient_tokens, sufficient_provenance_ids = sufficient_provenance_ids, sufficient_eval_latency = sufficient_eval_latency)
+                if os.path.isfile(result_path):
+                    continue
+                
+                provenance.logger(text, question, title, model_name, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path, sufficient_time = sufficient_time, sufficient_tokens = sufficient_tokens, sufficient_provenance_ids = sufficient_provenance_ids, sufficient_eval_latency = sufficient_eval_latency)
 
                 
 
@@ -132,7 +123,7 @@ def create_folder_if_not_exists(folder_path):
 
 
 if __name__ == "__main__":
-    model_name = 'gpt4omini'#'gemini2flash', gpt4omini
+    model_name = 'gemini2flash'#'gemini2flash'
     data = 'paper'
     data_folder = ''
     embedding_folder = ''

@@ -19,9 +19,9 @@ embedding_sentence_block_size = 1
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 sys.path.append(current_file_directory)
-from model import model #[gpt4o, gpt4vision, gpt4omini]
-model_expensive = 'gpt4o'
-model_cheap = 'gpt4o'#gpt4omini
+from model import model 
+model_expensive = ''
+model_cheap = ''
 
 
 def set_model(model_name):
@@ -633,6 +633,10 @@ def block_labeler(sentences, question, answers, blk_num):
     prompt = (instruction, context)
     #print(count_tokens(context))
     response = model(model_expensive, prompt)
+    response = response.strip()
+    print(response)
+    if response.endswith(","):
+        response = response[:-1]
     print(response)
     scores = [int(num.strip()) for num in response.split(",")]
     block_scores = {}

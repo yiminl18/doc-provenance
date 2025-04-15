@@ -5,7 +5,7 @@ import concurrent.futures
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 
-sufficient_provenance_strategy_pool = ['embedding_sufficient_top_down','embedding_sufficient_bottem_up']  #'LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down', 'divide_and_conquer_sufficient'
+sufficient_provenance_strategy_pool = ['embedding_sufficient_top_down','embedding_sufficient_bottem_up','LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down', 'divide_and_conquer_sufficient'] 
 minimal_provenance_strategy_pool = ['null', 'exponential_greedy','sequential_greedy'] 
 
 import json
@@ -69,8 +69,8 @@ def get_sufficient_path(data, result_folder_path, id, object, sufficient_provena
 def provenance_run(data, data_path, embedding_folder, result_folder_path, model_name):
     objects = read_json(data_path)
     instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
+    num_case = 500
 
-    
     i = 0
     for o in objects:
         if data == 'hotpotQA':
@@ -83,10 +83,17 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
         question = (q, instruction)
         i += 1
 
+        if i > num_case:
+            break
+
+        if i == 44 or i == 174 or i == 234:
+            continue
+
         for sufficient_provenance_strategy in sufficient_provenance_strategy_pool:
             for minimal_provenance_strategy in minimal_provenance_strategy_pool:
                 strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
-                #print(i, strategy)
+                
+                print(i, strategy)
 
                 embedding_path = get_embedding_path(data, embedding_folder, i, o)
                 result_path = get_result_path(data, result_folder_path, i, o, strategy, model_name)
@@ -102,7 +109,7 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
 
                 # print('result_path:', result_path)
                 # print('sufficient_path:', sufficient_path)
-                print('embedding_path:',embedding_path)
+                # print('embedding_path:',embedding_path)
                 # print('sufficient answers:', sufficient_answers)
                 if sufficient_status == 'NA' or sufficient_status == 'LA' or sufficient_status == 'SL':
                     continue
@@ -123,8 +130,8 @@ def create_folder_if_not_exists(folder_path):
 
 
 if __name__ == "__main__":
-    model_name = 'gemini2flash'#'gemini2flash'
-    data = 'paper'
+    model_name = 'gemini2flash'#
+    data = 'nl_dev'
     data_folder = ''
     embedding_folder = ''
     result_folder = ''

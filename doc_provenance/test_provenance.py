@@ -66,10 +66,10 @@ def get_sufficient_path(data, result_folder_path, id, object, sufficient_provena
     if data == 'hotpotQA':
         return result_folder_path + str(id) + '_' + str(object['document_name']) + '_'  + sufficient_provenance_strategy + '_null' + '_' + model +  '.json'
     
-def provenance_run(data, data_path, embedding_folder, result_folder_path, model_name):
+def provenance_run(data, data_path, embedding_folder, result_folder_path, model_name, num_case):
     objects = read_json(data_path)
     instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
-    num_case = 500
+    
 
     i = 0
     for o in objects:
@@ -135,6 +135,7 @@ if __name__ == "__main__":
     data_folder = ''
     embedding_folder = ''
     result_folder = ''
+    num_case = 50
     if data == 'paper':
         data_folder = parent_directory + '/data/qasper_sample_papers.json'
     elif data == 'nl_dev':
@@ -151,5 +152,5 @@ if __name__ == "__main__":
 
     create_folder_if_not_exists(result_folder)
 
-    provenance_run(data, data_folder, embedding_folder, result_folder, model_name)
+    provenance_run(data, data_folder, embedding_folder, result_folder, model_name, num_case)
     

@@ -5,7 +5,7 @@ import concurrent.futures
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 
-sufficient_provenance_strategy_pool = ['embedding_sufficient_top_down','embedding_sufficient_bottem_up','LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down', 'divide_and_conquer_sufficient'] 
+sufficient_provenance_strategy_pool = ['LLM_vanilla', 'embedding_sufficient_top_down','embedding_sufficient_bottem_up','LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down', 'divide_and_conquer_sufficient'] 
 minimal_provenance_strategy_pool = ['null', 'exponential_greedy','sequential_greedy'] 
 
 import json
@@ -86,14 +86,17 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
         if i > num_case:
             break
 
-        if i == 44 or i == 174 or i == 234:
-            continue
+        # if i == 44 or i == 174 or i == 234:
+        #     continue
 
         for sufficient_provenance_strategy in sufficient_provenance_strategy_pool:
+            if sufficient_provenance_strategy != 'LLM_vanilla':
+                    continue
             for minimal_provenance_strategy in minimal_provenance_strategy_pool:
                 strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
                 
-                print(i, strategy)
+                
+                
 
                 embedding_path = get_embedding_path(data, embedding_folder, i, o)
                 result_path = get_result_path(data, result_folder_path, i, o, strategy, model_name)
@@ -102,8 +105,8 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
                 if sufficient_provenance_strategy == 'LLM_vanilla' and os.path.exists(sufficient_path):
                     continue
 
-                if minimal_provenance_strategy != 'null' and not os.path.exists(sufficient_path):
-                    continue 
+                # if minimal_provenance_strategy != 'null' and not os.path.exists(sufficient_path):
+                #     continue 
                 sufficient_time, sufficient_tokens, sufficient_provenance_ids, sufficient_eval_latency, sufficient_answers, sufficient_status =  get_sufficient_result(sufficient_path)
 
 
@@ -119,6 +122,8 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
 
                 if os.path.isfile(result_path):
                     continue
+
+                print(i, strategy)
                 
                 provenance.logger(text, question, title, model_name, result_path, sufficient_provenance_strategy, minimal_provenance_strategy, metric = 'LLM', embedding_path=embedding_path, sufficient_time = sufficient_time, sufficient_tokens = sufficient_tokens, sufficient_provenance_ids = sufficient_provenance_ids, sufficient_eval_latency = sufficient_eval_latency)
 
@@ -144,7 +149,7 @@ if __name__ == "__main__":
         data_folder = parent_directory + '/data/hotpotQA_fullwiki.json'
     
     embedding_folder = parent_directory + '/out/' + data 
-    result_folder = '/Users/yiminglin/Documents/Codebase/doc_provenance_results/' + model_name  + '/eval' + '/' + data + '/results/'
+    result_folder = '/Users/yiminglin/Documents/Codebase/doc_provenance_results/' + model_name  + '/eval' + '/' + data + '/results_vanilla_LLM/'
 
     print(data_folder)
     print(embedding_folder)

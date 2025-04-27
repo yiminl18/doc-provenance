@@ -69,8 +69,6 @@ def get_sufficient_path(data, result_folder_path, id, object, sufficient_provena
 def provenance_run(data, data_path, embedding_folder, result_folder_path, model_name, num_case):
     objects = read_json(data_path)
     instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
-    
-
     i = 0
     for o in objects:
         if data == 'hotpotQA':
@@ -94,8 +92,6 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
                     continue
             for minimal_provenance_strategy in minimal_provenance_strategy_pool:
                 strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
-                
-                
                 
 
                 embedding_path = get_embedding_path(data, embedding_folder, i, o)
@@ -136,11 +132,11 @@ def create_folder_if_not_exists(folder_path):
 
 if __name__ == "__main__":
     model_name = 'gemini2flash'#
-    data = 'nl_dev'
+    data = 'hotpotQA'
     data_folder = ''
     embedding_folder = ''
     result_folder = ''
-    num_case = 50
+    num_case = 500
     if data == 'paper':
         data_folder = parent_directory + '/data/qasper_sample_papers.json'
     elif data == 'nl_dev':

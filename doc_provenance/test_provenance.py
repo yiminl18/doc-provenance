@@ -5,8 +5,8 @@ import concurrent.futures
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 
-sufficient_provenance_strategy_pool = ['LLM_vanilla', 'embedding_sufficient_top_down','embedding_sufficient_bottem_up','LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down', 'divide_and_conquer_sufficient'] 
-minimal_provenance_strategy_pool = ['null', 'exponential_greedy','sequential_greedy'] 
+sufficient_provenance_strategy_pool = ['raw','LLM_vanilla', 'embedding_sufficient_top_down','embedding_sufficient_bottem_up','LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down', 'divide_and_conquer_sufficient'] 
+minimal_provenance_strategy_pool = ['exponential_greedy','sequential_greedy'] 
 
 import json
 def read_json(path):
@@ -88,7 +88,7 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
         #     continue
 
         for sufficient_provenance_strategy in sufficient_provenance_strategy_pool:
-            if sufficient_provenance_strategy != 'LLM_vanilla':
+            if sufficient_provenance_strategy != 'raw':
                     continue
             for minimal_provenance_strategy in minimal_provenance_strategy_pool:
                 strategy = sufficient_provenance_strategy + '_' + minimal_provenance_strategy
@@ -98,8 +98,6 @@ def provenance_run(data, data_path, embedding_folder, result_folder_path, model_
                 result_path = get_result_path(data, result_folder_path, i, o, strategy, model_name)
                 sufficient_path = get_sufficient_path(data, result_folder_path, i, o, sufficient_provenance_strategy, model_name)
 
-                if sufficient_provenance_strategy == 'LLM_vanilla' and os.path.exists(sufficient_path):
-                    continue
 
                 # if minimal_provenance_strategy != 'null' and not os.path.exists(sufficient_path):
                 #     continue 
@@ -131,27 +129,32 @@ def create_folder_if_not_exists(folder_path):
 
 
 if __name__ == "__main__":
-    model_name = 'gemini2flash'#
-    data = 'hotpotQA'
+    model_name = 'gpt4omini'#
+    #data = 'hotpotQA'
     data_folder = ''
     embedding_folder = ''
     result_folder = ''
-    num_case = 500
-    if data == 'paper':
-        data_folder = parent_directory + '/data/qasper_sample_papers.json'
-    elif data == 'nl_dev':
-        data_folder = parent_directory + '/data/natural-questions_nq-dev-full.json'
-    elif data == 'hotpotQA':
-        data_folder = parent_directory + '/data/hotpotQA_fullwiki.json'
-    
-    embedding_folder = parent_directory + '/out/' + data 
-    result_folder = '/Users/yiminglin/Documents/Codebase/doc_provenance_results/' + model_name  + '/eval' + '/' + data + '/results_vanilla_LLM/'
+    num_case = 100
+    dataset = ['nl_dev'] #'paper','nl_dev',
 
-    print(data_folder)
-    print(embedding_folder)
-    print(result_folder)
+    for data in dataset: 
+        if data == 'paper':
+            data_folder = parent_directory + '/data/qasper_sample_papers.json'
+        elif data == 'nl_dev':
+            data_folder = parent_directory + '/data/natural-questions_nq-dev-full.json'
+        elif data == 'hotpotQA':
+            data_folder = parent_directory + '/data/hotpotQA_fullwiki.json'
 
-    create_folder_if_not_exists(result_folder)
+        print(data)
+        
+        embedding_folder = parent_directory + '/out/' + data 
+        result_folder = '/Users/yiminglin/Documents/Codebase/doc_provenance_results/' + model_name  + '/eval' + '/' + data + '/results_minimal/'
 
-    provenance_run(data, data_folder, embedding_folder, result_folder, model_name, num_case)
+        print(data_folder)
+        print(embedding_folder)
+        print(result_folder)
+
+        create_folder_if_not_exists(result_folder)
+
+        provenance_run(data, data_folder, embedding_folder, result_folder, model_name, num_case)
     

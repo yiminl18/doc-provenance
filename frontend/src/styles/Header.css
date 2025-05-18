@@ -1,0 +1,39 @@
+.header {
+  height: var(--header-height);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.chat-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.mode-selector {
+  display: flex;
+  background-color: var(--card-background);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.mode-btn svg {
+  margin-right: 5px;
+}
+
+.mode-btn.active {
+  background-color: rgba(255, 255, 255, 0.1);
+} 

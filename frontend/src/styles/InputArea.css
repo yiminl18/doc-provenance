@@ -1,0 +1,66 @@
+/* Input Area Styles */
+.input-area {
+  height: 70px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.upload-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.upload-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.input-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.question-input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  padding: 12px 15px;
+  font-size: 16px;
+  outline: none;
+}
+
+.question-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.send-btn {
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  margin: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-btn:disabled {
+  background-color: rgba(30, 136, 229, 0.5);
+  cursor: not-allowed;
+} 

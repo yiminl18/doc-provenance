@@ -5,15 +5,7 @@ from pathlib import Path
 
 # reads gemini's api key from folder in the home directory named 'api_keys'
 def read_api_key(filename="gemini2flash.txt", api_key_folder = '/Users/yiminglin/Documents/Codebase/api_keys/'):
-    api_key_path = api_key_folder + filename
-    try:
-        with open(api_key_path, 'r') as file:
-            api_key = file.read().strip()
-            return api_key
-    except FileNotFoundError:
-        raise FileNotFoundError(f"API key file not found at {api_key_path}. Please create this file with your API key.")
-    except Exception as e:
-        raise Exception(f"Error reading API key: {e}")
+    return "AIzaSyDkmvPP4MWfdv6Tt6r5xZgmE5UHiNE4Ndw"
 
 api_key = read_api_key()
 genai.configure(api_key=api_key)

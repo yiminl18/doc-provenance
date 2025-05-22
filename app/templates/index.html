@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provenance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-rocket"></i> Provenance
+            </div>
+            <button class="new-question-btn">
+                <i class="fas fa-plus"></i> New question
+                <span class="shortcut">⌘ K</span>
+            </button>
+            <div class="sidebar-menu">
+                <div class="menu-item active">
+                    <i class="fas fa-th-large"></i> My Space
+                    <span class="badge">1</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-chart-line"></i> Activity
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="chat-title">
+                    What can I help with?
+                </div>
+                <div class="mode-selector">
+                    <button class="mode-btn active">General</button>
+                    <button class="mode-btn">
+                        <i class="fas fa-graduation-cap"></i> Scholar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div id="question-display" class="question-display" style="display: none;">
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-file-alt"></i> Question
+                        </div>
+                        <div id="question-text" class="card-content"></div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <i class="fas fa-comment-alt"></i> Answer
+                        </div>
+                        <div id="answer-text" class="card-content"></div>
+                    </div>
+                </div>
+
+                <div id="sources-container" class="sources-container" style="display: none;">
+                    <div class="sources-heading">Sources</div>
+                    <div class="sources-relevance">
+                        <span>Most relevant</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="sources-list" class="sources-list"></div>
+                </div>
+
+                <!-- File upload status -->
+                <div id="upload-status" class="upload-status">
+                    <div id="file-status" class="file-status"></div>
+                </div>
+                    
+                <!-- Processing indicator -->
+                <div id="processing-indicator" class="processing" style="display: none;">
+                    <div class="processing-text">Processing</div>
+                    <div class="dots">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <form id="upload-form" enctype="multipart/form-data">
+                    <label for="file-upload" class="upload-btn">
+                        <i class="fas fa-upload"></i>
+                    </label>
+                    <input id="file-upload" type="file" name="file" accept=".pdf" style="display: none;">
+                </form>
+                <div class="input-container">
+                    <input id="question-input" type="text" placeholder="When was this paper published?" disabled>
+                    <button id="send-btn" disabled>
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 

@@ -101,13 +101,13 @@ def count_tokens(text, model="gpt-4o-mini"):
 
 def QA(question, context):
     #intruction = ' If answers are not found, return NULL.'
-    #print(len(context))
+    print(len(context))
     if len(context) == 0:
         return ['NULL'], 0, 0
     prompt = (question[0] + question[1], context)
     response = model(model_name, prompt)
-    # print('Prompt is:', prompt[0])
-    # print('QA response is:', response)
+    print('Prompt is:', prompt[0])
+    print('QA response is:', response)
     if('|' in response):
         ans = [o.strip() for o in response.split('|')]
     else:

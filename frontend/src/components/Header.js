@@ -3,7 +3,7 @@ import '../styles/Header.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 
-const Header = () => {
+const Header = ({activeDocument, theme}) => {
   return (
     <div className="header">
       <div className="chat-title">

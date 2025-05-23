@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+.cache
+*.log
+.git
+
+# Flask specific
+instance/
+.webassets-cache
+.env
+.flaskenv
+
+# Node.js and React
+node_modules/
+.npm
+package-lock.json
+
+# React build
+build/
+dist/
+
+# specific directories
+results/
+uploads/
+out/
+tests/
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Temporary files
+*.tmp
+*.temp

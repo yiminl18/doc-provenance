@@ -146,6 +146,7 @@ def ask_question():
                                 provenance_entries.append(current_entry)
                             
                             # Extract provenance ID and sentence IDs
+                            # TODO: does not handle 0 provenance scenarios
                             try:
                                 parts = line.split('provenance:')
                                 if len(parts) >= 2:

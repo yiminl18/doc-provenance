@@ -4,7 +4,9 @@
   --background-color: #121212;
   --text-color: #f8f8f2;
   --primary-color: #3a86ff;
+  --primary-color-rgb: 58, 134, 255;
   --secondary-color: #38b2ac;
+  --secondary-color-rgb: 56, 178, 172;
   --card-background: #1e1e1e;
   --border-color: rgba(255, 255, 255, 0.1);
   --sidebar-background: #0e0e0e;
@@ -23,7 +25,9 @@
   --background-color: #f8f9fa;
   --text-color: #333333;
   --primary-color: #0066cc;
+  --primary-color-rgb: 0, 102, 204;
   --secondary-color: #2c8c99;
+  --secondary-color-rgb: 44, 140, 153;
   --card-background: #ffffff;
   --border-color: rgba(0, 0, 0, 0.1);
   --sidebar-background: #e9ecef;

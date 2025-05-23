@@ -1,6 +1,9 @@
 from app import create_app
 import os
+from dotenv import load_dotenv
 from flask import send_from_directory
+
+load_dotenv
 
 app = create_app()
 

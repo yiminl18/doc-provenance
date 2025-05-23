@@ -1,12 +1,13 @@
 /* Sidebar Styles */
 .sidebar {
-  width: 240px;
+  width: 280px;
   background-color: var(--sidebar-background);
   padding: 20px;
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--border-color);
   transition: background-color var(--transition-speed);
+  overflow-y: auto;
 }
 
 .logo {

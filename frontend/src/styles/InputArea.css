@@ -1,66 +1,54 @@
 /* Input Area Styles */
 .input-area {
-  height: 70px;
   border-top: 1px solid var(--border-color);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.upload-progress {
+  margin-bottom: 8px;
+}
+
+.progress-message {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all var(--transition-speed);
+}
+
+.progress-message.success {
+  background-color: var(--success-color);
+  border: 1px solid var(--success-border);
+  color: #4caf50;
+}
+
+.progress-message.error {
+  background-color: var(--error-color);
+  border: 1px solid var(--error-border);
+  color: #f44336;
+}
+
+.active-document {
   display: flex;
   align-items: center;
-  padding: 0 20px;
-}
-
-.upload-btn {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  margin-right: 10px;
-  cursor: pointer;
-}
-
-.upload-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.input-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.question-input {
-  flex: 1;
-  background: none;
-  border: none;
+  gap: 8px;
+  font-size: 14px;
   color: var(--text-color);
-  padding: 12px 15px;
-  font-size: 16px;
-  outline: none;
+  opacity: 0.8;
+  padding: 8px 12px;
+  background-color: rgba(58, 134, 255, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(58, 134, 255, 0.3);
 }
 
-.question-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+.active-document svg {
+  color: var(--primary-color);
 }
 
-.send-btn {
-  width: 40px;
-  height: 40px;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  margin: 5px;
-  cursor: pointer;
+.input-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 12px;
 }
-
-.send-btn:disabled {
-  background-color: rgba(30, 136, 229, 0.5);
-  cursor: not-allowed;
-} 

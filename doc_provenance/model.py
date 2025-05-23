@@ -16,6 +16,6 @@ def model(model_name, prompt, image_path = ''):
         return gpt_4o_mini(prompt)
     # if(model_name == 'gemini2flash'):
     #     return gemini_2_flash(prompt)
-    return 'input model does not exist'
-
+    else:
+        return 'input model does not exist'
 

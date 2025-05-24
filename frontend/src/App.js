@@ -523,21 +523,22 @@ function App() {
                     </div>
                   )}
                 </div>
-
-                <ProvenanceOutput
-                  document={activeDocument}
-                  currentProvenances={getCurrentProvenances()}
-                  onProvenanceSelect={handleProvenanceSelect}
-                  onFeedbackRequest={openFeedbackModal}
-                  onLoadNextProvenances={loadNextProvenances}
-                  hasMoreProvenances={hasMoreProvenances()}
-                  remainingCount={
-                    activeDocument && activeDocument.activeQuestionId
-                      ? Math.max(0, (activeDocument.questions.get(activeDocument.activeQuestionId)?.provenanceSources?.length || 0) - ((currentProvenancePage + 1) * provenancesPerPage))
-                      : 0
-                  }
-                  compactMode={true}
-                />
+                <div className="provenance-content">
+                  <ProvenanceOutput
+                    document={activeDocument}
+                    currentProvenances={getCurrentProvenances()}
+                    onProvenanceSelect={handleProvenanceSelect}
+                    onFeedbackRequest={openFeedbackModal}
+                    onLoadNextProvenances={loadNextProvenances}
+                    hasMoreProvenances={hasMoreProvenances()}
+                    remainingCount={
+                      activeDocument && activeDocument.activeQuestionId
+                        ? Math.max(0, (activeDocument.questions.get(activeDocument.activeQuestionId)?.provenanceSources?.length || 0) - ((currentProvenancePage + 1) * provenancesPerPage))
+                        : 0
+                    }
+                    compactMode={true}
+                  />
+                </div>
               </div>
             </>
           ) : (
@@ -551,9 +552,23 @@ function App() {
       </div>
 
       {/* FEEDBACK MODAL */}
-      {feedbackModalOpen && (
+      {feedbackModalOpen && selectedQuestionForFeedback && (
         <FeedbackModal
+          // Create proper session object with all needed data
+          session={{
+            sessionId: selectedQuestionForFeedback.sessionId,
+            processingSessionId: selectedQuestionForFeedback.processingSessionId,
+            documentName: activeDocument?.filename,
+            createdAt: selectedQuestionForFeedback.createdAt,
+            completedAt: selectedQuestionForFeedback.isProcessing ? null : new Date(),
+            processingTime: selectedQuestionForFeedback.time ||
+              (selectedQuestionForFeedback.provenanceSources && selectedQuestionForFeedback.provenanceSources[0]?.time),
+            algorithmMethod: 'default', // You can track this based on your algorithm selection
+            userSessionId: `user_${Date.now()}` // Generate or track user session
+          }}
           question={selectedQuestionForFeedback}
+          // Pass actual provenance data
+          allProvenances={selectedQuestionForFeedback.provenanceSources || []}
           onSubmit={handleFeedbackSubmit}
           onClose={() => setFeedbackModalOpen(false)}
         />

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/brutalist-design.css';
+import '../styles/feedback-modal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faTimes, 
@@ -314,12 +315,18 @@ const FeedbackModal = ({ session, question, allProvenances, onSubmit, onClose })
 
   const getCompletionPercentage = () => {
     const allQuestions = [...qualityQuestions, ...timingQuestions, ...experienceQuestions];
-    const completedQuestions = allQuestions.filter(q => 
-      feedback.provenanceQuality[q.key] !== null || 
-      feedback.overallExperience[q.key] !== null ||
-      feedback[q.key] !== null
-    ).length;
-    return Math.round((completedQuestions / allQuestions.length) * 100);
+    const completedQuestions = allQuestions.filter(q => {
+      // Check the correct category for each question type
+      if (qualityQuestions.includes(q)) {
+        return feedback.provenanceQuality[q.key] !== null;
+      } else if (timingQuestions.includes(q)) {
+        return feedback.overallExperience[q.key] !== null;
+      } else if (experienceQuestions.includes(q)) {
+        return feedback.overallExperience[q.key] !== null || feedback[q.key] !== null;
+      }
+      return false;
+    }).length;
+        return Math.round((completedQuestions / allQuestions.length) * 100);
   };
 
   const currentStepData = steps[currentStep];

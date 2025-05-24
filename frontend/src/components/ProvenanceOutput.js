@@ -1,6 +1,6 @@
 // Enhanced ProvenanceOutput.js - Key changes for single provenance navigation
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '../styles/analysis-panel.css'
 import { 
@@ -20,7 +20,7 @@ const ProvenanceOutput = ({
   document, 
   onProvenanceSelect, 
   onFeedbackRequest, 
-  onProvenanceFeedback,  // New: individual provenance feedback
+  onProvenanceFeedback,
   compactMode = false
 }) => {
   const [currentProvenanceIndex, setCurrentProvenanceIndex] = useState(0);
@@ -38,14 +38,17 @@ const ProvenanceOutput = ({
   const availableProvenances = activeQuestion?.provenanceSources?.slice(0, 5) || [];
   const currentProvenance = availableProvenances[currentProvenanceIndex];
 
+
   // Reset provenance index when active question changes - MOVED BEFORE EARLY RETURN
-  React.useEffect(() => {
+  useEffect(() => {
+    console.log('useEffect: Active question changed, resetting provenance index');
     setCurrentProvenanceIndex(0);
     // Auto-select first provenance when question completes
     if (availableProvenances.length > 0) {
+      console.log('Auto-selecting first provenance:', availableProvenances[0]);
       onProvenanceSelect(availableProvenances[0]);
     }
-  }, [document?.activeQuestionId, availableProvenances.length, onProvenanceSelect]);
+  }, [document?.activeQuestionId, availableProvenances.length]);
 
   // Early return AFTER all hooks
   if (!document) {
@@ -80,12 +83,13 @@ const ProvenanceOutput = ({
     );
   }
   
-  const handleNextProvenance = () => {
+ const handleNextProvenance = () => {
     if (currentProvenanceIndex < availableProvenances.length - 1) {
       setCurrentProvenanceIndex(prev => prev + 1);
       // Auto-select the new provenance for PDF highlighting
       if (availableProvenances[currentProvenanceIndex + 1]) {
-        onProvenanceSelect(availableProvenances[currentProvenanceIndex + 1]);
+        console.log('🔍 Selecting next provenance:', availableProvenances[currentProvenanceIndex + 1]);
+        onProvenanceSelect && onProvenanceSelect(availableProvenances[currentProvenanceIndex + 1]);
       }
     }
   };
@@ -95,13 +99,36 @@ const ProvenanceOutput = ({
       setCurrentProvenanceIndex(prev => prev - 1);
       // Auto-select the new provenance for PDF highlighting
       if (availableProvenances[currentProvenanceIndex - 1]) {
-        onProvenanceSelect(availableProvenances[currentProvenanceIndex - 1]);
+        console.log('🔍 Selecting previous provenance:', availableProvenances[currentProvenanceIndex - 1]);
+        onProvenanceSelect && onProvenanceSelect(availableProvenances[currentProvenanceIndex - 1]);
       }
     }
   };
 
   const handleProvenanceClick = (provenance) => {
-    onProvenanceSelect(provenance);
+    console.log('🔍 Provenance clicked:', provenance);
+    onProvenanceSelect && onProvenanceSelect(provenance);
+  };
+
+  // Helper function to parse content into sentences
+  const parseProvenanceContent = (content) => {
+    if (!content) return [];
+    
+    if (Array.isArray(content)) {
+      // If already an array, process each item
+      return content.map(item => {
+        if (typeof item === 'string') {
+          // Split long strings into sentences
+          return item.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+        }
+        return [String(item)];
+      }).flat();
+    } else if (typeof content === 'string') {
+      // Split string content into sentences
+      return content.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+    }
+    
+    return [String(content)];
   };
 
 
@@ -121,7 +148,14 @@ const ProvenanceOutput = ({
       )}
 
       <div className="chat-history">
-        {questions.map((question) => (
+        {questions.map((question) => {
+          // 🔍 ADD MORE DEBUG LOGGING
+          const isActiveQuestion = question.id === document.activeQuestionId;
+          const hasProvenances = availableProvenances.length > 0;
+
+
+          return (
+
           <div key={question.id} className="question-thread">
             
             {/* USER QUERY */}
@@ -175,76 +209,82 @@ const ProvenanceOutput = ({
             )}
 
             {/* SINGLE PROVENANCE DISPLAY - Only for active question */}
-            {question.id === document.activeQuestionId && availableProvenances.length > 0 && (
-              <div className="provenance-section">
-                <div className="provenance-header">
-                  <span className="evidence-label">Supporting Evidence</span>
-                  <div className="provenance-counter">
-                    <span className="current-provenance">
-                      {currentProvenanceIndex + 1} of {availableProvenances.length}
-                    </span>
+              {isActiveQuestion && hasProvenances && (
+                <div className="provenance-section debug-highlight">
+                  <div className="provenance-header">
+                    <span className="evidence-label">Supporting Evidence</span>
+                    <div className="provenance-counter">
+                      <span className="current-provenance">
+                        {currentProvenanceIndex + 1} of {availableProvenances.length}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                
-                {/* SINGLE PROVENANCE CARD */}
-                {currentProvenance && (
-                  <div className="single-provenance-container">
-                    <div 
-                      className="provenance-card active"
-                      onClick={() => handleProvenanceClick(currentProvenance)}
-                    >
-                      <div className="provenance-id-bar">
-                        <span className="provenance-number">
-                          Evidence {String(currentProvenance.provenance_id || currentProvenanceIndex + 1).padStart(2, '0')}
-                        </span>
-                        <button 
-                          className="view-indicator"
-                          title="Click to highlight in PDF"
-                        >
-                          <FontAwesomeIcon icon={faEye} />
-                        </button>
-                      </div>
-                      
-                      <div className="provenance-content">
-                        {currentProvenance.content ? (
-                          <div className="evidence-text">
-                            {currentProvenance.content.slice(0, compactMode ? 2 : 3).map((sentence, idx) => (
-                              <p key={idx} className="evidence-sentence">
-                                {compactMode && sentence.length > 150 
-                                  ? `${sentence.substring(0, 150)}...`
-                                  : sentence
-                                }
-                              </p>
-                            ))}
-                            {currentProvenance.content.length > (compactMode ? 2 : 3) && (
-                              <p className="more-sentences">
-                                +{currentProvenance.content.length - (compactMode ? 2 : 3)} additional sentences
-                              </p>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="loading-evidence">
-                            Loading content...
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="provenance-metrics">
-                        <div className="metric-item">
-                          <FontAwesomeIcon icon={faClock} />
-                          <span>{currentProvenance.time ? `${currentProvenance.time.toFixed(2)}s` : 'N/A'}</span>
+                  
+                  {/* SINGLE PROVENANCE CARD */}
+                  {currentProvenance && (
+                    <div className="single-provenance-container">
+                      <div 
+                        className="provenance-card active"
+                        onClick={() => handleProvenanceClick(currentProvenance)}
+                      >
+                        <div className="provenance-id-bar">
+                          <span className="provenance-number">
+                            Evidence {String(currentProvenance.provenance_id || currentProvenanceIndex + 1).padStart(2, '0')}
+                          </span>
                         </div>
-                        <div className="metric-item">
-                          <span>SENTENCES:</span>
-                          <span>{currentProvenance.sentences_ids ? currentProvenance.sentences_ids.length : 0}</span>
+                        
+                        <div className="provenance-content">
+                          {currentProvenance.content ? (
+                            <div className="evidence-text">
+                              {(() => {
+                                const sentences = parseProvenanceContent(currentProvenance.content);
+                                const displayCount = compactMode ? 2 : 3;
+                                
+                                console.log('🔍 Parsed sentences:', sentences);
+                                
+                                return (
+                                  <>
+                                    {sentences.slice(0, displayCount).map((sentence, idx) => (
+                                      <p key={idx} className="evidence-sentence">
+                                        {compactMode && sentence.length > 150 
+                                          ? `${sentence.substring(0, 150)}...`
+                                          : sentence
+                                        }
+                                      </p>
+                                    ))}
+                                    {sentences.length > displayCount && (
+                                      <p className="more-sentences">
+                                        +{sentences.length - displayCount} additional sentences
+                                      </p>
+                                    )}
+                                  </>
+                                );
+                              })()}
+                            </div>
+                          ) : (
+                            <div className="loading-evidence">
+                              Loading content...
+                            </div>
+                          )}
                         </div>
-                        {!compactMode && (
+                        
+                        <div className="provenance-metrics">
                           <div className="metric-item">
-                            <span>TOKENS:</span>
-                            <span>{currentProvenance.input_token_size || 0}→{currentProvenance.output_token_size || 0}</span>
+                            <FontAwesomeIcon icon={faClock} />
+                            <span>{currentProvenance.time ? `${currentProvenance.time.toFixed(2)}s` : 'N/A'}</span>
                           </div>
-                        )}
-                      </div>
+                          <div className="metric-item">
+                            <span>SENTENCES:</span>
+                            <span>{currentProvenance.sentences_ids ? currentProvenance.sentences_ids.length : 0}</span>
+                          </div>
+                          {!compactMode && (
+                            <div className="metric-item">
+                              <span>TOKENS:</span>
+                              <span>{currentProvenance.input_token_size || 0}→{currentProvenance.output_token_size || 0}</span>
+                            </div>
+                          )}
+                        </div>
+                    
 
                       {/* QUICK FEEDBACK BUTTONS */}
                       <div className="quick-feedback">
@@ -329,7 +369,8 @@ const ProvenanceOutput = ({
               </div>
             )}
           </div>
-        ))}
+          );
+          })}
       </div>
     </div>
   );

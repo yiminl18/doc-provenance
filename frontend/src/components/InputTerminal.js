@@ -1,26 +1,27 @@
 import React, { useState, useRef } from 'react';
-import '../styles/InputArea.css';
+import '../styles/brutalist-design.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUpload, faArrowUp, faFileAlt } from '@fortawesome/free-solid-svg-icons';
+import { faUpload, faArrowRight, faFileAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { 
   uploadFile, 
   askQuestion, 
-  fetchSentences, 
-  checkProgress as apiCheckProgress, 
-  getResults as apiGetResults, 
-  checkStatus 
+  fetchSessionSentences, 
+  checkSessionProgress, 
+  getSessionResults, 
+  checkSessionStatus 
 } from '../services/api';
 
-const InputArea = ({
+const InputTerminal = ({
   activeDocument,
   onDocumentCreate,
   onQuestionAdd,
-  onQuestionUpdate
+  onQuestionUpdate,
+  compactMode = false
 }) => {
   const [questionText, setQuestionText] = useState('');
   const [uploadProgress, setUploadProgress] = useState(null);
   const fileInputRef = useRef(null);
-  const pollingIntervals = useRef(new Map()); // Track polling for each question
+  const pollingIntervals = useRef(new Map());
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -31,31 +32,28 @@ const InputArea = ({
 
     setUploadProgress({
       success: false,
-      message: `Uploading ${file.name}...`
+      message: `Uploading: ${file.name}...`
     });
 
     try {
       const response = await uploadFile(formData);
       
-      // Create new document environment
-      const docId = onDocumentCreate(response.filename);
+      const docId = onDocumentCreate(response.filename, false); // false = not preloaded
       
       setUploadProgress({
         success: true,
-        message: `${response.filename} uploaded successfully`
+        message: `Upload Complete: ${response.filename}`
       });
 
-      // Clear upload progress after a delay
       setTimeout(() => setUploadProgress(null), 3000);
 
     } catch (error) {
       setUploadProgress({
         success: false,
-        message: `Error: ${error.message}`
+        message: `Upload Error: ${error.message}`
       });
     }
 
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -64,83 +62,71 @@ const InputArea = ({
   const handleSendQuestion = async () => {
     if (!questionText.trim() || !activeDocument) return;
 
-    // Check if there's already a processing question
     const processingQuestion = Array.from(activeDocument.questions.values())
       .find(q => q.isProcessing);
     
     if (processingQuestion) {
-      // Don't allow new questions while processing
       return;
     }
 
     try {
-      const response = await askQuestion(questionText, activeDocument.filename);
+      // Use the new session-based API - pass document IDs instead of filename
+      const response = await askQuestion(questionText, [activeDocument.id]);
       
-      // Add question to document
-      onQuestionAdd(questionText, response.question_id);
+      onQuestionAdd(questionText, response.questionId);
       
-      // Start polling for this question
-      startPolling(response.question_id);
+      // Start polling with session IDs
+      if (response.sessions && response.sessions.length > 0) {
+        startPolling(response.questionId, response.sessions[0].sessionId);
+      }
       
-      // Clear input
       setQuestionText('');
 
     } catch (error) {
       console.error('Error sending question:', error);
-      // You might want to show an error message to the user
+      setUploadProgress({
+        success: false,
+        message: `Query Error: ${error.message}`
+      });
+      setTimeout(() => setUploadProgress(null), 3000);
     }
   };
 
-  const startPolling = (questionId) => {
-    // Clear any existing polling for this question
+  const startPolling = (questionId, sessionId) => {
     if (pollingIntervals.current.has(questionId)) {
       clearInterval(pollingIntervals.current.get(questionId));
     }
 
-    // Set up new polling
     const interval = setInterval(async () => {
       try {
-        // Check progress
-        const progress = await checkProgress(questionId);
-        
-        // Check if fully complete
-        const status = await checkStatus(questionId);
+        const progress = await checkSessionProgress(sessionId);
+        const status = await checkSessionStatus(sessionId);
         
         if (status.completed) {
-          // Get final results
-          await getFullResults(questionId);
-          
-          // Stop polling
+          await getFullResults(questionId, sessionId);
           clearInterval(interval);
           pollingIntervals.current.delete(questionId);
-          
-          // Mark as not processing
           onQuestionUpdate(questionId, { isProcessing: false });
         }
       } catch (error) {
         console.error('Error checking progress:', error);
-        // Continue polling even on error, but maybe limit retries
       }
     }, 1000);
 
     pollingIntervals.current.set(questionId, interval);
   };
 
-  const checkProgress = async (questionId) => {
+  const checkProgress = async (questionId, sessionId) => {
     try {
-      const data = await apiCheckProgress(questionId);
+      const data = await checkSessionProgress(sessionId);
       
-      // Update logs if available
       if (data.logs && data.logs.length > 0) {
         onQuestionUpdate(questionId, { logs: data.logs });
       }
       
-      // If processing is done and we have data, update provenance
       if (data.done && data.data && data.data.length > 0) {
-        await updateProvenanceSources(questionId, data.data);
-        
-        // Try to get answer
-        await getResults(questionId);
+        await updateProvenanceSources(questionId, sessionId, data.data);
+        await getResults(questionId, sessionId);
       }
       
       return data;
@@ -150,9 +136,9 @@ const InputArea = ({
     }
   };
 
-  const getResults = async (questionId) => {
+  const getResults = async (questionId, sessionId) => {
     try {
-      const data = await apiGetResults(questionId);
+      const data = await getSessionResults(sessionId);
       
       if (data.success && data.answer) {
         onQuestionUpdate(questionId, { answer: data.answer });
@@ -162,9 +148,9 @@ const InputArea = ({
     }
   };
   
-  const getFullResults = async (questionId) => {
+  const getFullResults = async (questionId, sessionId) => {
     try {
-      const data = await apiGetResults(questionId);
+      const data = await getSessionResults(sessionId);
       
       if (data.success) {
         const updates = {};
@@ -174,7 +160,7 @@ const InputArea = ({
         }
         
         if (data.provenance && data.provenance.length > 0) {
-          await updateProvenanceSources(questionId, data.provenance);
+          await updateProvenanceSources(questionId, sessionId, data.provenance);
         }
         
         onQuestionUpdate(questionId, updates);
@@ -184,7 +170,7 @@ const InputArea = ({
     }
   };
 
-  const updateProvenanceSources = async (questionId, provenance) => {
+  const updateProvenanceSources = async (questionId, sessionId, provenance) => {
     const provenanceArray = Array.isArray(provenance) ? provenance : [];
     
     if (provenanceArray.length === 0) {
@@ -192,7 +178,6 @@ const InputArea = ({
       return;
     }
     
-    // Collect all unique sentence IDs
     const allSentenceIds = new Set();
     provenanceArray.forEach(source => {
       if (source.sentences_ids) {
@@ -200,31 +185,28 @@ const InputArea = ({
       }
     });
     
-    // Fetch all sentences at once
     let sentencesData = {};
     if (allSentenceIds.size > 0) {
       try {
-        const response = await fetchSentences(questionId, Array.from(allSentenceIds));
+        const response = await fetchSessionSentences(sessionId, Array.from(allSentenceIds));
         sentencesData = response.sentences || {};
       } catch (error) {
         console.error('Error fetching sentences:', error);
       }
     }
     
-    // Map sentences to each provenance entry
     const enhancedProvenance = provenanceArray.map(source => {
       if (!source.sentences_ids || source.sentences_ids.length === 0) {
         return source;
       }
       
       const content = source.sentences_ids.map(id => 
-        sentencesData[id] || `[Sentence ${id} not found]`
+        sentencesData[id] || `[SENTENCE_${id}_NOT_FOUND]`
       );
       
       return { ...source, content };
     });
     
-    // Sort by provenance_id
     const sortedProvenance = enhancedProvenance.sort((a, b) => 
       (a.provenance_id !== undefined && b.provenance_id !== undefined) 
         ? a.provenance_id - b.provenance_id 
@@ -237,18 +219,87 @@ const InputArea = ({
   const isProcessing = activeDocument && Array.from(activeDocument.questions.values())
     .some(q => q.isProcessing);
 
-  return (
-    <div className="input-area">
-      {/* Upload Progress */}
-      {uploadProgress && (
-        <div className="upload-progress">
-          <div className={`progress-message ${uploadProgress.success ? 'success' : 'error'}`}>
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendQuestion();
+    }
+  };
+
+  if (compactMode) {
+    return (
+      <div className="input-area compact">
+        {/* Upload Progress */}
+        {uploadProgress && (
+          <div className={`upload-status compact ${uploadProgress.success ? 'success' : 'error'}`}>
             {uploadProgress.message}
           </div>
+        )}
+
+        {/* Active Document Indicator */}
+        {activeDocument && (
+          <div className="active-document compact">
+            <FontAwesomeIcon icon={faFileAlt} />
+            <span>{activeDocument.filename}</span>
+          </div>
+        )}
+
+        {/* Compact Controls */}
+        <div className="input-controls compact">
+          {/* Upload Button */}
+          <div className="upload-controls">
+            <label htmlFor="file-upload" className="upload-btn">
+              <FontAwesomeIcon icon={faUpload} />
+              Upload PDF
+            </label>
+            <input
+              ref={fileInputRef}
+              id="file-upload"
+              type="file"
+              accept=".pdf"
+              style={{ display: 'none' }}
+              onChange={handleFileUpload}
+            />
+          </div>
+          
+          {/* Question Input */}
+          <textarea
+            className="question-input compact"
+            placeholder={
+              activeDocument 
+                ? (isProcessing ? "Processing question..." : "Ask a question about this document...")
+                : "Upload a PDF first"
+            }
+            value={questionText}
+            onChange={(e) => setQuestionText(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={!activeDocument || isProcessing}
+            rows={3}
+          />
+          
+          {/* Send Button */}
+          <button
+            className="send-btn compact"
+            onClick={handleSendQuestion}
+            disabled={!activeDocument || !questionText.trim() || isProcessing}
+          >
+            <FontAwesomeIcon icon={faPaperPlane} />
+            {isProcessing ? 'Processing...' : 'Ask Question'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Original non-compact layout
+  return (
+    <div className="input-area">
+      {uploadProgress && (
+        <div className={`upload-status ${uploadProgress.success ? 'success' : 'error'}`}>
+          {uploadProgress.message}
         </div>
       )}
 
-      {/* Active Document Indicator */}
       {activeDocument && (
         <div className="active-document">
           <FontAwesomeIcon icon={faFileAlt} />
@@ -256,9 +307,8 @@ const InputArea = ({
         </div>
       )}
 
-      {/* Input Controls */}
       <div className="input-controls">
-        <label htmlFor="file-upload" className="upload-btn">
+        <label htmlFor="file-upload" className="upload-btn" title="Upload PDF">
           <FontAwesomeIcon icon={faUpload} />
         </label>
         <input
@@ -276,20 +326,21 @@ const InputArea = ({
             type="text"
             placeholder={
               activeDocument 
-                ? (isProcessing ? "Processing previous question..." : "Ask a question about this document...")
+                ? (isProcessing ? "Processing question..." : "Ask a question about this document...")
                 : "Upload a PDF to get started"
             }
             value={questionText}
             onChange={(e) => setQuestionText(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendQuestion()}
+            onKeyPress={handleKeyPress}
             disabled={!activeDocument || isProcessing}
           />
           <button
             className="send-btn"
             onClick={handleSendQuestion}
             disabled={!activeDocument || !questionText.trim() || isProcessing}
+            title="Send Query"
           >
-            <FontAwesomeIcon icon={faArrowUp} />
+            <FontAwesomeIcon icon={faArrowRight} />
           </button>
         </div>
       </div>
@@ -297,4 +348,4 @@ const InputArea = ({
   );
 };
 
-export default InputArea;
+export default InputTerminal;

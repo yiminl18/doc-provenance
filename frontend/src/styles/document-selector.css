@@ -1,0 +1,291 @@
+/* ========================================
+   DOCUMENT SELECTOR COMPONENT
+   Windows 95 Style Upload/Browse Interface
+   ======================================== */
+
+/* ===== DOCUMENT SELECTOR - FULL MODE ===== */
+.document-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.document-selector .upload-status {
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  border: var(--border-medium) solid;
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition-fast);
+}
+
+.document-selector .upload-status.success {
+  background-color: var(--success-green-light);
+  border-color: var(--success-green);
+  color: var(--win95-text);
+}
+
+.document-selector .upload-status.error {
+  background-color: var(--danger-red-light);
+  border-color: var(--danger-red);
+  color: var(--win95-text);
+}
+
+.document-selector .document-controls {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.document-selector .upload-btn,
+.document-selector .browse-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-tight);
+  border: var(--border-medium) solid var(--win95-border-dark);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-decoration: none;
+  min-height: 44px;
+  box-shadow: var(--shadow-raised);
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex: 1;
+}
+
+.document-selector .upload-btn {
+  background-color: var(--success-green);
+  border-color: var(--success-green);
+  color: white;
+}
+
+.document-selector .upload-btn:hover {
+  background-color: var(--success-green-hover);
+  border-color: var(--success-green-hover);
+}
+
+.document-selector .browse-btn {
+  background-color: var(--bg-panel);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.document-selector .browse-btn:hover {
+  background-color: var(--primary-blue-light);
+}
+
+.document-selector .upload-btn:active,
+.document-selector .browse-btn:active {
+  box-shadow: var(--shadow-pressed);
+  transform: translate(1px, 1px);
+}
+
+.document-selector .upload-btn:focus,
+.document-selector .browse-btn:focus {
+  outline: none;
+  box-shadow: var(--shadow-raised), var(--focus-ring);
+}
+
+/* ===== DOCUMENT SELECTOR - COMPACT MODE ===== */
+.document-selector.compact {
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--bg-secondary);
+  border-top: var(--border-thin) solid var(--win95-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.document-selector.compact .upload-status.compact {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  margin-bottom: var(--space-2);
+}
+
+.document-selector.compact .document-controls.compact {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.document-selector.compact .upload-btn.compact,
+.document-selector.compact .browse-btn.compact {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  min-height: 36px;
+  flex: 1;
+}
+
+.document-selector.compact .upload-btn.compact {
+  background-color: var(--success-green);
+  border-color: var(--success-green);
+  color: white;
+}
+
+.document-selector.compact .browse-btn.compact {
+  background-color: var(--bg-panel);
+  border-color: var(--win95-border-dark);
+  color: var(--win95-text);
+}
+
+.document-selector.compact .upload-btn.compact:hover {
+  background-color: var(--success-green-hover);
+}
+
+.document-selector.compact .browse-btn.compact:hover {
+  background-color: var(--win95-lightest);
+}
+
+/* ===== INTEGRATION WITH EXISTING LAYOUT ===== */
+
+/* Update pdf-panel to handle document selector */
+.pdf-panel .document-selector-section {
+  flex-shrink: 0;
+  border-top: var(--border-medium) solid var(--win95-border-dark);
+  background-color: var(--bg-secondary);
+}
+
+.pdf-panel .document-selector-section.compact {
+  /* Compact selector sits at bottom of PDF panel */
+  border-top: var(--border-medium) solid var(--win95-border-dark);
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Update the analysis panel sections */
+.analysis-panel .question-input-section {
+  flex-shrink: 0;
+  border-bottom: var(--border-medium) solid var(--win95-border-dark);
+  background-color: var(--bg-panel);
+}
+
+.analysis-panel .question-input-section .section-header {
+  background-color: var(--bg-secondary);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: var(--border-thin) solid var(--win95-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.analysis-panel .question-input-section .section-header h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--win95-text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.analysis-panel .analysis-results-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.analysis-panel .analysis-results-section .section-header {
+  background-color: var(--bg-secondary);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: var(--border-thin) solid var(--win95-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-soft);
+}
+
+.analysis-panel .analysis-results-section .section-header h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--win95-text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Analysis empty state */
+.analysis-panel .analysis-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-8);
+  color: var(--win95-text-muted);
+}
+
+.analysis-panel .analysis-empty .empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+  opacity: 0.7;
+}
+
+.analysis-panel .analysis-empty h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--win95-text);
+  margin-bottom: var(--space-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.analysis-panel .analysis-empty p {
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  max-width: 300px;
+  margin: 0;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 1200px) {
+  .document-selector .document-controls {
+    flex-direction: column;
+  }
+  
+  .document-selector .upload-btn,
+  .document-selector .browse-btn {
+    width: 100%;
+  }
+  
+  .document-selector.compact .document-controls.compact {
+    gap: var(--space-2);
+  }
+  
+  .document-selector.compact .upload-btn.compact,
+  .document-selector.compact .browse-btn.compact {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+    min-height: 32px;
+  }
+}
+
+@media (max-width: 900px) {
+  .analysis-panel .question-input-section,
+  .analysis-panel .analysis-results-section {
+    /* Stack vertically on mobile */
+    flex: 1;
+  }
+  
+  .pdf-panel .document-selector-section.compact {
+    /* Make compact selector more prominent on mobile */
+    border-top-width: var(--border-thick);
+  }
+}

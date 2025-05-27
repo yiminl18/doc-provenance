@@ -3,6 +3,7 @@ import './styles/brutalist-design.css';
 import './styles/layout.css';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
+import QuestionCollection from './components/QuestionCollection';
 import ProvenanceNavigator from './components/ProvenanceNavigator';
 import PDFJSViewer from './components/PDFViewer'
 import FeedbackModal from './components/FeedbackModal';
@@ -517,7 +518,9 @@ const handleDocumentUpload = async (formData) => {
               </div>
             )}
           </div>
-
+        </div>
+        {/* Right Sidebar */}
+        <div className="right-panel">
           {/* Q&A Flow Section */}
           <div className="qa-flow-section">
             <ProvenanceNavigator

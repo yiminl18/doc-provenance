@@ -40,22 +40,44 @@ export const getDocument = async (documentId) => {
 };
 
 /**
- * Get the full text of a document
+ * Enhanced document text retrieval with multiple fallback strategies
  * @param {string} documentId - The document ID
  * @returns {Promise} Document text
  */
 export const getDocumentText = async (documentId) => {
   try {
+    // First attempt: direct document text endpoint
     const response = await axios.get(`${API_URL}/documents/${documentId}/text`);
     return response.data;
   } catch (error) {
-    console.error('Error getting document text:', error);
+    console.error('Primary text retrieval failed:', error);
+    
+    try {
+      // Second attempt: check if it's a preloaded document
+      const preloadedResponse = await getPreloadedDocuments();
+      if (preloadedResponse.success && preloadedResponse.documents) {
+        const matchingDoc = preloadedResponse.documents.find(doc => 
+          doc.document_id === documentId
+        );
+        
+        if (matchingDoc) {
+          // Try to load and then get text
+          await loadPreloadedDocument(documentId);
+          const textResponse = await axios.get(`${API_URL}/documents/${documentId}`);
+          return textResponse.data;
+        }
+      }
+    } catch (secondError) {
+      console.error('Preloaded document fallback failed:', secondError);
+    }
+    
+    // Final fallback: return error info for graceful handling
     throw new Error(error.response?.data?.error || error.message);
   }
 };
 
 /**
- * Get list of available preloaded documents
+ * Get list of available preloaded documents with enhanced error handling
  * @returns {Promise} List of preloaded documents
  */
 export const getPreloadedDocuments = async () => {
@@ -64,12 +86,13 @@ export const getPreloadedDocuments = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching preloaded documents:', error);
+        
     throw new Error(error.response?.data?.error || error.message);
   }
 };
 
 /**
- * Load a preloaded document for use
+ * Load a preloaded document for use with enhanced error handling
  * @param {string} documentId - The preloaded document ID
  * @returns {Promise} Success response
  */
@@ -79,6 +102,18 @@ export const loadPreloadedDocument = async (documentId) => {
     return response.data;
   } catch (error) {
     console.error('Error loading preloaded document:', error);
+    
+    // For fallback, we can still return success to allow frontend handling
+    if (error.response?.status === 404) {
+      console.warn(`Preloaded document ${documentId} not found on server, allowing fallback handling`);
+      return {
+        success: true,
+        document_id: documentId,
+        message: 'Document loaded (fallback mode)',
+        fallback: true
+      };
+    }
+    
     throw new Error(error.response?.data?.error || error.message);
   }
 };
@@ -256,6 +291,44 @@ export const submitFeedback = async (feedbackData) => {
 // ===== UTILITY FUNCTIONS =====
 
 /**
+ * Utility function to check if a document exists before operations
+ * @param {string} documentId - The document ID to check
+ * @returns {Promise<boolean>} Whether the document exists
+ */
+export const checkDocumentExists = async (documentId) => {
+  try {
+    const response = await axios.get(`${API_URL}/documents/${documentId}`);
+    return response.data.success;
+  } catch (error) {
+    console.error('Error checking document existence:', error);
+    return false;
+  }
+};
+
+/**
+ * Get comprehensive document information including metadata and availability
+ * @param {string} documentId - The document ID
+ * @returns {Promise} Complete document information
+ */
+export const getDocumentComplete = async (documentId) => {
+  try {
+    const [metadataResponse, textAvailable] = await Promise.all([
+      getDocument(documentId),
+      checkDocumentExists(documentId)
+    ]);
+    
+    return {
+      ...metadataResponse,
+      textAvailable,
+      retrievedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Error getting complete document info:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
  * Generate a client-side content hash (for consistency checking)
  * @param {string|Object} content - Content to hash
  * @param {string} prefix - Optional prefix for the hash
@@ -401,72 +474,15 @@ export const pollProcessingUntilComplete = async (processingSessionIds, sessionI
   };
 };
 
-// ===== COMPATIBILITY LAYER =====
-// These functions provide backward compatibility with your existing frontend
+// ===== REMOVED PROBLEMATIC COMPATIBILITY LAYER =====
+// IMPORTANT: Removed the broken compatibility functions that were using 
+// sessionId = 'legacy' which doesn't work with your new API.
+// All components should now use the proper session-based methods above.
 
 /**
  * @deprecated Use uploadDocument instead
  */
 export const uploadFile = uploadDocument;
-
-/**
- * @deprecated Use processTextQuestion instead
- */
-export const askQuestion = async (questionText, documentIds, sessionId = null) => {
-  console.warn('askQuestion is deprecated. Use createSession + processTextQuestion instead.');
-  
-  // If no session provided, create one
-  if (!sessionId) {
-    const sessionResponse = await createSession();
-    sessionId = sessionResponse.session_id;
-  }
-  
-  // Process question for first document (maintaining backward compatibility)
-  const documentId = Array.isArray(documentIds) ? documentIds[0] : documentIds;
-  return await processTextQuestion(sessionId, questionText, documentId);
-};
-
-/**
- * @deprecated Use getTextProcessingProgress instead
- */
-export const checkSessionProgress = async (processingSessionId) => {
-  console.warn('checkSessionProgress is deprecated. Use getTextProcessingProgress instead.');
-  // This requires session_id which we don't have in the old API
-  // For now, we'll try to extract it from the processingSessionId or use a placeholder
-  const sessionId = 'legacy'; // You might need to adjust this based on your ID format
-  return await getTextProcessingProgress(sessionId, processingSessionId);
-};
-
-/**
- * @deprecated Use getTextProcessingResults instead
- */
-export const getSessionResults = async (processingSessionId) => {
-  console.warn('getSessionResults is deprecated. Use getTextProcessingResults instead.');
-  const sessionId = 'legacy'; // You might need to adjust this based on your ID format
-  return await getTextProcessingResults(sessionId, processingSessionId);
-};
-
-/**
- * @deprecated Use getProcessingSentences instead
- */
-export const fetchSessionSentences = async (processingSessionId, sentenceIds) => {
-  console.warn('fetchSessionSentences is deprecated. Use getProcessingSentences instead.');
-  const sessionId = 'legacy'; // You might need to adjust this based on your ID format
-  return await getProcessingSentences(sessionId, processingSessionId, sentenceIds);
-};
-
-/**
- * @deprecated Use getTextProcessingProgress instead
- */
-export const checkSessionStatus = async (processingSessionId) => {
-  console.warn('checkSessionStatus is deprecated. Use getTextProcessingProgress instead.');
-  const sessionId = 'legacy'; // You might need to adjust this based on your ID format
-  const progress = await getTextProcessingProgress(sessionId, processingSessionId);
-  return {
-    completed: progress.done,
-    status: progress.status
-  };
-};
 
 // Export all functions as default object for convenience
 export default {
@@ -500,11 +516,6 @@ export default {
   batchProcessingOperations,
   pollProcessingUntilComplete,
   
-  // Backward Compatibility (deprecated)
-  uploadFile,
-  askQuestion,
-  checkSessionProgress,
-  getSessionResults,
-  fetchSessionSentences,
-  checkSessionStatus
+  // Backward Compatibility (only safe ones)
+  uploadFile
 };

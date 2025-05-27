@@ -277,6 +277,9 @@
   white-space: pre-wrap;
   word-wrap: break-word;
   transform-origin: top left;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* PDF Highlighting Styles */

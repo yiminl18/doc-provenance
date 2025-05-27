@@ -9,6 +9,7 @@ def create_app():
     app.config['SECRET_KEY'] = os.urandom(24).hex()
     app.config['UPLOAD_FOLDER'] = 'app/uploads'
     app.config['ALLOWED_EXTENSIONS'] = {'pdf'}
+    app.config['PRELOAD_FOLDER'] = 'app/preloaded'
     
     from app.routes import main
     app.register_blueprint(main, url_prefix='/api')

@@ -18,8 +18,8 @@ const Sidebar = ({
   documents, 
   activeDocumentId, 
   onDocumentSelect, 
-  onUploadNewDocument, // Changed from onNewQuestion
-  theme 
+  onUploadNewDocument // Changed from onNewQuestion
+   
 }) => {
   const documentList = Array.from(documents.values()).sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -63,10 +63,7 @@ const Sidebar = ({
   return (
     <div className="sidebar">
       <div className="sidebar-content">
-        <div className="logo">
-          <FontAwesomeIcon icon={faRocket} style={{ marginRight: '8px' }} />
-          PROVENANCE
-        </div>
+        
         
         {/* Changed from "New Question" to "Upload New Document" */}
         <button className="upload-new-document-btn" onClick={onUploadNewDocument}>
@@ -190,16 +187,7 @@ const Sidebar = ({
           </div>
         </div>
         
-        <div className="system-info">
-          <div className="info-line">
-            <span className="info-label">Version:</span>
-            <span className="info-value">Provenance v1.0</span>
-          </div>
-          <div className="info-line">
-            <span className="info-label">Mode:</span>
-            <span className="info-value">Research</span>
-          </div>
-        </div>
+    
       </div>
     </div>
   );

@@ -1,9 +1,10 @@
 import doc_provenance, hashlib, json, logging, os, random, sys, time, uuid
 from datetime import datetime
 from io import StringIO
-from flask import Blueprint, render_template, request, jsonify, current_app, send_from_directory, session
+from flask import Blueprint, render_template, request, jsonify, current_app, send_from_directory, session, send_file
 from werkzeug.utils import secure_filename
 from pdfminer.high_level import extract_text
+from doc_provenance.base_strategies import extract_sentences_from_pdf
 
 main = Blueprint('main', __name__)
 
@@ -88,26 +89,107 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
-# =============================================================================
-# DOCUMENT MANAGEMENT ENDPOINTS
-# =============================================================================
+# Updated scan_upload_folder_for_pdfs function
+def scan_upload_folder_for_pdfs():
+    """Scan the upload folder for PDF files and create uploaded document metadata"""
+    uploads_dir = current_app.config['UPLOAD_FOLDER']
+    uploaded_docs = []
+    
+    try:
+        # Ensure upload directory exists
+        if not os.path.exists(uploads_dir):
+            logger.warning(f"Upload directory does not exist: {uploads_dir}")
+            return []
+        
+        # Get all PDF files in the upload directory
+        pdf_files = [f for f in os.listdir(uploads_dir) if f.lower().endswith('.pdf')]
+        
+        logger.info(f"Found {len(pdf_files)} PDF files in upload folder")
+        
+        for pdf_file in pdf_files:
+            try:
+                filepath = os.path.join(uploads_dir, pdf_file)
 
-@main.route('/')
-def index():
-    return render_template('index.html')
+                # Verify file actually exists before processing
+                if not os.path.exists(filepath):
+                    logger.warning(f"PDF file listed but not found: {filepath}")
+                    continue
+                
+                # Get base name without extension
+                base_name = pdf_file.replace('.pdf', '')
+                metadata_file = os.path.join(uploads_dir, f"{base_name}_metadata.json")
+                sentences_file = os.path.join(uploads_dir, f"{base_name}_sentences.json")
+                
+                # Generate consistent document ID
+                file_stat = os.stat(filepath)
+                doc_id = generate_content_hash(f"{pdf_file}_", "uploaded_")
+                
+                # Check if we already have processed this file
+                if os.path.exists(metadata_file) and os.path.exists(sentences_file):
+                    # Load existing metadata
+                    try:
+                        with open(metadata_file, 'r', encoding='utf-8') as f:
+                            metadata = json.load(f)
+                        
+                        # Update document ID and filepath in case it changed
+                        metadata['document_id'] = doc_id
+                        metadata['filepath'] = filepath
+                        
+                        # Verify the PDF file still exists
+                        if os.path.exists(filepath):
+                            uploaded_docs.append(metadata)
+                            logger.info(f"Loaded existing metadata for {pdf_file}")
+                        else:
+                            logger.warning(f"Metadata exists but PDF file missing: {filepath}")
+                        continue
+                    except Exception as e:
+                        logger.warning(f"Failed to load existing metadata for {pdf_file}: {e}")
+                
+                # Extract text and create new metadata
+                logger.info(f"Processing new PDF: {pdf_file}")
+                try:
+                    pdf_text = extract_text(filepath)
+                    sentences = extract_sentences_from_pdf(pdf_text)
 
-# Add this somewhere in your Flask app startup to debug routes
-@main.route('/debug/routes')
-def show_routes():
-    routes = []
-    for rule in current_app.url_map.iter_rules():
-        routes.append({
-            'endpoint': rule.endpoint,
-            'methods': list(rule.methods),
-            'rule': str(rule)
-        })
-    return jsonify(routes)
+                    # Create metadata (without sentences to keep it light)
+                    metadata = {
+                        'document_id': doc_id,
+                        'filename': pdf_file,
+                        'filepath': filepath,
+                        'text_length': len(pdf_text),
+                        'sentence_count': len(sentences),
+                        'processed_at': time.time(),
+                        'file_size': file_stat.st_size,
+                        'last_modified': file_stat.st_mtime,
+                        'base_name': base_name
+                    }
+                    
+                    # Save metadata to uploads folder
+                    with open(metadata_file, 'w', encoding='utf-8') as f:
+                        json.dump(metadata, f, indent=2, ensure_ascii=False)
+                    
+                    # Save sentences to uploads folder
+                    with open(sentences_file, 'w', encoding='utf-8') as f:
+                        json.dump(sentences, f, indent=2, ensure_ascii=False)
 
+                    uploaded_docs.append(metadata)
+                    logger.info(f"Successfully processed {pdf_file} - saved metadata and sentences to uploads folder")
+                    
+                except Exception as text_error:
+                    logger.error(f"Failed to extract text from {pdf_file}: {text_error}")
+                    continue
+                
+            except Exception as e:
+                logger.error(f"Error processing {pdf_file}: {e}")
+                continue
+    
+    except Exception as e:
+        logger.error(f"Error scanning upload folder: {e}")
+    
+    return uploaded_docs
+
+
+# Updated upload_document function
 @main.route('/documents', methods=['POST'])
 def upload_document():
     """Upload a PDF document and extract its text"""
@@ -131,24 +213,38 @@ def upload_document():
         pdf_text = extract_text(filepath)
         
         # Extract sentences for later use
-        from doc_provenance.base_strategies import extract_sentences_from_pdf
         sentences = extract_sentences_from_pdf(pdf_text)
         
         # Generate document ID
-        doc_id = generate_content_hash(f"{filename}_{len(pdf_text)}", "doc_")
+        file_stat = os.stat(filepath)
+        doc_id = generate_content_hash(f"{filename}_{file_stat.st_size}_{file_stat.st_mtime}", "doc_")
         
-        # Store document metadata
-        doc_data_path = os.path.join(RESULT_DIR, f"{doc_id}_data.json")
-        with open(doc_data_path, 'w') as f:
-            json.dump({
-                'document_id': doc_id,
-                'filename': filename,
-                'filepath': filepath,
-                'text_length': len(pdf_text),
-                'sentences': sentences,
-                'is_preloaded': False,
-                'processed_at': time.time()
-            }, f)
+        # Get base name without extension
+        base_name = filename.rsplit('.', 1)[0] if '.' in filename else filename
+        
+        # Create metadata
+        metadata = {
+            'document_id': doc_id,
+            'filename': filename,
+            'filepath': filepath,
+            'text_length': len(pdf_text),
+            'sentence_count': len(sentences),
+            'is_preloaded': False,
+            'processed_at': time.time(),
+            'file_size': file_stat.st_size,
+            'last_modified': file_stat.st_mtime,
+            'base_name': base_name
+        }
+        
+        # Save metadata to uploads folder (alongside the PDF)
+        metadata_path = os.path.join(current_app.config['UPLOAD_FOLDER'], f"{base_name}_metadata.json")
+        with open(metadata_path, 'w', encoding='utf-8') as f:
+            json.dump(metadata, f, indent=2, ensure_ascii=False)
+        
+        # Save sentences to uploads folder (alongside the PDF)
+        sentences_path = os.path.join(current_app.config['UPLOAD_FOLDER'], f"{base_name}_sentences.json")
+        with open(sentences_path, 'w', encoding='utf-8') as f:
+            json.dump(sentences, f, indent=2, ensure_ascii=False)
         
         # Log document upload
         user_session_id = get_or_create_user_session()
@@ -161,6 +257,8 @@ def upload_document():
             'sentence_count': len(sentences),
             'timestamp': time.time()
         })
+        
+        logger.info(f"Successfully uploaded {filename} - saved metadata and sentences to uploads folder")
         
         return jsonify({
             'success': True,
@@ -177,6 +275,735 @@ def upload_document():
             'success': False,
             'error': str(e)
         }), 500
+
+
+# Updated load_preloaded_document function
+@main.route('/documents/preloaded/<document_id>', methods=['POST'])
+def load_preloaded_document(document_id):
+    """Load a preloaded document for use with enhanced error handling"""
+    try:
+        user_session_id = get_or_create_user_session()
+        
+        # Find the document in our scanned results
+        preloaded_docs = scan_preload_folder_for_pdfs()
+        target_doc = None
+        
+        for doc in preloaded_docs:
+            if doc['document_id'] == document_id:
+                target_doc = doc
+                break
+        
+        if not target_doc:
+            logger.error(f"Preloaded document {document_id} not found in scan results")
+            return jsonify({
+                'success': False,
+                'error': f'Preloaded document {document_id} not found',
+                'available_documents': [doc['document_id'] for doc in preloaded_docs]
+            }), 404
+        
+        # Verify the file actually exists
+        if not os.path.exists(target_doc['filepath']):
+            logger.error(f"PDF file does not exist: {target_doc['filepath']}")
+            return jsonify({
+                'success': False,
+                'error': f'PDF file not found: {target_doc["filename"]}'
+            }), 404
+        
+        # Verify metadata and sentences files exist
+        base_name = target_doc.get('base_name', target_doc['filename'].replace('.pdf', ''))
+        uploads_dir = current_app.config['UPLOAD_FOLDER']
+        
+        metadata_path = os.path.join(uploads_dir, f"{base_name}_metadata.json")
+        sentences_path = os.path.join(uploads_dir, f"{base_name}_sentences.json")
+        
+        if not os.path.exists(sentences_path):
+            logger.warning(f"Sentences file missing for {document_id}, will regenerate")
+            # Regenerate if missing
+            try:
+                pdf_text = extract_text(target_doc['filepath'])
+                sentences = extract_sentences_from_pdf(pdf_text)
+                
+                # Save sentences
+                with open(sentences_path, 'w', encoding='utf-8') as f:
+                    json.dump(sentences, f, indent=2, ensure_ascii=False)
+                
+                # Update metadata
+                target_doc['sentence_count'] = len(sentences)
+                with open(metadata_path, 'w', encoding='utf-8') as f:
+                    json.dump(target_doc, f, indent=2, ensure_ascii=False)
+                    
+                logger.info(f"Regenerated sentences for {document_id}")
+                
+            except Exception as e:
+                logger.error(f"Failed to regenerate sentences for {document_id}: {e}")
+                return jsonify({
+                    'success': False,
+                    'error': f'Failed to process preloaded document: {str(e)}'
+                }), 500
+        
+        # Log the preloaded document access
+        log_user_study_event({
+            'event_type': 'preloaded_document_loaded',
+            'user_session_id': user_session_id,
+            'document_id': document_id,
+            'filename': target_doc['filename'],
+            'text_length': target_doc.get('text_length', 0),
+            'sentence_count': target_doc.get('sentence_count', 0),
+            'timestamp': time.time()
+        })
+        
+        return jsonify({
+            'success': True,
+            'document_id': document_id,
+            'filename': target_doc['filename'],
+            'text_length': target_doc.get('text_length', 0),
+            'sentence_count': target_doc.get('sentence_count', 0),
+            'message': f'Preloaded document {target_doc["filename"]} loaded successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error loading preloaded document {document_id}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# Helper function to clean up old data files (optional cleanup)
+def cleanup_old_result_data_files():
+    """Clean up old document data files from results directory"""
+    try:
+        if not os.path.exists(RESULT_DIR):
+            return
+            
+        # Remove old *_data.json files from results directory
+        for file in os.listdir(RESULT_DIR):
+            if file.endswith('_data.json'):
+                old_file_path = os.path.join(RESULT_DIR, file)
+                try:
+                    os.remove(old_file_path)
+                    logger.info(f"Cleaned up old data file: {file}")
+                except Exception as e:
+                    logger.error(f"Failed to remove old data file {file}: {e}")
+                    
+    except Exception as e:
+        logger.error(f"Error during cleanup: {e}")
+
+
+# Updated find_document_data function (already provided earlier)
+def find_document_data(document_id):
+    """Find document data by ID from uploads folder"""
+    uploads_dir = current_app.config['UPLOAD_FOLDER']
+    
+    # Look for metadata files in uploads directory
+    if os.path.exists(uploads_dir):
+        for item in os.listdir(uploads_dir):
+            if item.endswith('_metadata.json'):
+                try:
+                    metadata_path = os.path.join(uploads_dir, item)
+                    with open(metadata_path, 'r', encoding='utf-8') as f:
+                        metadata = json.load(f)
+                    
+                    if metadata.get('document_id') == document_id:
+                        # Load sentences
+                        base_name = item.replace('_metadata.json', '')
+                        sentences_path = os.path.join(uploads_dir, f"{base_name}_sentences.json")
+                        
+                        if os.path.exists(sentences_path):
+                            with open(sentences_path, 'r', encoding='utf-8') as f:
+                                sentences = json.load(f)
+                            metadata['sentences'] = sentences
+                        else:
+                            logger.warning(f"Sentences file missing for {base_name}")
+                            metadata['sentences'] = []
+                        
+                        logger.info(f"✅ Found document: {base_name}")
+                        return metadata
+                except Exception as e:
+                    logger.error(f"Error reading metadata {item}: {e}")
+    
+    # Fallback to old results storage for backward compatibility
+    old_doc_data_path = os.path.join(RESULT_DIR, f"{document_id}_data.json")
+    if os.path.exists(old_doc_data_path):
+        try:
+            with open(old_doc_data_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                logger.info(f"✅ Found document data in legacy results storage")
+                return data
+        except Exception as e:
+            logger.error(f"❌ Error reading legacy document data: {e}")
+    
+    logger.error(f"❌ Document {document_id} not found anywhere")
+    return None
+
+
+# =============================================================================
+# DOCUMENT MANAGEMENT ENDPOINTS
+# =============================================================================
+
+@main.route('/')
+def index():
+    return render_template('index.html')
+
+# Add this somewhere in your Flask app startup to debug routes
+@main.route('/debug/routes')
+def show_routes():
+    routes = []
+    for rule in current_app.url_map.iter_rules():
+        routes.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'rule': str(rule)
+        })
+    return jsonify(routes)
+
+# Add a utility route for debugging
+@main.route('/debug/upload-folder', methods=['GET'])
+def debug_upload_folder():
+    """Debug endpoint to see what's in the upload folder"""
+    try:
+        uploads_dir = current_app.config['UPLOAD_FOLDER']
+        
+        files = []
+        for item in os.listdir(uploads_dir):
+            item_path = os.path.join(uploads_dir, item)
+            if os.path.isfile(item_path):
+                stat = os.stat(item_path)
+                files.append({
+                    'name': item,
+                    'size': stat.st_size,
+                    'modified': stat.st_mtime,
+                    'is_pdf': item.lower().endswith('.pdf')
+                })
+        
+        return jsonify({
+            'upload_folder': uploads_dir,
+            'exists': os.path.exists(uploads_dir),
+            'files': files,
+            'total_files': len(files),
+            'pdf_files': len([f for f in files if f['is_pdf']])
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'upload_folder': current_app.config.get('UPLOAD_FOLDER', 'Not configured')
+        }), 500
+    
+@main.route('/debug/document/<document_id>', methods=['GET'])
+def debug_document(document_id):
+    """Debug endpoint to check document status"""
+    try:
+        doc_data_path = os.path.join(RESULT_DIR, f"{document_id}_data.json")
+        
+        debug_info = {
+            'document_id': document_id,
+            'result_dir': RESULT_DIR,
+            'doc_data_path': doc_data_path,
+            'doc_data_exists': os.path.exists(doc_data_path),
+            'result_dir_exists': os.path.exists(RESULT_DIR),
+            'result_dir_contents': []
+        }
+        
+        if os.path.exists(RESULT_DIR):
+            try:
+                debug_info['result_dir_contents'] = [
+                    f for f in os.listdir(RESULT_DIR) 
+                    if f.startswith(document_id)
+                ]
+            except Exception as e:
+                debug_info['result_dir_error'] = str(e)
+        
+        # Check preloaded documents
+        try:
+            preloaded_docs = scan_upload_folder_for_pdfs()
+            matching_preloaded = [
+                doc for doc in preloaded_docs 
+                if doc['document_id'] == document_id
+            ]
+            debug_info['matching_preloaded'] = matching_preloaded
+            debug_info['total_preloaded'] = len(preloaded_docs)
+        except Exception as e:
+            debug_info['preloaded_error'] = str(e)
+        
+        if os.path.exists(doc_data_path):
+            try:
+                with open(doc_data_path, 'r') as f:
+                    doc_data = json.load(f)
+                debug_info['doc_data_sample'] = {
+                    k: v for k, v in doc_data.items() 
+                    if k != 'sentences'  # Don't include full sentences in debug
+                }
+                debug_info['sentences_count'] = len(doc_data.get('sentences', []))
+            except Exception as e:
+                debug_info['doc_data_read_error'] = str(e)
+        
+        return jsonify(debug_info)
+        
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'document_id': document_id
+        }), 500
+    
+# Add this debug route to routes.py to test PDF serving
+
+@main.route('/debug/pdf-test/<document_id>', methods=['GET'])
+def debug_pdf_test(document_id):
+    """Debug route to test PDF file resolution without actually serving the file"""
+    try:
+        logger.info(f"🔍 PDF Debug Test for document: {document_id}")
+        
+        # Find document data
+        doc_data = find_document_data(document_id)
+        
+        if not doc_data:
+            return jsonify({
+                'error': 'Document not found',
+                'document_id': document_id
+            }), 404
+        
+        filepath = doc_data.get('filepath')
+        filename = doc_data.get('filename')
+        upload_folder = current_app.config.get('UPLOAD_FOLDER', 'app/uploads')
+        
+        # Test all possible paths
+        possible_paths = []
+        
+        # Strategy 1: Use the filepath as-is but normalize it
+        if filepath:
+            normalized_path = os.path.normpath(filepath)
+            possible_paths.append({
+                'strategy': 'Original path normalized',
+                'path': normalized_path,
+                'exists': os.path.exists(normalized_path),
+                'readable': False
+            })
+        
+        # Strategy 2: Combine upload folder with filename
+        direct_path = os.path.join(upload_folder, filename)
+        possible_paths.append({
+            'strategy': 'Upload folder + filename',
+            'path': direct_path,
+            'exists': os.path.exists(direct_path),
+            'readable': False
+        })
+        
+        # Strategy 3: Handle relative paths
+        if filepath and not os.path.isabs(filepath):
+            absolute_path = os.path.join(os.getcwd(), filepath)
+            possible_paths.append({
+                'strategy': 'Absolute from cwd',
+                'path': absolute_path,
+                'exists': os.path.exists(absolute_path),
+                'readable': False
+            })
+        
+        # Strategy 4: Try just the filename in current directory
+        current_dir_path = os.path.join(os.getcwd(), filename)
+        possible_paths.append({
+            'strategy': 'Current directory + filename',
+            'path': current_dir_path,
+            'exists': os.path.exists(current_dir_path),
+            'readable': False
+        })
+        
+        # Strategy 5: Handle app/uploads prefix specifically
+        if filepath and 'app/uploads' in str(filepath):
+            clean_path = str(filepath).replace('app/', '')
+            clean_absolute = os.path.join(os.getcwd(), clean_path)
+            possible_paths.append({
+                'strategy': 'Cleaned app/ prefix',
+                'path': clean_absolute,
+                'exists': os.path.exists(clean_absolute),
+                'readable': False
+            })
+        
+        # Test readability for existing files
+        for path_info in possible_paths:
+            if path_info['exists']:
+                try:
+                    with open(path_info['path'], 'rb') as f:
+                        f.read(1024)  # Try to read first 1KB
+                    path_info['readable'] = True
+                except:
+                    path_info['readable'] = False
+        
+        # Find working path
+        working_paths = [p for p in possible_paths if p['exists'] and p['readable']]
+        
+        # Get directory contents
+        directory_contents = {}
+        try:
+            if os.path.exists(upload_folder):
+                directory_contents['upload_folder'] = {
+                    'path': upload_folder,
+                    'exists': True,
+                    'contents': os.listdir(upload_folder)
+                }
+            else:
+                directory_contents['upload_folder'] = {
+                    'path': upload_folder,
+                    'exists': False,
+                    'contents': []
+                }
+        except Exception as e:
+            directory_contents['upload_folder'] = {
+                'path': upload_folder,
+                'error': str(e)
+            }
+        
+        # Check current working directory
+        cwd = os.getcwd()
+        try:
+            directory_contents['current_working_dir'] = {
+                'path': cwd,
+                'exists': True,
+                'contents': [f for f in os.listdir(cwd) if f.endswith('.pdf')][:10]  # Limit to 10 PDFs
+            }
+        except Exception as e:
+            directory_contents['current_working_dir'] = {
+                'path': cwd,
+                'error': str(e)
+            }
+        
+        return jsonify({
+            'document_id': document_id,
+            'document_data': {
+                'filename': filename,
+                'filepath': filepath,
+                'upload_folder': upload_folder
+            },
+            'path_resolution_strategies': possible_paths,
+            'working_paths': working_paths,
+            'directory_contents': directory_contents,
+            'recommendation': 'Use the first working path' if working_paths else 'No working paths found - check file location',
+            'current_working_directory': cwd
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in PDF debug test: {e}")
+        return jsonify({
+            'error': str(e),
+            'document_id': document_id
+        }), 500
+
+@main.route('/debug/preloaded-scan', methods=['GET'])
+def debug_preloaded_scan():
+    """Debug endpoint to check preloaded document scanning"""
+    try:
+        debug_info = {
+            'upload_folder': current_app.config.get('UPLOAD_FOLDER'),
+            'upload_folder_exists': False,
+            'pdf_files': [],
+            'scan_results': []
+        }
+        
+        upload_folder = current_app.config.get('UPLOAD_FOLDER')
+        if upload_folder and os.path.exists(upload_folder):
+            debug_info['upload_folder_exists'] = True
+            
+            # List PDF files
+            try:
+                all_files = os.listdir(upload_folder)
+                pdf_files = [f for f in all_files if f.lower().endswith('.pdf')]
+                debug_info['pdf_files'] = pdf_files
+                debug_info['all_files'] = all_files
+            except Exception as e:
+                debug_info['list_files_error'] = str(e)
+            
+            # Try scanning
+            try:
+                scan_results = scan_upload_folder_for_pdfs()
+                debug_info['scan_results'] = [
+                    {k: v for k, v in doc.items() if k != 'sentences'}
+                    for doc in scan_results
+                ]
+                debug_info['scan_count'] = len(scan_results)
+            except Exception as e:
+                debug_info['scan_error'] = str(e)
+        
+        return jsonify(debug_info)
+        
+    except Exception as e:
+        return jsonify({
+            'error': str(e)
+        }), 500
+
+
+    
+# Add this ultra-simple test route to bypass all document lookup logic
+
+@main.route('/debug/direct-pdf-serve', methods=['GET'])
+def direct_pdf_serve():
+    """Directly serve the PDF file using the known working absolute path"""
+    try:
+        # Use the absolute path we know works from the debug
+        absolute_path = "C:\\Users\\hannah\\git\\doc-provenance\\app\\uploads\\I_Dont_Understand_Issues_in_Self-Quantifying_Commuting.pdf"
+        filename = "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting.pdf"
+        
+        logger.info(f"🔍 Direct PDF serve test")
+        logger.info(f"📁 Path: {absolute_path}")
+        logger.info(f"📂 Exists: {os.path.exists(absolute_path)}")
+        
+        if not os.path.exists(absolute_path):
+            return jsonify({'error': f'File not found: {absolute_path}'}), 404
+        
+        # Check file size
+        file_size = os.path.getsize(absolute_path)
+        logger.info(f"📊 File size: {file_size}")
+        
+        # Method 1: Try send_file with absolute path
+        try:
+            logger.info("🔄 Trying send_file...")
+            return send_file(
+                absolute_path,
+                mimetype='application/pdf',
+                as_attachment=False,
+                download_name=filename
+            )
+        except Exception as send_error:
+            logger.error(f"❌ send_file failed: {send_error}")
+            
+            # Method 2: Read file and return as response
+            try:
+                logger.info("🔄 Trying direct response...")
+                
+                with open(absolute_path, 'rb') as f:
+                    pdf_data = f.read()
+                
+                from flask import Response
+                response = Response(
+                    pdf_data,
+                    mimetype='application/pdf',
+                    headers={
+                        'Content-Disposition': f'inline; filename="{filename}"'
+                    }
+                )
+                logger.info("✅ Direct response method worked")
+                return response
+                
+            except Exception as direct_error:
+                logger.error(f"❌ Direct response failed: {direct_error}")
+                return jsonify({'error': f'All methods failed: send_file={str(send_error)}, direct={str(direct_error)}'}), 500
+        
+    except Exception as e:
+        logger.error(f"💥 Unexpected error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# Also add a route to test send_from_directory which might work better
+@main.route('/debug/send-from-directory', methods=['GET'])
+def test_send_from_directory():
+    """Test using send_from_directory instead of send_file"""
+    try:
+        # Use send_from_directory with the directory and filename separately
+        directory = "C:\\Users\\hannah\\git\\doc-provenance\\app\\uploads"
+        filename = "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting.pdf"
+        
+        logger.info(f"🔍 Testing send_from_directory")
+        logger.info(f"📁 Directory: {directory}")
+        logger.info(f"📄 Filename: {filename}")
+        logger.info(f"📂 Directory exists: {os.path.exists(directory)}")
+        logger.info(f"📄 File exists: {os.path.exists(os.path.join(directory, filename))}")
+        
+        return send_from_directory(
+            directory,
+            filename,
+            mimetype='application/pdf',
+            as_attachment=False
+        )
+        
+    except Exception as e:
+        logger.error(f"❌ send_from_directory failed: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# Replace your serve_document_pdf function with this version that uses absolute paths
+
+@main.route('/documents/<document_id>/pdf', methods=['GET'])
+def serve_document_pdf(document_id):
+    """Serve PDF using absolute paths to avoid Flask's relative path resolution"""
+    try:
+        logger.info(f"🔍 PDF request for document: {document_id}")
+        
+        # Find document data
+        doc_data = find_document_data(document_id)
+        if not doc_data:
+            logger.error(f"❌ Document {document_id} not found")
+            return jsonify({'error': 'Document not found'}), 404
+        
+        filepath = doc_data.get('filepath')
+        filename = doc_data.get('filename')
+        
+        if not filepath or not filename:
+            logger.error(f"❌ Missing filepath or filename")
+            return jsonify({'error': 'PDF file path not found'}), 404
+        
+        logger.info(f"📁 Original filepath: {filepath}")
+        
+        # Convert to absolute path to avoid Flask's path resolution issues
+        if os.path.isabs(filepath):
+            # Already absolute
+            absolute_path = os.path.normpath(filepath)
+        else:
+            # Make it absolute based on current working directory
+            absolute_path = os.path.abspath(filepath)
+        
+        logger.info(f"🔧 Absolute path: {absolute_path}")
+        logger.info(f"📂 File exists: {os.path.exists(absolute_path)}")
+        
+        # Verify file exists
+        if not os.path.exists(absolute_path):
+            logger.error(f"❌ File not found at absolute path: {absolute_path}")
+            
+            # Try alternative absolute path construction
+            cwd = os.getcwd()
+            alternative_path = os.path.join(cwd, filepath.replace('\\', os.sep).replace('/', os.sep))
+            alternative_path = os.path.normpath(alternative_path)
+            
+            logger.info(f"🔄 Trying alternative absolute path: {alternative_path}")
+            
+            if os.path.exists(alternative_path):
+                absolute_path = alternative_path
+                logger.info(f"✅ Alternative path works!")
+            else:
+                logger.error(f"❌ Alternative path also doesn't exist")
+                return jsonify({
+                    'error': 'PDF file not found on disk',
+                    'attempted_paths': [absolute_path, alternative_path]
+                }), 404
+        
+        # Verify file is readable and is a PDF
+        try:
+            file_size = os.path.getsize(absolute_path)
+            logger.info(f"📊 File size: {file_size} bytes")
+            
+            if file_size == 0:
+                return jsonify({'error': 'PDF file is empty'}), 404
+            
+            # Check PDF header
+            with open(absolute_path, 'rb') as f:
+                first_bytes = f.read(4)
+                if not first_bytes.startswith(b'%PDF'):
+                    return jsonify({'error': 'File is not a valid PDF'}), 400
+            
+        except Exception as validation_error:
+            logger.error(f"❌ File validation error: {validation_error}")
+            return jsonify({'error': f'Cannot validate PDF file: {str(validation_error)}'}), 500
+        
+        logger.info(f"✅ Serving PDF from absolute path: {absolute_path}")
+        
+        # Use absolute path with send_file
+        try:
+            return send_file(
+                absolute_path,
+                mimetype='application/pdf',
+                as_attachment=False,
+                download_name=filename
+            )
+        except Exception as send_error:
+            logger.error(f"❌ send_file error with absolute path: {send_error}")
+            
+            # Try reading file directly and returning as response
+            try:
+                logger.info("🔄 Trying direct file reading method...")
+                
+                with open(absolute_path, 'rb') as f:
+                    pdf_data = f.read()
+                
+                from flask import Response
+                
+                response = Response(
+                    pdf_data,
+                    mimetype='application/pdf',
+                    headers={
+                        'Content-Disposition': f'inline; filename="{filename}"',
+                        'Content-Length': str(len(pdf_data)),
+                        'Cache-Control': 'no-cache'
+                    }
+                )
+                
+                logger.info(f"✅ Direct file reading successful")
+                return response
+                
+            except Exception as direct_error:
+                logger.error(f"❌ Direct file reading also failed: {direct_error}")
+                return jsonify({'error': f'Failed to serve PDF: {str(direct_error)}'}), 500
+        
+    except Exception as e:
+        logger.error(f"💥 Unexpected error: {e}")
+        logger.exception("Full traceback:")
+        return jsonify({'error': f'Unexpected error: {str(e)}'}), 500
+
+# Also add this helper function to find document data more reliably
+def find_document_data(document_id):
+    """Find document data by ID with enhanced fallback strategies"""
+    # Strategy 1: Check result directory for document data
+    doc_data_path = os.path.join(RESULT_DIR, f"{document_id}_data.json")
+    if os.path.exists(doc_data_path):
+        try:
+            with open(doc_data_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                logger.info(f"✅ Found document data in results: {doc_data_path}")
+                return data
+        except Exception as e:
+            logger.error(f"❌ Error reading document data from results: {e}")
+    
+    # Strategy 2: Check if it's a preloaded document
+    try:
+        preloaded_docs = scan_upload_folder_for_pdfs()
+        for doc in preloaded_docs:
+            if doc.get('document_id') == document_id:
+                logger.info(f"✅ Found document in preloaded scan")
+                return doc
+    except Exception as e:
+        logger.error(f"❌ Error scanning preloaded documents: {e}")
+    
+    logger.error(f"❌ Document {document_id} not found anywhere")
+    return None
+    
+@main.route('/debug/document-data/<document_id>', methods=['GET'])
+def debug_document_data(document_id):
+    """Debug endpoint to check document data structure"""
+    try:
+        doc_data = find_document_data(document_id)
+        
+        if not doc_data:
+            return jsonify({
+                'error': 'Document not found',
+                'document_id': document_id,
+                'result_dir': RESULT_DIR,
+                'files_in_result_dir': os.listdir(RESULT_DIR) if os.path.exists(RESULT_DIR) else []
+            })
+        
+        # Safe document data (without full sentences)
+        safe_doc_data = {k: v for k, v in doc_data.items() if k != 'sentences'}
+        
+        return jsonify({
+            'document_id': document_id,
+            'doc_data': safe_doc_data,
+            'filepath_exists': os.path.exists(doc_data.get('filepath', '')) if doc_data.get('filepath') else False,
+            'filepath': doc_data.get('filepath', 'NO_FILEPATH'),
+            'upload_folder': current_app.config.get('UPLOAD_FOLDER'),
+            'upload_folder_contents': os.listdir(current_app.config['UPLOAD_FOLDER']) if os.path.exists(current_app.config['UPLOAD_FOLDER']) else []
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'document_id': document_id
+        }), 500
+
+# Also add a route to serve files from uploads directory
+@main.route('/uploads/<filename>')
+def serve_uploaded_file(filename):
+    """Serve files from the uploads directory"""
+    try:
+        uploads_dir = current_app.config['UPLOAD_FOLDER']
+        return send_from_directory(uploads_dir, filename)
+    except Exception as e:
+        logger.error(f"Error serving uploaded file {filename}: {e}")
+        return jsonify({'error': 'File not found'}), 404
+    
 
 @main.route('/documents/<document_id>', methods=['GET'])
 def get_document(document_id):
@@ -211,13 +1038,40 @@ def get_document(document_id):
 
 @main.route('/documents/<document_id>/text', methods=['GET'])
 def get_document_text(document_id):
-    """Get the full text of a document"""
+    """Get the full text of a document with enhanced preloaded support"""
     try:
         doc_data_path = os.path.join(RESULT_DIR, f"{document_id}_data.json")
         
         if not os.path.exists(doc_data_path):
-            return jsonify({'error': 'Document not found'}), 404
+            # Try to find it in preloaded documents
+            preloaded_docs = scan_upload_folder_for_pdfs()
+            target_doc = None
+            
+            for doc in preloaded_docs:
+                if doc['document_id'] == document_id:
+                    target_doc = doc
+                    break
+            
+            if not target_doc:
+                return jsonify({'error': 'Document not found'}), 404
+            
+            # Load the preloaded document
+            try:
+                pdf_text = extract_text(target_doc['filepath'])
+                
+                return jsonify({
+                    'success': True,
+                    'document_id': document_id,
+                    'text': pdf_text,
+                    'source': 'preloaded_direct'
+                })
+            except Exception as e:
+                return jsonify({
+                    'success': False,
+                    'error': f'Failed to extract text from preloaded document: {str(e)}'
+                }), 500
         
+        # Load from existing document data
         with open(doc_data_path, 'r') as f:
             doc_data = json.load(f)
         
@@ -231,87 +1085,129 @@ def get_document_text(document_id):
         return jsonify({
             'success': True,
             'document_id': document_id,
-            'text': pdf_text
+            'text': pdf_text,
+            'source': 'document_data'
         })
         
     except Exception as e:
-        logger.error(f"Error getting document text: {e}")
+        logger.error(f"Error getting document text for {document_id}: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
         }), 500
+    
+def scan_preload_folder_for_pdfs():
+    """Scan the preload folder for PDF files and create/load document metadata"""
+    uploads_dir = current_app.config['PRELOAD_FOLDER']
+    preloaded_docs = []
+    
+    try:
+        # Ensure preload directory exists
+        if not os.path.exists(uploads_dir):
+            logger.warning(f"Preload directory does not exist: {uploads_dir}")
+            return []
+        
+        # Get all PDF files in the preload directory
+        pdf_files = [f for f in os.listdir(uploads_dir) if f.lower().endswith('.pdf')]
+        
+        logger.info(f"Found {len(pdf_files)} PDF files in preload folder")
+        
+        for pdf_file in pdf_files:
+            try:
+                filepath = os.path.join(uploads_dir, pdf_file)
+
+                # Verify file actually exists before processing
+                if not os.path.exists(filepath):
+                    logger.warning(f"PDF file listed but not found: {filepath}")
+                    continue
+                
+                # Get base name without extension
+                base_name = pdf_file.replace('.pdf', '')
+                metadata_file = os.path.join(uploads_dir, f"{base_name}_metadata.json")
+                sentences_file = os.path.join(uploads_dir, f"{base_name}_sentences.json")
+                
+                # Generate consistent document ID
+                file_stat = os.stat(filepath)
+                doc_id = generate_content_hash(f"{pdf_file}_{file_stat.st_size}_{file_stat.st_mtime}", "preloaded_")
+                
+                # Check if we already have processed this file
+                if os.path.exists(metadata_file) and os.path.exists(sentences_file):
+                    # Load existing metadata
+                    try:
+                        with open(metadata_file, 'r', encoding='utf-8') as f:
+                            metadata = json.load(f)
+                        
+                        # Update document ID and filepath in case it changed
+                        metadata['document_id'] = doc_id
+                        metadata['filepath'] = filepath
+                        
+                        # Verify the PDF file still exists
+                        if os.path.exists(filepath):
+                            preloaded_docs.append(metadata)
+                            logger.info(f"Loaded existing metadata for {pdf_file}")
+                        else:
+                            logger.warning(f"Metadata exists but PDF file missing: {filepath}")
+                        continue
+                    except Exception as e:
+                        logger.warning(f"Failed to load existing metadata for {pdf_file}: {e}")
+                
+                # Extract text and create new metadata
+                logger.info(f"Processing new PDF: {pdf_file}")
+                try:
+                    pdf_text = extract_text(filepath)
+                    sentences = extract_sentences_from_pdf(pdf_text)
+
+                    # Create metadata (without sentences to keep it light)
+                    metadata = {
+                        'document_id': doc_id,
+                        'filename': pdf_file,
+                        'filepath': filepath,
+                        'text_length': len(pdf_text),
+                        'sentence_count': len(sentences),
+                        'is_preloaded': True,
+                        'processed_at': time.time(),
+                        'file_size': file_stat.st_size,
+                        'last_modified': file_stat.st_mtime,
+                        'base_name': base_name
+                    }
+                    
+                    # Save metadata to preload folder
+                    with open(metadata_file, 'w', encoding='utf-8') as f:
+                        json.dump(metadata, f, indent=2, ensure_ascii=False)
+                    
+                    # Save sentences to preload folder
+                    with open(sentences_file, 'w', encoding='utf-8') as f:
+                        json.dump(sentences, f, indent=2, ensure_ascii=False)
+
+                    preloaded_docs.append(metadata)
+                    logger.info(f"Successfully processed {pdf_file} - saved metadata and sentences to preload folder")
+                    
+                except Exception as text_error:
+                    logger.error(f"Failed to extract text from {pdf_file}: {text_error}")
+                    continue
+                
+            except Exception as e:
+                logger.error(f"Error processing {pdf_file}: {e}")
+                continue
+    
+    except Exception as e:
+        logger.error(f"Error scanning preload folder: {e}")
+    
+    return preloaded_docs
+
 
 @main.route('/documents/preloaded', methods=['GET'])
 def get_preloaded_documents():
-    """Get list of available preloaded documents"""
+    """Get list of available preloaded documents by scanning preload folder"""
     try:
-        preloaded_docs = []
-        uploads_dir = current_app.config['UPLOAD_FOLDER']
-        
-        for filename in os.listdir(uploads_dir):
-            if filename.endswith('_data.json'):
-                data_path = os.path.join(uploads_dir, filename)
-                try:
-                    with open(data_path, 'r') as f:
-                        doc_data = json.load(f)
-                    
-                    if doc_data.get('is_preloaded', False):
-                        base_name = filename.replace('_data.json', '')
-                        doc_id = generate_content_hash(f"{doc_data.get('filename', f'{base_name}.pdf')}_{doc_data.get('text_length', 0)}", "doc_")
-                        
-                        preloaded_docs.append({
-                            'document_id': doc_id,
-                            'filename': doc_data.get('filename', f"{base_name}.pdf"),
-                            'text_length': doc_data.get('text_length', 0),
-                            'sentence_count': len(doc_data.get('sentences', [])),
-                            'description': get_document_description(base_name),
-                            'is_preloaded': True,
-                            'base_name': base_name
-                        })
-                except Exception as e:
-                    logger.error(f"Error processing {filename}: {e}")
-                    continue
-        
-        return jsonify({
-            'success': True,
-            'documents': preloaded_docs
-        })
-        
+        preloaded_docs = scan_preload_folder_for_pdfs()
+        return jsonify({'success': True,
+                       'documents': preloaded_docs}), 200
     except Exception as e:
         logger.error(f"Error getting preloaded documents: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({'error': 'Failed to load preloaded documents'}), 500
 
-@main.route('/documents/preloaded/<document_id>', methods=['POST'])
-def load_preloaded_document(document_id):
-    """Load a preloaded document for use"""
-    try:
-        # Implementation for loading preloaded document
-        # This would copy from preloaded directory to active directory
-        # Similar to your existing uploadPreloadedDocument logic
-        
-        user_session_id = get_or_create_user_session()
-        log_user_study_event({
-            'event_type': 'preloaded_document_loaded',
-            'user_session_id': user_session_id,
-            'document_id': document_id,
-            'timestamp': time.time()
-        })
-        
-        return jsonify({
-            'success': True,
-            'document_id': document_id,
-            'message': 'Preloaded document loaded successfully'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error loading preloaded document: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+
 
 # =============================================================================
 # SESSION MANAGEMENT ENDPOINTS
@@ -418,8 +1314,8 @@ def process_text_question(session_id):
         
         # Save sentences for later
         sentences_path = os.path.join(processing_dir, 'sentences.json')
-        with open(sentences_path, 'w') as f:
-            json.dump(doc_data.get('sentences', []), f)
+        with open(sentences_path, 'w', encoding='utf-8') as f:
+            json.dump(doc_data.get('sentences', []), f, ensure_ascii=False, indent=2)
         
         # Initialize processing logs
         logs_path = os.path.join(processing_dir, 'process_logs.json')
@@ -568,7 +1464,7 @@ def get_text_processing_results(session_id, processing_session_id):
 
 @main.route('/sessions/<session_id>/processing/<processing_session_id>/sentences', methods=['GET'])
 def get_processing_sentences(session_id, processing_session_id):
-    """Get sentences for a specific processing session"""
+    """Get sentences for a specific processing session from document storage"""
     sentence_ids = request.args.get('ids')
     if not sentence_ids:
         return jsonify({'error': 'No sentence IDs provided'}), 400
@@ -579,12 +1475,24 @@ def get_processing_sentences(session_id, processing_session_id):
         return jsonify({'error': 'Invalid sentence IDs format'}), 400
     
     try:
-        sentences_path = os.path.join(RESULT_DIR, processing_session_id, 'sentences.json')
-        if not os.path.exists(sentences_path):
-            return jsonify({'error': 'Sentences not found'}), 404
+        # Get the document_id from processing session logs
+        logs_path = os.path.join(RESULT_DIR, processing_session_id, 'process_logs.json')
+        if not os.path.exists(logs_path):
+            return jsonify({'error': 'Processing session not found'}), 404
+            
+        with open(logs_path, 'r', encoding='utf-8') as f:
+            logs = json.load(f)
         
-        with open(sentences_path, 'r') as f:
-            sentences = json.load(f)
+        document_id = logs.get('document_id')
+        if not document_id:
+            return jsonify({'error': 'Document ID not found in processing session'}), 404
+        
+        # Get document data (which includes sentences)
+        doc_data = find_document_data(document_id)
+        if not doc_data:
+            return jsonify({'error': 'Document not found'}), 404
+        
+        sentences = doc_data.get('sentences', [])
         
         result = {}
         for id in sentence_ids:
@@ -597,6 +1505,7 @@ def get_processing_sentences(session_id, processing_session_id):
             'success': True,
             'session_id': session_id,
             'processing_session_id': processing_session_id,
+            'document_id': document_id,
             'sentences': result
         })
         
@@ -757,32 +1666,109 @@ def submit_feedback():
 # UTILITY FUNCTIONS (CONTINUED)
 # =============================================================================
 
+def save_document_data(document_id, doc_data, sentences):
+    """Save document data and sentences to appropriate folder"""
+    is_preloaded = doc_data.get('is_preloaded', False)
+    base_dir = PRELOAD_DIR if is_preloaded else current_app.config['UPLOAD_FOLDER']
+    
+    # Use the original filename without extension for the base name
+    filename = doc_data.get('filename', '')
+    base_name = filename.rsplit('.', 1)[0] if '.' in filename else filename
+    
+    # Save sentences alongside the PDF
+    sentences_path = os.path.join(base_dir, f"{base_name}_sentences.json")
+    with open(sentences_path, 'w', encoding='utf-8') as f:
+        json.dump(sentences, f, indent=2, ensure_ascii=False)
+    
+    # Save metadata (without sentences to keep it light)
+    metadata_path = os.path.join(base_dir, f"{base_name}_metadata.json")
+    metadata = {k: v for k, v in doc_data.items() if k != 'sentences'}
+    with open(metadata_path, 'w', encoding='utf-8') as f:
+        json.dump(metadata, f, indent=2, ensure_ascii=False)
+    
+    logger.info(f"Saved document data for {base_name} in {'preloaded' if is_preloaded else 'uploads'}")
+
 def find_document_data(document_id):
-    """Find document data by ID"""
-    doc_data_path = os.path.join(RESULT_DIR, f"{document_id}_data.json")
-    if os.path.exists(doc_data_path):
-        try:
-            with open(doc_data_path, 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            logger.error(f"Error reading document data: {e}")
+    """Find document data by ID from uploads or preloaded folders"""
+    
+    # Strategy 1: Check preloaded documents
+    if os.path.exists(PRELOAD_DIR):
+        for item in os.listdir(PRELOAD_DIR):
+            if item.endswith('_metadata.json'):
+                try:
+                    metadata_path = os.path.join(PRELOAD_DIR, item)
+                    with open(metadata_path, 'r', encoding='utf-8') as f:
+                        metadata = json.load(f)
+                    
+                    if metadata.get('document_id') == document_id:
+                        # Load sentences
+                        base_name = item.replace('_metadata.json', '')
+                        sentences_path = os.path.join(PRELOAD_DIR, f"{base_name}_sentences.json")
+                        
+                        if os.path.exists(sentences_path):
+                            with open(sentences_path, 'r', encoding='utf-8') as f:
+                                sentences = json.load(f)
+                            metadata['sentences'] = sentences
+                        
+                        logger.info(f"✅ Found preloaded document: {base_name}")
+                        return metadata
+                except Exception as e:
+                    logger.error(f"Error reading preloaded metadata {item}: {e}")
+    
+    # Strategy 2: Check uploaded documents
+    uploads_dir = current_app.config['UPLOAD_FOLDER']
+    if os.path.exists(uploads_dir):
+        for item in os.listdir(uploads_dir):
+            if item.endswith('_metadata.json'):
+                try:
+                    metadata_path = os.path.join(uploads_dir, item)
+                    with open(metadata_path, 'r', encoding='utf-8') as f:
+                        metadata = json.load(f)
+                    
+                    if metadata.get('document_id') == document_id:
+                        # Load sentences
+                        base_name = item.replace('_metadata.json', '')
+                        sentences_path = os.path.join(uploads_dir, f"{base_name}_sentences.json")
+                        
+                        if os.path.exists(sentences_path):
+                            with open(sentences_path, 'r', encoding='utf-8') as f:
+                                sentences = json.load(f)
+                            metadata['sentences'] = sentences
+                        
+                        logger.info(f"✅ Found uploaded document: {base_name}")
+                        return metadata
+                except Exception as e:
+                    logger.error(f"Error reading uploaded metadata {item}: {e}")
+    logger.error(f"❌ Document {document_id} not found in uploads or preloaded directories")
     return None
 
 def process_question_session(processing_session_id, question_text, doc_data, question_id):
-    """Process a single question-document session with comprehensive logging"""
+    """Process a single question-document session using pre-extracted sentences"""
     start_time = time.time()
     
     try:
-        update_process_log(processing_session_id, f"Analyzing document with {doc_data.get('text_length', 0)} characters...")
-        
-        # Extract text from PDF
-        filepath = doc_data.get('filepath')
-        if not filepath or not os.path.exists(filepath):
-            update_process_log(processing_session_id, "Error: PDF file not found", status="error")
+        # Get pre-extracted sentences from doc_data
+        sentences = doc_data.get('sentences', [])
+        if not sentences:
+            update_process_log(processing_session_id, "Error: No sentences found in document data", status="error")
             return
+            
+        sentence_count = len(sentences)
+        update_process_log(processing_session_id, f"Analyzing document with {sentence_count} sentences...")
         
-        pdf_text = extract_text(filepath)
         result_path = os.path.join(RESULT_DIR, processing_session_id)
+        
+        # Ensure result directory exists
+        os.makedirs(result_path, exist_ok=True)
+        
+        # Save sentences to the processing session for later reference
+        sentences_path = os.path.join(result_path, 'sentences.json')
+        with open(sentences_path, 'w', encoding='utf-8') as f:
+            json.dump(sentences, f, ensure_ascii=False, indent=2)
+        
+        # Convert sentences list back to text for the algorithm
+        # (Your algorithm might expect text, but we'll maintain sentence boundaries)
+        pdf_text = ' '.join(sentences)
         
         # Capture stdout to preserve the exact output format
         stdout_buffer = StringIO()
@@ -792,7 +1778,8 @@ def process_question_session(processing_session_id, question_text, doc_data, que
         algorithm_start_time = time.time()
         
         try:
-            # Process the question using doc_provenance API
+            # Process the question using doc_provenance API with sentence-aware text
+            update_process_log(processing_session_id, f"Starting provenance algorithm...")
             doc_provenance.divide_and_conquer_progressive_API(question_text, pdf_text, result_path)
             
             algorithm_end_time = time.time()
@@ -801,7 +1788,7 @@ def process_question_session(processing_session_id, question_text, doc_data, que
             # Get the captured output
             output = stdout_buffer.getvalue()
             
-            # Extract provenance information from the output
+            # Parse provenance information from the output
             provenance_entries = []
             current_entry = None
             total_input_tokens = 0
@@ -828,9 +1815,14 @@ def process_question_session(processing_session_id, question_text, doc_data, que
                                 ids_str = ids_str.strip('[]')
                                 prov_ids = [int(id_str.strip()) for id_str in ids_str.split(',') if id_str.strip()]
                                 
+                                # Validate sentence IDs are within range
+                                valid_prov_ids = [pid for pid in prov_ids if 0 <= pid < sentence_count]
+                                if len(valid_prov_ids) != len(prov_ids):
+                                    update_process_log(processing_session_id, f"Warning: Some sentence IDs out of range for provenance {prov_id}")
+                                
                                 current_entry = {
                                     "provenance_id": prov_id,
-                                    "sentences_ids": prov_ids,
+                                    "sentences_ids": valid_prov_ids,
                                     "time": 0,
                                     "input_token_size": 0,
                                     "output_token_size": 0
@@ -866,10 +1858,25 @@ def process_question_session(processing_session_id, question_text, doc_data, que
             if current_entry is not None:
                 provenance_entries.append(current_entry)
             
+            # Validate and enhance provenance entries with actual sentence content
+            enhanced_provenance = []
+            for entry in provenance_entries:
+                if entry.get('sentences_ids'):
+                    # Add the actual sentence content for verification
+                    sentence_content = []
+                    for sid in entry['sentences_ids']:
+                        if 0 <= sid < len(sentences):
+                            sentence_content.append(sentences[sid])
+                        else:
+                            sentence_content.append(f"[INVALID_SENTENCE_ID_{sid}]")
+                    
+                    entry['sentence_content'] = sentence_content
+                    enhanced_provenance.append(entry)
+            
             # Write the processed provenance entries
             provenance_path = os.path.join(result_path, 'provenance.json')
-            with open(provenance_path, 'w') as f:
-                json.dump(provenance_entries, f, indent=2)
+            with open(provenance_path, 'w', encoding='utf-8') as f:
+                json.dump(enhanced_provenance, f, indent=2, ensure_ascii=False)
                 
             # Create a status file to indicate completion
             status_path = os.path.join(result_path, 'status.json')
@@ -877,13 +1884,16 @@ def process_question_session(processing_session_id, question_text, doc_data, que
                 json.dump({
                     "completed": True,
                     "timestamp": time.time(),
-                    "total_provenance": len(provenance_entries),
+                    "total_provenance": len(enhanced_provenance),
                     "processing_session_id": processing_session_id,
                     "total_processing_time": time.time() - start_time,
-                    "algorithm_processing_time": algorithm_processing_time
+                    "algorithm_processing_time": algorithm_processing_time,
+                    "sentence_count": sentence_count,
+                    "total_input_tokens": total_input_tokens,
+                    "total_output_tokens": total_output_tokens
                 }, f)
             
-            update_process_log(processing_session_id, "Text processing completed!", status="completed")
+            update_process_log(processing_session_id, f"Text processing completed! Found {len(enhanced_provenance)} provenance entries.", status="completed")
             
         finally:
             sys.stdout = stdout_backup
@@ -918,81 +1928,3 @@ def update_process_log(processing_session_id, message, status=None):
         json.dump(logs, f)
     
     logger.info(f"Processing session {processing_session_id}: {message}")
-
-def get_document_description(base_name):
-    """Get a description for the document based on its name"""
-    descriptions = {
-        'whatgoesaround-sigmodrec2024': 'Database evolution research paper examining 20 years of data model developments',
-        # Add more descriptions as needed
-    }
-    return descriptions.get(base_name, 'Academic research document for analysis')
-
-
-# =============================================================================
-# LEGACY HANDLERS
-# =============================================================================
-# Add this compatibility route to routes.py to handle the old frontend calls:
-
-@main.route('/upload', methods=['POST'])
-def upload_file_legacy():
-    """Legacy upload endpoint for backward compatibility"""
-    return upload_document()
-
-@main.route('/ask', methods=['POST'])
-def ask_question_legacy():
-    """Legacy question endpoint for backward compatibility"""
-    data = request.json
-    question_text = data.get('question')
-    document_ids = data.get('documentIds', [])
-    
-    if not question_text:
-        return jsonify({'error': 'Question text required'}), 400
-    
-    if not document_ids:
-        return jsonify({'error': 'Document IDs required'}), 400
-    
-    try:
-        # Create a session
-        user_session_id = get_or_create_user_session()
-        session_id = generate_content_hash(f"{user_session_id}_{time.time()}", "session_")
-        
-        # Use first document ID
-        document_id = document_ids[0] if isinstance(document_ids, list) else document_ids
-        
-        # Process the question
-        question_id = generate_content_hash(question_text, "q_")
-        processing_session_id = generate_content_hash(f"{session_id}_{question_id}_{document_id}_{time.time()}", "proc_")
-        
-        # Get document data
-        doc_data = find_document_data(document_id)
-        if not doc_data:
-            return jsonify({'error': 'Document not found'}), 404
-        
-        # Create processing session directory
-        processing_dir = os.path.join(RESULT_DIR, processing_session_id)
-        os.makedirs(processing_dir, exist_ok=True)
-        
-        # Save sentences for later
-        sentences_path = os.path.join(processing_dir, 'sentences.json')
-        with open(sentences_path, 'w') as f:
-            json.dump(doc_data.get('sentences', []), f)
-        
-        # Start processing in background
-        from threading import Thread
-        thread = Thread(target=process_question_session, args=(processing_session_id, question_text, doc_data, question_id))
-        thread.daemon = True
-        thread.start()
-        
-        # Return legacy format
-        return jsonify({
-            'success': True,
-            'questionId': question_id,
-            'sessions': [{'sessionId': processing_session_id}]
-        })
-        
-    except Exception as e:
-        logger.error(f"Error in legacy ask endpoint: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500

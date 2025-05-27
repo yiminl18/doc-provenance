@@ -36,7 +36,8 @@ const InputTerminal = ({
     });
 
     try {
-      const response = await uploadFile(formData);
+      // FIXED: Use new uploadDocument method
+      const response = await uploadDocument(formData);
       
       const docId = onDocumentCreate(response.filename, false); // false = not preloaded
       
@@ -70,15 +71,23 @@ const InputTerminal = ({
     }
 
     try {
-      // Use the new session-based API - pass document IDs instead of filename
-      const response = await askQuestion(questionText, [activeDocument.id]);
+      // FIXED: Use new session-based API
+      const sessionResponse = await createSession();
+      const sessionId = sessionResponse.session_id;
       
-      onQuestionAdd(questionText, response.questionId);
+      // Get the backend document ID
+      const backendDocumentId = activeDocument.backendDocumentId || activeDocument.id;
       
-      // Start polling with session IDs
-      if (response.sessions && response.sessions.length > 0) {
-        startPolling(response.questionId, response.sessions[0].sessionId);
-      }
+      const response = await processTextQuestion(sessionId, questionText, backendDocumentId);
+      const processingSessionId = response.processing_session_id;
+      
+      // Create a question ID for tracking
+      const questionId = `q_${Date.now()}`;
+      
+      onQuestionAdd(questionText, questionId);
+      
+      // Start polling with the new session-based approach
+      startPolling(questionId, sessionId, processingSessionId);
       
       setQuestionText('');
 
@@ -92,18 +101,24 @@ const InputTerminal = ({
     }
   };
 
-  const startPolling = (questionId, sessionId) => {
+  const startPolling = (questionId, sessionId, processingSessionId) => {
     if (pollingIntervals.current.has(questionId)) {
       clearInterval(pollingIntervals.current.get(questionId));
     }
 
     const interval = setInterval(async () => {
       try {
-        const progress = await checkSessionProgress(sessionId);
-        const status = await checkSessionStatus(sessionId);
+        // FIXED: Use new progress checking method
+        const progress = await getTextProcessingProgress(sessionId, processingSessionId);
         
-        if (status.completed) {
-          await getFullResults(questionId, sessionId);
+        // Update logs if available
+        if (progress.logs && progress.logs.length > 0) {
+          onQuestionUpdate(questionId, { logs: progress.logs });
+        }
+        
+        // Check if processing is complete
+        if (progress.done && progress.status === 'completed') {
+          await getFullResults(questionId, sessionId, processingSessionId);
           clearInterval(interval);
           pollingIntervals.current.delete(questionId);
           onQuestionUpdate(questionId, { isProcessing: false });
@@ -116,41 +131,10 @@ const InputTerminal = ({
     pollingIntervals.current.set(questionId, interval);
   };
 
-  const checkProgress = async (questionId, sessionId) => {
+  const getFullResults = async (questionId, sessionId, processingSessionId) => {
     try {
-      const data = await checkSessionProgress(sessionId);
-      
-      if (data.logs && data.logs.length > 0) {
-        onQuestionUpdate(questionId, { logs: data.logs });
-      }
-      
-      if (data.done && data.data && data.data.length > 0) {
-        await updateProvenanceSources(questionId, sessionId, data.data);
-        await getResults(questionId, sessionId);
-      }
-      
-      return data;
-    } catch (error) {
-      console.error('Error checking progress:', error);
-      return { progress: 0, done: false };
-    }
-  };
-
-  const getResults = async (questionId, sessionId) => {
-    try {
-      const data = await getSessionResults(sessionId);
-      
-      if (data.success && data.answer) {
-        onQuestionUpdate(questionId, { answer: data.answer });
-      }
-    } catch (error) {
-      console.error('Error getting results:', error);
-    }
-  };
-  
-  const getFullResults = async (questionId, sessionId) => {
-    try {
-      const data = await getSessionResults(sessionId);
+      // FIXED: Use new results method
+      const data = await getTextProcessingResults(sessionId, processingSessionId);
       
       if (data.success) {
         const updates = {};
@@ -160,7 +144,7 @@ const InputTerminal = ({
         }
         
         if (data.provenance && data.provenance.length > 0) {
-          await updateProvenanceSources(questionId, sessionId, data.provenance);
+          await updateProvenanceSources(questionId, sessionId, processingSessionId, data.provenance);
         }
         
         onQuestionUpdate(questionId, updates);
@@ -170,7 +154,7 @@ const InputTerminal = ({
     }
   };
 
-  const updateProvenanceSources = async (questionId, sessionId, provenance) => {
+  const updateProvenanceSources = async (questionId, sessionId, processingSessionId, provenance) => {
     const provenanceArray = Array.isArray(provenance) ? provenance : [];
     
     if (provenanceArray.length === 0) {
@@ -178,6 +162,7 @@ const InputTerminal = ({
       return;
     }
     
+    // Collect all sentence IDs that need content
     const allSentenceIds = new Set();
     provenanceArray.forEach(source => {
       if (source.sentences_ids) {
@@ -188,13 +173,15 @@ const InputTerminal = ({
     let sentencesData = {};
     if (allSentenceIds.size > 0) {
       try {
-        const response = await fetchSessionSentences(sessionId, Array.from(allSentenceIds));
+        // FIXED: Use new sentences method
+        const response = await getProcessingSentences(sessionId, processingSessionId, Array.from(allSentenceIds));
         sentencesData = response.sentences || {};
       } catch (error) {
         console.error('Error fetching sentences:', error);
       }
     }
     
+    // Enhance provenance with actual sentence content
     const enhancedProvenance = provenanceArray.map(source => {
       if (!source.sentences_ids || source.sentences_ids.length === 0) {
         return source;
@@ -207,6 +194,7 @@ const InputTerminal = ({
       return { ...source, content };
     });
     
+    // Sort by provenance ID
     const sortedProvenance = enhancedProvenance.sort((a, b) => 
       (a.provenance_id !== undefined && b.provenance_id !== undefined) 
         ? a.provenance_id - b.provenance_id 

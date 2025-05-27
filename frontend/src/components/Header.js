@@ -1,33 +1,15 @@
 import React from 'react';
 import '../styles/brutalist-design.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGraduationCap, faTerminal, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faRocket, faTerminal, faFileAlt, faDatabase } from '@fortawesome/free-solid-svg-icons';
 
-const Header = ({ activeDocument, theme }) => {
-  const getGreeting = () => {
-    const greetings = [
-      "What patterns shall we uncover today?",
-      "Ready to excavate knowledge from documents?",
-      "Let's trace the provenance of ideas...",
-      "What research questions are burning today?",
-      "Time to dig into the evidence...",
-      "What connections shall we discover?",
-      "Ready to analyze and synthesize?"
-    ];
-    
-    // Use document name to pick consistent greeting
-    const index = activeDocument 
-      ? activeDocument.filename.length % greetings.length
-      : Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % greetings.length; // Daily rotation
-    
-    return greetings[index];
-  };
+const Header = ({ activeDocument, onShowPreloaded }) => {
 
   const getSessionStatus = () => {
     if (!activeDocument) {
       return {
-        status: "No Active Document",
-        color: "var(--concrete-accent)"
+        status: "Ready for Questions",
+        color: "var(--terminal-amber)"
       };
     }
 
@@ -60,8 +42,9 @@ const Header = ({ activeDocument, theme }) => {
   return (
     <div className="app-header-compact">
       <div className="header-left">
-        <div className="chat-title">
-          {getGreeting()}
+        <div className="logo">
+          <FontAwesomeIcon icon={faRocket} />
+          <span>PROVENANCE</span>
         </div>
         <div className="session-status" style={{ color: sessionStatus.color }}>
           <FontAwesomeIcon icon={faTerminal} />
@@ -70,20 +53,25 @@ const Header = ({ activeDocument, theme }) => {
       </div>
       
       <div className="header-right">
-        <div className="mode-selector">
-          <button className="mode-btn active">
-            <FontAwesomeIcon icon={faTerminal} />
-            <span>General</span>
-          </button>
-          <button className="mode-btn">
-            <FontAwesomeIcon icon={faGraduationCap} />
-            <span>Scholar</span>
-          </button>
-        </div>
-        
-        <div className="header-controls">
-          <button className="control-btn" title="System Settings">
-            <FontAwesomeIcon icon={faCog} />
+        {/* Document Actions */}
+        <div className="document-actions">
+          {activeDocument && (
+            <div className="active-document-info">
+              <FontAwesomeIcon icon={faFileAlt} />
+              <span className="doc-name">{activeDocument.filename}</span>
+              {activeDocument.isPreloaded && (
+                <span className="preloaded-badge">📚</span>
+              )}
+            </div>
+          )}
+          
+          <button 
+            className="header-action-btn"
+            onClick={onShowPreloaded}
+            title="Browse Research Papers"
+          >
+            <FontAwesomeIcon icon={faDatabase} />
+            <span>Browse Papers</span>
           </button>
         </div>
       </div>

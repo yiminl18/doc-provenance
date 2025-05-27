@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './styles/brutalist-design.css';
 import './styles/layout.css';
-import './styles/analysis-panel.css';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import ProvenanceOutput from './components/ProvenanceOutput';
-import PDFViewer from './components/PDFViewer';
+import ProvenanceNavigator from './components/ProvenanceNavigator';
+import PDFJSViewer from './components/PDFViewer'
 import FeedbackModal from './components/FeedbackModal';
-import QuestionCollection from './components/QuestionCollection';
 import DocumentSelector from './components/DocumentSelector';
 import {
   uploadFile,
@@ -16,11 +14,6 @@ import {
   getTextProcessingProgress,
   getTextProcessingResults,
   getProcessingSentences,
-  askQuestion,
-  fetchSessionSentences,
-  checkSessionProgress,
-  getSessionResults,
-  checkSessionStatus
 } from './services/api';
 
 function App() {
@@ -32,133 +25,240 @@ function App() {
   const [selectedProvenance, setSelectedProvenance] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(null);
 
-  // Provenance display state
-  const [currentProvenancePage, setCurrentProvenancePage] = useState(0);
-  const [provenancesPerPage] = useState(2);
-
   // Modal state
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [selectedQuestionForFeedback, setSelectedQuestionForFeedback] = useState(null);
   const [showPreloadedModal, setShowPreloadedModal] = useState(false);
+  const [preloadedDocuments, setPreloadedDocuments] = useState([]);
+  const [loadingPreloaded, setLoadingPreloaded] = useState(false);
 
   // Get active document
   const activeDocument = activeDocumentId ? documents.get(activeDocumentId) : null;
 
-  // Handle center panel upload - now properly implemented
-  const handleCenterUpload = async (formData) => {
 
-    const fileName = formData.get('file')?.name || 'Unknown file';
-
-    setUploadProgress({
-      success: false,
-      message: `Uploading: ${fileName}...`
+  // Handle showing preloaded documents
+  const handleShowPreloaded = () => {
+    setLoadingPreloaded(true);
+    import('./services/api').then(({ getPreloadedDocuments }) => {
+      getPreloadedDocuments()
+        .then(response => {
+          if (response.success && response.documents) {
+            setPreloadedDocuments(response.documents);
+          } else {
+            setPreloadedDocuments([
+              {
+                document_id: 'preloaded_1',
+                filename: 'whatgoesaround-sigmodrec2024.pdf',
+          
+                text_length: 85000,
+                sentence_count: 450,
+                is_preloaded: true
+              }
+            ]);
+          }
+          setShowPreloadedModal(true);
+        })
+        .catch(error => {
+          console.error('Error fetching preloaded documents:', error);
+          setPreloadedDocuments([]);
+          setShowPreloadedModal(true);
+        })
+        .finally(() => {
+          setLoadingPreloaded(false);
+        });
     });
+  };
 
-    try {
-      const response = await uploadFile(formData);
+ // Update these functions in your App.js
 
-      // Create document with proper data from backend response
-      const docId = createNewDocument(response.filename, false, {
-        document_id: response.document_id,
-        text_length: response.text_length,
-        sentence_count: response.sentence_count
+const handlePreloadedSelect = async (document) => {
+  try {
+    setLoadingPreloaded(true);
+    console.log('🔄 Loading preloaded document:', document);
+    
+    const { loadPreloadedDocument } = await import('./services/api');
+    const response = await loadPreloadedDocument(document.document_id);
+
+    if (response.success) {
+      console.log('✅ Preloaded document loaded successfully:', response);
+      
+      const docId = createNewDocument(document.filename, true, {
+        document_id: document.document_id,
+        text_length: document.text_length || response.text_length,
+        sentence_count: document.sentence_count || response.sentence_count
       });
 
-      // Update document with upload success status
+      // Update the document with additional metadata needed for PDF viewing
       setDocuments(prev => {
         const newDocs = new Map(prev);
         const doc = newDocs.get(docId);
         if (doc) {
-          doc.uploadStatus = {
-            success: true,
-            message: response.message || `${response.filename} uploaded successfully`
-          };
-          doc.backendDocumentId = response.document_id; // Store backend document ID
-          doc.textLength = response.text_length;
-          doc.sentenceCount = response.sentence_count;
+          doc.isPreloaded = true;
+          doc.isPreLoaded = true; // Support both naming conventions
+          doc.backendDocumentId = document.document_id; // This is crucial for PDF serving
+          doc.textLength = document.text_length || response.text_length;
+          doc.sentenceCount = document.sentence_count || response.sentence_count;
+          
+          console.log('📄 Updated document object:', {
+            id: doc.id,
+            filename: doc.filename,
+            backendDocumentId: doc.backendDocumentId,
+            isPreloaded: doc.isPreloaded
+          });
+          
           newDocs.set(docId, doc);
         }
         return newDocs;
       });
 
-      setUploadProgress({
-        success: true,
-        message: `Upload Complete: ${response.filename}`
-      });
-
-      // Clear progress after 3 seconds
-      setTimeout(() => setUploadProgress(null), 3000);
-
-      return docId;
-
-    } catch (error) {
-      console.error('Upload error:', error);
-
-      setUploadProgress({
-        success: false,
-        message: `Upload Error: ${error.message}`
-      });
-
-      // Clear error after 5 seconds
-      setTimeout(() => setUploadProgress(null), 5000);
-
-      throw error;
+      setShowPreloadedModal(false);
+    } else {
+      console.error('❌ Failed to load preloaded document:', response);
+      throw new Error(response.error || 'Failed to load preloaded document');
     }
-  };
-
-  // Handle showing preloaded documents
-  const handleShowPreloaded = () => {
-    setShowPreloadedModal(true);
-  };
-
-  // Handle selecting a preloaded document
-  const handlePreloadedSelect = (document) => {
-    const docId = createNewDocument(document.filename, true);
+  } catch (error) {
+    console.error('Error loading preloaded document:', error);
+    
+    // Show error to user but still allow fallback
+    alert(`Error loading document: ${error.message}`);
+    
+    // Create document anyway for fallback handling
+    const docId = createNewDocument(document.filename, true, {
+      document_id: document.document_id,
+      text_length: document.text_length,
+      sentence_count: document.sentence_count
+    });
+    
+    setDocuments(prev => {
+      const newDocs = new Map(prev);
+      const doc = newDocs.get(docId);
+      if (doc) {
+        doc.isPreloaded = true;
+        doc.backendDocumentId = document.document_id;
+        doc.uploadStatus = {
+          success: false,
+          message: `Error loading ${document.filename}: ${error.message}`
+        };
+        newDocs.set(docId, doc);
+      }
+      return newDocs;
+    });
+    
     setShowPreloadedModal(false);
+  } finally {
+    setLoadingPreloaded(false);
+  }
+};
+
+// Also update the createNewDocument function to better handle document IDs
+const createNewDocument = (filename, isPreLoaded = false, backendData = null) => {
+  const docId = `doc_${Date.now()}`;
+  const newDoc = {
+    id: docId,
+    filename,
+    questions: new Map(),
+    activeQuestionId: null,
+    uploadStatus: { 
+      success: true, 
+      message: isPreLoaded ? `${filename} loaded successfully` : `${filename} uploaded successfully` 
+    },
+    isPreLoaded,
+    isPreloaded: isPreLoaded, // Support both naming conventions
+    createdAt: new Date(),
+    ...(backendData && {
+      backendDocumentId: backendData.document_id,
+      textLength: backendData.text_length,
+      sentenceCount: backendData.sentence_count
+    })
   };
 
-  // Create new document environment
-  const createNewDocument = (filename, isPreLoaded = false, backendData = null) => {
-    const docId = `doc_${Date.now()}`;
-    const newDoc = {
-      id: docId,
-      filename,
-      questions: new Map(),
-      activeQuestionId: null,
-      uploadStatus: { success: true, message: isPreLoaded ? `${filename} loaded successfully` : `${filename} uploaded successfully` },
-      isPreLoaded,
-      createdAt: new Date(),
-      // Add backend data if provided
-      ...(backendData && {
-        backendDocumentId: backendData.document_id,
-        textLength: backendData.text_length,
-        sentenceCount: backendData.sentence_count
-      })
-    };
+  console.log('📄 Creating new document:', {
+    id: newDoc.id,
+    filename: newDoc.filename,
+    backendDocumentId: newDoc.backendDocumentId,
+    isPreloaded: newDoc.isPreloaded
+  });
 
-    setDocuments(prev => new Map(prev).set(docId, newDoc));
-    setActiveDocumentId(docId);
+  setDocuments(prev => new Map(prev).set(docId, newDoc));
+  setActiveDocumentId(docId);
+  return docId;
+};
+
+// Update the handleDocumentUpload function too
+const handleDocumentUpload = async (formData) => {
+  const fileName = formData.get('file')?.name || 'Unknown file';
+
+  setUploadProgress({
+    success: false,
+    message: `Uploading: ${fileName}...`
+  });
+
+  try {
+    console.log('🔄 Uploading document:', fileName);
+    const response = await uploadFile(formData);
+    console.log('✅ Upload response:', response);
+
+    const docId = createNewDocument(response.filename, false, {
+      document_id: response.document_id,
+      text_length: response.text_length,
+      sentence_count: response.sentence_count
+    });
+
+    setDocuments(prev => {
+      const newDocs = new Map(prev);
+      const doc = newDocs.get(docId);
+      if (doc) {
+        doc.uploadStatus = {
+          success: true,
+          message: response.message || `${response.filename} uploaded successfully`
+        };
+        doc.backendDocumentId = response.document_id;
+        doc.textLength = response.text_length;
+        doc.sentenceCount = response.sentence_count;
+        
+        console.log('📄 Updated uploaded document:', {
+          id: doc.id,
+          filename: doc.filename,
+          backendDocumentId: doc.backendDocumentId
+        });
+        
+        newDocs.set(docId, doc);
+      }
+      return newDocs;
+    });
+
+    setUploadProgress({
+      success: true,
+      message: `Upload Complete: ${response.filename}`
+    });
+
+    setTimeout(() => setUploadProgress(null), 3000);
     return docId;
-  };
 
-  // Add question to active document - updated with proper API integration
+  } catch (error) {
+    console.error('Upload error:', error);
+    setUploadProgress({
+      success: false,
+      message: `Upload Error: ${error.message}`
+    });
+    setTimeout(() => setUploadProgress(null), 5000);
+    throw error;
+  }
+};
+
+  // Add question to active document
   const addQuestionToDocument = async (questionText) => {
     if (!activeDocumentId || !activeDocument) return;
 
-    // Get the backend document ID
     const backendDocumentId = activeDocument.backendDocumentId;
     if (!backendDocumentId) {
       console.error('No backend document ID found');
       return;
     }
 
-    // Generate temporary question ID
     const tempQuestionId = `temp_${Date.now()}`;
 
     try {
-
-
-      // Add question to state immediately with processing status
       const questionData = {
         id: tempQuestionId,
         text: questionText,
@@ -181,15 +281,12 @@ function App() {
         return newDocs;
       });
 
-      // Create a session first
       const sessionResponse = await createSession();
       const sessionId = sessionResponse.session_id;
 
-      // Submit question to backend with proper IDs
       const response = await processTextQuestion(sessionId, questionText, backendDocumentId);
       const processingSessionId = response.processing_session_id;
 
-      // Update question with real IDs and start polling
       setDocuments(prev => {
         const newDocs = new Map(prev);
         const doc = newDocs.get(activeDocumentId);
@@ -197,20 +294,15 @@ function App() {
           const question = doc.questions.get(tempQuestionId);
           question.sessionId = sessionId;
           question.processingSessionId = processingSessionId;
-
           newDocs.set(activeDocumentId, doc);
         }
         return newDocs;
       });
 
-      // Start polling for results
       startPollingForResults(tempQuestionId, sessionId, processingSessionId);
-
-      setCurrentProvenancePage(0);
 
     } catch (error) {
       console.error('Error submitting question:', error);
-      // Update question with error status
       setDocuments(prev => {
         const newDocs = new Map(prev);
         const doc = newDocs.get(activeDocumentId);
@@ -225,26 +317,22 @@ function App() {
     }
   };
 
-  // Start polling for question results
+  // Start polling for results
   const startPollingForResults = (questionId, sessionId, processingSessionId) => {
     const pollInterval = setInterval(async () => {
       try {
         const progress = await getTextProcessingProgress(sessionId, processingSessionId);
 
-        // Update logs
         if (progress.logs) {
           updateQuestion(questionId, { logs: progress.logs });
         }
 
-        // Check if completed
         if (progress.done && progress.status === 'completed') {
           clearInterval(pollInterval);
 
-          // Get final results
           const results = await getTextProcessingResults(sessionId, processingSessionId);
 
           if (results.success && results.provenance) {
-            // Fetch sentence content for provenance
             const enhancedProvenance = await enhanceProvenanceWithContent(
               sessionId,
               processingSessionId,
@@ -265,11 +353,9 @@ function App() {
         }
       } catch (error) {
         console.error('Polling error:', error);
-        // Continue polling unless it's a critical error
       }
     }, 1000);
 
-    // Store interval reference for cleanup
     setDocuments(prev => {
       const newDocs = new Map(prev);
       const doc = newDocs.get(activeDocumentId);
@@ -282,7 +368,7 @@ function App() {
     });
   };
 
-  // Enhance provenance with sentence content
+  // Enhance provenance with content
   const enhanceProvenanceWithContent = async (sessionId, processingSessionId, provenanceArray) => {
     if (!Array.isArray(provenanceArray) || provenanceArray.length === 0) {
       return [];
@@ -322,7 +408,7 @@ function App() {
     );
   };
 
-  // Update question in active document
+  // Update question
   const updateQuestion = (questionId, updates) => {
     if (!activeDocumentId) return;
 
@@ -340,27 +426,32 @@ function App() {
 
   // Handle provenance selection
   const handleProvenanceSelect = (provenance) => {
+    console.log('Provenance selected:', provenance);
     setSelectedProvenance(provenance);
   };
 
-  // Handle feedback submission
+  // Handle highlighting in PDF
+  const handleHighlightInPDF = (provenance) => {
+    console.log('Highlighting provenance in PDF:', provenance);
+    setSelectedProvenance(provenance);
+    // The PDFViewer will handle the actual highlighting
+  };
+
+  // Handle feedback
   const handleFeedbackSubmit = (questionId, feedback) => {
     updateQuestion(questionId, { feedback });
     setFeedbackModalOpen(false);
     setSelectedQuestionForFeedback(null);
-
     console.log('Submitting feedback:', { questionId, feedback });
   };
 
-  // Open feedback modal
   const openFeedbackModal = (question) => {
     setSelectedQuestionForFeedback(question);
     setFeedbackModalOpen(true);
   };
 
-  // Handle uploading new document (replaces "New Question")
+  // Handle uploading new document
   const handleUploadNewDocument = () => {
-    // Trigger file input click
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.pdf';
@@ -370,7 +461,7 @@ function App() {
         const formData = new FormData();
         formData.append('file', file);
         try {
-          await handleCenterUpload(formData);
+          await handleDocumentUpload(formData);
         } catch (error) {
           console.error('Upload failed:', error);
         }
@@ -379,182 +470,70 @@ function App() {
     fileInput.click();
   };
 
-  // Handle re-asking a question
-  const handleReaskQuestion = (questionText) => {
-    addQuestionToDocument(questionText);
-  };
-
-  // Load next batch of provenances
-  const loadNextProvenances = () => {
-    if (!activeDocument || !activeDocument.activeQuestionId) return;
-
-    const currentQuestion = activeDocument.questions.get(activeDocument.activeQuestionId);
-    if (!currentQuestion || !currentQuestion.provenanceSources) return;
-
-    const totalProvenances = currentQuestion.provenanceSources.length;
-    const maxPage = Math.ceil(totalProvenances / provenancesPerPage) - 1;
-
-    if (currentProvenancePage < maxPage) {
-      setCurrentProvenancePage(prev => prev + 1);
-    }
-  };
-
-  // Get current provenance slice for display
-  const getCurrentProvenances = () => {
-    if (!activeDocument || !activeDocument.activeQuestionId) return [];
-
-    const currentQuestion = activeDocument.questions.get(activeDocument.activeQuestionId);
-    if (!currentQuestion || !currentQuestion.provenanceSources) return [];
-
-    const startIndex = 0;
-    const endIndex = (currentProvenancePage + 1) * provenancesPerPage;
-
-    return currentQuestion.provenanceSources.slice(startIndex, endIndex);
-  };
-
-  // Check if more provenances available
-  const hasMoreProvenances = () => {
-    if (!activeDocument || !activeDocument.activeQuestionId) return false;
-
-    const currentQuestion = activeDocument.questions.get(activeDocument.activeQuestionId);
-    if (!currentQuestion || !currentQuestion.provenanceSources) return false;
-
-    const totalProvenances = currentQuestion.provenanceSources.length;
-    const shownProvenances = (currentProvenancePage + 1) * provenancesPerPage;
-
-    return shownProvenances < totalProvenances;
-  };
-
   return (
     <div className="app-improved">
-
-      {/* HEADER COMPONENT */}
-      <Header activeDocument={activeDocument} theme="muted" />
-      {/* MAIN CONTENT GRID */}
+      {/* Streamlined Header */}
+      <Header 
+        activeDocument={activeDocument} 
+        onShowPreloaded={handleShowPreloaded}
+      />
+      
+      {/* Main Content Grid */}
       <div className="app-content-grid">
-
-        {/* LEFT SIDEBAR - Document Management Only */}
+        {/* Left Sidebar */}
         <div className="sidebar-panel">
           <Sidebar
             documents={documents}
             activeDocumentId={activeDocumentId}
             onDocumentSelect={setActiveDocumentId}
-            onUploadNewDocument={handleUploadNewDocument} // Changed from onNewQuestion
+            onUploadNewDocument={handleUploadNewDocument}
           />
         </div>
 
-        {/* CENTER - PDF VIEWER + DOCUMENT SELECTOR */}
-        <div className="pdf-panel">
-          {activeDocument ? (
-            <>
-              {/* PDF Viewer Section - Main document display */}
-              <div className="pdf-viewer-section">
-                <PDFViewer
-                  document={activeDocument}
-                  selectedProvenance={selectedProvenance}
-                  onClose={() => { }} // No close in this layout
-                  isGridMode={true}
-                  isMainView={true}
-                />
-              </div>
-
-              {/* Compact Document Selector - For quick document changes */}
-              <div className="document-selector-section compact">
-                <DocumentSelector
-                  onDocumentUpload={handleCenterUpload}
-                  onShowPreloaded={handleShowPreloaded}
-                  uploadProgress={uploadProgress}
-                  compactMode={true}
-                />
-              </div>
-            </>
-          ) : (
-            <div className="pdf-empty-state">
-              <div className="empty-icon">📄</div>
-              <h3>Ready to Analyze Documents</h3>
-              <p>Upload your own PDF or choose from our preloaded research papers to begin document analysis and provenance extraction.</p>
-
-              <div className="pdf-empty-actions">
-                <DocumentSelector
-                  onDocumentUpload={handleCenterUpload}
-                  onShowPreloaded={handleShowPreloaded}
-                  uploadProgress={uploadProgress}
-                  compactMode={false}
-                />
-
-                <div className="upload-prompt">
-                  💡 Start by selecting a document to analyze
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT - QUESTION INPUT + ANALYSIS RESULTS */}
-        <div className="analysis-panel">
-          {activeDocument ? (
-            <>
-              {/* Question Input Section - Primary interaction area */}
-              <div className="question-input-section">
-                <div className="section-header">
-                  <h3>
-                    <span aria-hidden="true">❓</span>
-                    Ask Questions
-                  </h3>
-                </div>
-
-                <QuestionCollection
-                  document={activeDocument}
-                  onQuestionSubmit={addQuestionToDocument}
-                  onReaskQuestion={handleReaskQuestion}
-                />
-              </div>
-
-              {/* Analysis Results Section - Answer + provenance display */}
-              <div className="analysis-results-section">
-                <div className="section-header">
-                  <h3>
-                    <span aria-hidden="true">📊</span>
-                    Analysis Results
-                  </h3>
-                  {activeDocument && (
-                    <div className="question-count" aria-label={`${Array.from(activeDocument.questions.values()).length} questions`}>
-                      {Array.from(activeDocument.questions.values()).length}
-                    </div>
-                  )}
-                </div>
-                <div className="provenance-content">
-                  <ProvenanceOutput
-                    document={activeDocument}
-                    currentProvenances={getCurrentProvenances()}
-                    onProvenanceSelect={handleProvenanceSelect}
-                    onFeedbackRequest={openFeedbackModal}
-                    onLoadNextProvenances={loadNextProvenances}
-                    hasMoreProvenances={hasMoreProvenances()}
-                    remainingCount={
-                      activeDocument && activeDocument.activeQuestionId
-                        ? Math.max(0, (activeDocument.questions.get(activeDocument.activeQuestionId)?.provenanceSources?.length || 0) - ((currentProvenancePage + 1) * provenancesPerPage))
-                        : 0
-                    }
-                    compactMode={true}
+        {/* Main Content Area */}
+        <div className="main-content">
+          {/* PDF Section */}
+          <div className="pdf-section">
+            {activeDocument ? (
+              <PDFJSViewer
+                document={activeDocument}
+                selectedProvenance={selectedProvenance}
+                onClose={() => {}}
+              />
+            ) : (
+              <div className="pdf-empty-state">
+                <div className="empty-icon">📄</div>
+                <h3>Ready to Analyze Documents</h3>
+                <p>Upload your own PDF or choose from our preloaded research papers to begin document analysis and provenance extraction.</p>
+                
+                <div className="pdf-empty-actions">
+                  <DocumentSelector
+                    onDocumentUpload={handleDocumentUpload}
+                    onShowPreloaded={handleShowPreloaded}
+                    uploadProgress={uploadProgress}
+                    compactMode={false}
                   />
                 </div>
               </div>
-            </>
-          ) : (
-            <div className="analysis-empty">
-              <div className="empty-icon">🤔</div>
-              <h3>Ready for Questions</h3>
-              <p>Upload a document to start asking questions and analyzing provenance.</p>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* Q&A Flow Section */}
+          <div className="qa-flow-section">
+            <ProvenanceNavigator
+              document={activeDocument}
+              onQuestionSubmit={addQuestionToDocument}
+              onProvenanceSelect={handleProvenanceSelect}
+              onFeedbackRequest={openFeedbackModal}
+              onHighlightInPDF={handleHighlightInPDF}
+            />
+          </div>
         </div>
       </div>
 
-      {/* FEEDBACK MODAL */}
+      {/* Feedback Modal */}
       {feedbackModalOpen && selectedQuestionForFeedback && (
         <FeedbackModal
-          // Create proper session object with all needed data
           session={{
             sessionId: selectedQuestionForFeedback.sessionId,
             processingSessionId: selectedQuestionForFeedback.processingSessionId,
@@ -563,81 +542,57 @@ function App() {
             completedAt: selectedQuestionForFeedback.isProcessing ? null : new Date(),
             processingTime: selectedQuestionForFeedback.time ||
               (selectedQuestionForFeedback.provenanceSources && selectedQuestionForFeedback.provenanceSources[0]?.time),
-            algorithmMethod: 'default', // You can track this based on your algorithm selection
-            userSessionId: `user_${Date.now()}` // Generate or track user session
+            algorithmMethod: 'default',
+            userSessionId: `user_${Date.now()}`
           }}
           question={selectedQuestionForFeedback}
-          // Pass actual provenance data
           allProvenances={selectedQuestionForFeedback.provenanceSources || []}
           onSubmit={handleFeedbackSubmit}
           onClose={() => setFeedbackModalOpen(false)}
         />
       )}
 
-      {/* PRELOADED DOCUMENTS MODAL */}
+      {/* Preloaded Documents Modal */}
       {showPreloadedModal && (
-        <div
-          className="modal-overlay"
-          onClick={(e) => e.target === e.currentTarget && setShowPreloadedModal(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="preloaded-modal-title"
-        >
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowPreloadedModal(false)}>
           <div className="preloaded-modal">
             <div className="modal-header">
-              <h3 id="preloaded-modal-title">
-                <span aria-hidden="true">📚</span>
-                Research Papers
-              </h3>
-              <button
-                className="close-btn"
-                onClick={() => setShowPreloadedModal(false)}
-                aria-label="Close modal"
-              >
-                <span aria-hidden="true">✕</span>
-              </button>
+              <h3>📚 Research Papers</h3>
+              <button className="close-btn" onClick={() => setShowPreloadedModal(false)}>✕</button>
             </div>
             <div className="modal-body">
-              <p>Choose from our collection of research papers:</p>
-              <div className="documents-grid" role="list">
-                {[
-                  {
-                    id: 1,
-                    title: "What Goes Around Comes Around",
-                    description: "Database evolution research paper examining 20 years of data model developments",
-                    pages: 24
-                  },
-                  {
-                    id: 2,
-                    title: "Machine Learning Systems",
-                    description: "Modern ML architecture survey covering distributed training and inference",
-                    pages: 18
-                  },
-                  {
-                    id: 3,
-                    title: "Data Privacy in the Cloud",
-                    description: "Privacy-preserving techniques for cloud-based data processing",
-                    pages: 32
-                  }
-                ].map(doc => (
-                  <button
-                    key={doc.id}
-                    className="document-card"
-                    onClick={() => handlePreloadedSelect(doc)}
-                    role="listitem"
-                    aria-describedby={`doc-desc-${doc.id}`}
-                  >
-                    <div className="doc-icon" aria-hidden="true">📄</div>
-                    <div className="doc-info">
-                      <h4>{doc.title}</h4>
-                      <p id={`doc-desc-${doc.id}`}>{doc.description}</p>
-                      <span className="doc-pages" aria-label={`${doc.pages} pages`}>
-                        {doc.pages} pages
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
+              {loadingPreloaded ? (
+                <div className="loading-state">
+                  <p>Loading available research papers...</p>
+                </div>
+              ) : preloadedDocuments.length > 0 ? (
+                <>
+                  <p>Choose from our collection of research papers:</p>
+                  <div className="documents-grid">
+                    {preloadedDocuments.map(doc => (
+                      <button
+                        key={doc.document_id}
+                        className="document-card"
+                        onClick={() => handlePreloadedSelect(doc)}
+                        disabled={loadingPreloaded}
+                      >
+                        <div className="doc-icon">📄</div>
+                        <div className="doc-info">
+                          <h4>{doc.filename}</h4>
+                          <div className="doc-stats">
+                            <span>{Math.round(doc.text_length / 1000)}k chars</span>
+                            <span>{doc.sentence_count} sentences</span>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="empty-state">
+                  <p>No preloaded documents are currently available.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -171,7 +171,7 @@ const ProvenanceNavigator = ({
                 onClick={handlePreviousProvenance}
                 disabled={currentProvenanceIndex === 0}
               >
-                <FontAwesomeIcon icon={faChevronLeft} />
+             
                 <span>Previous</span>
               </button>
               <button 
@@ -180,7 +180,7 @@ const ProvenanceNavigator = ({
                 disabled={currentProvenanceIndex === availableProvenances.length - 1}
               >
                 <span>Next</span>
-                <FontAwesomeIcon icon={faChevronRight} />
+       
               </button>
             </div>
           </div>

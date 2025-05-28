@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 from openai import OpenAI
+from difflib import SequenceMatcher
 client = OpenAI()
 embedding_model = "text-embedding-3-small"
 from collections import deque
@@ -123,16 +124,20 @@ def eval_equivelance_rules(s):
     s = s.strip('.')
     return s
 
+def str_similarity(str1, str2):
+    similarity = SequenceMatcher(None, str1, str2).ratio()
+    return similarity
+
 def equal_string(res1, res2):
-    if(len(res1) != len(res2)):
-        return False
-    res1_lower = []
     for r in res1:
         if 'null' in r.lower():
             return False
     for r in res2:
         if 'null' in r.lower():
             return False
+    if(len(res1) != len(res2)):
+        return False
+    res1_lower = []
     # print('before:',res1)
     # print('before:',res2)
     for r in res1:
@@ -141,8 +146,14 @@ def equal_string(res1, res2):
     res2_lower = []
     for r in res2:
         res2_lower.append(eval_equivelance_rules(r).lower())
-    # print('after:',res1_lower)
-    # print('after:',res2_lower)
+
+    if len(res1_lower) == 1 and len(res2_lower) == 1:
+        str1 = res1_lower[0]
+        str2 = res2_lower[0]
+        #print('str_similarity:', str_similarity(str1, str2))
+        if len(str1) > 20 and len(str2) > 20 and str_similarity(str1, str2) > 0.9:
+            return True
+
     for r in res1_lower:
         if r not in res2_lower:
             return False
@@ -151,7 +162,8 @@ def equal_string(res1, res2):
             return False
     return True
 
-def equal(res1, res2, metric = 'string'):
+        
+def equal(res1, res2, question, metric = 'string'):
     res1 = sorted(res1)
     res2 = sorted(res2)
     #print(len(res1), len(res2))
@@ -159,14 +171,20 @@ def equal(res1, res2, metric = 'string'):
     if(metric == 'string'):
         return equal_string(res1, res2)
     else:
-        instruct_prompt = 'Determine if two strings are equivalent in meaning, not just in format. Lists must contain the same elements, allowing for alternative spellings, transliterations, or equivalent name variations. Missing or extra elements make them unequal. Dates in different formats should be considered equivalent if they represent the same time. Ignore case, punctuation, and spacing unless they change meaning. Return True if the strings are equivalent and False otherwise. Do not add explanations. ' 
+        #check NULL answer
+        for r in res1:
+            if 'null' in r.lower():
+                return False
+        for r in res2:
+            if 'null' in r.lower():
+                return False
+        instruction = 'I have two answers to the given question. If these two answers are equivalent in meaning, return True; otherwise, return False. Do not provide any explanation. ' + 'Answer 1: ' + ''.join(res1) + ' Answer 2: ' + ''.join(res2) + ' Question: ' + question[0] 
         if equal_string(res1, res2):
+            #print('Return true in string metric')
             return True
         if len(res1) != len(res2):
             return False 
         if(len(res1) > 1 or len(res2) > 1):
-            print('LLM evaluation1')
-            instruction = instruct_prompt + ' String 1 is: ' + " ".join(res1) + ' String 2 is: ' + " ".join(res2)
             response = model(model_name, (instruction, ''))
             if('true' in response.lower()):
                 return True
@@ -174,13 +192,7 @@ def equal(res1, res2, metric = 'string'):
         if(len(res1) == 1 and len(res2) == 1):
             str1 = res1[0]
             str2 = res2[0]
-            if len(str1) > 2*len(str2) or len(str2) > 2*len(str1):
-                print('length mis-match')
-                return False
-            print('LLM evaluation2')
-            instruction = 'Given the following two strings, String 1 is: '  + res1[0] + '. String 2 is: ' + res2[0] + '. ' + instruct_prompt
             response = model(model_name, (instruction, ''))
-            #print(instruction)
             if('true' in response.lower()):
                 return True
             return False

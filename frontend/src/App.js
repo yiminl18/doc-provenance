@@ -8,6 +8,7 @@ import QuestionCollection from './components/QuestionCollection';
 import ProvenanceNavigator from './components/ProvenanceNavigator';
 import PDFViewer from './components/CleanPDFViewer'
 import SentenceBasedPDFViewer from './components/SentenceBasedPDFViewer';
+import HybridPDFViewer from './components/HybridPDFViewer';
 //import PDFViewer from './components/PDFJSViewer'
 //import PDFViewer from './components/PDFViewer';
 import FeedbackModal from './components/FeedbackModal';
@@ -503,7 +504,7 @@ const handleDocumentUpload = async (formData) => {
           <div className="pdf-section">
          
             {activeDocument ? (
-              <SentenceBasedPDFViewer
+              <HybridPDFViewer
                 pdfDocument={activeDocument}
                 selectedProvenance={selectedProvenance}
                 onClose={() => {}}

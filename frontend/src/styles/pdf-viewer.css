@@ -430,3 +430,251 @@
     box-shadow: none !important;
   }
 }
+
+/* Additional CSS for PDF Viewer Component - Add to your CSS files */
+
+/* Override any conflicting layout styles */
+.pdf-viewer {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  background-color: var(--bg-paper) !important;
+  border: none !important; /* Remove border for grid layout */
+  box-shadow: none !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* PDF Content Container - Critical for react-pdf */
+.pdf-content {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  background-color: var(--bg-paper) !important;
+  position: relative !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  padding: var(--space-4) !important;
+}
+
+/* Ensure react-pdf Document renders properly */
+.pdf-content > div {
+  position: relative !important;
+  display: inline-block !important;
+}
+
+/* React-pdf canvas styling */
+.pdf-content canvas {
+  border: 2px solid var(--win95-border) !important;
+  box-shadow: var(--shadow-medium) !important;
+  background: white !important;
+}
+
+/* Text layer for react-pdf */
+.textLayer {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  overflow: hidden !important;
+  opacity: 0.2 !important;
+  line-height: 1.0 !important;
+}
+
+/* Annotation layer for react-pdf */
+.annotationLayer {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+/* PDF Header - ensure it doesn't interfere */
+.pdf-header {
+  background-color: var(--bg-secondary) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  border-bottom: var(--border-medium) solid var(--win95-border-dark) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: var(--shadow-raised) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+}
+
+.pdf-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-2) !important;
+  font-family: var(--font-display) !important;
+  font-size: var(--text-sm) !important;
+  font-weight: var(--font-semibold) !important;
+  color: var(--win95-text) !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.pdf-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-2) !important;
+}
+
+.control-btn {
+  background-color: var(--bg-panel) !important;
+  color: var(--win95-text) !important;
+  border: var(--border-medium) solid var(--win95-border) !important;
+  padding: var(--space-2) !important;
+  cursor: pointer !important;
+  transition: var(--transition-fast) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  box-shadow: var(--shadow-raised) !important;
+}
+
+.control-btn:hover {
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--primary-blue) !important;
+}
+
+.control-btn:active {
+  box-shadow: var(--shadow-pressed) !important;
+  transform: translate(1px, 1px) !important;
+}
+
+.control-btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  color: var(--win95-text-muted) !important;
+}
+
+/* Document info panel */
+.document-info {
+  background-color: var(--bg-secondary) !important;
+  border: var(--border-medium) solid var(--win95-border) !important;
+  padding: var(--space-3) !important;
+  margin-bottom: var(--space-4) !important;
+  box-shadow: var(--shadow-raised) !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: var(--space-4) !important;
+  flex-shrink: 0 !important;
+}
+
+.info-item {
+  font-family: var(--font-mono) !important;
+  font-size: var(--text-xs) !important;
+  color: var(--win95-text) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-1) !important;
+}
+
+.info-item strong {
+  color: var(--primary-blue) !important;
+  font-weight: var(--font-semibold) !important;
+}
+
+/* Highlight legend */
+.highlight-legend {
+  background-color: var(--accent-purple-light) !important;
+  border: var(--border-medium) solid var(--accent-purple) !important;
+  padding: var(--space-4) !important;
+  margin-bottom: var(--space-4) !important;
+  box-shadow: var(--shadow-raised) !important;
+  flex-shrink: 0 !important;
+}
+
+.highlight-legend h4 {
+  font-family: var(--font-display) !important;
+  font-size: var(--text-sm) !important;
+  font-weight: var(--font-bold) !important;
+  color: var(--accent-purple) !important;
+  margin-bottom: var(--space-3) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-2) !important;
+}
+
+/* PDF highlight overlays */
+.pdf-highlight {
+  position: absolute !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+  border-radius: 2px !important;
+  transition: var(--transition-fast) !important;
+}
+
+.pdf-highlight.highlight-0 {
+  background-color: rgba(255, 235, 59, 0.3) !important;
+  border: 2px solid #ffcc00 !important;
+}
+
+.pdf-highlight.highlight-1 {
+  background-color: rgba(76, 175, 80, 0.3) !important;
+  border: 2px solid #4caf50 !important;
+}
+
+.pdf-highlight.highlight-2 {
+  background-color: rgba(33, 150, 243, 0.3) !important;
+  border: 2px solid #2196f3 !important;
+}
+
+/* Empty states */
+.pdf-empty {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  text-align: center !important;
+  padding: var(--space-12) !important;
+  color: var(--win95-text-muted) !important;
+}
+
+.pdf-empty .empty-icon {
+  font-size: 4rem !important;
+  margin-bottom: var(--space-6) !important;
+  color: var(--primary-blue) !important;
+  opacity: 0.7 !important;
+}
+
+.empty-message {
+  font-family: var(--font-display) !important;
+  font-size: var(--text-lg) !important;
+  font-weight: var(--font-medium) !important;
+  line-height: var(--leading-normal) !important;
+}
+
+/* Force react-pdf to be visible */
+.react-pdf__Document {
+  display: block !important;
+  position: relative !important;
+}
+
+.react-pdf__Page {
+  position: relative !important;
+  display: inline-block !important;
+}
+
+.react-pdf__Page__canvas {
+  display: block !important;
+  border: 2px solid var(--win95-border) !important;
+  box-shadow: var(--shadow-medium) !important;
+}
+
+/* Debug styles - temporarily make everything visible */
+.pdf-content * {
+  border: 1px solid red !important;
+  background-color: rgba(255, 0, 0, 0.1) !important;
+}

@@ -1,735 +1,576 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faTimes,
-  faSearchPlus,
-  faSearchMinus,
-  faExpand,
-  faCompress,
-  faHighlighter,
-  faFileAlt,
-  faEye,
-  faEyeSlash,
-  faSpinner
-} from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import '../styles/pdf-viewer.css'
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-const PDFJSViewer = ({ document: pdfDocument, selectedProvenance, onClose, isGridMode = false }) => {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1.2);
+// Multiple worker configurations to try
+const WORKER_CONFIGS = [
+  `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.mjs`,
+  `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.js`,
+  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`,
+  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`,
+  // Fallback to known working version
+  `https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`,
+  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`
+];
+
+const PDFViewer = ({ pdfDocument, selectedProvenance, onClose }) => {
+  const [numPages, setNumPages] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [scale, setScale] = useState(1.0);
+  const [pdfUrl, setPdfUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showHighlights, setShowHighlights] = useState(true);
-  const [pdfDoc, setPdfDoc] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [sentences, setSentences] = useState([]);
-  const [textContent, setTextContent] = useState('');
-
-  const canvasRef = useRef(null);
-  const textLayerRef = useRef(null);
+  const [urlReady, setUrlReady] = useState(false);
+  const [textItems, setTextItems] = useState(new Map()); // Map of page -> text items
+  const [workerIndex, setWorkerIndex] = useState(0);
+  const [workerInitialized, setWorkerInitialized] = useState(false);
   const containerRef = useRef(null);
-  const highlightLayerRef = useRef(null);
 
-  // Check PDF.js availability
+  // Memoize document options to prevent unnecessary reloads
+  const documentOptions = useMemo(() => ({
+    cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+    cMapPacked: true,
+  }), []);
+
+  // Initialize PDF.js worker with cycling capability
   useEffect(() => {
-    const checkPDFJS = () => {
-      if (window.pdfjsLib) {
-        console.log('✅ PDF.js already available');
-        
-        // Ensure worker is set (in case it wasn't set in index.html)
-        if (!window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
-          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-          console.log('✅ PDF.js worker source set');
+    const initializeWorker = async () => {
+      const workerUrl = WORKER_CONFIGS[workerIndex];
+      console.log(`🔧 Trying PDF.js worker ${workerIndex + 1}/${WORKER_CONFIGS.length}: ${workerUrl}`);
+      
+      pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+      
+      // Test if worker URL is accessible
+      try {
+        const response = await fetch(workerUrl, { method: 'HEAD' });
+        if (response.ok) {
+          console.log(`✅ Worker ${workerIndex + 1} is accessible`);
+          setWorkerInitialized(true);
+          setError(null);
+        } else {
+          throw new Error(`Worker returned ${response.status}`);
         }
+      } catch (workerError) {
+        console.warn(`⚠️ Worker ${workerIndex + 1} failed: ${workerError.message}`);
         
-        return;
-      } else {
-        console.warn('⚠️ PDF.js not found - make sure it\'s loaded in index.html');
-        setError('PDF.js library not available. Please ensure it\'s loaded in your HTML.');
+        // Try next worker if available
+        if (workerIndex < WORKER_CONFIGS.length - 1) {
+          setTimeout(() => {
+            setWorkerIndex(prev => prev + 1);
+          }, 100);
+        } else {
+          setError(`All PDF.js workers failed. Last error: ${workerError.message}`);
+          setLoading(false);
+        }
       }
     };
 
-    // Check immediately
-    checkPDFJS();
-    
-    // If not available, wait a bit and check again (in case it's still loading)
-    if (!window.pdfjsLib) {
-      const timeout = setTimeout(checkPDFJS, 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, []);
+    initializeWorker();
+  }, [workerIndex]);
 
-  // Load PDF document
+  // Reset worker cycling when document changes
   useEffect(() => {
-    if (!pdfDocument || !window.pdfjsLib) return;
-
-    loadPDFDocument();
+    if (pdfDocument) {
+      setWorkerIndex(0);
+      setWorkerInitialized(false);
+      setError(null);
+      setLoading(true);
+    }
   }, [pdfDocument]);
 
-  // Load sentences from backend
+  // Generate PDF URL (only when worker is ready)
   useEffect(() => {
-    if (!pdfDocument) return;
-
-    loadSentences();
-  }, [pdfDocument]);
-
-  // Handle provenance highlighting
-  useEffect(() => {
-    if (selectedProvenance && sentences.length > 0 && showHighlights) {
-      console.log('🎯 PDFJSViewer highlighting provenance:', {
-        provenanceId: selectedProvenance.provenance_id,
-        sentenceIds: selectedProvenance.sentences_ids
-      });
-
-      highlightProvenance();
-    } else if (!showHighlights) {
-      clearHighlights();
+    if (!pdfDocument || !workerInitialized) {
+      setPdfUrl(null);
+      return;
     }
-  }, [selectedProvenance, sentences, showHighlights, currentPage]);
 
-  const loadPDFDocument = async () => {
-    setLoading(true);
-    setError(null);
-
-    let pdfUrl = '';
-
-    try {
-
-
-      console.log('🔍 PDF Document Debug:', {
-        hasFile: !!pdfDocument.file,
-        backendDocumentId: pdfDocument.backendDocumentId,
-        isPreloaded: pdfDocument.isPreloaded,
+    const ensureDocumentAndGetPdfUrl = async () => {
+      const baseUrl = process.env.REACT_APP_API_URL || '';
+      const docId = pdfDocument.backendDocumentId || pdfDocument.document_id;
+      
+      console.log('📄 Setting up PDF for document:', {
         filename: pdfDocument.filename,
-        id: pdfDocument.id
+        isPreloaded: pdfDocument.isPreloaded || pdfDocument.isPreLoaded,
+        backendDocumentId: docId,
+        workerIndex: workerIndex + 1
       });
 
-      // Determine how to load the PDF
-      if (pdfDocument.file) {
-        // File upload case - direct file object
-        pdfUrl = URL.createObjectURL(pdfDocument.file);
-        console.log('📁 Using file object URL');
-      } else if (pdfDocument.backendDocumentId) {
-        // Backend document case - use the PDF endpoint
-        pdfUrl = `/api/documents/${pdfDocument.backendDocumentId}/pdf`;
-        console.log('🔗 Using backend PDF URL:', pdfUrl);
-      } else if (pdfDocument.id) {
-        // Use the document ID if available
-        pdfUrl = `/api/documents/${pdfDocument.id}/pdf`;
-        console.log('🆔 Using document ID PDF URL:', pdfUrl);
-      } else if (pdfDocument.isPreloaded || pdfDocument.isPreLoaded) {
-        // Preloaded document case - try uploads directory
-        pdfUrl = `/uploads/${pdfDocument.filename}`;
-        console.log('📚 Using preloaded PDF URL:', pdfUrl);
-      } else {
-        throw new Error('No valid PDF source found - missing document ID or file');
+      // For preloaded documents, ensure they're loaded first
+      if (pdfDocument.isPreloaded || pdfDocument.isPreLoaded) {
+        try {
+          console.log('🔄 Ensuring preloaded document is activated...');
+          const response = await fetch(`${baseUrl}/api/documents/preloaded/${docId}`, {
+            method: 'POST'
+          });
+          
+          if (!response.ok) {
+            console.warn('⚠️ Preloaded document activation failed, but continuing...');
+          } else {
+            console.log('✅ Preloaded document activated');
+          }
+        } catch (error) {
+          console.warn('⚠️ Preloaded document activation error:', error.message);
+        }
       }
 
-      console.log('🎯 Final PDF URL:', pdfUrl);
-
-      // Test if the URL is accessible before loading with PDF.js
+      const pdfUrl = `${baseUrl}/api/documents/${docId}/pdf`;
+      const absolutePdfUrl = new URL(pdfUrl, window.location.origin).href;
+      console.log('📄 PDF URLs:', { relative: pdfUrl, absolute: absolutePdfUrl });
+      
+      // Test if the PDF URL is accessible
       try {
-        const testResponse = await fetch(pdfUrl, { method: 'HEAD' });
+        console.log('🔍 Testing PDF URL accessibility...');
+        const testResponse = await fetch(absolutePdfUrl, { method: 'HEAD' });
+        console.log('📊 PDF URL test response:', {
+          status: testResponse.status,
+          statusText: testResponse.statusText,
+          contentType: testResponse.headers.get('content-type'),
+          contentLength: testResponse.headers.get('content-length')
+        });
+        
         if (!testResponse.ok) {
-          throw new Error(`PDF not accessible: ${testResponse.status} ${testResponse.statusText}`);
+          setError(`PDF endpoint returned ${testResponse.status}: ${testResponse.statusText}`);
+          setLoading(false);
+          return;
         }
-        console.log('✅ PDF URL is accessible');
+        
+        if (!testResponse.headers.get('content-type')?.includes('pdf')) {
+          console.warn('⚠️ Response is not a PDF:', testResponse.headers.get('content-type'));
+        }
+        
       } catch (fetchError) {
         console.error('❌ PDF URL test failed:', fetchError);
-        throw new Error(`Cannot access PDF: ${fetchError.message}`);
+        setError(`PDF URL not accessible: ${fetchError.message}`);
+        setLoading(false);
+        return;
       }
-
-      const loadingTask = window.pdfjsLib.getDocument({
-        url: pdfUrl,
-        // Add some options for better compatibility
-        verbosity: 0, // Reduce console spam
-        cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
-        cMapPacked: true
-      });
-
-      const pdf = await loadingTask.promise;
-
-      setPdfDoc(pdf);
-      setTotalPages(pdf.numPages);
-      setCurrentPage(1);
-
-      console.log('✅ PDF loaded successfully:', pdf.numPages, 'pages');
-      console.log('📄 PDF loaded from URL:', pdfUrl);
-
-    } catch (err) {
-      console.error('❌ Error loading PDF:', err);
-      setError(`Failed to load PDF: ${err.message}`);
-
-      // Try fallback approaches
-      if (pdfDocument.filename && !pdfUrl?.includes('/uploads/')) {
-        console.log('🔄 Trying fallback URL...');
-        try {
-          const fallbackUrl = `/uploads/${pdfDocument.filename}`;
-          const fallbackTask = window.pdfjsLib.getDocument(fallbackUrl);
-          const fallbackPdf = await fallbackTask.promise;
-
-          setPdfDoc(fallbackPdf);
-          setTotalPages(fallbackPdf.numPages);
-          setCurrentPage(1);
-
-          console.log('✅ PDF loaded with fallback URL:', fallbackUrl);
-          setError(null); // Clear error since fallback worked
-
-        } catch (fallbackError) {
-          console.error('❌ Fallback also failed:', fallbackError);
-          setError(`Failed to load PDF: ${err.message}. Fallback also failed: ${fallbackError.message}`);
+      
+      console.log('✅ PDF URL validated, setting for react-pdf...');
+      setPdfUrl(absolutePdfUrl);
+      setUrlReady(true);
+      
+      // Set a timeout to catch if react-pdf never starts loading
+      setTimeout(() => {
+        if (loading && urlReady) {
+          console.warn('⚠️ react-pdf timeout: Document component never started loading');
+          // Try next worker
+          if (workerIndex < WORKER_CONFIGS.length - 1) {
+            console.log('🔄 Trying next worker due to timeout...');
+            setWorkerIndex(prev => prev + 1);
+            setUrlReady(false);
+            setPdfUrl(null);
+          } else {
+            setError('PDF loading timed out - all workers exhausted');
+            setLoading(false);
+          }
         }
-      }
-    } finally {
+      }, 10000); // 10 second timeout
+    };
+
+    ensureDocumentAndGetPdfUrl();
+  }, [pdfDocument, workerInitialized, workerIndex]);
+
+  // Handle successful PDF load
+  const onDocumentLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
+    setLoading(false);
+    setError(null);
+    console.log('✅ PDF loaded successfully:', { 
+      numPages, 
+      filename: pdfDocument?.filename,
+      workerUsed: workerIndex + 1
+    });
+  };
+
+  // Handle PDF load error with worker cycling
+  const onDocumentLoadError = (error) => {
+    console.error('❌ PDF load error:', error);
+    
+    // Try next worker if available
+    if (workerIndex < WORKER_CONFIGS.length - 1) {
+      console.log('🔄 Trying next worker due to load error...');
+      setWorkerIndex(prev => prev + 1);
+      setUrlReady(false);
+      setPdfUrl(null);
+      setError(null);
+    } else {
+      setError(`Failed to load PDF with all workers. Last error: ${error.message}`);
       setLoading(false);
     }
   };
 
-  const loadSentences = async () => {
-    if (!pdfDocument) return;
+  // Handle load start
+  const onDocumentLoadStart = () => {
+    console.log('🔄 react-pdf: Load started successfully!');
+    setLoading(true);
+    setError(null);
+  };
 
-    try {
-      // Try multiple approaches to get the document ID
-      const backendDocumentId = pdfDocument.backendDocumentId || pdfDocument.id;
+  // Handle source success
+  const onSourceSuccess = () => {
+    console.log('✅ react-pdf: Source loaded successfully');
+  };
 
-      console.log('🔍 Loading sentences for document:', {
-        backendDocumentId,
-        filename: pdfDocument.filename,
-        isPreloaded: pdfDocument.isPreloaded
-      });
+  // Handle source error with worker cycling
+  const onSourceError = (error) => {
+    console.error('❌ react-pdf: Source error:', error);
+    
+    // Try next worker if available
+    if (workerIndex < WORKER_CONFIGS.length - 1) {
+      console.log('🔄 Trying next worker due to source error...');
+      setWorkerIndex(prev => prev + 1);
+      setUrlReady(false);
+      setPdfUrl(null);
+      setError(null);
+    } else {
+      setError(`PDF source error with all workers. Last error: ${error.message}`);
+      setLoading(false);
+    }
+  };
 
-      if (backendDocumentId) {
-        try {
-          const response = await fetch(`/api/documents/${backendDocumentId}/text`);
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.text) {
-              setTextContent(data.text);
-              // Split into sentences (you might want to use your exact sentence splitting logic)
-              const sentenceList = data.text.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
-              setSentences(sentenceList);
-              console.log('✅ Loaded sentences from text endpoint:', sentenceList.length);
-              return;
-            }
-          }
-          console.log('⚠️ Text endpoint failed, trying fallback approaches');
-        } catch (error) {
-          console.log('⚠️ Text endpoint error:', error);
-        }
+  // Handle page render success to extract text items for highlighting
+  const onPageRenderSuccess = (page) => {
+    const pageNum = page.pageNumber;
+    
+    // Get text content for this page
+    page.getTextContent().then((textContent) => {
+      const items = textContent.items.map((item, index) => ({
+        id: index,
+        text: item.str,
+        transform: item.transform,
+        width: item.width,
+        height: item.height,
+        // Calculate position from transform matrix
+        x: item.transform[4],
+        y: item.transform[5],
+        fontSize: item.transform[0]
+      }));
+      
+      setTextItems(prev => new Map(prev).set(pageNum, items));
+    }).catch(console.error);
+  };
+
+  // Find text items that match provenance content
+  const findProvenanceMatches = (pageItems, provenanceText) => {
+    if (!pageItems || !provenanceText) return [];
+    
+    const matches = [];
+    const searchText = provenanceText.toLowerCase().trim();
+    
+    // Try to find longer phrase matches first
+    const words = searchText.split(/\s+/).filter(word => word.length > 2);
+    
+    for (let i = 0; i < pageItems.length; i++) {
+      const item = pageItems[i];
+      const itemText = item.text.toLowerCase();
+      
+      // Look for exact matches of significant words
+      if (words.some(word => itemText.includes(word) && word.length > 3)) {
+        matches.push(item);
       }
-
-      // Fallback - use existing text if available  
-      if (pdfDocument.fullText) {
-        setTextContent(pdfDocument.fullText);
-        const sentenceList = pdfDocument.fullText.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
-        setSentences(sentenceList);
-        console.log('✅ Used fallback text from document object');
-      } else {
-        console.log('⚠️ No text content available for sentence extraction');
+      
+      // Also check if the provenance text contains this item's text
+      if (itemText.length > 3 && searchText.includes(itemText.trim())) {
+        matches.push(item);
       }
-
-    } catch (err) {
-      console.error('❌ Error loading sentences:', err);
     }
+    
+    return matches;
   };
 
-  const renderPage = async (pageNum) => {
-    if (!pdfDoc || !canvasRef.current) return;
-
-    try {
-      const page = await pdfDoc.getPage(pageNum);
-      const viewport = page.getViewport({
-        scale: zoomLevel,
-        rotation: 0 
-      });
-
-      const canvas = canvasRef.current;
-      const context = canvas.getContext('2d');
-
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      const renderContext = {
-        canvasContext: context,
-        viewport: viewport
-      };
-
-      await page.render(renderContext).promise;
-
-      // Render text layer for searching
-      await renderTextLayer(page, viewport);
-
-      console.log(`✅ Rendered page ${pageNum}`);
-
-    } catch (err) {
-      console.error(`❌ Error rendering page ${pageNum}:`, err);
-    }
-  };
-
-  const renderTextLayer = async (page, viewport) => {
-    if (!textLayerRef.current) return;
-
-    try {
-      const textContent = await page.getTextContent();
-
-      // Clear previous text layer
-      textLayerRef.current.innerHTML = '';
-      textLayerRef.current.style.left = '0px';
-      textLayerRef.current.style.top = '0px';
-      textLayerRef.current.style.width = viewport.width + 'px';
-      textLayerRef.current.style.height = viewport.height + 'px';
-
-      // Create text layer
-      const textLayer = new window.pdfjsLib.TextLayer({
-        textContentSource: textContent,
-        container: textLayerRef.current,
-        viewport: viewport,
-        textDivs: []
-      });
-
-      await textLayer.render();
-
-      console.log('✅ Text layer rendered');
-
-    } catch (err) {
-      console.error('❌ Error rendering text layer:', err);
-    }
-  };
-
-  const highlightProvenance = () => {
-    if (!selectedProvenance?.sentences_ids || !sentences.length) return;
-
-    clearHighlights();
-
-    try {
-      // Get sentences to highlight
-      const sentencesToHighlight = selectedProvenance.sentences_ids
-        .filter(id => id >= 0 && id < sentences.length)
-        .map(id => sentences[id]);
-
-      console.log('🔍 Highlighting sentences:', sentencesToHighlight.length);
-
-      // Search for each sentence in the text layer and highlight
-      sentencesToHighlight.forEach((sentence, index) => {
-        highlightTextInLayer(sentence, index);
-      });
-
-      // Scroll to first highlight
-      setTimeout(() => scrollToFirstHighlight(), 500);
-
-    } catch (err) {
-      console.error('❌ Error highlighting provenance:', err);
-    }
-  };
-
-  const highlightTextInLayer = (searchText, highlightIndex) => {
-    if (!textLayerRef.current || !searchText || searchText.length < 10) return;
-
-    const textLayer = textLayerRef.current;
-    const textDivs = textLayer.querySelectorAll('.textLayer > span, .textLayer > div');
-
-    // Clean search text
-    const cleanSearchText = searchText.trim().replace(/\s+/g, ' ');
-    const searchWords = cleanSearchText.split(/\s+/).filter(word => word.length > 3);
-
-    if (searchWords.length === 0) return;
-
-    // Try to find text spans that contain our search words
-    const matchingSpans = [];
-
-    textDivs.forEach((span, spanIndex) => {
-      const spanText = span.textContent.trim();
-      if (!spanText) return;
-
-      // Check if this span contains significant words from our search
-      const spanWords = spanText.toLowerCase().split(/\s+/);
-      const matchCount = searchWords.filter(word =>
-        spanWords.some(spanWord => spanWord.includes(word.toLowerCase()))
-      ).length;
-
-      if (matchCount >= Math.min(2, searchWords.length * 0.5)) {
-        matchingSpans.push({ span, spanIndex, matchCount });
+  // Create highlight overlays for provenance
+  const createHighlightOverlays = (pageNum) => {
+    if (!selectedProvenance || !selectedProvenance.content) return null;
+    
+    const pageItems = textItems.get(pageNum);
+    if (!pageItems) return null;
+    
+    // Get all content text from the provenance
+    const provenanceTexts = Array.isArray(selectedProvenance.content) 
+      ? selectedProvenance.content 
+      : [selectedProvenance.content];
+    
+    const allMatches = [];
+    provenanceTexts.forEach((text, textIndex) => {
+      if (typeof text === 'string') {
+        const matches = findProvenanceMatches(pageItems, text);
+        // Add text index to distinguish different provenance segments
+        matches.forEach(match => {
+          allMatches.push({ ...match, provenanceIndex: textIndex });
+        });
       }
     });
-
-    // Sort by match quality and highlight the best matches
-    matchingSpans
-      .sort((a, b) => b.matchCount - a.matchCount)
-      .slice(0, Math.min(5, matchingSpans.length)) // Limit highlights per sentence
-      .forEach(({ span }) => {
-        highlightSpan(span, highlightIndex);
-      });
+    
+    return allMatches.map((match, index) => (
+      <div
+        key={`highlight-${pageNum}-${index}`}
+        className={`pdf-highlight highlight-${match.provenanceIndex % 3}`}
+        style={{
+          position: 'absolute',
+          left: `${(match.x / 612) * 100}%`, // Assuming standard page width
+          top: `${100 - ((match.y + match.height) / 792) * 100}%`, // Assuming standard page height
+          width: `${Math.max((match.width / 612) * 100, 0.5)}%`,
+          height: `${Math.max((match.height / 792) * 100, 0.5)}%`,
+          pointerEvents: 'none',
+          zIndex: 10,
+          minWidth: '4px',
+          minHeight: '12px'
+        }}
+        title={`Provenance ${match.provenanceIndex + 1}: ${match.text}`}
+      />
+    ));
   };
 
-  const highlightSpan = (span, highlightIndex) => {
-    // Create highlight overlay
-    const highlight = document.createElement('div');
-    highlight.className = `pdf-highlight provenance-${highlightIndex % 5}`;
-    highlight.style.position = 'absolute';
-    highlight.style.left = span.style.left;
-    highlight.style.top = span.style.top;
-    highlight.style.width = span.style.width || 'auto';
-    highlight.style.height = span.style.height || 'auto';
-    highlight.style.fontSize = span.style.fontSize;
-    highlight.style.fontFamily = span.style.fontFamily;
-    highlight.style.pointerEvents = 'none';
-    highlight.style.zIndex = '10';
-
-    // Add to highlight layer
-    if (highlightLayerRef.current) {
-      highlightLayerRef.current.appendChild(highlight);
-    }
+  // Navigation functions
+  const goToPrevPage = () => {
+    setPageNumber(prev => Math.max(1, prev - 1));
   };
 
-  const clearHighlights = () => {
-    if (highlightLayerRef.current) {
-      highlightLayerRef.current.innerHTML = '';
-    }
+  const goToNextPage = () => {
+    setPageNumber(prev => Math.min(numPages || 1, prev + 1));
   };
 
-  const scrollToFirstHighlight = () => {
-    const firstHighlight = highlightLayerRef.current?.querySelector('.pdf-highlight');
-    if (firstHighlight && containerRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const highlightRect = firstHighlight.getBoundingClientRect();
-
-      const scrollTop = highlightRect.top - containerRect.top + containerRef.current.scrollTop - 100;
-
-      containerRef.current.scrollTo({
-        top: scrollTop,
-        behavior: 'smooth'
-      });
-
-      // Add pulse animation
-      firstHighlight.style.animation = 'highlightPulse 2s ease-in-out';
-      setTimeout(() => {
-        if (firstHighlight.style) {
-          firstHighlight.style.animation = '';
-        }
-      }, 2000);
-    }
+  const zoomIn = () => {
+    setScale(prev => Math.min(3.0, prev + 0.2));
   };
 
-  // Re-render page when zoom changes
-  useEffect(() => {
-    if (pdfDoc && currentPage) {
-      renderPage(currentPage);
-    }
-  }, [pdfDoc, currentPage, zoomLevel]);
-
-  const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev + 0.25, 3));
+  const zoomOut = () => {
+    setScale(prev => Math.max(0.5, prev - 0.2));
   };
 
-  const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev - 0.25, 0.5));
+  const resetZoom = () => {
+    setScale(1.0);
   };
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-  };
-
-  const toggleHighlights = () => {
-    setShowHighlights(!showHighlights);
-  };
-
-  const goToPage = (pageNum) => {
-    if (pageNum >= 1 && pageNum <= totalPages) {
-      setCurrentPage(pageNum);
+  // Manual retry function
+  const retryWithNextWorker = () => {
+    if (workerIndex < WORKER_CONFIGS.length - 1) {
+      setWorkerIndex(prev => prev + 1);
+      setError(null);
+      setLoading(true);
+      setUrlReady(false);
+      setPdfUrl(null);
     }
   };
 
   if (!pdfDocument) {
     return (
-      <div className="pdf-viewer">
-        <div className="pdf-empty">
-          <div className="empty-icon">
-            <FontAwesomeIcon icon={faFileAlt} />
-          </div>
-          <div className="empty-message">
-            NO_DOCUMENT_SELECTED
-            <br />
-            <span style={{ fontSize: '11px', color: 'var(--win95-text-muted)' }}>
-              Upload PDF to view content
-            </span>
-          </div>
+      <div className="pdf-empty">
+        <div className="empty-icon">📄</div>
+        <div className="empty-message">No document selected</div>
+      </div>
+    );
+  }
+
+  if (loading && !error) {
+    return (
+      <div className="pdf-empty">
+        <div className="empty-icon">⏳</div>
+        <div className="empty-message">
+          Loading PDF: {pdfDocument.filename}
+          <br />
+          <small style={{ color: '#666', marginTop: '0.5rem', display: 'block' }}>
+            Worker {workerIndex + 1}/{WORKER_CONFIGS.length}
+            {!workerInitialized && ' - Initializing worker...'}
+            {workerInitialized && !urlReady && ' - Preparing PDF...'}
+            {urlReady && ' - Loading document...'}
+          </small>
         </div>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className="pdf-empty">
+        <div className="empty-icon">⚠️</div>
+        <div className="empty-message">PDF Load Error</div>
+        <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: 'var(--win95-text-muted)' }}>
+          {error}
+        </p>
+        <div style={{ marginTop: '1rem', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
+          Document: {pdfDocument.filename}<br/>
+          Type: {pdfDocument.isPreloaded ? 'Preloaded' : 'Uploaded'}<br/>
+          ID: {pdfDocument.backendDocumentId}<br/>
+          Worker: {workerIndex + 1}/{WORKER_CONFIGS.length}
+        </div>
+        {workerIndex < WORKER_CONFIGS.length - 1 && (
+          <button 
+            onClick={retryWithNextWorker}
+            style={{ 
+              marginTop: '1rem', 
+              padding: '0.5rem 1rem',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            Try Worker {workerIndex + 2}
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className="pdf-viewer" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className="pdf-viewer">
       {/* PDF Header */}
       <div className="pdf-header">
         <div className="pdf-title">
-          <FontAwesomeIcon icon={faFileAlt} />
           <span className="doc-name">{pdfDocument.filename}</span>
+          {pdfDocument.isPreloaded && (
+            <span className="preloaded-indicator">PRELOADED</span>
+          )}
           {selectedProvenance && (
             <span className="provenance-indicator">
-              PROV_{String(selectedProvenance.provenance_id || 0).padStart(3, '0')}_HIGHLIGHTED
+              📍 PROV {selectedProvenance.provenance_id || '#'}
             </span>
           )}
-          {pdfDocument.isPreloaded && (
-            <span className="preloaded-indicator">📚 PRELOADED</span>
-          )}
+          <small style={{ marginLeft: '1rem', color: '#666' }}>
+            Worker {workerIndex + 1}/{WORKER_CONFIGS.length}
+          </small>
         </div>
-
+        
         <div className="pdf-controls">
-          <button
-            className="control-btn"
-            onClick={toggleHighlights}
-            title={showHighlights ? "Hide Highlights" : "Show Highlights"}
-          >
-            <FontAwesomeIcon icon={showHighlights ? faEye : faEyeSlash} />
+          <button className="control-btn" onClick={goToPrevPage} disabled={pageNumber <= 1}>
+            ←
           </button>
-
-          <button className="control-btn" onClick={handleZoomOut} title="Zoom Out">
-            <FontAwesomeIcon icon={faSearchMinus} />
+          <span className="zoom-level">
+            {pageNumber} / {numPages}
+          </span>
+          <button className="control-btn" onClick={goToNextPage} disabled={pageNumber >= numPages}>
+            →
           </button>
-
-          <span className="zoom-level">{Math.round(zoomLevel * 100)}%</span>
-
-          <button className="control-btn" onClick={handleZoomIn} title="Zoom In">
-            <FontAwesomeIcon icon={faSearchPlus} />
+          
+          <button className="control-btn" onClick={zoomOut} disabled={scale <= 0.5}>
+            -
           </button>
-
-          {!isGridMode && (
-            <>
-              <button className="control-btn" onClick={toggleFullscreen} title="Toggle Fullscreen">
-                <FontAwesomeIcon icon={isFullscreen ? faCompress : faExpand} />
-              </button>
-
-              <button className="control-btn close-btn" onClick={onClose} title="Close">
-                <FontAwesomeIcon icon={faTimes} />
-              </button>
-            </>
+          <span className="zoom-level">
+            {Math.round(scale * 100)}%
+          </span>
+          <button className="control-btn" onClick={zoomIn} disabled={scale >= 3.0}>
+            +
+          </button>
+          
+          {onClose && (
+            <button className="control-btn close-btn" onClick={onClose}>
+              ✕
+            </button>
           )}
         </div>
       </div>
 
-      {/* PDF Content */}
-      <div className="pdf-content" ref={containerRef} style={{ flex: 1, overflow: 'auto', position: 'relative' }}>
-        {loading && (
-          <div className="pdf-loading">
-            <FontAwesomeIcon icon={faSpinner} spin />
-            <span>Loading PDF...</span>
+      {/* Document Info Panel */}
+      <div className="document-info">
+        <div className="info-item">
+          <strong>Document:</strong> {pdfDocument.filename}
+        </div>
+        <div className="info-item">
+          <strong>Type:</strong> {pdfDocument.isPreloaded ? 'Preloaded Research Paper' : 'Uploaded Document'}
+        </div>
+        <div className="info-item">
+          <strong>Pages:</strong> {numPages}
+        </div>
+        <div className="info-item">
+          <strong>Scale:</strong> {Math.round(scale * 100)}%
+        </div>
+        <div className="info-item">
+          <strong>Worker:</strong> {workerIndex + 1}/{WORKER_CONFIGS.length}
+        </div>
+        {pdfDocument.textLength && (
+          <div className="info-item">
+            <strong>Text Length:</strong> {Math.round(pdfDocument.textLength / 1000)}k chars
           </div>
         )}
-
-        {error && (
-          <div className="pdf-error">
-            <div style={{ color: 'red', marginBottom: '10px' }}>❌ {error}</div>
-            <button onClick={() => loadPDFDocument()} className="retry-btn">
-              Retry Loading
-            </button>
+        {pdfDocument.sentenceCount && (
+          <div className="info-item">
+            <strong>Sentences:</strong> {pdfDocument.sentenceCount}
           </div>
-        )}
-
-        {pdfDoc && !loading && !error && (
-          <>
-            {/* Page Navigation */}
-            <div className="page-navigation">
-              <button
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={currentPage <= 1}
-                className="nav-btn"
-              >
-                Previous
-              </button>
-
-              <span className="page-info">
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <button
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={currentPage >= totalPages}
-                className="nav-btn"
-              >
-                Next
-              </button>
-            </div>
-
-            {/* PDF Rendering Container */}
-            <div className="pdf-page-container" style={{ position: 'relative', display: 'inline-block' }}>
-              {/* PDF Canvas */}
-              <canvas
-                ref={canvasRef}
-                style={{ display: 'block', border: '1px solid #ccc' }}
-              />
-
-              {/* Text Layer for Selection/Search */}
-              <div
-                ref={textLayerRef}
-                className="textLayer"
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  overflow: 'hidden',
-                  opacity: 0.2,
-                  lineHeight: 1.0,
-                  pointerEvents: 'none'
-                }}
-              />
-
-              {/* Highlight Layer */}
-              <div
-                ref={highlightLayerRef}
-                className="highlightLayer"
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  overflow: 'hidden',
-                  pointerEvents: 'none',
-                  zIndex: 10
-                }}
-              />
-            </div>
-
-            {/* Provenance Info */}
-            {/*selectedProvenance && showHighlights && (
-              <div className="provenance-info" style={{
-                margin: '20px',
-                padding: '15px',
-                backgroundColor: '#f5f5f5',
-                border: '1px solid #ddd',
-                borderRadius: '5px'
-              }}>
-                <h4>
-                  <FontAwesomeIcon icon={faHighlighter} />
-                  Highlighted Provenance Evidence
-                </h4>
-                <div><strong>Provenance ID:</strong> {selectedProvenance.provenance_id}</div>
-                <div><strong>Sentences:</strong> {selectedProvenance.sentences_ids?.length || 0}</div>
-                <div><strong>Processing Time:</strong> {selectedProvenance.time?.toFixed(2) || 'N/A'}s</div>
-              </div>
-            )*/}
-          </>
         )}
       </div>
 
-      {/* Add CSS styles to head */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .pdf-highlight {
-            background-color: rgba(255, 235, 59, 0.4);
-            border: 2px solid #ffeb3b;
-            border-radius: 3px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          }
-          
-          .pdf-highlight.provenance-0 {
-            background-color: rgba(255, 235, 59, 0.4);
-            border-color: #ffeb3b;
-          }
-          
-          .pdf-highlight.provenance-1 {
-            background-color: rgba(76, 175, 80, 0.4);
-            border-color: #4caf50;
-          }
-          
-          .pdf-highlight.provenance-2 {
-            background-color: rgba(33, 150, 243, 0.4);
-            border-color: #2196f3;
-          }
-          
-          .pdf-highlight.provenance-3 {
-            background-color: rgba(255, 152, 0, 0.4);
-            border-color: #ff9800;
-          }
-          
-          .pdf-highlight.provenance-4 {
-            background-color: rgba(156, 39, 176, 0.4);
-            border-color: #9c27b0;
-          }
+      {/* Highlight Legend */}
+      {selectedProvenance && selectedProvenance.content && (
+        <div className="highlight-legend">
+          <h4>📍 Provenance Highlighting</h4>
+          <div className="legend-items">
+            <div className="legend-item">
+              <div className="legend-color highlight-0"></div>
+              <span>Primary Evidence</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color highlight-1"></div>
+              <span>Supporting Context</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color highlight-2"></div>
+              <span>Related Information</span>
+            </div>
+          </div>
+          <div className="provenance-summary">
+            <div className="summary-item">
+              <span className="summary-label">Provenance ID:</span>
+              <span className="summary-value">{selectedProvenance.provenance_id || 'N/A'}</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Text Segments:</span>
+              <span className="summary-value">
+                {Array.isArray(selectedProvenance.content) 
+                  ? selectedProvenance.content.length 
+                  : 1
+                }
+              </span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Current Page:</span>
+              <span className="summary-value">{pageNumber} of {numPages}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
-          @keyframes highlightPulse {
-            0% { 
-              box-shadow: 0 0 0 0 rgba(255, 235, 59, 0.7);
-            }
-            70% {
-              box-shadow: 0 0 0 10px rgba(255, 235, 59, 0);
-            }
-            100% {
-              box-shadow: 0 0 0 0 rgba(255, 235, 59, 0);
-            }
-          }
-
-          .pdf-loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 200px;
-            gap: 10px;
-          }
-
-          .pdf-error {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 200px;
-            gap: 10px;
-          }
-
-          .page-navigation {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-          }
-
-          .nav-btn {
-            padding: 5px 10px;
-            border: 1px solid #ccc;
-            background: white;
-            cursor: pointer;
-          }
-
-          .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-          }
-
-          .page-info {
-            font-weight: bold;
-            min-width: 100px;
-            text-align: center;
-          }
-
-          .retry-btn {
-            padding: 8px 16px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-          }
-
-          .textLayer > span,
-          .textLayer > div {
-            color: transparent;
-            position: absolute;
-            white-space: pre;
-            cursor: text;
-            transform-origin: 0% 0%;
-          }
-        `
-      }} />
+      {/* PDF Document */}
+      <div className="pdf-content" ref={containerRef}>
+        {urlReady && pdfUrl && workerInitialized ? (
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <Document
+              file={pdfUrl}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={onDocumentLoadError}
+              onLoadStart={onDocumentLoadStart}
+              onSourceSuccess={onSourceSuccess}
+              onSourceError={onSourceError}
+              loading={<div>Loading PDF...</div>}
+              error={<div>Failed to load PDF</div>}
+              options={documentOptions}
+            >
+              <Page 
+                pageNumber={pageNumber} 
+                scale={scale}
+                onRenderSuccess={onPageRenderSuccess}
+                renderTextLayer={true}
+                renderAnnotationLayer={true}
+              />
+              {/* Provenance highlights overlay */}
+              {createHighlightOverlays(pageNumber)}
+            </Document>
+          </div>
+        ) : (
+          <div style={{ padding: '2rem', textAlign: 'center' }}>
+            <div>Preparing PDF...</div>
+            <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.5rem' }}>
+              {!workerInitialized && 'Initializing PDF.js worker...'}
+              {workerInitialized && !urlReady && 'Setting up document URL...'}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default PDFJSViewer;
+export default PDFViewer;

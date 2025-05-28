@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './styles/brutalist-design.css';
 import './styles/layout.css';
+
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import QuestionCollection from './components/QuestionCollection';
 import ProvenanceNavigator from './components/ProvenanceNavigator';
-import PDFJSViewer from './components/PDFViewer'
+//import PDFJSViewer from './components/PDFViewer2_prev'
+import PDFViewer from './components/PDFViewer';
+//import PDFViewerDebug from './components/PDFViewerDebug';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import {
@@ -496,8 +499,8 @@ const handleDocumentUpload = async (formData) => {
           {/* PDF Section */}
           <div className="pdf-section">
             {activeDocument ? (
-              <PDFJSViewer
-                document={activeDocument}
+              <PDFViewer
+                pdfDocument={activeDocument}
                 selectedProvenance={selectedProvenance}
                 onClose={() => {}}
               />

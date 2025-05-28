@@ -1,276 +1,248 @@
 import React, { useState, useEffect } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
-
-// Try multiple worker configurations - Fixed URLs
-const WORKER_CONFIGS = [
-  `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.mjs`,
-  `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.js`,
-  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`,
-  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`,
-  // Fallback to specific known working version
-  `https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`,
-  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`
-];
 
 const PDFViewerDebug = ({ pdfDocument, selectedProvenance, onClose }) => {
   const [debugInfo, setDebugInfo] = useState({});
-  const [workerIndex, setWorkerIndex] = useState(0);
-  const [pdfUrl, setPdfUrl] = useState(null);
-  const [documentState, setDocumentState] = useState('initializing');
-  const [errorLog, setErrorLog] = useState([]);
 
-  const addLog = (message, type = 'info') => {
-    const timestamp = new Date().toLocaleTimeString();
-    setErrorLog(prev => [...prev, { timestamp, message, type }]);
-    console.log(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
-  };
+  // Debug logging every time component renders
+  console.log('🔍 PDFViewerDebug Component Render:', {
+    pdfDocument,
+    hasPdfDocument: !!pdfDocument,
+    pdfDocumentType: typeof pdfDocument,
+    pdfDocumentKeys: pdfDocument ? Object.keys(pdfDocument) : [],
+    selectedProvenance,
+    onClose: typeof onClose
+  });
 
-  // Initialize PDF.js worker
   useEffect(() => {
-    const workerUrl = WORKER_CONFIGS[workerIndex];
-    pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
-    
-    addLog(`Setting PDF.js worker to: ${workerUrl}`);
-    addLog(`PDF.js version: ${pdfjs.version}`);
-    
     setDebugInfo({
-      pdfVersion: pdfjs.version,
-      workerUrl: pdfjs.GlobalWorkerOptions.workerSrc,
-      workerIndex: workerIndex
+      componentMounted: true,
+      timestamp: new Date().toISOString(),
+      pdfDocumentReceived: !!pdfDocument,
+      pdfDocumentDetails: pdfDocument ? {
+        id: pdfDocument.id,
+        filename: pdfDocument.filename,
+        backendDocumentId: pdfDocument.backendDocumentId,
+        isPreloaded: pdfDocument.isPreloaded,
+        hasAllRequiredFields: !!(pdfDocument.id && pdfDocument.filename && pdfDocument.backendDocumentId)
+      } : null
     });
-  }, [workerIndex]);
-
-  // Generate PDF URL
-  useEffect(() => {
-    if (!pdfDocument) {
-      setPdfUrl(null);
-      return;
-    }
-
-    const generatePdfUrl = async () => {
-      const baseUrl = process.env.REACT_APP_API_URL || '';
-      const docId = pdfDocument.backendDocumentId || pdfDocument.document_id;
-      
-      addLog(`Setting up PDF for document: ${pdfDocument.filename}`);
-      addLog(`Backend ID: ${docId}`);
-      
-      // For preloaded documents, ensure they're loaded first
-      if (pdfDocument.isPreloaded || pdfDocument.isPreLoaded) {
-        try {
-          addLog('Activating preloaded document...');
-          const response = await fetch(`${baseUrl}/api/documents/preloaded/${docId}`, {
-            method: 'POST'
-          });
-          
-          if (response.ok) {
-            addLog('✅ Preloaded document activated');
-          } else {
-            addLog(`⚠️ Preloaded activation returned ${response.status}`, 'warn');
-          }
-        } catch (error) {
-          addLog(`⚠️ Preloaded activation error: ${error.message}`, 'warn');
-        }
-      }
-
-      const pdfUrl = `${baseUrl}/api/documents/${docId}/pdf`;
-      const absolutePdfUrl = new URL(pdfUrl, window.location.origin).href;
-      
-      addLog(`PDF URL: ${absolutePdfUrl}`);
-      
-      // Test URL accessibility
-      try {
-        const testResponse = await fetch(absolutePdfUrl, { method: 'HEAD' });
-        addLog(`URL test: ${testResponse.status} ${testResponse.statusText}`);
-        addLog(`Content-Type: ${testResponse.headers.get('content-type')}`);
-        addLog(`Content-Length: ${testResponse.headers.get('content-length')}`);
-        
-        if (testResponse.ok) {
-          setPdfUrl(absolutePdfUrl);
-          setDocumentState('url-ready');
-          addLog('✅ PDF URL is accessible, setting for react-pdf');
-        } else {
-          addLog(`❌ PDF URL returned ${testResponse.status}`, 'error');
-          setDocumentState('url-error');
-        }
-      } catch (fetchError) {
-        addLog(`❌ URL test failed: ${fetchError.message}`, 'error');
-        setDocumentState('url-error');
-      }
-    };
-
-    generatePdfUrl();
   }, [pdfDocument]);
 
-  // Document load handlers with extensive logging
-  const onDocumentLoadStart = () => {
-    addLog('🔄 react-pdf: Document load started!');
-    setDocumentState('loading');
-  };
-
-  const onDocumentLoadSuccess = ({ numPages }) => {
-    addLog(`✅ react-pdf: Document loaded successfully! Pages: ${numPages}`);
-    setDocumentState('loaded');
-  };
-
-  const onDocumentLoadError = (error) => {
-    addLog(`❌ react-pdf: Document load error: ${error.message}`, 'error');
-    setDocumentState('error');
-  };
-
-  const onSourceSuccess = () => {
-    addLog('✅ react-pdf: Source loaded successfully');
-  };
-
-  const onSourceError = (error) => {
-    addLog(`❌ react-pdf: Source error: ${error.message}`, 'error');
-  };
-
-  // Force PDF.js test
-  const testDirectPdfJs = async () => {
-    if (!pdfUrl) return;
-    
-    addLog('🔍 Testing direct PDF.js loading...');
-    
-    try {
-      const loadingTask = pdfjs.getDocument({
-        url: pdfUrl,
-        cMapUrl: 'https://unpkg.com/pdfjs-dist@2.16.105/cmaps/',
-        cMapPacked: true,
-      });
-      
-      const pdf = await loadingTask.promise;
-      addLog(`✅ Direct PDF.js load successful! Pages: ${pdf.numPages}`);
-      
-      // Try to get first page
-      const page = await pdf.getPage(1);
-      addLog(`✅ First page loaded successfully`);
-      
-    } catch (error) {
-      addLog(`❌ Direct PDF.js load failed: ${error.message}`, 'error');
-    }
-  };
-
-  // Try different worker
-  const tryNextWorker = () => {
-    const nextIndex = (workerIndex + 1) % WORKER_CONFIGS.length;
-    setWorkerIndex(nextIndex);
-    setPdfUrl(null);
-    setDocumentState('initializing');
-    addLog(`Trying worker configuration ${nextIndex + 1}/${WORKER_CONFIGS.length}`);
-  };
-
+  // First check: No document at all
   if (!pdfDocument) {
+    console.log('❌ PDFViewerDebug: No pdfDocument prop - returning empty state');
     return (
-      <div className="pdf-empty">
-        <div className="empty-icon">📄</div>
-        <div className="empty-message">No document selected</div>
+      <div className="pdf-viewer" style={{ 
+        border: '3px solid red', 
+        padding: '2rem', 
+        backgroundColor: '#ffebee',
+        margin: '1rem',
+        maxHeight: '80vh',
+        overflowY: 'auto',
+        overflowX: 'hidden'
+      }}>
+        <h3 style={{ color: 'red' }}>PDFViewerDebug: No Document</h3>
+        <div style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+          <div><strong>pdfDocument prop:</strong> {String(pdfDocument)}</div>
+          <div><strong>Type:</strong> {typeof pdfDocument}</div>
+          <div><strong>Is null:</strong> {pdfDocument === null ? 'Yes' : 'No'}</div>
+          <div><strong>Is undefined:</strong> {pdfDocument === undefined ? 'Yes' : 'No'}</div>
+        </div>
+        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#fff', border: '1px solid #ddd' }}>
+          <strong>This means:</strong> The PDFViewer component is being called, but no document is being passed to it.
+          Check your App.js to see if activeDocument is being set correctly.
+        </div>
       </div>
     );
   }
 
+  // Second check: Document exists but missing required fields
+  const missingFields = [];
+  if (!pdfDocument.id) missingFields.push('id');
+  if (!pdfDocument.filename) missingFields.push('filename');
+  if (!pdfDocument.backendDocumentId) missingFields.push('backendDocumentId');
+
+  if (missingFields.length > 0) {
+    console.log('⚠️ PDFViewerDebug: Document missing required fields:', missingFields);
+    return (
+      <div className="pdf-viewer" style={{ 
+        border: '3px solid orange', 
+        padding: '2rem', 
+        backgroundColor: '#fff3e0',
+        margin: '1rem',
+        maxHeight: '80vh',
+        overflowY: 'auto',
+        overflowX: 'hidden'
+      }}>
+        <h3 style={{ color: 'orange' }}>PDFViewerDebug: Incomplete Document</h3>
+        <div style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>
+          <div><strong>Missing fields:</strong> {missingFields.join(', ')}</div>
+          <div><strong>Available fields:</strong> {Object.keys(pdfDocument).join(', ')}</div>
+        </div>
+        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#fff', border: '1px solid #ddd' }}>
+          <h4>Current Document Object:</h4>
+          <pre style={{ 
+            overflow: 'auto', 
+            maxHeight: '300px',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+            fontSize: '0.75rem'
+          }}>
+            {JSON.stringify(pdfDocument, null, 2)}
+          </pre>
+        </div>
+      </div>
+    );
+  }
+
+  // Third check: All good, show success
+  console.log('✅ PDFViewerDebug: Valid document, would normally render PDF viewer');
+  
   return (
-    <div className="pdf-viewer">
-      {/* Debug Header */}
-      <div className="pdf-header">
-        <div className="pdf-title">
-          <span className="doc-name">{pdfDocument.filename}</span>
-          <span style={{ marginLeft: '1rem', fontSize: '0.8rem', color: '#666' }}>
-            State: {documentState}
-          </span>
-        </div>
-        
-        <div className="pdf-controls">
-          <button className="control-btn" onClick={testDirectPdfJs}>
-            Test PDF.js
-          </button>
-          <button className="control-btn" onClick={tryNextWorker}>
-            Try Worker {workerIndex + 2}
-          </button>
-          {onClose && (
-            <button className="control-btn close-btn" onClick={onClose}>
-              ✕
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Debug Info Panel */}
-      <div className="document-info">
-        <div className="info-item">
-          <strong>PDF.js Version:</strong> {debugInfo.pdfVersion}
-        </div>
-        <div className="info-item">
-          <strong>Worker:</strong> {debugInfo.workerIndex + 1}/{WORKER_CONFIGS.length}
-        </div>
-        <div className="info-item">
-          <strong>Document State:</strong> {documentState}
-        </div>
-        <div className="info-item">
-          <strong>PDF URL Ready:</strong> {pdfUrl ? 'Yes' : 'No'}
-        </div>
-      </div>
-
-      {/* Error Log */}
+    <div className="pdf-viewer" style={{ 
+      border: '3px solid green', 
+      padding: '2rem', 
+      backgroundColor: '#e8f5e8',
+      margin: '1rem',
+      maxHeight: '80vh',
+      overflowY: 'auto',
+      overflowX: 'hidden'
+    }}>
+      <h3 style={{ color: 'green' }}>✅ PDFViewerDebug: Ready to Load PDF</h3>
+      
+      {/* Document Info */}
       <div style={{ 
-        maxHeight: '200px', 
-        overflow: 'auto', 
+        marginTop: '1rem', 
         padding: '1rem', 
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#fff', 
+        border: '1px solid #ddd',
+        fontFamily: 'monospace',
+        fontSize: '0.9rem'
+      }}>
+        <h4>Document Details:</h4>
+        <div><strong>ID:</strong> {pdfDocument.id}</div>
+        <div><strong>Filename:</strong> {pdfDocument.filename}</div>
+        <div><strong>Backend ID:</strong> {pdfDocument.backendDocumentId}</div>
+        <div><strong>Is Preloaded:</strong> {pdfDocument.isPreloaded ? 'Yes' : 'No'}</div>
+        <div><strong>Text Length:</strong> {pdfDocument.textLength || 'Not set'}</div>
+        <div><strong>Sentence Count:</strong> {pdfDocument.sentenceCount || 'Not set'}</div>
+      </div>
+
+      {/* Debug Info */}
+      <div style={{ 
+        marginTop: '1rem', 
+        padding: '1rem', 
+        backgroundColor: '#f5f5f5', 
+        border: '1px solid #ddd',
         fontFamily: 'monospace',
         fontSize: '0.8rem',
-        margin: '1rem'
+        maxHeight: '300px',
+        overflowY: 'auto'
       }}>
-        <h4>Debug Log:</h4>
-        {errorLog.map((log, index) => (
-          <div 
-            key={index} 
-            style={{ 
-              color: log.type === 'error' ? 'red' : log.type === 'warn' ? 'orange' : 'black',
-              marginBottom: '0.25rem'
-            }}
-          >
-            [{log.timestamp}] {log.message}
-          </div>
-        ))}
+        <h4>Debug Info:</h4>
+        <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+          {JSON.stringify(debugInfo, null, 2)}
+        </pre>
       </div>
 
-      {/* PDF Content */}
-      <div className="pdf-content">
-        {documentState === 'url-ready' && pdfUrl ? (
-          <div style={{ border: '2px solid blue', padding: '1rem' }}>
-            <h4>React-PDF Document Component Test</h4>
-            <p>URL: {pdfUrl}</p>
-            <p>Expected: onLoadStart should fire immediately</p>
-            
-            <Document
-              file={pdfUrl}
-              onLoadStart={onDocumentLoadStart}
-              onLoadSuccess={onDocumentLoadSuccess}
-              onLoadError={onDocumentLoadError}
-              onSourceSuccess={onSourceSuccess}
-              onSourceError={onSourceError}
-              loading={<div style={{ padding: '2rem', backgroundColor: 'yellow' }}>React-PDF Loading...</div>}
-              error={<div style={{ padding: '2rem', backgroundColor: 'red', color: 'white' }}>React-PDF Error!</div>}
-              options={{
-                cMapUrl: 'https://unpkg.com/pdfjs-dist@2.16.105/cmaps/',
-                cMapPacked: true,
-              }}
-            >
-              <Page pageNumber={1} />
-            </Document>
-          </div>
-        ) : (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <h3>Waiting for PDF URL...</h3>
-            <p>Current State: {documentState}</p>
-            {documentState === 'url-error' && (
-              <button onClick={() => window.location.reload()}>
-                Retry
-              </button>
-            )}
-          </div>
+      {/* Test PDF URL */}
+      <div style={{ marginTop: '1rem' }}>
+        <TestPDFUrl pdfDocument={pdfDocument} />
+      </div>
+
+      {/* Controls */}
+      <div style={{ marginTop: '1rem' }}>
+        <button 
+          onClick={() => console.log('Full pdfDocument object:', pdfDocument)}
+          style={{ padding: '0.5rem 1rem', marginRight: '1rem', backgroundColor: '#2196F3', color: 'white', border: 'none' }}
+        >
+          Log Full Document to Console
+        </button>
+        
+        {onClose && (
+          <button 
+            onClick={onClose}
+            style={{ padding: '0.5rem 1rem', backgroundColor: '#f44336', color: 'white', border: 'none' }}
+          >
+            Close Debug View
+          </button>
         )}
       </div>
+    </div>
+  );
+};
+
+// Helper component to test PDF URL generation
+const TestPDFUrl = ({ pdfDocument }) => {
+  const [urlTest, setUrlTest] = useState({ status: 'pending', message: 'Testing...' });
+
+  useEffect(() => {
+    const testUrl = async () => {
+      try {
+        const baseUrl = process.env.REACT_APP_API_URL || '';
+        const docId = pdfDocument.backendDocumentId || pdfDocument.document_id;
+        const pdfUrl = `${baseUrl}/api/documents/${docId}/pdf`;
+        const absoluteUrl = new URL(pdfUrl, window.location.origin).href;
+
+        console.log('🔍 Testing PDF URL:', absoluteUrl);
+
+        const response = await fetch(absoluteUrl, { method: 'HEAD' });
+        
+        setUrlTest({
+          status: response.ok ? 'success' : 'error',
+          message: response.ok ? 
+            `✅ PDF accessible (${response.status}, ${response.headers.get('content-length')} bytes)` :
+            `❌ PDF not accessible (${response.status} ${response.statusText})`,
+          url: absoluteUrl,
+          contentType: response.headers.get('content-type'),
+          contentLength: response.headers.get('content-length')
+        });
+
+      } catch (error) {
+        setUrlTest({
+          status: 'error',
+          message: `❌ URL test failed: ${error.message}`,
+          error: error.message
+        });
+      }
+    };
+
+    testUrl();
+  }, [pdfDocument]);
+
+  return (
+    <div style={{ 
+      padding: '1rem', 
+      backgroundColor: urlTest.status === 'success' ? '#e8f5e8' : '#ffebee', 
+      border: '1px solid ' + (urlTest.status === 'success' ? 'green' : 'red') 
+    }}>
+      <h4>PDF URL Test:</h4>
+      <div style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+        <div><strong>Status:</strong> {urlTest.message}</div>
+        {urlTest.url && <div><strong>URL:</strong> {urlTest.url}</div>}
+        {urlTest.contentType && <div><strong>Content-Type:</strong> {urlTest.contentType}</div>}
+        {urlTest.contentLength && <div><strong>Size:</strong> {urlTest.contentLength} bytes</div>}
+      </div>
+      
+      {urlTest.url && (
+        <div style={{ marginTop: '0.5rem' }}>
+          <a 
+            href={urlTest.url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              padding: '0.5rem 1rem', 
+              backgroundColor: '#4CAF50', 
+              color: 'white', 
+              textDecoration: 'none',
+              borderRadius: '4px',
+              fontSize: '0.8rem'
+            }}
+          >
+            Open PDF in New Tab
+          </a>
+        </div>
+      )}
     </div>
   );
 };

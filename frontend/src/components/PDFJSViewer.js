@@ -281,14 +281,14 @@ const PDFJSViewer = ({ document: pdfDocument, selectedProvenance, onClose, isGri
       textLayerRef.current.style.height = viewport.height + 'px';
 
       // Create text layer
-      const textLayer = new window.pdfjsLib.renderTextLayer({
+      const textLayer = new window.pdfjsLib.TextLayer({
         textContentSource: textContent,
         container: textLayerRef.current,
         viewport: viewport,
         textDivs: []
       });
 
-      //await textLayer.render();
+      await textLayer.render();
 
       console.log('✅ Text layer rendered');
 
@@ -595,7 +595,7 @@ const PDFJSViewer = ({ document: pdfDocument, selectedProvenance, onClose, isGri
             </div>
 
             {/* Provenance Info */}
-            {/*selectedProvenance && showHighlights && (
+            {selectedProvenance && showHighlights && (
               <div className="provenance-info" style={{
                 margin: '20px',
                 padding: '15px',
@@ -611,7 +611,7 @@ const PDFJSViewer = ({ document: pdfDocument, selectedProvenance, onClose, isGri
                 <div><strong>Sentences:</strong> {selectedProvenance.sentences_ids?.length || 0}</div>
                 <div><strong>Processing Time:</strong> {selectedProvenance.time?.toFixed(2) || 'N/A'}s</div>
               </div>
-            )*/}
+            )}
           </>
         )}
       </div>

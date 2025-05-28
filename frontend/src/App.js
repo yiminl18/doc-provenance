@@ -6,9 +6,10 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import QuestionCollection from './components/QuestionCollection';
 import ProvenanceNavigator from './components/ProvenanceNavigator';
-//import PDFJSViewer from './components/PDFViewer2_prev'
-import PDFViewer from './components/PDFViewer';
-//import PDFViewerDebug from './components/PDFViewerDebug';
+import PDFViewer from './components/CleanPDFViewer'
+import SentenceBasedPDFViewer from './components/SentenceBasedPDFViewer';
+//import PDFViewer from './components/PDFJSViewer'
+//import PDFViewer from './components/PDFViewer';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import {
@@ -98,7 +99,6 @@ const handlePreloadedSelect = async (document) => {
         const doc = newDocs.get(docId);
         if (doc) {
           doc.isPreloaded = true;
-          doc.isPreLoaded = true; // Support both naming conventions
           doc.backendDocumentId = document.document_id; // This is crucial for PDF serving
           doc.textLength = document.text_length || response.text_length;
           doc.sentenceCount = document.sentence_count || response.sentence_count;
@@ -155,7 +155,7 @@ const handlePreloadedSelect = async (document) => {
 };
 
 // Also update the createNewDocument function to better handle document IDs
-const createNewDocument = (filename, isPreLoaded = false, backendData = null) => {
+const createNewDocument = (filename, isPreloaded = false, backendData = null) => {
   const docId = `doc_${Date.now()}`;
   const newDoc = {
     id: docId,
@@ -164,10 +164,9 @@ const createNewDocument = (filename, isPreLoaded = false, backendData = null) =>
     activeQuestionId: null,
     uploadStatus: { 
       success: true, 
-      message: isPreLoaded ? `${filename} loaded successfully` : `${filename} uploaded successfully` 
+      message: isPreloaded ? `${filename} loaded successfully` : `${filename} uploaded successfully` 
     },
-    isPreLoaded,
-    isPreloaded: isPreLoaded, // Support both naming conventions
+    isPreloaded,
     createdAt: new Date(),
     ...(backendData && {
       backendDocumentId: backendData.document_id,
@@ -434,11 +433,14 @@ const handleDocumentUpload = async (formData) => {
     setSelectedProvenance(provenance);
   };
 
-  // Handle highlighting in PDF
+  // Handle highlighting in document viewer
   const handleHighlightInPDF = (provenance) => {
-    console.log('Highlighting provenance in PDF:', provenance);
+    console.log('🖍️ Highlighting provenance in document viewer:', {
+      provenance_id: provenance.provenance_id,
+      sentences_ids: provenance.sentences_ids
+    });
     setSelectedProvenance(provenance);
-    // The PDFViewer will handle the actual highlighting
+    // The SentenceBasedPDFViewer will handle the actual highlighting by sentence IDs
   };
 
   // Handle feedback
@@ -482,6 +484,7 @@ const handleDocumentUpload = async (formData) => {
         onShowPreloaded={handleShowPreloaded}
       />
       
+      
       {/* Main Content Grid */}
       <div className="app-content-grid">
         {/* Left Sidebar */}
@@ -498,8 +501,9 @@ const handleDocumentUpload = async (formData) => {
         <div className="main-content">
           {/* PDF Section */}
           <div className="pdf-section">
+         
             {activeDocument ? (
-              <PDFViewer
+              <SentenceBasedPDFViewer
                 pdfDocument={activeDocument}
                 selectedProvenance={selectedProvenance}
                 onClose={() => {}}

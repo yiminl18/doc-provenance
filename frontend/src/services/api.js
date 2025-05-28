@@ -474,6 +474,49 @@ export const pollProcessingUntilComplete = async (processingSessionIds, sessionI
   };
 };
 
+/**
+ * Get sentences for a document - optimized for sentence-based rendering
+ * @param {string} documentId - The document ID
+ * @param {number} start - Optional start index for sentence range
+ * @param {number} end - Optional end index for sentence range
+ * @returns {Promise} Sentences data
+ */
+export const getDocumentSentences = async (documentId, start = null, end = null) => {
+  try {
+    let url = `${API_URL}/documents/${documentId}/sentences`;
+    const params = new URLSearchParams();
+    
+    if (start !== null) params.append('start', start);
+    if (end !== null) params.append('end', end);
+    
+    if (params.toString()) {
+      url += `?${params.toString()}`;
+    }
+    
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting document sentences:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Get a specific sentence by ID
+ * @param {string} documentId - The document ID
+ * @param {number} sentenceId - The sentence ID
+ * @returns {Promise} Sentence data
+ */
+export const getSpecificSentence = async (documentId, sentenceId) => {
+  try {
+    const response = await axios.get(`${API_URL}/documents/${documentId}/sentences/${sentenceId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting specific sentence:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
 // ===== REMOVED PROBLEMATIC COMPATIBILITY LAYER =====
 // IMPORTANT: Removed the broken compatibility functions that were using 
 // sessionId = 'legacy' which doesn't work with your new API.

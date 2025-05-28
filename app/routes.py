@@ -188,6 +188,16 @@ def scan_upload_folder_for_pdfs():
     
     return uploaded_docs
 
+# Add this new route for static PDF serving
+@main.route('/static/pdfs/<filename>')
+def serve_static_pdf(filename):
+    """Serve PDFs from static folder"""
+    try:
+        static_pdf_dir = os.path.join(current_app.root_path, 'static', 'pdfs')
+        return send_from_directory(static_pdf_dir, filename)
+    except Exception as e:
+        logger.error(f"Error serving static PDF {filename}: {e}")
+        return jsonify({'error': 'PDF not found'}), 404
 
 # Updated upload_document function
 @main.route('/documents', methods=['POST'])
@@ -731,97 +741,9 @@ def debug_preloaded_scan():
         }), 500
 
 
-    
-# Add this ultra-simple test route to bypass all document lookup logic
-
-@main.route('/debug/direct-pdf-serve', methods=['GET'])
-def direct_pdf_serve():
-    """Directly serve the PDF file using the known working absolute path"""
-    try:
-        # Use the absolute path we know works from the debug
-        absolute_path = "C:\\Users\\hannah\\git\\doc-provenance\\app\\uploads\\I_Dont_Understand_Issues_in_Self-Quantifying_Commuting.pdf"
-        filename = "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting.pdf"
-        
-        logger.info(f"🔍 Direct PDF serve test")
-        logger.info(f"📁 Path: {absolute_path}")
-        logger.info(f"📂 Exists: {os.path.exists(absolute_path)}")
-        
-        if not os.path.exists(absolute_path):
-            return jsonify({'error': f'File not found: {absolute_path}'}), 404
-        
-        # Check file size
-        file_size = os.path.getsize(absolute_path)
-        logger.info(f"📊 File size: {file_size}")
-        
-        # Method 1: Try send_file with absolute path
-        try:
-            logger.info("🔄 Trying send_file...")
-            return send_file(
-                absolute_path,
-                mimetype='application/pdf',
-                as_attachment=False,
-                download_name=filename
-            )
-        except Exception as send_error:
-            logger.error(f"❌ send_file failed: {send_error}")
-            
-            # Method 2: Read file and return as response
-            try:
-                logger.info("🔄 Trying direct response...")
-                
-                with open(absolute_path, 'rb') as f:
-                    pdf_data = f.read()
-                
-                from flask import Response
-                response = Response(
-                    pdf_data,
-                    mimetype='application/pdf',
-                    headers={
-                        'Content-Disposition': f'inline; filename="{filename}"'
-                    }
-                )
-                logger.info("✅ Direct response method worked")
-                return response
-                
-            except Exception as direct_error:
-                logger.error(f"❌ Direct response failed: {direct_error}")
-                return jsonify({'error': f'All methods failed: send_file={str(send_error)}, direct={str(direct_error)}'}), 500
-        
-    except Exception as e:
-        logger.error(f"💥 Unexpected error: {e}")
-        return jsonify({'error': str(e)}), 500
-
-# Also add a route to test send_from_directory which might work better
-@main.route('/debug/send-from-directory', methods=['GET'])
-def test_send_from_directory():
-    """Test using send_from_directory instead of send_file"""
-    try:
-        # Use send_from_directory with the directory and filename separately
-        directory = "C:\\Users\\hannah\\git\\doc-provenance\\app\\uploads"
-        filename = "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting.pdf"
-        
-        logger.info(f"🔍 Testing send_from_directory")
-        logger.info(f"📁 Directory: {directory}")
-        logger.info(f"📄 Filename: {filename}")
-        logger.info(f"📂 Directory exists: {os.path.exists(directory)}")
-        logger.info(f"📄 File exists: {os.path.exists(os.path.join(directory, filename))}")
-        
-        return send_from_directory(
-            directory,
-            filename,
-            mimetype='application/pdf',
-            as_attachment=False
-        )
-        
-    except Exception as e:
-        logger.error(f"❌ send_from_directory failed: {e}")
-        return jsonify({'error': str(e)}), 500
-
-# Replace your serve_document_pdf function with this version that uses absolute paths
-
 @main.route('/documents/<document_id>/pdf', methods=['GET'])
 def serve_document_pdf(document_id):
-    """Serve PDF using absolute paths to avoid Flask's relative path resolution"""
+    """Serve PDF - copy to static folder if needed"""
     try:
         logger.info(f"🔍 PDF request for document: {document_id}")
         
@@ -835,104 +757,40 @@ def serve_document_pdf(document_id):
         filename = doc_data.get('filename')
         
         if not filepath or not filename:
-            logger.error(f"❌ Missing filepath or filename")
             return jsonify({'error': 'PDF file path not found'}), 404
         
-        logger.info(f"📁 Original filepath: {filepath}")
+        # Create static PDFs directory
+        static_pdf_dir = os.path.join(current_app.root_path, 'static', 'pdfs')
+        os.makedirs(static_pdf_dir, exist_ok=True)
         
-        # Convert to absolute path to avoid Flask's path resolution issues
-        if os.path.isabs(filepath):
-            # Already absolute
-            absolute_path = os.path.normpath(filepath)
-        else:
-            # Make it absolute based on current working directory
-            absolute_path = os.path.abspath(filepath)
+        # Copy PDF to static folder if it doesn't exist
+        static_pdf_path = os.path.join(static_pdf_dir, filename)
         
-        logger.info(f"🔧 Absolute path: {absolute_path}")
-        logger.info(f"📂 File exists: {os.path.exists(absolute_path)}")
-        
-        # Verify file exists
-        if not os.path.exists(absolute_path):
-            logger.error(f"❌ File not found at absolute path: {absolute_path}")
+        if not os.path.exists(static_pdf_path):
+            logger.info(f"📄 Copying PDF to static folder: {filename}")
             
-            # Try alternative absolute path construction
-            cwd = os.getcwd()
-            alternative_path = os.path.join(cwd, filepath.replace('\\', os.sep).replace('/', os.sep))
-            alternative_path = os.path.normpath(alternative_path)
-            
-            logger.info(f"🔄 Trying alternative absolute path: {alternative_path}")
-            
-            if os.path.exists(alternative_path):
-                absolute_path = alternative_path
-                logger.info(f"✅ Alternative path works!")
+            # Ensure source file exists and is absolute
+            if not os.path.isabs(filepath):
+                source_path = os.path.abspath(filepath)
             else:
-                logger.error(f"❌ Alternative path also doesn't exist")
-                return jsonify({
-                    'error': 'PDF file not found on disk',
-                    'attempted_paths': [absolute_path, alternative_path]
-                }), 404
+                source_path = filepath
+                
+            if not os.path.exists(source_path):
+                return jsonify({'error': f'Source PDF not found: {source_path}'}), 404
+                
+            # Copy file
+            import shutil
+            shutil.copy2(source_path, static_pdf_path)
+            logger.info(f"✅ PDF copied to static folder")
         
-        # Verify file is readable and is a PDF
-        try:
-            file_size = os.path.getsize(absolute_path)
-            logger.info(f"📊 File size: {file_size} bytes")
-            
-            if file_size == 0:
-                return jsonify({'error': 'PDF file is empty'}), 404
-            
-            # Check PDF header
-            with open(absolute_path, 'rb') as f:
-                first_bytes = f.read(4)
-                if not first_bytes.startswith(b'%PDF'):
-                    return jsonify({'error': 'File is not a valid PDF'}), 400
-            
-        except Exception as validation_error:
-            logger.error(f"❌ File validation error: {validation_error}")
-            return jsonify({'error': f'Cannot validate PDF file: {str(validation_error)}'}), 500
-        
-        logger.info(f"✅ Serving PDF from absolute path: {absolute_path}")
-        
-        # Use absolute path with send_file
-        try:
-            return send_file(
-                absolute_path,
-                mimetype='application/pdf',
-                as_attachment=False,
-                download_name=filename
-            )
-        except Exception as send_error:
-            logger.error(f"❌ send_file error with absolute path: {send_error}")
-            
-            # Try reading file directly and returning as response
-            try:
-                logger.info("🔄 Trying direct file reading method...")
-                
-                with open(absolute_path, 'rb') as f:
-                    pdf_data = f.read()
-                
-                from flask import Response
-                
-                response = Response(
-                    pdf_data,
-                    mimetype='application/pdf',
-                    headers={
-                        'Content-Disposition': f'inline; filename="{filename}"',
-                        'Content-Length': str(len(pdf_data)),
-                        'Cache-Control': 'no-cache'
-                    }
-                )
-                
-                logger.info(f"✅ Direct file reading successful")
-                return response
-                
-            except Exception as direct_error:
-                logger.error(f"❌ Direct file reading also failed: {direct_error}")
-                return jsonify({'error': f'Failed to serve PDF: {str(direct_error)}'}), 500
+        # Serve from static folder
+        return send_from_directory(static_pdf_dir, filename, 
+                                 mimetype='application/pdf',
+                                 as_attachment=False)
         
     except Exception as e:
-        logger.error(f"💥 Unexpected error: {e}")
-        logger.exception("Full traceback:")
-        return jsonify({'error': f'Unexpected error: {str(e)}'}), 500
+        logger.error(f"💥 Error serving PDF: {e}")
+        return jsonify({'error': f'PDF serving error: {str(e)}'}), 500
 
 # Also add this helper function to find document data more reliably
 def find_document_data(document_id):
@@ -1044,7 +902,7 @@ def get_document_text(document_id):
         
         if not os.path.exists(doc_data_path):
             # Try to find it in preloaded documents
-            preloaded_docs = scan_upload_folder_for_pdfs()
+            preloaded_docs = scan_preload_folder_for_pdfs()
             target_doc = None
             
             for doc in preloaded_docs:
@@ -1052,6 +910,7 @@ def get_document_text(document_id):
                     target_doc = doc
                     break
             
+
             if not target_doc:
                 return jsonify({'error': 'Document not found'}), 404
             
@@ -1379,7 +1238,7 @@ def get_text_processing_progress(session_id, processing_session_id):
         status = 'processing'
         if os.path.exists(logs_path):
             try:
-                with open(logs_path, 'r') as f:
+                with open(logs_path, 'r', encoding='utf-8') as f:
                     log_data = json.load(f)
                     logs = log_data.get('logs', [])
                     status = log_data.get('status', 'processing')
@@ -1397,7 +1256,7 @@ def get_text_processing_progress(session_id, processing_session_id):
             })
         
         try:
-            with open(provenance_path, 'r') as f:
+            with open(provenance_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             
             provenance_data = data if isinstance(data, list) else []
@@ -1457,6 +1316,80 @@ def get_text_processing_results(session_id, processing_session_id):
         
     except Exception as e:
         logger.error(f"Error getting processing results: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    
+@main.route('/documents/<document_id>/sentences', methods=['GET'])
+def get_document_sentences(document_id):
+    """Get sentences for a document - optimized for frontend sentence-based rendering"""
+    try:
+        doc_data = find_document_data(document_id)
+        if not doc_data:
+            return jsonify({'error': 'Document not found'}), 404
+        
+        sentences = doc_data.get('sentences', [])
+        
+        # Get optional sentence range parameters
+        start_idx = request.args.get('start', type=int)
+        end_idx = request.args.get('end', type=int)
+        
+        if start_idx is not None or end_idx is not None:
+            # Return a slice of sentences
+            start_idx = start_idx or 0
+            end_idx = end_idx or len(sentences)
+            sentences_slice = sentences[start_idx:end_idx]
+            
+            return jsonify({
+                'success': True,
+                'document_id': document_id,
+                'sentences': sentences_slice,
+                'total_sentences': len(sentences),
+                'start_index': start_idx,
+                'end_index': min(end_idx, len(sentences)),
+                'filename': doc_data.get('filename', 'Unknown')
+            })
+        else:
+            # Return all sentences
+            return jsonify({
+                'success': True,
+                'document_id': document_id,
+                'sentences': sentences,
+                'total_sentences': len(sentences),
+                'filename': doc_data.get('filename', 'Unknown')
+            })
+        
+    except Exception as e:
+        logger.error(f"Error getting document sentences for {document_id}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/documents/<document_id>/sentences/<int:sentence_id>', methods=['GET'])
+def get_specific_sentence(document_id, sentence_id):
+    """Get a specific sentence by ID"""
+    try:
+        doc_data = find_document_data(document_id)
+        if not doc_data:
+            return jsonify({'error': 'Document not found'}), 404
+        
+        sentences = doc_data.get('sentences', [])
+        
+        if sentence_id < 0 or sentence_id >= len(sentences):
+            return jsonify({'error': f'Sentence ID {sentence_id} out of range'}), 400
+        
+        return jsonify({
+            'success': True,
+            'document_id': document_id,
+            'sentence_id': sentence_id,
+            'sentence': sentences[sentence_id],
+            'total_sentences': len(sentences)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting sentence {sentence_id} for document {document_id}: {e}")
         return jsonify({
             'success': False,
             'error': str(e)

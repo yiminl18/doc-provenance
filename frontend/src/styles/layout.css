@@ -124,7 +124,7 @@
 .app-content-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr 420px; /* Added right panel */
+  grid-template-columns: var(--left-sidebar-width) 1fr var(--right-panel-width); /* Added right panel */
   grid-template-rows: 1fr;
   gap: 0;
   overflow: hidden;
@@ -612,14 +612,6 @@
   gap: var(--space-2);
 }
 
-
-.provenance-content {
-  background-color: white;
-  border: var(--border-medium) solid var(--win95-border);
-  padding: var(--space-4);
-  margin-bottom: var(--space-4);
-  box-shadow: var(--shadow-pressed);
-}
 
 .evidence-text {
   font-family: var(--font-display);

@@ -123,6 +123,8 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
 
   const loadSentenceMapping = async (pdf) => {
     try {
+      
+ 
       const docId = pdfDocument.backendDocumentId || pdfDocument.id;
       
       const sentencesResponse = await fetch(`/api/documents/${docId}/sentences`);
@@ -476,7 +478,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
         )}
       </div>
 
-      {/* Provenance Info */}
+      {/* Provenance Info }
       {selectedProvenance && showHighlights && (
         <div className="provenance-info">
           <h4>
@@ -502,7 +504,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             </div>
           </div>
         </div>
-      )}
+      )*/}
 
       {/* Styles */}
       <style dangerouslySetInnerHTML={{

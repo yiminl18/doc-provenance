@@ -158,11 +158,19 @@ export const getSession = async (sessionId) => {
  * @param {string} documentId - The document ID to analyze
  * @returns {Promise} Processing session information
  */
-export const processTextQuestion = async (sessionId, questionText, documentId) => {
+export const processTextQuestion = async (sessionId, questionText, documentId, documentText) => {
   try {
+
+    console.log('Processing text question:', {
+      sessionId,
+      questionText,
+      documentId,
+      documentText});
+
     const response = await axios.post(`${API_URL}/sessions/${sessionId}/process-text`, {
       question: questionText,
-      document_id: documentId
+      document_id: documentId,
+      document_text: documentText
     });
     return response.data;
   } catch (error) {
@@ -507,9 +515,9 @@ export const getDocumentSentences = async (documentId, start = null, end = null)
  * @param {number} sentenceId - The sentence ID
  * @returns {Promise} Sentence data
  */
-export const getSpecificSentence = async (documentId, sentenceId) => {
+export const getSpecificSentence = async (documentId, sentenceIds) => {
   try {
-    const response = await axios.get(`${API_URL}/documents/${documentId}/sentences/${sentenceId}`);
+    const response = await axios.get(`${API_URL}/documents/${documentId}/sentences?ids=${sentenceIds.join(',')}`);
     return response.data;
   } catch (error) {
     console.error('Error getting specific sentence:', error);
@@ -517,10 +525,66 @@ export const getSpecificSentence = async (documentId, sentenceId) => {
   }
 };
 
-// ===== REMOVED PROBLEMATIC COMPATIBILITY LAYER =====
-// IMPORTANT: Removed the broken compatibility functions that were using 
-// sessionId = 'legacy' which doesn't work with your new API.
-// All components should now use the proper session-based methods above.
+// ===== yash_code =====
+
+// Ask a question about a document
+export const askQuestion = async (question, filename) => {
+  try {
+    const response = await axios.post(`${API_URL}/ask`, {
+      question,
+      filename
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error asking question:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+// Check processing progress
+export const checkProgress = async (questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/check-progress/${questionId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error checking progress:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+// Get final results
+export const getResults = async (questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/results/${questionId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting results:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+// Fetch sentences
+export const fetchSentences = async (documentId, sentenceIds) => {
+  try {
+    const response = await axios.get(`${API_URL}/documents/${documentId}/sentences?ids=${sentenceIds.join(',')}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching sentences:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+// Check processing status
+export const checkStatus = async (questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/status/${questionId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error checking status:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+}; 
+
 
 /**
  * @deprecated Use uploadDocument instead
@@ -558,6 +622,13 @@ export default {
   generateContentHash,
   batchProcessingOperations,
   pollProcessingUntilComplete,
+
+  // yash_code
+  askQuestion,
+  checkProgress,
+  getResults,
+  fetchSentences,
+  checkStatus,
   
   // Backward Compatibility (only safe ones)
   uploadFile

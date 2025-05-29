@@ -12,7 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 const ProvenanceNavigator = ({ 
-  document,
+  pdfDocument,
   onQuestionSubmit,
   onProvenanceSelect,
   onFeedbackRequest,
@@ -23,8 +23,8 @@ const ProvenanceNavigator = ({
   const [currentProvenanceIndex, setCurrentProvenanceIndex] = useState(0);
 
   // Get the active question and its data
-  const activeQuestion = document?.activeQuestionId 
-    ? document.questions.get(document.activeQuestionId)
+  const activeQuestion = pdfDocument?.activeQuestionId 
+    ? pdfDocument.questions.get(pdfDocument.activeQuestionId)
     : null;
 
   const availableProvenances = activeQuestion?.provenanceSources?.slice(0, 5) || [];
@@ -36,7 +36,7 @@ const ProvenanceNavigator = ({
     if (availableProvenances.length > 0) {
       onProvenanceSelect?.(availableProvenances[0]);
     }
-  }, [document?.activeQuestionId, availableProvenances.length]);
+  }, [pdfDocument?.activeQuestionId, availableProvenances.length]);
 
   // Auto-select provenance when index changes
   useEffect(() => {
@@ -47,7 +47,7 @@ const ProvenanceNavigator = ({
 
   const handleQuestionSubmit = async (e) => {
     e.preventDefault();
-    if (!currentQuestion.trim() || isSubmitting || !document) return;
+    if (!currentQuestion.trim() || isSubmitting || !pdfDocument) return;
 
     setIsSubmitting(true);
     try {
@@ -86,77 +86,9 @@ const ProvenanceNavigator = ({
 
   const isProcessing = activeQuestion?.isProcessing || false;
 
-  if (!document) {
-    return (
-      <div className="qa-flow-empty">
-        <div className="empty-icon">🤔</div>
-        <h4>Ready for Questions</h4>
-        <p>Upload a document to start asking questions and analyzing provenance.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="qa-flow-content">
-      {/* Question Input - Always Visible */}
-      <div className="question-input-container">
-        <div className="question-input-header">
-          <span className="terminal-prompt">$</span>
-          <span>Ask a question about this document:</span>
-        </div>
-        
-        <form onSubmit={handleQuestionSubmit} className="question-form">
-          <textarea
-            className="question-textarea"
-            value={currentQuestion}
-            onChange={(e) => setCurrentQuestion(e.target.value)}
-            placeholder={
-              isProcessing 
-                ? "Please wait for current question to complete..." 
-                : "What would you like to know about this document?"
-            }
-            disabled={isSubmitting || isProcessing}
-            rows={2}
-          />
-          <button
-            type="submit"
-            className="submit-btn"
-            disabled={!currentQuestion.trim() || isSubmitting || isProcessing}
-          >
-            {isSubmitting ? (
-              <FontAwesomeIcon icon={faSpinner} spin />
-            ) : (
-              <FontAwesomeIcon icon={faPaperPlane} />
-            )}
-            <span>
-              {isSubmitting ? 'Submitting...' : 'Ask Question'}
-            </span>
-          </button>
-        </form>
-      </div>
-
-      {/* Processing Indicator */}
-      {isProcessing && (
-        <div className="processing-indicator">
-          <div className="processing-text">
-            <div className="terminal-cursor"></div>
-            <span>ANALYZING_DOCUMENT...</span>
-          </div>
-        </div>
-      )}
-
-      {/* Answer Section */}
-      {activeQuestion?.answer && (
-        <div className="answer-container">
-          <div className="answer-header">
-            <FontAwesomeIcon icon={faFileAlt} />
-            <span>Response</span>
-          </div>
-          <div className="answer-content">
-            {activeQuestion.answer}
-          </div>
-        </div>
-      )}
 
       {/* Provenance Navigator - The Star of the Show */}
       {availableProvenances.length > 0 && !isProcessing && (
@@ -226,7 +158,7 @@ const ProvenanceNavigator = ({
         </div>
       )}
 
-      {/* Question History - Compact List */}
+      {/* Question History - Compact List 
       {document.questions.size > 0 && (
         <div className="question-history-compact">
           <h5>Recent Questions ({document.questions.size})</h5>
@@ -250,7 +182,7 @@ const ProvenanceNavigator = ({
               ))}
           </div>
         </div>
-      )}
+      )}*/}
     </div>
   );
 };

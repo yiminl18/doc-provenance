@@ -6,8 +6,8 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import QuestionCollection from './components/QuestionCollection';
 import ProvenanceNavigator from './components/ProvenanceNavigator';
-import PDFViewer from './components/CleanPDFViewer'
-import SentenceBasedPDFViewer from './components/SentenceBasedPDFViewer';
+//import PDFViewer from './components/CleanPDFViewer'
+//import SentenceBasedPDFViewer from './components/SentenceBasedPDFViewer';
 import HybridPDFViewer from './components/HybridPDFViewer';
 //import PDFViewer from './components/PDFJSViewer'
 //import PDFViewer from './components/PDFViewer';
@@ -16,10 +16,15 @@ import DocumentSelector from './components/DocumentSelector';
 import {
   uploadFile,
   createSession,
+  askQuestion,
+  checkProgress as apiCheckProgress,
+  getResults as apiGetResults,
+  checkStatus,
   processTextQuestion,
   getTextProcessingProgress,
   getTextProcessingResults,
   getProcessingSentences,
+  getDocumentText,
 } from './services/api';
 
 function App() {
@@ -84,14 +89,15 @@ const handlePreloadedSelect = async (document) => {
     
     const { loadPreloadedDocument } = await import('./services/api');
     const response = await loadPreloadedDocument(document.document_id);
-
+    const responseText = await getDocumentText(document.document_id);
     if (response.success) {
-      console.log('✅ Preloaded document loaded successfully:', response);
+      console.log('✅ Preloaded document loaded successfully:', responseText);
       
       const docId = createNewDocument(document.filename, true, {
         document_id: document.document_id,
         text_length: document.text_length || response.text_length,
-        sentence_count: document.sentence_count || response.sentence_count
+        sentence_count: document.sentence_count || response.sentence_count,
+        text: responseText.text || null
       });
 
       // Update the document with additional metadata needed for PDF viewing
@@ -103,7 +109,7 @@ const handlePreloadedSelect = async (document) => {
           doc.backendDocumentId = document.document_id; // This is crucial for PDF serving
           doc.textLength = document.text_length || response.text_length;
           doc.sentenceCount = document.sentence_count || response.sentence_count;
-          
+          doc.text = responseText.text || null; // Store the text if available
           console.log('📄 Updated document object:', {
             id: doc.id,
             filename: doc.filename,
@@ -157,6 +163,10 @@ const handlePreloadedSelect = async (document) => {
 
 // Also update the createNewDocument function to better handle document IDs
 const createNewDocument = (filename, isPreloaded = false, backendData = null) => {
+
+
+
+
   const docId = `doc_${Date.now()}`;
   const newDoc = {
     id: docId,
@@ -202,10 +212,16 @@ const handleDocumentUpload = async (formData) => {
     const response = await uploadFile(formData);
     console.log('✅ Upload response:', response);
 
+    console.log('Getting document text...');
+
+    const responseText = await getDocumentText(response.document_id);
+    console.log('Document text retrieved:', responseText);
+
     const docId = createNewDocument(response.filename, false, {
       document_id: response.document_id,
       text_length: response.text_length,
-      sentence_count: response.sentence_count
+      sentence_count: response.sentence_count,
+      text: responseText.text || null
     });
 
     setDocuments(prev => {
@@ -219,6 +235,7 @@ const handleDocumentUpload = async (formData) => {
         doc.backendDocumentId = response.document_id;
         doc.textLength = response.text_length;
         doc.sentenceCount = response.sentence_count;
+        doc.text = responseText.text || null;
         
         console.log('📄 Updated uploaded document:', {
           id: doc.id,
@@ -288,7 +305,9 @@ const handleDocumentUpload = async (formData) => {
       const sessionResponse = await createSession();
       const sessionId = sessionResponse.session_id;
 
-      const response = await processTextQuestion(sessionId, questionText, backendDocumentId);
+      const documentText = activeDocument.text || '';
+
+      const response = await processTextQuestion(sessionId, questionText, backendDocumentId, documentText);
       const processingSessionId = response.processing_session_id;
 
       setDocuments(prev => {
@@ -531,15 +550,24 @@ const handleDocumentUpload = async (formData) => {
         <div className="right-panel">
           {/* Q&A Flow Section */}
           <div className="qa-flow-section">
+
+                    {/* Question Collection Section */}
+          <QuestionCollection
+            pdfDocument={activeDocument}
+            onQuestionSubmit={addQuestionToDocument}
+            onReaskQuestion={(question) => addQuestionToDocument(question.text)}
+            />
+
             <ProvenanceNavigator
-              document={activeDocument}
+              pdfDocument={activeDocument}
               onQuestionSubmit={addQuestionToDocument}
               onProvenanceSelect={handleProvenanceSelect}
               onFeedbackRequest={openFeedbackModal}
               onHighlightInPDF={handleHighlightInPDF}
             />
           </div>
-        </div>
+  
+            </div>
       </div>
 
       {/* Feedback Modal */}

@@ -32,8 +32,8 @@ for directory in [RESULT_DIR, PRELOAD_DIR, COLLECTIONS_DIR, STUDY_LOGS_DIR]:
     os.makedirs(directory, exist_ok=True)
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+#logging.basicConfig(level=logging.INFO)
+#logger = logging.getLogger(__name__)
 
 # =============================================================================
 # UTILITY FUNCTIONS
@@ -83,7 +83,7 @@ def log_user_study_event(event_data):
             f.write(json.dumps(event_data) + '\n')
             
     except Exception as e:
-        logger.error(f"Error logging user study event: {e}")
+        print(f"Error logging user study event: {e}")
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -98,13 +98,13 @@ def scan_upload_folder_for_pdfs():
     try:
         # Ensure upload directory exists
         if not os.path.exists(uploads_dir):
-            logger.warning(f"Upload directory does not exist: {uploads_dir}")
+            #logger.warning(f"Upload directory does not exist: {uploads_dir}")
             return []
         
         # Get all PDF files in the upload directory
         pdf_files = [f for f in os.listdir(uploads_dir) if f.lower().endswith('.pdf')]
         
-        logger.info(f"Found {len(pdf_files)} PDF files in upload folder")
+        #logger.info(f"Found {len(pdf_files)} PDF files in upload folder")
         
         for pdf_file in pdf_files:
             try:
@@ -112,7 +112,7 @@ def scan_upload_folder_for_pdfs():
 
                 # Verify file actually exists before processing
                 if not os.path.exists(filepath):
-                    logger.warning(f"PDF file listed but not found: {filepath}")
+                    #logger.warning(f"PDF file listed but not found: {filepath}")
                     continue
                 
                 # Get base name without extension
@@ -138,15 +138,15 @@ def scan_upload_folder_for_pdfs():
                         # Verify the PDF file still exists
                         if os.path.exists(filepath):
                             uploaded_docs.append(metadata)
-                            logger.info(f"Loaded existing metadata for {pdf_file}")
+                            #logger.info(f"Loaded existing metadata for {pdf_file}")
                         else:
-                            logger.warning(f"Metadata exists but PDF file missing: {filepath}")
+                            print(f"Metadata exists but PDF file missing: {filepath}")
                         continue
                     except Exception as e:
-                        logger.warning(f"Failed to load existing metadata for {pdf_file}: {e}")
+                        print(f"Failed to load existing metadata for {pdf_file}: {e}")
                 
                 # Extract text and create new metadata
-                logger.info(f"Processing new PDF: {pdf_file}")
+                #logger.info(f"Processing new PDF: {pdf_file}")
                 try:
                     pdf_text = extract_text(filepath)
                     sentences = extract_sentences_from_pdf(pdf_text)
@@ -173,18 +173,18 @@ def scan_upload_folder_for_pdfs():
                         json.dump(sentences, f, indent=2, ensure_ascii=False)
 
                     uploaded_docs.append(metadata)
-                    logger.info(f"Successfully processed {pdf_file} - saved metadata and sentences to uploads folder")
+                    #logger.info(f"Successfully processed {pdf_file} - saved metadata and sentences to uploads folder")
                     
                 except Exception as text_error:
-                    logger.error(f"Failed to extract text from {pdf_file}: {text_error}")
+                    #logger.error(f"Failed to extract text from {pdf_file}: {text_error}")
                     continue
                 
             except Exception as e:
-                logger.error(f"Error processing {pdf_file}: {e}")
+                #logger.error(f"Error processing {pdf_file}: {e}")
                 continue
     
     except Exception as e:
-        logger.error(f"Error scanning upload folder: {e}")
+        print(f"Error scanning upload folder: {e}")
     
     return uploaded_docs
 
@@ -196,7 +196,7 @@ def serve_static_pdf(filename):
         static_pdf_dir = os.path.join(current_app.root_path, 'static', 'pdfs')
         return send_from_directory(static_pdf_dir, filename)
     except Exception as e:
-        logger.error(f"Error serving static PDF {filename}: {e}")
+        #logger.error(f"Error serving static PDF {filename}: {e}")
         return jsonify({'error': 'PDF not found'}), 404
 
 # Updated upload_document function
@@ -268,7 +268,7 @@ def upload_document():
             'timestamp': time.time()
         })
         
-        logger.info(f"Successfully uploaded {filename} - saved metadata and sentences to uploads folder")
+        #logger.info(f"Successfully uploaded {filename} - saved metadata and sentences to uploads folder")
         
         return jsonify({
             'success': True,
@@ -280,7 +280,7 @@ def upload_document():
         })
         
     except Exception as e:
-        logger.error(f"Error uploading document: {e}")
+        #logger.error(f"Error uploading document: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -304,7 +304,7 @@ def load_preloaded_document(document_id):
                 break
         
         if not target_doc:
-            logger.error(f"Preloaded document {document_id} not found in scan results")
+            #logger.error(f"Preloaded document {document_id} not found in scan results")
             return jsonify({
                 'success': False,
                 'error': f'Preloaded document {document_id} not found',
@@ -313,7 +313,7 @@ def load_preloaded_document(document_id):
         
         # Verify the file actually exists
         if not os.path.exists(target_doc['filepath']):
-            logger.error(f"PDF file does not exist: {target_doc['filepath']}")
+            #logger.error(f"PDF file does not exist: {target_doc['filepath']}")
             return jsonify({
                 'success': False,
                 'error': f'PDF file not found: {target_doc["filename"]}'
@@ -327,7 +327,7 @@ def load_preloaded_document(document_id):
         sentences_path = os.path.join(uploads_dir, f"{base_name}_sentences.json")
         
         if not os.path.exists(sentences_path):
-            logger.warning(f"Sentences file missing for {document_id}, will regenerate")
+            #logger.warning(f"Sentences file missing for {document_id}, will regenerate")
             # Regenerate if missing
             try:
                 pdf_text = extract_text(target_doc['filepath'])
@@ -342,10 +342,10 @@ def load_preloaded_document(document_id):
                 with open(metadata_path, 'w', encoding='utf-8') as f:
                     json.dump(target_doc, f, indent=2, ensure_ascii=False)
                     
-                logger.info(f"Regenerated sentences for {document_id}")
+                #logger.info(f"Regenerated sentences for {document_id}")
                 
             except Exception as e:
-                logger.error(f"Failed to regenerate sentences for {document_id}: {e}")
+                #logger.error(f"Failed to regenerate sentences for {document_id}: {e}")
                 return jsonify({
                     'success': False,
                     'error': f'Failed to process preloaded document: {str(e)}'
@@ -372,7 +372,7 @@ def load_preloaded_document(document_id):
         })
         
     except Exception as e:
-        logger.error(f"Error loading preloaded document {document_id}: {e}")
+        #logger.error(f"Error loading preloaded document {document_id}: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -392,12 +392,12 @@ def cleanup_old_result_data_files():
                 old_file_path = os.path.join(RESULT_DIR, file)
                 try:
                     os.remove(old_file_path)
-                    logger.info(f"Cleaned up old data file: {file}")
+                    #logger.info(f"Cleaned up old data file: {file}")
                 except Exception as e:
-                    logger.error(f"Failed to remove old data file {file}: {e}")
+                    print(f"Failed to remove old data file {file}: {e}")
                     
     except Exception as e:
-        logger.error(f"Error during cleanup: {e}")
+        print(f"Error during cleanup: {e}")
 
 
 # Updated find_document_data function (already provided earlier)
@@ -424,13 +424,13 @@ def find_document_data(document_id):
                                 sentences = json.load(f)
                             metadata['sentences'] = sentences
                         else:
-                            logger.warning(f"Sentences file missing for {base_name}")
+                            #logger.warning(f"Sentences file missing for {base_name}")
                             metadata['sentences'] = []
                         
-                        logger.info(f"✅ Found document: {base_name}")
+                        #logger.info(f"✅ Found document: {base_name}")
                         return metadata
                 except Exception as e:
-                    logger.error(f"Error reading metadata {item}: {e}")
+                    print(f"Error reading metadata {item}: {e}")
     
     # Fallback to old results storage for backward compatibility
     old_doc_data_path = os.path.join(RESULT_DIR, f"{document_id}_data.json")
@@ -438,12 +438,12 @@ def find_document_data(document_id):
         try:
             with open(old_doc_data_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                logger.info(f"✅ Found document data in legacy results storage")
+                #logger.info(f"✅ Found document data in legacy results storage")
                 return data
         except Exception as e:
-            logger.error(f"❌ Error reading legacy document data: {e}")
+            print(f"❌ Error reading legacy document data: {e}")
     
-    logger.error(f"❌ Document {document_id} not found anywhere")
+    print(f"❌ Document {document_id} not found anywhere")
     return None
 
 
@@ -538,7 +538,7 @@ def debug_document(document_id):
         
         if os.path.exists(doc_data_path):
             try:
-                with open(doc_data_path, 'r') as f:
+                with open(doc_data_path, 'r', encoding='utf-8') as f:
                     doc_data = json.load(f)
                 debug_info['doc_data_sample'] = {
                     k: v for k, v in doc_data.items() 
@@ -562,7 +562,7 @@ def debug_document(document_id):
 def debug_pdf_test(document_id):
     """Debug route to test PDF file resolution without actually serving the file"""
     try:
-        logger.info(f"🔍 PDF Debug Test for document: {document_id}")
+        #logger.info(f"🔍 PDF Debug Test for document: {document_id}")
         
         # Find document data
         doc_data = find_document_data(document_id)
@@ -692,7 +692,7 @@ def debug_pdf_test(document_id):
         })
         
     except Exception as e:
-        logger.error(f"Error in PDF debug test: {e}")
+        #logger.error(f"Error in PDF debug test: {e}")
         return jsonify({
             'error': str(e),
             'document_id': document_id
@@ -745,12 +745,12 @@ def debug_preloaded_scan():
 def serve_document_pdf(document_id):
     """Serve PDF - copy to static folder if needed"""
     try:
-        logger.info(f"🔍 PDF request for document: {document_id}")
+        #logger.info(f"🔍 PDF request for document: {document_id}")
         
         # Find document data
         doc_data = find_document_data(document_id)
         if not doc_data:
-            logger.error(f"❌ Document {document_id} not found")
+            #logger.error(f"❌ Document {document_id} not found")
             return jsonify({'error': 'Document not found'}), 404
         
         filepath = doc_data.get('filepath')
@@ -767,7 +767,7 @@ def serve_document_pdf(document_id):
         static_pdf_path = os.path.join(static_pdf_dir, filename)
         
         if not os.path.exists(static_pdf_path):
-            logger.info(f"📄 Copying PDF to static folder: {filename}")
+            #logger.info(f"📄 Copying PDF to static folder: {filename}")
             
             # Ensure source file exists and is absolute
             if not os.path.isabs(filepath):
@@ -781,7 +781,7 @@ def serve_document_pdf(document_id):
             # Copy file
             import shutil
             shutil.copy2(source_path, static_pdf_path)
-            logger.info(f"✅ PDF copied to static folder")
+            #logger.info(f"✅ PDF copied to static folder")
         
         # Serve from static folder
         return send_from_directory(static_pdf_dir, filename, 
@@ -789,7 +789,7 @@ def serve_document_pdf(document_id):
                                  as_attachment=False)
         
     except Exception as e:
-        logger.error(f"💥 Error serving PDF: {e}")
+        #logger.error(f"💥 Error serving PDF: {e}")
         return jsonify({'error': f'PDF serving error: {str(e)}'}), 500
 
 # Also add this helper function to find document data more reliably
@@ -801,22 +801,23 @@ def find_document_data(document_id):
         try:
             with open(doc_data_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                logger.info(f"✅ Found document data in results: {doc_data_path}")
+                #logger.info(f"✅ Found document data in results: {doc_data_path}")
                 return data
         except Exception as e:
-            logger.error(f"❌ Error reading document data from results: {e}")
+            print(f"❌ Error reading document data from results: {e}")
+            
     
     # Strategy 2: Check if it's a preloaded document
     try:
         preloaded_docs = scan_upload_folder_for_pdfs()
         for doc in preloaded_docs:
             if doc.get('document_id') == document_id:
-                logger.info(f"✅ Found document in preloaded scan")
+                #logger.info(f"✅ Found document in preloaded scan")
                 return doc
     except Exception as e:
-        logger.error(f"❌ Error scanning preloaded documents: {e}")
+        print(f"❌ Error scanning preloaded documents: {e}")
     
-    logger.error(f"❌ Document {document_id} not found anywhere")
+    #logger.error(f"❌ Document {document_id} not found anywhere")
     return None
     
 @main.route('/debug/document-data/<document_id>', methods=['GET'])
@@ -859,7 +860,7 @@ def serve_uploaded_file(filename):
         uploads_dir = current_app.config['UPLOAD_FOLDER']
         return send_from_directory(uploads_dir, filename)
     except Exception as e:
-        logger.error(f"Error serving uploaded file {filename}: {e}")
+        #logger.error(f"Error serving uploaded file {filename}: {e}")
         return jsonify({'error': 'File not found'}), 404
     
 
@@ -872,7 +873,7 @@ def get_document(document_id):
         if not os.path.exists(doc_data_path):
             return jsonify({'error': 'Document not found'}), 404
         
-        with open(doc_data_path, 'r') as f:
+        with open(doc_data_path, 'r', encoding='utf-8') as f:
             doc_data = json.load(f)
         
         return jsonify({
@@ -888,7 +889,7 @@ def get_document(document_id):
         })
         
     except Exception as e:
-        logger.error(f"Error getting document: {e}")
+        #logger.error(f"Error getting document: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -931,7 +932,7 @@ def get_document_text(document_id):
                 }), 500
         
         # Load from existing document data
-        with open(doc_data_path, 'r') as f:
+        with open(doc_data_path, 'r', encoding='utf-8') as f:
             doc_data = json.load(f)
         
         # Extract text from the PDF file
@@ -949,7 +950,7 @@ def get_document_text(document_id):
         })
         
     except Exception as e:
-        logger.error(f"Error getting document text for {document_id}: {e}")
+        #logger.error(f"Error getting document text for {document_id}: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -963,13 +964,13 @@ def scan_preload_folder_for_pdfs():
     try:
         # Ensure preload directory exists
         if not os.path.exists(uploads_dir):
-            logger.warning(f"Preload directory does not exist: {uploads_dir}")
+            #logger.warning(f"Preload directory does not exist: {uploads_dir}")
             return []
         
         # Get all PDF files in the preload directory
         pdf_files = [f for f in os.listdir(uploads_dir) if f.lower().endswith('.pdf')]
         
-        logger.info(f"Found {len(pdf_files)} PDF files in preload folder")
+        #logger.info(f"Found {len(pdf_files)} PDF files in preload folder")
         
         for pdf_file in pdf_files:
             try:
@@ -977,7 +978,7 @@ def scan_preload_folder_for_pdfs():
 
                 # Verify file actually exists before processing
                 if not os.path.exists(filepath):
-                    logger.warning(f"PDF file listed but not found: {filepath}")
+                    #logger.warning(f"PDF file listed but not found: {filepath}")
                     continue
                 
                 # Get base name without extension
@@ -1003,15 +1004,15 @@ def scan_preload_folder_for_pdfs():
                         # Verify the PDF file still exists
                         if os.path.exists(filepath):
                             preloaded_docs.append(metadata)
-                            logger.info(f"Loaded existing metadata for {pdf_file}")
+                            #logger.info(f"Loaded existing metadata for {pdf_file}")
                         else:
-                            logger.warning(f"Metadata exists but PDF file missing: {filepath}")
+                            print(f"Metadata exists but PDF file missing: {filepath}")
                         continue
                     except Exception as e:
-                        logger.warning(f"Failed to load existing metadata for {pdf_file}: {e}")
+                        print(f"Failed to load existing metadata for {pdf_file}: {e}")
                 
                 # Extract text and create new metadata
-                logger.info(f"Processing new PDF: {pdf_file}")
+                #logger.info(f"Processing new PDF: {pdf_file}")
                 try:
                     pdf_text = extract_text(filepath)
                     sentences = extract_sentences_from_pdf(pdf_text)
@@ -1039,18 +1040,18 @@ def scan_preload_folder_for_pdfs():
                         json.dump(sentences, f, indent=2, ensure_ascii=False)
 
                     preloaded_docs.append(metadata)
-                    logger.info(f"Successfully processed {pdf_file} - saved metadata and sentences to preload folder")
+                    #logger.info(f"Successfully processed {pdf_file} - saved metadata and sentences to preload folder")
                     
                 except Exception as text_error:
-                    logger.error(f"Failed to extract text from {pdf_file}: {text_error}")
+                    #logger.error(f"Failed to extract text from {pdf_file}: {text_error}")
                     continue
                 
             except Exception as e:
-                logger.error(f"Error processing {pdf_file}: {e}")
+                #logger.error(f"Error processing {pdf_file}: {e}")
                 continue
     
     except Exception as e:
-        logger.error(f"Error scanning preload folder: {e}")
+        print(f"Error scanning preload folder: {e}")
     
     return preloaded_docs
 
@@ -1063,7 +1064,7 @@ def get_preloaded_documents():
         return jsonify({'success': True,
                        'documents': preloaded_docs}), 200
     except Exception as e:
-        logger.error(f"Error getting preloaded documents: {e}")
+        #logger.error(f"Error getting preloaded documents: {e}")
         return jsonify({'error': 'Failed to load preloaded documents'}), 500
 
 
@@ -1110,7 +1111,7 @@ def create_session():
         })
         
     except Exception as e:
-        logger.error(f"Error creating session: {e}")
+        #logger.error(f"Error creating session: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1134,7 +1135,7 @@ def get_session(session_id):
         })
         
     except Exception as e:
-        logger.error(f"Error getting session: {e}")
+        #logger.error(f"Error getting session: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1146,10 +1147,12 @@ def get_session(session_id):
 
 @main.route('/sessions/<session_id>/process-text', methods=['POST'])
 def process_text_question(session_id):
-    """Process a question against document text using provenance algorithm"""
+    """Process a question against document text using provenance algorithm
+        AKA - ask a question about a document"""
     data = request.json
     question_text = data.get('question')
     document_id = data.get('document_id')
+    document_text = data.get('document_text', None)
     
     if not question_text:
         return jsonify({'error': 'Question text required'}), 400
@@ -1206,7 +1209,7 @@ def process_text_question(session_id):
         
         # Start processing in background thread
         from threading import Thread
-        thread = Thread(target=process_question_session, args=(processing_session_id, question_text, doc_data, question_id))
+        thread = Thread(target=process_question_session, args=(processing_session_id, question_text, document_text, question_id))
         thread.daemon = True
         thread.start()
         
@@ -1220,7 +1223,7 @@ def process_text_question(session_id):
         })
         
     except Exception as e:
-        logger.error(f"Error processing text question: {e}")
+        #logger.error(f"Error processing text question: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1282,7 +1285,7 @@ def get_text_processing_progress(session_id, processing_session_id):
             })
             
     except Exception as e:
-        logger.error(f"Error getting processing progress: {e}")
+        #logger.error(f"Error getting processing progress: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1296,7 +1299,7 @@ def get_text_processing_results(session_id, processing_session_id):
         if not os.path.exists(provenance_path):
             return jsonify({'error': 'Processing results not found'}), 404
         
-        with open(provenance_path, 'r') as f:
+        with open(provenance_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
         # Check if there's an answer file
@@ -1315,7 +1318,7 @@ def get_text_processing_results(session_id, processing_session_id):
         })
         
     except Exception as e:
-        logger.error(f"Error getting processing results: {e}")
+        #logger.error(f"Error getting processing results: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1361,7 +1364,7 @@ def get_document_sentences(document_id):
             })
         
     except Exception as e:
-        logger.error(f"Error getting document sentences for {document_id}: {e}")
+        #logger.error(f"Error getting document sentences for {document_id}: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1389,7 +1392,7 @@ def get_specific_sentence(document_id, sentence_id):
         })
         
     except Exception as e:
-        logger.error(f"Error getting sentence {sentence_id} for document {document_id}: {e}")
+        #logger.error(f"Error getting sentence {sentence_id} for document {document_id}: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1443,7 +1446,7 @@ def get_processing_sentences(session_id, processing_session_id):
         })
         
     except Exception as e:
-        logger.error(f"Error getting processing sentences: {e}")
+        #logger.error(f"Error getting processing sentences: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1472,7 +1475,7 @@ def get_session_questions(session_id):
         })
         
     except Exception as e:
-        logger.error(f"Error getting session questions: {e}")
+        #logger.error(f"Error getting session questions: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1504,7 +1507,7 @@ def get_document_questions(session_id, document_id):
         })
         
     except Exception as e:
-        logger.error(f"Error getting document questions: {e}")
+        #logger.error(f"Error getting document questions: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1540,7 +1543,7 @@ def get_specific_question(session_id, document_id, question_id):
         })
         
     except Exception as e:
-        logger.error(f"Error getting specific question: {e}")
+        #logger.error(f"Error getting specific question: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1589,7 +1592,7 @@ def submit_feedback():
         })
         
     except Exception as e:
-        logger.error(f"Error submitting feedback: {e}")
+        #logger.error(f"Error submitting feedback: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1619,7 +1622,7 @@ def save_document_data(document_id, doc_data, sentences):
     with open(metadata_path, 'w', encoding='utf-8') as f:
         json.dump(metadata, f, indent=2, ensure_ascii=False)
     
-    logger.info(f"Saved document data for {base_name} in {'preloaded' if is_preloaded else 'uploads'}")
+    #logger.info(f"Saved document data for {base_name} in {'preloaded' if is_preloaded else 'uploads'}")
 
 def find_document_data(document_id):
     """Find document data by ID from uploads or preloaded folders"""
@@ -1643,10 +1646,10 @@ def find_document_data(document_id):
                                 sentences = json.load(f)
                             metadata['sentences'] = sentences
                         
-                        logger.info(f"✅ Found preloaded document: {base_name}")
+                        #logger.info(f"✅ Found preloaded document: {base_name}")
                         return metadata
                 except Exception as e:
-                    logger.error(f"Error reading preloaded metadata {item}: {e}")
+                    print(f"Error reading preloaded metadata {item}: {e}")
     
     # Strategy 2: Check uploaded documents
     uploads_dir = current_app.config['UPLOAD_FOLDER']
@@ -1668,40 +1671,25 @@ def find_document_data(document_id):
                                 sentences = json.load(f)
                             metadata['sentences'] = sentences
                         
-                        logger.info(f"✅ Found uploaded document: {base_name}")
+                        #logger.info(f"✅ Found uploaded document: {base_name}")
                         return metadata
                 except Exception as e:
-                    logger.error(f"Error reading uploaded metadata {item}: {e}")
-    logger.error(f"❌ Document {document_id} not found in uploads or preloaded directories")
+                    print(f"Error reading uploaded metadata {item}: {e}")
+    print(f"❌ Document {document_id} not found in uploads or preloaded directories")
     return None
 
-def process_question_session(processing_session_id, question_text, doc_data, question_id):
+def process_question_session(processing_session_id, question_text, pdf_text, question_id):
     """Process a single question-document session using pre-extracted sentences"""
     start_time = time.time()
-    
+    sentences = extract_sentences_from_pdf(pdf_text)
     try:
-        # Get pre-extracted sentences from doc_data
-        sentences = doc_data.get('sentences', [])
-        if not sentences:
-            update_process_log(processing_session_id, "Error: No sentences found in document data", status="error")
-            return
-            
-        sentence_count = len(sentences)
-        update_process_log(processing_session_id, f"Analyzing document with {sentence_count} sentences...")
+
+        update_process_log(processing_session_id, f"Analyzing document with {len(pdf_text)} characters...")
         
         result_path = os.path.join(RESULT_DIR, processing_session_id)
         
         # Ensure result directory exists
         os.makedirs(result_path, exist_ok=True)
-        
-        # Save sentences to the processing session for later reference
-        sentences_path = os.path.join(result_path, 'sentences.json')
-        with open(sentences_path, 'w', encoding='utf-8') as f:
-            json.dump(sentences, f, ensure_ascii=False, indent=2)
-        
-        # Convert sentences list back to text for the algorithm
-        # (Your algorithm might expect text, but we'll maintain sentence boundaries)
-        pdf_text = ' '.join(sentences)
         
         # Capture stdout to preserve the exact output format
         stdout_buffer = StringIO()
@@ -1712,7 +1700,6 @@ def process_question_session(processing_session_id, question_text, doc_data, que
         
         try:
             # Process the question using doc_provenance API with sentence-aware text
-            update_process_log(processing_session_id, f"Starting provenance algorithm...")
             doc_provenance.divide_and_conquer_progressive_API(question_text, pdf_text, result_path)
             
             algorithm_end_time = time.time()
@@ -1743,47 +1730,49 @@ def process_question_session(processing_session_id, question_text, doc_data, que
                                 id_part = parts[0].strip()
                                 prov_id = int(id_part.split('-')[1].split()[0])
                                 
-                                # Extract sentence IDs from square brackets
+                                 # Extract sentence IDs from square brackets
                                 ids_str = parts[1].strip()
+                                # Remove square brackets
                                 ids_str = ids_str.strip('[]')
+                                # Split by comma and convert to integers
                                 prov_ids = [int(id_str.strip()) for id_str in ids_str.split(',') if id_str.strip()]
-                                
-                                # Validate sentence IDs are within range
-                                valid_prov_ids = [pid for pid in prov_ids if 0 <= pid < sentence_count]
-                                if len(valid_prov_ids) != len(prov_ids):
-                                    update_process_log(processing_session_id, f"Warning: Some sentence IDs out of range for provenance {prov_id}")
-                                
+                                    
                                 current_entry = {
                                     "provenance_id": prov_id,
-                                    "sentences_ids": valid_prov_ids,
+                                    "sentences_ids": prov_ids,
                                     "time": 0,
                                     "input_token_size": 0,
                                     "output_token_size": 0
                                 }
                         except Exception as e:
-                            logger.error(f"Error parsing provenance line '{line}': {str(e)}")
+                            #logger.error(f"Error parsing provenance line '{line}': {str(e)}")
                             pass
                     
                     # Parse time and token information
                     elif line.startswith('Time:') and current_entry is not None:
                         try:
                             current_entry["time"] = float(line.split(':')[1].strip())
+
+                            # Write current provenance entries after each time entry is processed
+                            # This ensures we save intermediate results
+                            provenance_path = os.path.join(result_path, 'provenance.json')
+                            with open(provenance_path, 'w') as f:
+                                temp_entries = provenance_entries.copy()
+                                if current_entry is not None:
+                                    temp_entries.append(current_entry)
+                                json.dump(temp_entries, f, indent=2)
                         except:
                             pass
                     
                     elif line.startswith('Input tokens:') and current_entry is not None:
                         try:
-                            tokens = int(line.split(':')[1].strip())
-                            current_entry["input_token_size"] = tokens
-                            total_input_tokens += tokens
+                            current_entry["input_token_size"] = int(line.split(':')[1].strip())
                         except:
                             pass
                     
                     elif line.startswith('Output tokens:') and current_entry is not None:
                         try:
-                            tokens = int(line.split(':')[1].strip())
-                            current_entry["output_token_size"] = tokens
-                            total_output_tokens += tokens
+                            current_entry["output_token_size"] = int(line.split(':')[1].strip())
                         except:
                             pass
             
@@ -1818,12 +1807,8 @@ def process_question_session(processing_session_id, question_text, doc_data, que
                     "completed": True,
                     "timestamp": time.time(),
                     "total_provenance": len(enhanced_provenance),
-                    "processing_session_id": processing_session_id,
                     "total_processing_time": time.time() - start_time,
-                    "algorithm_processing_time": algorithm_processing_time,
-                    "sentence_count": sentence_count,
-                    "total_input_tokens": total_input_tokens,
-                    "total_output_tokens": total_output_tokens
+                    "algorithm_processing_time": algorithm_processing_time
                 }, f)
             
             update_process_log(processing_session_id, f"Text processing completed! Found {len(enhanced_provenance)} provenance entries.", status="completed")
@@ -1832,7 +1817,7 @@ def process_question_session(processing_session_id, question_text, doc_data, que
             sys.stdout = stdout_backup
             
     except Exception as e:
-        logger.exception("Error in text processing session")
+        #logger.exception("Error in text processing session")
         update_process_log(processing_session_id, f"Error: {str(e)}", status="error")
 
 def update_process_log(processing_session_id, message, status=None):
@@ -1860,4 +1845,344 @@ def update_process_log(processing_session_id, message, status=None):
     with open(logs_path, 'w') as f:
         json.dump(logs, f)
     
-    logger.info(f"Processing session {processing_session_id}: {message}")
+    #logger.info(f"Processing session {processing_session_id}: {message}")
+
+
+# yash_code below:
+
+@main.route('/ask', methods=['POST'])
+def ask_question():
+    data = request.json
+    question = data.get('question')
+    filename = data.get('filename')
+    
+    
+    if not question or not filename:
+        return jsonify({'error': 'Question or filename missing'}), 400
+    
+    # Get PDF data
+    pdf_data_path = os.path.join(RESULT_DIR, f"{filename.split('.')[0]}_data.json")
+    try:
+        with open(pdf_data_path, 'r') as f:
+            pdf_data = json.load(f)
+    except FileNotFoundError:
+        return jsonify({'error': 'PDF data not found'}), 404
+    
+    filepath = pdf_data.get('filepath')
+    if not filepath or not os.path.exists(filepath):
+        return jsonify({'error': 'PDF file not found'}), 404
+    
+    # Extract text from PDF
+    pdf_text = extract_text(filepath)
+    
+    # Create result path for this question
+    question_id = str(int(time.time()))
+    result_path = os.path.join(RESULT_DIR, question_id)
+    os.makedirs(result_path, exist_ok=True)
+    
+    # Save sentences for later
+    sentences_path = os.path.join(result_path, 'sentences.json')
+    with open(sentences_path, 'w') as f:
+        json.dump(pdf_data.get('sentences', []), f)
+    
+    # DO NOT initialize the provenance file with an empty array
+    # The doc_provenance function will create and write to this file
+    
+    # Initialize process logs
+    logs_path = os.path.join(result_path, 'process_logs.json')
+    logs = {
+        'status': 'started',
+        'logs': [f"[{time.strftime('%H:%M:%S')}] Processing started: {question}"],
+        'timestamp': time.time()
+    }
+    with open(logs_path, 'w') as f:
+        json.dump(logs, f)
+    
+    # Start processing in a separate thread
+    from threading import Thread
+    def process_question():
+        try:
+            # Add log entry
+            update_process_log(question_id, f"Analyzing document with {len(pdf_text)} characters...")
+            
+            # Capture stdout to preserve the exact output format
+            stdout_buffer = StringIO()
+            stdout_backup = sys.stdout
+            sys.stdout = stdout_buffer
+            
+            try:
+                # Process the question using doc_provenance API
+                doc_provenance.divide_and_conquer_progressive_API(question, pdf_text, result_path)
+                
+                # Get the captured output
+                output = stdout_buffer.getvalue()
+                
+                # Extract provenance information from the output
+                provenance_entries = []
+                current_entry = None
+                
+                for line in output.strip().split('\n'):
+                    if line.strip():
+                        update_process_log(question_id, line.strip())
+                        
+                        # Parse Top-X provenance lines
+                        if line.startswith('Top-'):
+                            if current_entry is not None:
+                                provenance_entries.append(current_entry)
+                            
+                            # Extract provenance ID and sentence IDs
+                            try:
+                                parts = line.split('provenance:')
+                                if len(parts) >= 2:
+                                    id_part = parts[0].strip()
+                                    prov_id = int(id_part.split('-')[1].split()[0])
+                                    
+                                    # Extract sentence IDs from square brackets
+                                    ids_str = parts[1].strip()
+                                    # Remove square brackets
+                                    ids_str = ids_str.strip('[]')
+                                    # Split by comma and convert to integers
+                                    prov_ids = [int(id_str.strip()) for id_str in ids_str.split(',') if id_str.strip()]
+                                    
+                                    #logger.info(f"Found provenance {prov_id} with IDs: {prov_ids}")
+                                    
+                                    current_entry = {
+                                        "provenance_id": prov_id,
+                                        "sentences_ids": prov_ids,
+                                        "time": 0,
+                                        "input_token_size": 0,
+                                        "output_token_size": 0
+                                    }
+                            except Exception as e:
+                                #logger.error(f"Error parsing provenance line '{line}': {str(e)}")
+                                # If we can't parse the line properly, just skip it
+                                pass
+                        
+                        # Parse time information
+                        elif line.startswith('Time:') and current_entry is not None:
+                            try:
+                                current_entry["time"] = float(line.split(':')[1].strip())
+                                
+                                # Write current provenance entries after each time entry is processed
+                                # This ensures we save intermediate results
+                                provenance_path = os.path.join(result_path, 'provenance.json')
+                                with open(provenance_path, 'w') as f:
+                                    temp_entries = provenance_entries.copy()
+                                    if current_entry is not None:
+                                        temp_entries.append(current_entry)
+                                    json.dump(temp_entries, f, indent=2)
+                                    
+                            except:
+                                pass
+                        
+                        # Parse token information
+                        elif line.startswith('Input tokens:') and current_entry is not None:
+                            try:
+                                current_entry["input_token_size"] = int(line.split(':')[1].strip())
+                            except:
+                                pass
+                        
+                        elif line.startswith('Output tokens:') and current_entry is not None:
+                            try:
+                                current_entry["output_token_size"] = int(line.split(':')[1].strip())
+                            except:
+                                pass
+                
+                # Add the last entry if it exists
+                if current_entry is not None:
+                    provenance_entries.append(current_entry)
+                
+                # Write the processed provenance entries to a new file
+                provenance_path = os.path.join(result_path, 'provenance.json')
+                with open(provenance_path, 'w') as f:
+                    json.dump(provenance_entries, f, indent=2)
+                    
+                # Create a status file to indicate all processing is done
+                status_path = os.path.join(result_path, 'status.json')
+                with open(status_path, 'w') as f:
+                    json.dump({
+                        "completed": True,
+                        "timestamp": time.time(),
+                        "total_provenance": len(provenance_entries)
+                    }, f)
+                
+                # Mark process as complete
+                update_process_log(question_id, "Processing completed!", status="completed")
+            finally:
+                # Restore stdout
+                sys.stdout = stdout_backup
+                
+        except Exception as e:
+            #logger.exception("Error processing question")
+            update_process_log(question_id, f"Error: {str(e)}", status="error")
+    
+    thread = Thread(target=process_question)
+    thread.daemon = True
+    thread.start()
+    
+    return jsonify({
+        'success': True,
+        'question_id': question_id,
+        'message': 'Processing started'
+    })
+
+def update_process_log(question_id, message, status=None):
+    """Add a new message to the process logs"""
+    logs_path = os.path.join(RESULT_DIR, question_id, 'process_logs.json')
+    try:
+        with open(logs_path, 'r') as f:
+            logs = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        logs = {'status': 'started', 'logs': [], 'timestamp': time.time()}
+    
+    # Don't add timestamp for messages from doc_provenance
+    if message.startswith('Top-') or message.startswith('Labeler') or message.startswith('Provenance:') or 'tokens:' in message or 'Time:' in message:
+        log_entry = message
+    else:
+        # Add timestamp to the message
+        log_entry = f"[{time.strftime('%H:%M:%S')}] {message}"
+        
+    logs['logs'].append(log_entry)
+    
+    # Update status if provided
+    if status:
+        logs['status'] = status
+    
+    # Update timestamp
+    logs['timestamp'] = time.time()
+    
+    # Write back to the file
+    with open(logs_path, 'w') as f:
+        json.dump(logs, f)
+    
+    #logger.info(f"Question {question_id}: {message}")
+
+@main.route('/results/<question_id>', methods=['GET'])
+def get_results(question_id):
+    # Check if the provenance file exists
+    provenance_path = os.path.join(RESULT_DIR, question_id, 'provenance.json')
+    if not os.path.exists(provenance_path):
+        return jsonify({'error': 'Results not found'}), 404
+    
+    # Read the provenance file
+    with open(provenance_path, 'r') as f:
+        data = json.load(f)
+    
+    # Check if there's an answer file
+    answer_path = os.path.join(RESULT_DIR, question_id, 'answers.txt')
+    answer = None
+    if os.path.exists(answer_path):
+        with open(answer_path, 'r') as f:
+            answer = f.read().strip()
+    
+    return jsonify({
+        'success': True,
+        'provenance': data,
+        'answer': answer
+    })
+
+@main.route('/check-progress/<question_id>', methods=['GET'])
+def check_progress(question_id):
+    # Read the provenance file to check progress
+    provenance_path = os.path.join(RESULT_DIR, question_id, 'provenance.json')
+    logs_path = os.path.join(RESULT_DIR, question_id, 'process_logs.json')
+    
+    # Get process logs if available
+    logs = []
+    status = 'processing'
+    if os.path.exists(logs_path):
+        try:
+            with open(logs_path, 'r') as f:
+                log_data = json.load(f)
+                logs = log_data.get('logs', [])
+                status = log_data.get('status', 'processing')
+        except json.JSONDecodeError:
+            pass
+    
+    if not os.path.exists(provenance_path):
+        return jsonify({
+            'progress': 0, 
+            'done': False,
+            'logs': logs,
+            'status': status
+        })
+    
+    try:
+        with open(provenance_path, 'r') as f:
+            data = json.load(f)
+        
+        # Make sure data is an array
+        provenance_data = data if isinstance(data, list) else []
+        
+        # Determine if processing is done
+        done = status == 'completed' or len(provenance_data) > 0
+        
+        return jsonify({
+            'progress': len(provenance_data),
+            'done': done,
+            'data': provenance_data,
+            'logs': logs,
+            'status': status
+        })
+    except json.JSONDecodeError:
+        # File might be being written to
+        return jsonify({
+            'progress': 0, 
+            'done': False,
+            'logs': logs,
+            'status': status
+        })
+        
+@main.route('/sentences/<question_id>', methods=['GET'])
+def get_sentences(question_id):
+    # Get sentence IDs from query parameters
+    sentence_ids = request.args.get('ids')
+    if not sentence_ids:
+        return jsonify({'error': 'No sentence IDs provided'}), 400
+    
+    # Parse sentence IDs
+    try:
+        sentence_ids = [int(id) for id in sentence_ids.split(',')]
+    except ValueError:
+        return jsonify({'error': 'Invalid sentence IDs format'}), 400
+    
+    # Get sentences file
+    sentences_path = os.path.join(RESULT_DIR, question_id, 'sentences.json')
+    if not os.path.exists(sentences_path):
+        return jsonify({'error': 'Sentences not found'}), 404
+    
+    # Read sentences
+    with open(sentences_path, 'r') as f:
+        sentences = json.load(f)
+    
+    # Get requested sentences
+    result = {}
+    for id in sentence_ids:
+        if 0 <= id < len(sentences):
+            result[id] = sentences[id]
+        else:
+            result[id] = f"Sentence ID {id} out of range"
+    
+    return jsonify({
+        'success': True,
+        'sentences': result
+    })
+
+@main.route('/status/<question_id>', methods=['GET'])
+def check_status(question_id):
+    """Check if processing is fully complete and all provenance entries are available"""
+    status_path = os.path.join(RESULT_DIR, question_id, 'status.json')
+    
+    if os.path.exists(status_path):
+        try:
+            with open(status_path, 'r') as f:
+                status_data = json.load(f)
+            return jsonify(status_data)
+        except:
+            pass
+    
+    # If no status file exists or there was an error reading it
+    return jsonify({
+        "completed": False,
+        "timestamp": time.time()
+    }) 

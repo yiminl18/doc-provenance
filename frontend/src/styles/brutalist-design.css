@@ -101,8 +101,8 @@
   --shadow-pressed: inset -1px -1px 0px rgba(255, 255, 255, 0.8), inset 1px 1px 0px rgba(0, 0, 0, 0.2);
   
   /* Layout Constants */
-  --sidebar-width: 320px;
-  --analysis-panel-width: 420px;
+  --left-sidebar-width: 240px;
+  --right-panel-width: 360px;
   --header-height: 64px;
   
   /* Smooth Transitions */

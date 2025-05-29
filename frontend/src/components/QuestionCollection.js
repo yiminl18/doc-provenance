@@ -2,27 +2,33 @@ import React, { useState, useRef, useEffect } from 'react';
 import '../styles/brutalist-design.css';
 import '../styles/question-collection.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faTerminal, 
-  faPaperPlane, 
-  faHistory, 
+import {
+  faTerminal,
+  faPaperPlane,
+  faHistory,
   faRedo,
+  faFileAlt,
   faClock,
   faCheck,
   faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 
-const QuestionCollection = ({ document, onQuestionSubmit, onReaskQuestion }) => {
+const QuestionCollection = ({ pdfDocument, onQuestionSubmit, onReaskQuestion }) => {
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inputRef = useRef(null);
   const historyRef = useRef(null);
 
   // Get questions history from document
-  const questionsHistory = document ? 
-    Array.from(document.questions.values()).sort(
+  const questionsHistory = pdfDocument ?
+    Array.from(pdfDocument.questions.values()).sort(
       (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
     ) : [];
+
+  // Get the active question and its data
+  const activeQuestion = pdfDocument?.activeQuestionId
+    ? pdfDocument.questions.get(pdfDocument.activeQuestionId)
+    : null;
 
   // Check if currently processing any questions
   const isProcessing = questionsHistory.some(q => q.isProcessing);
@@ -30,7 +36,7 @@ const QuestionCollection = ({ document, onQuestionSubmit, onReaskQuestion }) => 
   // Handle question submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!currentQuestion.trim() || isSubmitting || isProcessing) return;
+    if (!currentQuestion.trim() || isSubmitting || isProcessing || !pdfDocument) return;
 
     setIsSubmitting(true);
     try {
@@ -72,9 +78,9 @@ const QuestionCollection = ({ document, onQuestionSubmit, onReaskQuestion }) => 
   }, []);
 
   const formatTimestamp = (date) => {
-    return new Date(date).toLocaleTimeString([], { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return new Date(date).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -87,6 +93,16 @@ const QuestionCollection = ({ document, onQuestionSubmit, onReaskQuestion }) => 
       return { icon: faClock, color: 'var(--win95-text-muted)', spin: false, text: 'Pending' };
     }
   };
+
+    if (!pdfDocument) {
+    return (
+      <div className="qa-flow-empty">
+        <div className="empty-icon">🤔</div>
+        <h4>Ready for Questions</h4>
+        <p>Upload a document to start asking questions and analyzing provenance.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="question-collection">
@@ -103,45 +119,43 @@ const QuestionCollection = ({ document, onQuestionSubmit, onReaskQuestion }) => 
       </div>
 
       <div className="question-collection-content">
-        
+
         {/* Question Input Section */}
-        <div className="question-input-section">
-          <div className="input-header">
+        <div className="question-input-container">
+          <div className="question-input-header">
             <span className="terminal-prompt">$</span>
             <span className="prompt-label">Ask a question about this document:</span>
           </div>
-          
+
           <form onSubmit={handleSubmit} className="question-form">
-            <div className="input-container">
-              <textarea
-                ref={inputRef}
-                className="question-textarea"
-                value={currentQuestion}
-                onChange={(e) => setCurrentQuestion(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={
-                  isProcessing 
-                    ? "Please wait for current question to complete..." 
-                    : "What would you like to know about this document?"
-                }
-                disabled={isSubmitting || isProcessing}
-                rows={3}
-              />
-              <button
-                type="submit"
-                className="submit-btn"
-                disabled={!currentQuestion.trim() || isSubmitting || isProcessing}
-              >
-                {isSubmitting ? (
-                  <FontAwesomeIcon icon={faSpinner} spin />
-                ) : (
-                  <FontAwesomeIcon icon={faPaperPlane} />
-                )}
-                <span>
-                  {isSubmitting ? 'Submitting...' : 'Ask Question'}
-                </span>
-              </button>
-            </div>
+
+            <textarea
+              className="question-textarea"
+              value={currentQuestion}
+              onChange={(e) => setCurrentQuestion(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={
+                isProcessing
+                  ? "Please wait for current question to complete..."
+                  : "What would you like to know about this document?"
+              }
+              disabled={isSubmitting || isProcessing}
+              rows={2}
+            />
+            <button
+              type="submit"
+              className="submit-btn"
+              disabled={!currentQuestion.trim() || isSubmitting || isProcessing}
+            >
+              {isSubmitting ? (
+                <FontAwesomeIcon icon={faSpinner} spin />
+              ) : (
+                <FontAwesomeIcon icon={faPaperPlane} />
+              )}
+              <span>
+                {isSubmitting ? 'Submitting...' : 'Ask Question'}
+              </span>
+            </button>
           </form>
         </div>
 
@@ -157,7 +171,7 @@ const QuestionCollection = ({ document, onQuestionSubmit, onReaskQuestion }) => 
               </div>
             )}
           </div>
-          
+
           <div className="questions-history" ref={historyRef}>
             {questionsHistory.length === 0 ? (
               <div className="empty-history">
@@ -169,14 +183,14 @@ const QuestionCollection = ({ document, onQuestionSubmit, onReaskQuestion }) => 
               questionsHistory.map((question) => {
                 const status = getQuestionStatus(question);
                 return (
-                  <div 
-                    key={question.id} 
+                  <div
+                    key={question.id}
                     className={`question-history-item ${question.isProcessing ? 'processing' : 'completed'}`}
                   >
                     <div className="question-header">
                       <div className="question-status">
-                        <FontAwesomeIcon 
-                          icon={status.icon} 
+                        <FontAwesomeIcon
+                          icon={status.icon}
                           spin={status.spin}
                           style={{ color: status.color }}
                         />
@@ -186,25 +200,34 @@ const QuestionCollection = ({ document, onQuestionSubmit, onReaskQuestion }) => 
                         {formatTimestamp(question.createdAt)}
                       </div>
                     </div>
-                    
+
                     <div className="question-text">
                       {question.text}
                     </div>
+
+                          {/* Processing Indicator */}
+                          {isProcessing && (
+                            <div className="processing-indicator">
+                              <div className="processing-text">
+                                <div className="terminal-cursor"></div>
+                                <span>ANALYZING_DOCUMENT...</span>
+                              </div>
+                            </div>
+                          )}
                     
-                    {question.answer && (
-                      <div className="question-answer">
-                        <strong>Answer:</strong> {question.answer}
-                      </div>
-                    )}
-                    
-                    {question.provenanceSources && question.provenanceSources.length > 0 && (
-                      <div className="provenance-summary">
-                        <span className="provenance-count">
-                          {question.provenanceSources.length} evidence source{question.provenanceSources.length !== 1 ? 's' : ''} found
-                        </span>
-                      </div>
-                    )}
-                    
+                          {/* Answer Section */}
+                          {activeQuestion?.answer && (
+                            <div className="answer-container">
+                              <div className="answer-header">
+                                <FontAwesomeIcon icon={faFileAlt} />
+                                <span>Response</span>
+                              </div>
+                              <div className="answer-content">
+                                {activeQuestion.answer}
+                              </div>
+                            </div>
+                          )}
+
                     <div className="question-actions">
                       <button
                         className="reask-btn"
@@ -215,7 +238,7 @@ const QuestionCollection = ({ document, onQuestionSubmit, onReaskQuestion }) => 
                         <FontAwesomeIcon icon={faRedo} />
                         <span>Ask Again</span>
                       </button>
-                      
+
                       {question.feedback && (
                         <span className="feedback-indicator">
                           ✓ Feedback provided

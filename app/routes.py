@@ -1,7 +1,8 @@
-import doc_provenance, hashlib, json, logging, os, random, shutil, sys, time, uuid
-from datetime import datetime
+import doc_provenance, hashlib, json, logging, os, random, shutil, sys, threading, time, uuid
+from datetime import datetime, timedelta
 from io import StringIO
 from flask import Blueprint, render_template, request, jsonify, current_app, send_from_directory, session, send_file
+from threading import Thread
 from werkzeug.utils import secure_filename
 from pdfminer.high_level import extract_text
 from doc_provenance.base_strategies import extract_sentences_from_pdf
@@ -21,14 +22,29 @@ ALGORITHM_CONFIGURATIONS = {
     'minimal':  minimal_provenance_strategy_pool
 }
 
+# =============================================================================
+
+# Configuration for the experiment
+
+PROCESSING_TIMEOUT = 300  # 5 minutes timeout for processing
+EXPERIMENT_TOP_K = 5  # User-facing limit for this experiment
+MAX_PROVENANCE_PROCESSING = 50  # Internal limit to prevent infinite processing
+
+class ProcessingTimeoutError(Exception):
+    """Custom timeout exception for processing"""
+    pass
+
+# =============================================================================
+
 # Directory configurations
 RESULT_DIR = os.path.join(os.getcwd(), 'app/results')
 PRELOAD_DIR = os.path.join(os.getcwd(), 'app/preloaded')
-COLLECTIONS_DIR = os.path.join(os.getcwd(), 'app/collections')
 STUDY_LOGS_DIR = os.path.join(os.getcwd(), 'app/study_logs')
 
+# =============================================================================
+
 # Create directories
-for directory in [RESULT_DIR, PRELOAD_DIR, COLLECTIONS_DIR, STUDY_LOGS_DIR]:
+for directory in [RESULT_DIR, PRELOAD_DIR, STUDY_LOGS_DIR]:
     os.makedirs(directory, exist_ok=True)
 
 # Set up logging
@@ -1436,8 +1452,6 @@ def ask_question_in_session(session_id):
         with open(logs_file, 'w', encoding='utf-8') as f:
             json.dump(logs, f, indent=2, ensure_ascii=False)
         
-        # Start processing in background thread
-        from threading import Thread
         thread = Thread(target=process_question_in_session, 
                        args=(session_id, question_id, question_text, pdf_text, question_dir))
         thread.daemon = True
@@ -1471,42 +1485,96 @@ def ask_question_in_session(session_id):
 
 def process_question_in_session(session_id, question_id, question_text, pdf_text, question_dir):
     """Background processing for a question within a session"""
+
+    processing_start_time = time.time()
+    timeout_deadline = processing_start_time + PROCESSING_TIMEOUT
+
+
     try:
         update_question_log(question_dir, f"Analyzing document with {len(pdf_text)} characters...")
         
-        # Process using doc_provenance
-        import sys
-        from io import StringIO
-        
+
         stdout_buffer = StringIO()
         stdout_backup = sys.stdout
         sys.stdout = stdout_buffer
         
         try:
-            # Process the question
+            if time.time() > timeout_deadline:
+                raise ProcessingTimeoutError(f"Processing timed out after {PROCESSING_TIMEOUT} seconds for question {question_id}")
             doc_provenance.divide_and_conquer_progressive_API(question_text, pdf_text, question_dir)
             
+            # Check if we hit the timeout during processing
+            if time.time() > timeout_deadline:
+                raise ProcessingTimeoutError(f"Processing timed out after {PROCESSING_TIMEOUT} seconds for question {question_id}")
             # Get captured output
             output = stdout_buffer.getvalue()
             
-            # Parse provenance entries (same logic as before)
+            # Parse provenance entries
             provenance_entries = parse_provenance_output(output, question_dir)
             
-            # Save final provenance
-            provenance_file = os.path.join(question_dir, 'provenance.json')
-            with open(provenance_file, 'w', encoding='utf-8') as f:
-                json.dump(provenance_entries, f, indent=2, ensure_ascii=False)
+            # Limit to top-5 provenance entries
+            top_provenance_entries = provenance_entries[:5] if len(provenance_entries) > 5 else provenance_entries
             
-            # Create completion status
-            status_file = os.path.join(question_dir, 'completion_status.json')
-            with open(status_file, 'w') as f:
-                json.dump({
-                    "completed": True,
-                    "timestamp": time.time(),
-                    "total_provenance": len(provenance_entries),
-                    "session_id": session_id,
-                    "question_id": question_id
-                }, f, indent=2)
+            processing_time = time.time() - processing_start_time
+            
+            # Check if we got meaningful results
+            if not top_provenance_entries:
+                # No provenance found - this indicates the document may not be suitable for atomic decomposition
+                update_question_log(question_dir, "No provenance evidence found for this question.")
+                update_question_log(question_dir, "This may indicate that the document cannot be broken into smaller atomic units to answer this specific question.")
+                
+                # Save empty provenance with explanation
+                provenance_file = os.path.join(question_dir, 'provenance.json')
+                with open(provenance_file, 'w', encoding='utf-8') as f:
+                    json.dump({
+                        "provenance_entries": [],
+                        "total_found": 0,
+                        "processing_time": processing_time,
+                        "status": "no_provenance_found",
+                        "explanation": "The document could not be decomposed into atomic units that support answering this question. This may happen when: 1) The answer requires synthesis across the entire document, 2) The question is too abstract or general, 3) The required information is not present in the document, or 4) The document structure doesn't align with the question's granularity requirements."
+                    }, f, indent=2, ensure_ascii=False)
+                
+                # Update completion status
+                status_file = os.path.join(question_dir, 'completion_status.json')
+                with open(status_file, 'w') as f:
+                    json.dump({
+                        "completed": True,
+                        "timestamp": time.time(),
+                        "total_provenance": 0,
+                        "session_id": session_id,
+                        "question_id": question_id,
+                        "status": "no_provenance_found",
+                        "processing_time": processing_time
+                    }, f, indent=2)
+                
+                update_question_log(question_dir, "Processing completed - no atomic evidence found.", status="completed_no_provenance")
+                
+            else:
+                # Save successful provenance (limited to top-5)
+                provenance_file = os.path.join(question_dir, 'provenance.json')
+                with open(provenance_file, 'w', encoding='utf-8') as f:
+                    json.dump({
+                        "provenance_entries": top_provenance_entries,
+                        "total_found": len(provenance_entries),
+                        "top_k_limit": 5,
+                        "processing_time": processing_time,
+                        "status": "success"
+                    }, f, indent=2, ensure_ascii=False)
+                
+                # Create completion status
+                status_file = os.path.join(question_dir, 'completion_status.json')
+                with open(status_file, 'w') as f:
+                    json.dump({
+                        "completed": True,
+                        "timestamp": time.time(),
+                        "total_provenance": len(top_provenance_entries),
+                        "session_id": session_id,
+                        "question_id": question_id,
+                        "status": "success",
+                        "processing_time": processing_time
+                    }, f, indent=2)
+                
+                update_question_log(question_dir, f"Processing completed! Found {len(top_provenance_entries)} evidence entries (showing top-5).", status="completed")
             
             # Update question metadata
             metadata_file = os.path.join(question_dir, 'question_metadata.json')
@@ -1514,22 +1582,61 @@ def process_question_in_session(session_id, question_id, question_text, pdf_text
                 metadata = json.load(f)
             
             metadata.update({
-                'status': 'completed',
+                'status': 'completed' if top_provenance_entries else 'completed_no_provenance',
                 'completed_at': time.time(),
                 'completed_at_iso': datetime.utcnow().isoformat(),
-                'provenance_count': len(provenance_entries)
+                'provenance_count': len(top_provenance_entries),
+                'processing_time': processing_time
             })
             
             with open(metadata_file, 'w') as f:
                 json.dump(metadata, f, indent=2)
-            
-            update_question_log(question_dir, "Processing completed!", status="completed")
-            
+                
         finally:
             sys.stdout = stdout_backup
             
+    except TimeoutError as e:
+        update_question_log(question_dir, f"Processing timed out after {PROCESSING_TIMEOUT} seconds.", status="timeout")
+        update_question_log(question_dir, "This document may be too large or complex for atomic provenance analysis within the time limit.")
+        
+        # Save timeout status
+        provenance_file = os.path.join(question_dir, 'provenance.json')
+        with open(provenance_file, 'w', encoding='utf-8') as f:
+            json.dump({
+                "provenance_entries": [],
+                "total_found": 0,
+                "processing_time": PROCESSING_TIMEOUT,
+                "status": "timeout",
+                "explanation": f"Processing timed out after {PROCESSING_TIMEOUT} seconds. The document may be too large or complex for atomic provenance analysis. Consider asking more specific questions or using shorter documents."
+            }, f, indent=2, ensure_ascii=False)
+        
+        # Update completion status
+        status_file = os.path.join(question_dir, 'completion_status.json')
+        with open(status_file, 'w') as f:
+            json.dump({
+                "completed": True,
+                "timestamp": time.time(),
+                "total_provenance": 0,
+                "session_id": session_id,
+                "question_id": question_id,
+                "status": "timeout",
+                "processing_time": PROCESSING_TIMEOUT
+            }, f, indent=2)
+            
     except Exception as e:
+        logger.error(f"Error processing question {question_id}: {e}")
         update_question_log(question_dir, f"Error: {str(e)}", status="error")
+        
+        # Save error status
+        provenance_file = os.path.join(question_dir, 'provenance.json')
+        with open(provenance_file, 'w', encoding='utf-8') as f:
+            json.dump({
+                "provenance_entries": [],
+                "total_found": 0,
+                "processing_time": time.time() - processing_start_time if 'processing_start_time' in locals() else 0,
+                "status": "error",
+                "explanation": f"An error occurred during processing: {str(e)}"
+            }, f, indent=2, ensure_ascii=False)
 
 def update_question_log(question_dir, message, status=None):
     """Update logs for a question"""
@@ -1589,6 +1696,7 @@ def parse_provenance_output(output, question_dir):
     """Parse provenance output and save progressively"""
     provenance_entries = []
     current_entry = None
+    processed_count = 0
     
     for line in output.strip().split('\n'):
         if line.strip():
@@ -1598,6 +1706,12 @@ def parse_provenance_output(output, question_dir):
             if line.startswith('Top-'):
                 if current_entry is not None:
                     provenance_entries.append(current_entry)
+                    processed_count += 1
+
+                 # Safety limit to prevent infinite processing
+                if processed_count >= MAX_PROVENANCE_PROCESSING:
+                    update_question_log(question_dir, f"Reached maximum processing limit of {MAX_PROVENANCE_PROCESSING} provenances.")
+                    break
                 
                 try:
                     parts = line.split('provenance:')
@@ -1613,8 +1727,13 @@ def parse_provenance_output(output, question_dir):
                             "sentences_ids": prov_ids,
                             "time": 0,
                             "input_token_size": 0,
-                            "output_token_size": 0
+                            "output_token_size": 0,
+                            "user_visible": processed_count < EXPERIMENT_TOP_K  # Only show if within top K
                         }
+
+                        if len(provenance_entries) >= 4:
+                            break
+
                 except Exception as e:
                     pass
             
@@ -1973,8 +2092,6 @@ def process_text_question(session_id):
             'timestamp': time.time()
         })
         
-        # Start processing in background thread
-        from threading import Thread
         thread = Thread(target=process_question_session, args=(processing_session_id, question_text, document_text, question_id))
         thread.daemon = True
         thread.start()
@@ -2622,8 +2739,6 @@ def ask_question():
         
         logger.info(f"✅ Initialized processing for question: {question_id}")
         
-        # Start processing in a separate thread (same as before)
-        from threading import Thread
         def process_question():
             try:
                 logger.info(f"🔄 Starting background processing for question: {question_id}")

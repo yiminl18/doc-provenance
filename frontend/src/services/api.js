@@ -139,28 +139,6 @@ export const getDocumentText = async (documentId) => {
   }
 };
 
-/**
- * Get document sentences - unified for all document types
- */
-export const getDocumentSentences = async (documentId, start = null, end = null) => {
-  try {
-    let url = `${API_URL}/documents/${documentId}/sentences`;
-    const params = new URLSearchParams();
-    
-    if (start !== null) params.append('start', start);
-    if (end !== null) params.append('end', end);
-    
-    if (params.toString()) {
-      url += `?${params.toString()}`;
-    }
-    
-    const response = await axios.get(url);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting document sentences:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
 
 // ===== SESSION-BASED QUESTION PROCESSING =====
 
@@ -181,32 +159,6 @@ export const askQuestionInSession = async (sessionId, questionText, documentId) 
 };
 
 /**
- * Get question progress in session
- */
-export const getQuestionProgress = async (sessionId, questionId) => {
-  try {
-    const response = await axios.get(`${API_URL}/sessions/${sessionId}/questions/${questionId}/progress`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting question progress:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-/**
- * Get question results in session
- */
-export const getQuestionResults = async (sessionId, questionId) => {
-  try {
-    const response = await axios.get(`${API_URL}/sessions/${sessionId}/questions/${questionId}/results`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting question results:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-/**
  * Get question sentences in session
  */
 export const getQuestionSentences = async (sessionId, questionId, sentenceIds) => {
@@ -221,16 +173,316 @@ export const getQuestionSentences = async (sessionId, questionId, sentenceIds) =
 };
 
 /**
- * Check question status in session
+ * Enhanced question progress with timeout and special status handling
+ */
+export const getQuestionProgress = async (sessionId, questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/sessions/${sessionId}/questions/${questionId}/progress`);
+    
+    // Enhanced response handling
+    const data = response.data;
+    
+    // Transform the response to ensure consistent format
+    return {
+      ...data,
+      // Ensure we have the expected fields
+      progress: data.progress || 0,
+      done: data.done || false,
+      data: Array.isArray(data.data) ? data.data.slice(0, 5) : [], // Always limit to top-5 for user
+      logs: Array.isArray(data.logs) ? data.logs : [],
+      status: data.status || 'processing',
+      processing_status: data.processing_status || data.status || 'processing',
+      user_message: data.user_message || null,
+      explanation: data.explanation || null,
+      
+      // Enhanced: Include total vs user-visible counts
+      total_found: data.total_found || 0,
+      user_visible_count: data.user_visible_count || 0,
+      experiment_top_k: data.experiment_top_k || 5,
+      
+      // Handle special cases
+      is_timeout: data.processing_status === 'timeout' || data.user_message?.includes('timeout'),
+      is_no_provenance: data.processing_status === 'no_provenance_found' || data.user_message?.includes('No atomic evidence'),
+      is_error: data.processing_status === 'error' || data.status === 'error'
+    };
+  } catch (error) {
+    console.error('Error getting question progress:', error);
+    
+    // Enhanced error handling
+    if (error.response?.status === 404) {
+      return {
+        progress: 0,
+        done: true,
+        data: [],
+        logs: ['Question not found'],
+        status: 'error',
+        processing_status: 'error',
+        user_message: 'Question processing session not found',
+        is_error: true,
+        total_found: 0,
+        user_visible_count: 0
+      };
+    }
+    
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Enhanced question results with provenance limiting
+ */
+export const getQuestionResults = async (sessionId, questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/sessions/${sessionId}/questions/${questionId}/results`);
+    const data = response.data;
+    
+    // Ensure provenance is limited to top-5
+    if (data.success && data.provenance && Array.isArray(data.provenance)) {
+      data.provenance = data.provenance.slice(0, 5);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error getting question results:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Enhanced question status with special case handling
  */
 export const getQuestionStatus = async (sessionId, questionId) => {
   try {
     const response = await axios.get(`${API_URL}/sessions/${sessionId}/questions/${questionId}/status`);
-    return response.data;
+    const data = response.data;
+    
+    return {
+      ...data,
+      // Normalize status information
+      completed: data.completed || false,
+      status: data.status || 'processing',
+      total_provenance: Math.min(data.total_provenance || 0, 5), // Cap at 5
+      processing_time: data.processing_time || 0,
+      
+      // Special status flags
+      is_timeout: data.status === 'timeout',
+      is_no_provenance: data.status === 'no_provenance_found',
+      is_error: data.status === 'error'
+    };
   } catch (error) {
     console.error('Error checking question status:', error);
     throw new Error(error.response?.data?.error || error.message);
   }
+};
+
+/**
+ * Enhanced legacy progress checking with timeout detection
+ */
+export const checkProgress = async (questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/check-progress/${questionId}`);
+    const data = response.data;
+    
+    // Limit provenance data to top-5 for legacy compatibility
+    if (data.data && Array.isArray(data.data)) {
+      data.data = data.data.slice(0, 5);
+    }
+    
+    return {
+      ...data,
+      // Add timeout detection for legacy
+      is_timeout: data.status === 'timeout' || data.logs?.some(log => 
+        log.includes('timeout') || log.includes('timed out')
+      ),
+      is_no_provenance: data.status === 'completed' && (!data.data || data.data.length === 0),
+      is_error: data.status === 'error'
+    };
+  } catch (error) {
+    console.error('Error checking progress (legacy):', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Enhanced legacy results with provenance limiting
+ */
+export const getResults = async (questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/results/${questionId}`);
+    const data = response.data;
+    
+    // Limit provenance to top-5 for legacy compatibility
+    if (data.success && data.provenance && Array.isArray(data.provenance)) {
+      data.provenance = data.provenance.slice(0, 5);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error getting results (legacy):', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Enhanced feedback submission with processing status context
+ */
+export const submitFeedback = async (feedbackData) => {
+  try {
+    // Enhance feedback data with processing context
+    const enhancedFeedback = {
+      ...feedbackData,
+      
+      // Add processing status context
+      processing_status: feedbackData.processing_status || 'completed',
+      had_timeout: feedbackData.is_timeout || false,
+      had_no_provenance: feedbackData.is_no_provenance || false,
+      had_error: feedbackData.is_error || false,
+      
+      // Add provenance statistics
+      provenance_count: feedbackData.provenance_count || 0,
+      max_provenance_limit: 5,
+      
+      // Timestamp
+      feedback_submitted_at: new Date().toISOString()
+    };
+    
+    const response = await axios.post(`${API_URL}/feedback`, enhancedFeedback);
+    return response.data;
+  } catch (error) {
+    console.error('Error submitting feedback:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Utility function to check if a question processing has special status
+ */
+export const getQuestionSpecialStatus = (question) => {
+  if (!question) return null;
+  
+  if (question.processingStatus === 'timeout' || question.is_timeout) {
+    return {
+      type: 'timeout',
+      message: 'Processing timed out. The document may be too complex.',
+      suggestion: 'Try asking more specific questions or use shorter documents.'
+    };
+  }
+  
+  if (question.processingStatus === 'no_provenance_found' || question.is_no_provenance) {
+    return {
+      type: 'no_provenance',
+      message: 'No atomic evidence found in the document.',
+      suggestion: 'The document may not be suitable for breaking into smaller units to answer this question. Try more specific questions.'
+    };
+  }
+  
+  if (question.processingStatus === 'error' || question.is_error) {
+    return {
+      type: 'error',
+      message: 'An error occurred during processing.',
+      suggestion: 'Please try again or contact support if the problem persists.'
+    };
+  }
+  
+  return null;
+};
+
+/**
+ * Utility function to format processing time
+ */
+export const formatProcessingTime = (timeInSeconds) => {
+  if (!timeInSeconds || timeInSeconds < 0) return 'N/A';
+  
+  if (timeInSeconds < 60) {
+    return `${timeInSeconds.toFixed(1)}s`;
+  } else if (timeInSeconds < 3600) {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}m ${seconds}s`;
+  } else {
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+    return `${hours}h ${minutes}m`;
+  }
+};
+
+/**
+ * Get complete provenance data (admin/research function)
+ */
+export const getCompleteProvenance = async (sessionId, questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/admin/sessions/${sessionId}/questions/${questionId}/complete-provenance`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting complete provenance:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Get/Set experiment configuration
+ */
+export const getExperimentConfig = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/admin/experiment-config`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting experiment config:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+export const setExperimentConfig = async (config) => {
+  try {
+    const response = await axios.post(`${API_URL}/admin/experiment-config`, config);
+    return response.data;
+  } catch (error) {
+    console.error('Error setting experiment config:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Enhanced document sentences with retry logic
+ */
+export const getDocumentSentences = async (documentId, start = null, end = null, retries = 2) => {
+  let lastError;
+  
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      let url = `${API_URL}/documents/${documentId}/sentences`;
+      const params = new URLSearchParams();
+      
+      if (start !== null) params.append('start', start);
+      if (end !== null) params.append('end', end);
+      
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
+      
+      const response = await axios.get(url);
+      const data = response.data;
+      
+      // Validate response
+      if (!data.success || !data.sentences) {
+        throw new Error('Invalid sentence data received');
+      }
+      
+      return data;
+      
+    } catch (error) {
+      lastError = error;
+      console.warn(`Attempt ${attempt + 1} failed for document sentences:`, error.message);
+      
+      if (attempt < retries) {
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+      }
+    }
+  }
+  
+  console.error('All attempts failed for document sentences:', lastError);
+  throw new Error(lastError.response?.data?.error || lastError.message);
 };
 
 // ===== CLEANUP MANAGEMENT =====
@@ -294,17 +546,7 @@ export const cleanupAllSessions = async (confirmPhrase) => {
   }
 };
 
-// ===== FEEDBACK =====
 
-export const submitFeedback = async (feedbackData) => {
-  try {
-    const response = await axios.post(`${API_URL}/feedback`, feedbackData);
-    return response.data;
-  } catch (error) {
-    console.error('Error submitting feedback:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
 
 // ===== BACKWARD COMPATIBILITY (for gradual migration) =====
 
@@ -325,25 +567,6 @@ export const askQuestion = async (question, filename) => {
   }
 };
 
-export const checkProgress = async (questionId) => {
-  try {
-    const response = await axios.get(`${API_URL}/check-progress/${questionId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error checking progress (legacy):', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-export const getResults = async (questionId) => {
-  try {
-    const response = await axios.get(`${API_URL}/results/${questionId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting results (legacy):', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
 
 export const fetchSentences = async (questionId, sentenceIds) => {
   try {

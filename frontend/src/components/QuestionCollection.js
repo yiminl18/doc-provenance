@@ -11,7 +11,8 @@ import {
   faClock,
   faCheck,
   faSpinner,
-  faExclamationTriangle
+  faExclamationTriangle,
+  faRefresh
 } from '@fortawesome/free-solid-svg-icons';
 
 const QuestionCollection = ({ 
@@ -21,6 +22,7 @@ const QuestionCollection = ({
 }) => {
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
   const inputRef = useRef(null);
   const historyRef = useRef(null);
 
@@ -33,7 +35,7 @@ const QuestionCollection = ({
   // Check if currently processing any questions
   const isProcessing = questionsHistory.some(q => q.isProcessing);
 
-  // Simplified question submission - let App.js handle the complexity
+  // Enhanced question submission with better error handling
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentQuestion.trim() || isSubmitting || isProcessing || !pdfDocument) return;
@@ -41,6 +43,7 @@ const QuestionCollection = ({
     const questionText = currentQuestion.trim();
     setCurrentQuestion('');
     setIsSubmitting(true);
+    setSubmitError(null);
     
     try {
       console.log('🔄 Submitting question via QuestionCollection:', questionText);
@@ -57,8 +60,22 @@ const QuestionCollection = ({
       
     } catch (error) {
       console.error('❌ Error submitting question:', error);
-      // You could show a toast or error message here
-      alert(`Error submitting question: ${error.message}`);
+      
+      // Show user-friendly error message
+      let errorMessage = 'Failed to submit question';
+      if (error.message.includes('500')) {
+        errorMessage = 'Server error - please check your session and try again';
+      } else if (error.message.includes('network')) {
+        errorMessage = 'Network error - please check your connection';
+      } else if (error.message.includes('session')) {
+        errorMessage = 'Session error - please refresh the page';
+      } else {
+        errorMessage = error.message;
+      }
+      
+      setSubmitError(errorMessage);
+      setCurrentQuestion(questionText); // Restore question text
+      
     } finally {
       setIsSubmitting(false);
     }
@@ -68,6 +85,15 @@ const QuestionCollection = ({
   const handleReask = (questionText) => {
     if (isProcessing || isSubmitting) return;
     setCurrentQuestion(questionText);
+    setSubmitError(null);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  // Handle retry after error
+  const handleRetry = () => {
+    setSubmitError(null);
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -95,6 +121,13 @@ const QuestionCollection = ({
     }
   }, []);
 
+  // Clear submit error when user starts typing
+  useEffect(() => {
+    if (submitError && currentQuestion) {
+      setSubmitError(null);
+    }
+  }, [currentQuestion]);
+
   const formatTimestamp = (date) => {
     return new Date(date).toLocaleTimeString([], {
       hour: '2-digit',
@@ -103,26 +136,37 @@ const QuestionCollection = ({
   };
 
   const getQuestionStatus = (question) => {
-    if (question.isProcessing) {
+    if (question.hasError || question.processingStatus === 'error') {
+      return { 
+        icon: faExclamationTriangle, 
+        color: '#dc3545', 
+        spin: false, 
+        text: 'Error',
+        className: 'error'
+      };
+    } else if (question.isProcessing) {
       return { 
         icon: faSpinner, 
         color: '#ff9500', 
         spin: true, 
-        text: 'Processing...' 
+        text: 'Processing...',
+        className: 'processing'
       };
-    } else if (question.answer) {
+    } else if (question.answer || question.provenanceSources?.length > 0) {
       return { 
         icon: faCheck, 
-        color: '#00ff00', 
+        color: '#28a745', 
         spin: false, 
-        text: 'Completed' 
+        text: 'Completed',
+        className: 'completed'
       };
     } else {
       return { 
         icon: faClock, 
-        color: '#888', 
+        color: '#6c757d', 
         spin: false, 
-        text: 'Pending' 
+        text: 'Pending',
+        className: 'pending'
       };
     }
   };
@@ -164,16 +208,34 @@ const QuestionCollection = ({
             <span className="prompt-label">Ask a question about this document:</span>
           </div>
 
+          {/* Error Display */}
+          {submitError && (
+            <div className="submit-error">
+              <FontAwesomeIcon icon={faExclamationTriangle} />
+              <span className="error-message">{submitError}</span>
+              <button 
+                className="retry-btn" 
+                onClick={handleRetry}
+                title="Clear error and try again"
+              >
+                <FontAwesomeIcon icon={faRefresh} />
+                Retry
+              </button>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="question-form">
             <textarea
               ref={inputRef}
-              className="question-textarea"
+              className={`question-textarea ${submitError ? 'error' : ''}`}
               value={currentQuestion}
               onChange={(e) => setCurrentQuestion(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={
                 isProcessing
                   ? "Please wait for current question to complete..."
+                  : submitError
+                  ? "Fix the issue above and try again..."
                   : "What would you like to know about this document?"
               }
               disabled={isSubmitting || isProcessing}
@@ -181,7 +243,7 @@ const QuestionCollection = ({
             />
             <button
               type="submit"
-              className="submit-btn"
+              className={`submit-btn ${submitError ? 'error' : ''}`}
               disabled={!currentQuestion.trim() || isSubmitting || isProcessing}
             >
               {isSubmitting ? (
@@ -222,7 +284,7 @@ const QuestionCollection = ({
                 return (
                   <div
                     key={question.id}
-                    className={`question-history-item ${question.isProcessing ? 'processing' : 'completed'}`}
+                    className={`question-history-item ${status.className}`}
                   >
                     <div className="question-header">
                       <div className="question-status">
@@ -249,6 +311,22 @@ const QuestionCollection = ({
                       {question.text}
                     </div>
 
+                    {/* Error Display */}
+                    {question.hasError && (
+                      <div className="question-error">
+                        <FontAwesomeIcon icon={faExclamationTriangle} />
+                        <span className="error-message">
+                          {question.userMessage || 'Processing failed'}
+                        </span>
+                        {question.errorDetails && (
+                          <details className="error-details">
+                            <summary>Error Details</summary>
+                            <pre>{JSON.stringify(question.errorDetails, null, 2)}</pre>
+                          </details>
+                        )}
+                      </div>
+                    )}
+
                     {/* Processing Indicator */}
                     {question.isProcessing && (
                       <div className="processing-indicator">
@@ -256,6 +334,15 @@ const QuestionCollection = ({
                           <div className="terminal-cursor"></div>
                           <span>ANALYZING_DOCUMENT...</span>
                         </div>
+                        {question.logs && question.logs.length > 0 && (
+                          <div className="processing-logs">
+                            {question.logs.slice(-2).map((log, idx) => (
+                              <div key={idx} className="log-entry">
+                                {log}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                     
@@ -280,6 +367,11 @@ const QuestionCollection = ({
                         </span>
                         {question.isProcessing && (
                           <span className="loading-more">Loading more...</span>
+                        )}
+                        {question.hiddenResultsMessage && (
+                          <span className="hidden-results">
+                            💡 {question.hiddenResultsMessage}
+                          </span>
                         )}
                       </div>
                     )}
@@ -314,6 +406,115 @@ const QuestionCollection = ({
           </div>
         </div>
       </div>
+
+      {/* Enhanced Styles */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .submit-error {
+            background: #f8d7da;
+            border: 1px solid #dc3545;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #721c24;
+            font-size: 14px;
+          }
+          
+          .submit-error .error-message {
+            flex: 1;
+          }
+          
+          .submit-error .retry-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+          }
+          
+          .submit-error .retry-btn:hover {
+            background: #c82333;
+          }
+          
+          .question-textarea.error {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+          }
+          
+          .submit-btn.error {
+            border-color: #dc3545;
+            color: #dc3545;
+          }
+          
+          .question-history-item.error {
+            border-left: 4px solid #dc3545;
+            background: #fff5f5;
+          }
+          
+          .question-error {
+            background: #f8d7da;
+            border: 1px solid #dc3545;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 8px 0;
+            color: #721c24;
+            font-size: 13px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+          }
+          
+          .error-details {
+            margin-top: 8px;
+            font-size: 11px;
+          }
+          
+          .error-details summary {
+            cursor: pointer;
+            color: #495057;
+            font-weight: bold;
+          }
+          
+          .error-details pre {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 4px;
+            overflow-x: auto;
+            font-size: 10px;
+          }
+          
+          .processing-logs {
+            margin-top: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 11px;
+          }
+          
+          .log-entry {
+            margin-bottom: 2px;
+            color: #495057;
+          }
+          
+          .hidden-results {
+            color: #007bff;
+            font-size: 12px;
+            font-style: italic;
+            display: block;
+            margin-top: 4px;
+          }
+        `
+      }} />
     </div>
   );
 };

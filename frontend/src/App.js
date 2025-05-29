@@ -31,6 +31,8 @@ import {
 } from './services/api';
 
 function App() {
+
+  const EXPERIMENT_TOP_K = 5;
   // Session management - simplified
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [sessionReady, setSessionReady] = useState(false);
@@ -87,11 +89,11 @@ function App() {
 
     try {
       const response = await uploadDocument(formData);
-      
+
       // Try to process for session if available
       let textLength = 0;
       let sentenceCount = 0;
-      
+
       if (sessionReady && currentSessionId) {
         try {
           const processResponse = await processDocumentForSession(response.document_id);
@@ -128,64 +130,64 @@ function App() {
   };
 
   // Add this function to debug document loading
-const debugDocumentLoading = async () => {
-  try {
-    console.log('🔍 Starting document loading debug...');
-    
-    // Test 1: Check preloaded documents endpoint
-    const preloadedResponse = await fetch('/api/documents/preloaded');
-    const preloadedData = await preloadedResponse.json();
-    
-    // Test 2: Check session status
-    const sessionResponse = await fetch('/api/sessions/current');
-    const sessionData = await sessionResponse.json();
-    
-    // Test 3: Test debug endpoint
-    const debugResponse = await fetch('/api/debug/preloaded-docs');
-    const debugData = await debugResponse.json();
-    
-    const debugInfo = {
-      preloaded_endpoint: {
-        status: preloadedResponse.status,
-        success: preloadedData.success,
-        documents_count: preloadedData.documents?.length || 0,
-        documents: preloadedData.documents || [],
-        error: preloadedData.error
-      },
-      session_endpoint: {
-        status: sessionResponse.status,
-        success: sessionData.success,
-        session_id: sessionData.session_id,
-        error: sessionData.error
-      },
-      debug_endpoint: {
-        status: debugResponse.status,
-        preload_dir: debugData.preload_dir,
-        preload_dir_exists: debugData.preload_dir_exists,
-        pdf_count: debugData.pdf_count,
-        processed_count: debugData.processed_count,
-        files_in_preload: debugData.files_in_preload,
-        error: debugData.error
-      },
-      frontend_state: {
-        sessionReady,
-        currentSessionId,
-        documentsCount: documents.size,
-        loadingPreloaded
-      }
-    };
-    
-    setDebugInfo(debugInfo);
-    setShowDebugInfo(true);
-    
-    console.log('🔍 Debug info collected:', debugInfo);
-    
-  } catch (error) {
-    console.error('❌ Debug failed:', error);
-    setDebugInfo({ error: error.message });
-    setShowDebugInfo(true);
-  }
-};
+  const debugDocumentLoading = async () => {
+    try {
+      console.log('🔍 Starting document loading debug...');
+
+      // Test 1: Check preloaded documents endpoint
+      const preloadedResponse = await fetch('/api/documents/preloaded');
+      const preloadedData = await preloadedResponse.json();
+
+      // Test 2: Check session status
+      const sessionResponse = await fetch('/api/sessions/current');
+      const sessionData = await sessionResponse.json();
+
+      // Test 3: Test debug endpoint
+      const debugResponse = await fetch('/api/debug/preloaded-docs');
+      const debugData = await debugResponse.json();
+
+      const debugInfo = {
+        preloaded_endpoint: {
+          status: preloadedResponse.status,
+          success: preloadedData.success,
+          documents_count: preloadedData.documents?.length || 0,
+          documents: preloadedData.documents || [],
+          error: preloadedData.error
+        },
+        session_endpoint: {
+          status: sessionResponse.status,
+          success: sessionData.success,
+          session_id: sessionData.session_id,
+          error: sessionData.error
+        },
+        debug_endpoint: {
+          status: debugResponse.status,
+          preload_dir: debugData.preload_dir,
+          preload_dir_exists: debugData.preload_dir_exists,
+          pdf_count: debugData.pdf_count,
+          processed_count: debugData.processed_count,
+          files_in_preload: debugData.files_in_preload,
+          error: debugData.error
+        },
+        frontend_state: {
+          sessionReady,
+          currentSessionId,
+          documentsCount: documents.size,
+          loadingPreloaded
+        }
+      };
+
+      setDebugInfo(debugInfo);
+      setShowDebugInfo(true);
+
+      console.log('🔍 Debug info collected:', debugInfo);
+
+    } catch (error) {
+      console.error('❌ Debug failed:', error);
+      setDebugInfo({ error: error.message });
+      setShowDebugInfo(true);
+    }
+  };
 
 
   // Handle preloaded document selection
@@ -208,89 +210,89 @@ const debugDocumentLoading = async () => {
     }
   };
 
- // Add this improved handleDocumentSelect function to your App.js
+  // Add this improved handleDocumentSelect function to your App.js
 
-const handleDocumentSelect = async (document) => {
-  if (!sessionReady) {
-    console.error('Session not ready for document processing');
-    return;
-  }
-
-  try {
-    setLoadingPreloaded(true);
-    console.log('🔄 Loading document:', document);
-    
-    // Step 1: Load the document (this makes it available)
-    console.log('Step 1: Loading document...');
-    const loadResponse = await loadDocument(document.document_id);
-    
-    if (!loadResponse.success) {
-      throw new Error(loadResponse.error || 'Failed to load document');
+  const handleDocumentSelect = async (document) => {
+    if (!sessionReady) {
+      console.error('Session not ready for document processing');
+      return;
     }
-    
-    console.log('✅ Document loaded:', loadResponse);
-    
-    // Step 2: Process document for current session (extracts sentences, etc.)
-    console.log('Step 2: Processing document for session...');
-    let processResponse;
+
     try {
-      processResponse = await processDocumentForSession(document.document_id);
-      console.log('✅ Document processed for session:', processResponse);
-    } catch (processError) {
-      console.warn('⚠️ Session processing failed, using basic document info:', processError);
-      // Continue with basic document info if session processing fails
-      processResponse = {
-        success: true,
-        text_length: document.text_length || 0,
-        sentence_count: document.sentence_count || 0,
-        document_id: document.document_id,
-        filename: document.filename
-      };
-    }
-    
-    // Step 3: Create the frontend document object
-    console.log('Step 3: Creating frontend document...');
-    const docId = createNewDocument(document.filename, document.is_preloaded || false, {
-      document_id: document.document_id,
-      text_length: processResponse.text_length || document.text_length || 0,
-      sentence_count: processResponse.sentence_count || document.sentence_count || 0
-    });
+      setLoadingPreloaded(true);
+      console.log('🔄 Loading document:', document);
 
-    // Step 4: Update document with additional metadata
-    setDocuments(prev => {
-      const newDocs = new Map(prev);
-      const doc = newDocs.get(docId);
-      if (doc) {
-        doc.isPreloaded = document.is_preloaded || false;
-        doc.backendDocumentId = document.document_id;
-        doc.textLength = processResponse.text_length || document.text_length || 0;
-        doc.sentenceCount = processResponse.sentence_count || document.sentence_count || 0;
-        doc.sourceFolder = document.source_folder || (document.is_preloaded ? 'preloaded' : 'uploads');
-        doc.sessionProcessed = processResponse.success || false;
-        
-        // Add additional metadata for PDF loading
-        doc.originalDocument = document; // Keep reference to original
-        
-        newDocs.set(docId, doc);
-        console.log('✅ Document created and configured:', doc);
+      // Step 1: Load the document (this makes it available)
+      console.log('Step 1: Loading document...');
+      const loadResponse = await loadDocument(document.document_id);
+
+      if (!loadResponse.success) {
+        throw new Error(loadResponse.error || 'Failed to load document');
       }
-      return newDocs;
-    });
 
-    // Step 5: Close modal and show success
-    if (showPreloadedModal) {
-      setShowPreloadedModal(false);
+      console.log('✅ Document loaded:', loadResponse);
+
+      // Step 2: Process document for current session (extracts sentences, etc.)
+      console.log('Step 2: Processing document for session...');
+      let processResponse;
+      try {
+        processResponse = await processDocumentForSession(document.document_id);
+        console.log('✅ Document processed for session:', processResponse);
+      } catch (processError) {
+        console.warn('⚠️ Session processing failed, using basic document info:', processError);
+        // Continue with basic document info if session processing fails
+        processResponse = {
+          success: true,
+          text_length: document.text_length || 0,
+          sentence_count: document.sentence_count || 0,
+          document_id: document.document_id,
+          filename: document.filename
+        };
+      }
+
+      // Step 3: Create the frontend document object
+      console.log('Step 3: Creating frontend document...');
+      const docId = createNewDocument(document.filename, document.is_preloaded || false, {
+        document_id: document.document_id,
+        text_length: processResponse.text_length || document.text_length || 0,
+        sentence_count: processResponse.sentence_count || document.sentence_count || 0
+      });
+
+      // Step 4: Update document with additional metadata
+      setDocuments(prev => {
+        const newDocs = new Map(prev);
+        const doc = newDocs.get(docId);
+        if (doc) {
+          doc.isPreloaded = document.is_preloaded || false;
+          doc.backendDocumentId = document.document_id;
+          doc.textLength = processResponse.text_length || document.text_length || 0;
+          doc.sentenceCount = processResponse.sentence_count || document.sentence_count || 0;
+          doc.sourceFolder = document.source_folder || (document.is_preloaded ? 'preloaded' : 'uploads');
+          doc.sessionProcessed = processResponse.success || false;
+
+          // Add additional metadata for PDF loading
+          doc.originalDocument = document; // Keep reference to original
+
+          newDocs.set(docId, doc);
+          console.log('✅ Document created and configured:', doc);
+        }
+        return newDocs;
+      });
+
+      // Step 5: Close modal and show success
+      if (showPreloadedModal) {
+        setShowPreloadedModal(false);
+      }
+
+      console.log('🎉 Document selection completed successfully');
+
+    } catch (error) {
+      console.error('❌ Error loading document:', error);
+      alert(`Error loading document: ${error.message}`);
+    } finally {
+      setLoadingPreloaded(false);
     }
-    
-    console.log('🎉 Document selection completed successfully');
-    
-  } catch (error) {
-    console.error('❌ Error loading document:', error);
-    alert(`Error loading document: ${error.message}`);
-  } finally {
-    setLoadingPreloaded(false);
-  }
-};
+  };
 
   const createNewDocument = (filename, isPreloaded = false, backendData = null) => {
     const docId = `doc_${Date.now()}`;
@@ -299,9 +301,9 @@ const handleDocumentSelect = async (document) => {
       filename,
       questions: new Map(),
       activeQuestionId: null,
-      uploadStatus: { 
-        success: true, 
-        message: isPreloaded ? `${filename} loaded successfully` : `${filename} uploaded successfully` 
+      uploadStatus: {
+        success: true,
+        message: isPreloaded ? `${filename} loaded successfully` : `${filename} uploaded successfully`
       },
       isPreloaded,
       createdAt: new Date(),
@@ -318,166 +320,353 @@ const handleDocumentSelect = async (document) => {
     return docId;
   };
 
-  // SIMPLIFIED question submission with progressive loading
-  const addQuestionToDocument = async (questionText) => {
-    if (!activeDocumentId || !activeDocument) {
-      console.error('No active document');
-      return;
+  // Helper function to get question logs safely
+  const getQuestionLogs = (questionId) => {
+    if (!activeDocumentId) return [];
+    const doc = documents.get(activeDocumentId);
+    if (doc && doc.questions.has(questionId)) {
+      return doc.questions.get(questionId).logs || [];
     }
+    return [];
+  };
 
-    const tempQuestionId = `temp_${Date.now()}`;
-    const questionData = {
-      id: tempQuestionId,
-      text: questionText,
-      answer: null,
-      provenanceSources: [],
-      isProcessing: true,
-      logs: [],
-      createdAt: new Date()
-    };
+// Add these enhancements to your App.js
 
-    // Add question to document immediately
-    setDocuments(prev => {
-      const newDocs = new Map(prev);
-      const doc = newDocs.get(activeDocumentId);
-      if (doc) {
-        doc.questions.set(tempQuestionId, questionData);
-        doc.activeQuestionId = tempQuestionId;
-        newDocs.set(activeDocumentId, doc);
-      }
-      return newDocs;
-    });
+// Enhanced session-based polling with timeout and no-provenance handling
+const startSessionPolling = (questionId, sessionId, sessionQuestionId) => {
+  let currentProvenanceCount = 0;
+  let pollCount = 0;
+  const maxPolls = 300; // 5 minutes at 1-second intervals
 
+  const pollInterval = setInterval(async () => {
     try {
-      // Try session-based approach first
-      if (sessionReady && currentSessionId && activeDocument.backendDocumentId) {
-        const response = await askQuestionInSession(currentSessionId, questionText, activeDocument.backendDocumentId);
-        startSessionPolling(tempQuestionId, currentSessionId, response.question_id);
-      } else {
-        // Fallback to legacy
-        const response = await askQuestion(questionText, activeDocument.filename);
-        startLegacyPolling(tempQuestionId, response.question_id);
+      pollCount++;
+      
+      // Check for timeout on frontend side
+      if (pollCount >= maxPolls) {
+        clearInterval(pollInterval);
+        updateQuestion(questionId, {
+          isProcessing: false,
+          processingStatus: 'timeout',
+          userMessage: 'Frontend timeout: Processing took too long. Please try a more specific question.',
+          logs: [...(getQuestionLogs(questionId) || []), 'Frontend timeout after 5 minutes']
+        });
+        return;
       }
+
+      // Check progress
+      const progress = await getQuestionProgress(sessionId, sessionQuestionId);
+      console.log('📊 Progress update:', progress);
+      
+      // Update logs
+      if (progress.logs) {
+        updateQuestion(questionId, { logs: progress.logs });
+      }
+
+      // Handle special processing statuses
+      if (progress.processing_status) {
+        updateQuestion(questionId, { 
+          processingStatus: progress.processing_status,
+          userMessage: progress.user_message,
+          explanation: progress.explanation
+        });
+      }
+
+      // Progressive provenance loading
+      if (progress.data && progress.data.length > currentProvenanceCount) {
+        const newProvenances = await enhanceSessionProvenanceWithContent(
+          sessionId, sessionQuestionId, progress.data.slice(currentProvenanceCount)
+        );
+
+        updateQuestion(questionId, (prev) => ({
+          provenanceSources: [...(prev.provenanceSources || []), ...newProvenances]
+        }));
+        
+        currentProvenanceCount = progress.data.length;
+      }
+
+      // Try to get answer as soon as possible
+      if (progress.done || progress.data?.length > 0) {
+        try {
+          const results = await getQuestionResults(sessionId, sessionQuestionId);
+          if (results.success && results.answer) {
+            updateQuestion(questionId, { answer: results.answer });
+          }
+        } catch (error) {
+          console.warn('Answer not ready yet');
+        }
+      }
+
+      // Check if processing is complete (including special cases)
+      if (progress.done || progress.processing_status in ['success', 'no_provenance_found', 'timeout', 'error']) {
+        clearInterval(pollInterval);
+        
+        // Final status update
+        const finalStatus = {
+          isProcessing: false,
+          processingStatus: progress.processing_status || 'completed'
+        };
+
+        // Handle special completion cases
+        if (progress.processing_status === 'no_provenance_found') {
+          finalStatus.userMessage = progress.user_message || 'No atomic evidence found for this question.';
+          finalStatus.explanation = progress.explanation;
+        } else if (progress.processing_status === 'timeout') {
+          finalStatus.userMessage = progress.user_message || 'Processing timed out. Try a more specific question.';
+          finalStatus.explanation = progress.explanation;
+        }
+
+        updateQuestion(questionId, finalStatus);
+        
+        // Final attempt to get status and results
+        try {
+          const status = await getQuestionStatus(sessionId, sessionQuestionId);
+          console.log('📋 Final status:', status);
+        } catch (error) {
+          console.warn('Could not get final status:', error);
+        }
+      }
+
     } catch (error) {
-      console.error('Error submitting question:', error);
-      updateQuestion(tempQuestionId, {
+      console.error('Session polling error:', error);
+      clearInterval(pollInterval);
+      updateQuestion(questionId, { 
         isProcessing: false,
-        answer: `Error: ${error.message}`
+        processingStatus: 'error',
+        userMessage: `Polling error: ${error.message}`,
+        logs: [...(getQuestionLogs(questionId) || []), `Error: ${error.message}`],
+        hasError: true
       });
     }
-  };
+  }, 1000);
 
-  // Session-based polling with progressive provenance loading
-  const startSessionPolling = (questionId, sessionId, sessionQuestionId) => {
-    let currentProvenanceCount = 0;
+  // Store interval reference for potential cleanup
+  updateQuestion(questionId, { pollInterval });
+};
 
-    const pollInterval = setInterval(async () => {
-      try {
-        // Check progress
-        const progress = await getQuestionProgress(sessionId, sessionQuestionId);
-        
-        // Update logs
-        if (progress.logs) {
-          updateQuestion(questionId, { logs: progress.logs });
-        }
+// Enhanced legacy polling with similar improvements
+const startLegacyPolling = (questionId, backendQuestionId) => {
+  let currentProvenanceCount = 0;
+  let pollCount = 0;
+  const maxPolls = 300; // 5 minutes timeout
 
-        // Progressive provenance loading
-        if (progress.data && progress.data.length > currentProvenanceCount) {
-          const newProvenances = await enhanceSessionProvenanceWithContent(
-            sessionId, sessionQuestionId, progress.data.slice(currentProvenanceCount)
-          );
-
-          updateQuestion(questionId, (prev) => ({
-            provenanceSources: [...(prev.provenanceSources || []), ...newProvenances]
-          }));
-          
-          currentProvenanceCount = progress.data.length;
-        }
-
-        // Try to get answer as soon as possible
-        if (progress.done || progress.data?.length > 0) {
-          try {
-            const results = await getQuestionResults(sessionId, sessionQuestionId);
-            if (results.success && results.answer) {
-              updateQuestion(questionId, { answer: results.answer });
-            }
-          } catch (error) {
-            console.warn('Answer not ready yet');
-          }
-        }
-
-        // Check if fully complete
-        const status = await getQuestionStatus(sessionId, sessionQuestionId);
-        if (status.completed) {
-          clearInterval(pollInterval);
-          updateQuestion(questionId, { isProcessing: false });
-        }
-
-      } catch (error) {
-        console.error('Session polling error:', error);
+  const pollInterval = setInterval(async () => {
+    try {
+      pollCount++;
+      
+      if (pollCount >= maxPolls) {
         clearInterval(pollInterval);
-        updateQuestion(questionId, { isProcessing: false });
+        updateQuestion(questionId, {
+          isProcessing: false,
+          processingStatus: 'timeout',
+          userMessage: 'Processing took too long. Please try a more specific question.'
+        });
+        return;
       }
-    }, 1000);
-  };
 
-  // Legacy polling (fallback)
-  const startLegacyPolling = (questionId, backendQuestionId) => {
-    let currentProvenanceCount = 0;
+      const progress = await checkProgress(backendQuestionId);
+      
+      if (progress.logs) {
+        updateQuestion(questionId, { logs: progress.logs });
+      }
 
-    const pollInterval = setInterval(async () => {
-      try {
-        const progress = await checkProgress(backendQuestionId);
+      if (progress.data && progress.data.length > currentProvenanceCount) {
+        const newProvenances = await enhanceLegacyProvenanceWithContent(
+          backendQuestionId, progress.data.slice(currentProvenanceCount)
+        );
+
+        updateQuestion(questionId, (prev) => ({
+          provenanceSources: [...(prev.provenanceSources || []), ...newProvenances]
+        }));
         
-        if (progress.logs) {
-          updateQuestion(questionId, { logs: progress.logs });
-        }
-
-        if (progress.data && progress.data.length > currentProvenanceCount) {
-          const newProvenances = await enhanceLegacyProvenanceWithContent(
-            backendQuestionId, progress.data.slice(currentProvenanceCount)
-          );
-
-          updateQuestion(questionId, (prev) => ({
-            provenanceSources: [...(prev.provenanceSources || []), ...newProvenances]
-          }));
-          
-          currentProvenanceCount = progress.data.length;
-        }
-
-        if (progress.done || progress.data?.length > 0) {
-          try {
-            const results = await getResults(backendQuestionId);
-            if (results.success && results.answer) {
-              updateQuestion(questionId, { answer: results.answer });
-            }
-          } catch (error) {
-            console.warn('Answer not ready yet');
-          }
-        }
-
-        const status = await checkStatus(backendQuestionId);
-        if (status.completed) {
-          clearInterval(pollInterval);
-          updateQuestion(questionId, { isProcessing: false });
-        }
-
-      } catch (error) {
-        console.error('Legacy polling error:', error);
-        clearInterval(pollInterval);
-        updateQuestion(questionId, { isProcessing: false });
+        currentProvenanceCount = progress.data.length;
       }
-    }, 1000);
+
+      if (progress.done || progress.data?.length > 0) {
+        try {
+          const results = await getResults(backendQuestionId);
+          if (results.success && results.answer) {
+            updateQuestion(questionId, { answer: results.answer });
+          }
+        } catch (error) {
+          console.warn('Answer not ready yet');
+        }
+      }
+
+      const status = await checkStatus(backendQuestionId);
+      if (status.completed) {
+        clearInterval(pollInterval);
+        updateQuestion(questionId, { 
+          isProcessing: false,
+          processingStatus: status.status || 'completed'
+        });
+      }
+
+    } catch (error) {
+      console.error('Legacy polling error:', error);
+      clearInterval(pollInterval);
+      updateQuestion(questionId, { 
+        isProcessing: false,
+        processingStatus: 'error',
+        userMessage: `Processing error: ${error.message}`
+      });
+    }
+  }, 1000);
+};
+
+// Enhanced question update helper to handle cleanup
+const updateQuestion = (questionId, updates) => {
+  if (!activeDocumentId) return {};
+
+  setDocuments(prev => {
+    const newDocs = new Map(prev);
+    const doc = newDocs.get(activeDocumentId);
+    if (doc && doc.questions.has(questionId)) {
+      const currentQuestion = doc.questions.get(questionId);
+      
+      // If we're getting a new question state, clean up any existing polling
+      if (updates && typeof updates === 'object' && 'isProcessing' in updates && !updates.isProcessing) {
+        if (currentQuestion.pollInterval) {
+          clearInterval(currentQuestion.pollInterval);
+        }
+      }
+      
+      const newQuestion = typeof updates === 'function'
+        ? { ...currentQuestion, ...updates(currentQuestion) }
+        : { ...currentQuestion, ...updates };
+      
+      doc.questions.set(questionId, newQuestion);
+      newDocs.set(activeDocumentId, doc);
+      
+      return newDocs;
+    }
+    return prev;
+  });
+  
+  // Return current question for chaining/access
+  const doc = documents.get(activeDocumentId);
+  return doc?.questions.get(questionId) || {};
+};
+
+// Add cleanup function to prevent memory leaks
+const cleanupQuestionPolling = (questionId) => {
+  if (!activeDocumentId) return;
+  
+  const doc = documents.get(activeDocumentId);
+  if (doc && doc.questions.has(questionId)) {
+    const question = doc.questions.get(questionId);
+    if (question.pollInterval) {
+      clearInterval(question.pollInterval);
+    }
+  }
+};
+
+// Enhanced document removal with cleanup
+const removeDocument = (docId) => {
+  // Clean up any active polling for questions in this document
+  const doc = documents.get(docId);
+  if (doc) {
+    doc.questions.forEach((question, questionId) => {
+      if (question.pollInterval) {
+        clearInterval(question.pollInterval);
+      }
+    });
+  }
+  
+  setDocuments(prev => {
+    const newDocs = new Map(prev);
+    newDocs.delete(docId);
+    return newDocs;
+  });
+  
+  if (activeDocumentId === docId) {
+    setActiveDocumentId(null);
+  }
+};
+
+// Add component cleanup on unmount
+useEffect(() => {
+  return () => {
+    // Clean up all polling intervals on component unmount
+    documents.forEach((doc, docId) => {
+      doc.questions.forEach((question, questionId) => {
+        if (question.pollInterval) {
+          clearInterval(question.pollInterval);
+        }
+      });
+    });
+  };
+}, []);
+
+// Enhanced error boundary for question processing
+const handleQuestionError = (questionId, error) => {
+  console.error('Question processing error:', error);
+  
+  updateQuestion(questionId, {
+    isProcessing: false,
+    processingStatus: 'error',
+    userMessage: `Processing failed: ${error.message}`,
+    logs: [...(updateQuestion(questionId, {}).logs || []), `Error: ${error.message}`]
+  });
+};
+
+// Update the addQuestionToDocument function to handle cleanup
+const addQuestionToDocument = async (questionText) => {
+  if (!activeDocumentId || !activeDocument) {
+    console.error('No active document');
+    return;
+  }
+
+  const tempQuestionId = `temp_${Date.now()}`;
+  const questionData = {
+    id: tempQuestionId,
+    text: questionText,
+    answer: null,
+    provenanceSources: [],
+    isProcessing: true,
+    logs: [],
+    createdAt: new Date(),
+    processingStatus: 'processing',
+    userMessage: null,
+    explanation: null
   };
 
+  // Add question to document immediately
+  setDocuments(prev => {
+    const newDocs = new Map(prev);
+    const doc = newDocs.get(activeDocumentId);
+    if (doc) {
+      doc.questions.set(tempQuestionId, questionData);
+      doc.activeQuestionId = tempQuestionId;
+      newDocs.set(activeDocumentId, doc);
+    }
+    return newDocs;
+  });
+
+  try {
+    // Try session-based approach first
+    if (sessionReady && currentSessionId && activeDocument.backendDocumentId) {
+      const response = await askQuestionInSession(currentSessionId, questionText, activeDocument.backendDocumentId);
+      startSessionPolling(tempQuestionId, currentSessionId, response.question_id);
+    } else {
+      // Fallback to legacy
+      const response = await askQuestion(questionText, activeDocument.filename);
+      startLegacyPolling(tempQuestionId, response.question_id);
+    }
+  } catch (error) {
+    handleQuestionError(tempQuestionId, error);
+  }
+};
   // Enhanced provenance loading for session-based approach
   const enhanceSessionProvenanceWithContent = async (sessionId, sessionQuestionId, provenanceArray) => {
     if (!Array.isArray(provenanceArray) || provenanceArray.length === 0) {
       return [];
     }
 
+    const limitedProvenance = provenanceArray.slice(0, EXPERIMENT_TOP_K);
+
     const allSentenceIds = new Set();
-    provenanceArray.forEach(source => {
+    limitedProvenance.forEach(source => {
       if (source.sentences_ids) {
         source.sentences_ids.forEach(id => allSentenceIds.add(id));
       }
@@ -493,7 +682,7 @@ const handleDocumentSelect = async (document) => {
       }
     }
 
-    return provenanceArray.map(source => {
+    return limitedProvenance.map(source => {
       if (!source.sentences_ids || source.sentences_ids.length === 0) {
         return source;
       }
@@ -510,14 +699,17 @@ const handleDocumentSelect = async (document) => {
     );
   };
 
-  // Enhanced provenance loading for legacy approach
+  // Enhanced legacy provenance loading with top-K limiting
   const enhanceLegacyProvenanceWithContent = async (backendQuestionId, provenanceArray) => {
     if (!Array.isArray(provenanceArray) || provenanceArray.length === 0) {
       return [];
     }
 
+    // Strictly limit to top-K
+    const limitedProvenance = provenanceArray.slice(0, EXPERIMENT_TOP_K);
+
     const allSentenceIds = new Set();
-    provenanceArray.forEach(source => {
+    limitedProvenance.forEach(source => {
       if (source.sentences_ids) {
         source.sentences_ids.forEach(id => allSentenceIds.add(id));
       }
@@ -533,7 +725,7 @@ const handleDocumentSelect = async (document) => {
       }
     }
 
-    return provenanceArray.map(source => {
+    return limitedProvenance.map(source => {
       if (!source.sentences_ids || source.sentences_ids.length === 0) {
         return source;
       }
@@ -550,24 +742,53 @@ const handleDocumentSelect = async (document) => {
     );
   };
 
-  // Update question helper
-  const updateQuestion = (questionId, updates) => {
-    if (!activeDocumentId) return;
+ 
 
-    setDocuments(prev => {
-      const newDocs = new Map(prev);
-      const doc = newDocs.get(activeDocumentId);
-      if (doc && doc.questions.has(questionId)) {
-        const currentQuestion = doc.questions.get(questionId);
-        const newQuestion = typeof updates === 'function'
-          ? { ...currentQuestion, ...updates(currentQuestion) }
-          : { ...currentQuestion, ...updates };
-        doc.questions.set(questionId, newQuestion);
-        newDocs.set(activeDocumentId, doc);
+  // Add admin function to check complete provenance (for development/research)
+  const getCompleteProvenance = async (sessionId, questionId) => {
+    try {
+      const response = await fetch(`/api/admin/sessions/${sessionId}/questions/${questionId}/complete-provenance`);
+      const data = await response.json();
+
+      if (data.success) {
+        console.log('🔍 Complete provenance data:', data);
+        return data.complete_provenance;
+      } else {
+        console.warn('Could not fetch complete provenance:', data.error);
+        return null;
       }
-      return newDocs;
+    } catch (error) {
+      console.error('Error fetching complete provenance:', error);
+      return null;
+    }
+  };
+
+  // Enhanced debug function for development
+  const debugProvenanceInfo = (question) => {
+    if (!question) return;
+
+    console.log('📊 Provenance Debug Info:', {
+      questionId: question.id,
+      totalFound: question.totalProvenanceFound,
+      userVisible: question.userVisibleProvenance,
+      experimentTopK: question.experimentTopK,
+      currentProvenanceSources: question.provenanceSources?.length || 0,
+      hiddenResultsMessage: question.hiddenResultsMessage,
+      processingStatus: question.processingStatus
     });
   };
+
+  // Add to your existing component - call this when a question completes
+  useEffect(() => {
+    if (activeDocument && activeDocument.activeQuestionId) {
+      const activeQuestion = activeDocument.questions.get(activeDocument.activeQuestionId);
+      if (activeQuestion && !activeQuestion.isProcessing && process.env.NODE_ENV === 'development') {
+        debugProvenanceInfo(activeQuestion);
+      }
+    }
+  }, [activeDocument?.activeQuestionId, documents]);
+
+  
 
   // Handle provenance selection
   const handleProvenanceSelect = (provenance) => {
@@ -622,58 +843,15 @@ const handleDocumentSelect = async (document) => {
   return (
     <div className="app-improved">
       {/* Header */}
-      <Header 
-        activeDocument={activeDocument} 
+      <Header
+        activeDocument={activeDocument}
         onShowPreloaded={handleShowPreloaded}
         onUploadDocument={handleUploadNewDocument}
         currentSession={{ session_id: currentSessionId }}
       />
 
-      {process.env.NODE_ENV === 'development' && (
-  <>
-    <button 
-      onClick={debugDocumentLoading}
-      style={{
-        position: 'fixed',
-        top: '10px',
-        right: '10px',
-        zIndex: 9999,
-        padding: '5px 10px',
-        background: '#ff6b6b',
-        color: 'white',
-        border: 'none',
-        borderRadius: '3px',
-        fontSize: '12px'
-      }}
-    >
-      Debug Document Loading
-    </button>
-    
-    {showDebugInfo && debugInfo && (
-      <div style={{
-        position: 'fixed',
-        top: '50px',
-        right: '10px',
-        width: '400px',
-        maxHeight: '80vh',
-        background: 'white',
-        border: '2px solid #333',
-        padding: '10px',
-        zIndex: 9999,
-        overflow: 'auto',
-        fontSize: '12px',
-        fontFamily: 'monospace'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-          <h4>Document Loading Debug</h4>
-          <button onClick={() => setShowDebugInfo(false)}>✕</button>
-        </div>
-        <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
-      </div>
-    )}
-  </>
-)}
-      
+
+
       {/* Main Content Grid */}
       <div className="app-content-grid">
         {/* Left Sidebar */}
@@ -695,7 +873,7 @@ const handleDocumentSelect = async (document) => {
               <HybridPDFViewer
                 pdfDocument={activeDocument}
                 selectedProvenance={selectedProvenance}
-                onClose={() => {}}
+                onClose={() => { }}
                 currentSession={{ session_id: currentSessionId }}
               />
             ) : (
@@ -703,7 +881,7 @@ const handleDocumentSelect = async (document) => {
                 <div className="empty-icon">📄</div>
                 <h3>Ready to Analyze Documents</h3>
                 <p>Upload your own PDF or choose from our preloaded research papers to begin document analysis and provenance extraction.</p>
-                
+
                 <div className="pdf-empty-actions">
                   <DocumentSelector
                     onDocumentUpload={handleDocumentUpload}
@@ -718,7 +896,7 @@ const handleDocumentSelect = async (document) => {
             )}
           </div>
         </div>
-        
+
         {/* Right Panel - Q&A Flow */}
         <div className="right-panel">
           <div className="qa-flow-section">
@@ -730,7 +908,7 @@ const handleDocumentSelect = async (document) => {
                 currentSession={{ session_id: currentSessionId }}
               />
             </div>
-            
+
             {/* Provenance Navigator - Bottom */}
             <div className="provenance-section">
               <ProvenanceNavigator

@@ -10,12 +10,21 @@ import {
   faExclamationTriangle,
   faBalanceScale,
   faSearch,
+  faSpinner,
   faGraduationCap,
   faChartLine,
   faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons';
+import { submitFeedback } from '../services/api';
 
-const FeedbackModal = ({ session, question, allProvenances, onSubmit, onClose }) => {
+const FeedbackModal = ({ 
+  session, 
+  question, 
+  allProvenances, 
+  onSubmit, 
+  onClose,
+  currentSession 
+}) => {
   const [feedback, setFeedback] = useState({
     // Provenance Quality Assessment (for each provenance viewed)
     provenanceQuality: {
@@ -49,6 +58,8 @@ const FeedbackModal = ({ session, question, allProvenances, onSubmit, onClose })
 
   const [currentStep, setCurrentStep] = useState(0);
   const [viewedProvenances] = useState(new Set()); // Track which provenances user has seen
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const steps = [
     {
@@ -264,27 +275,69 @@ const FeedbackModal = ({ session, question, allProvenances, onSubmit, onClose })
     setCurrentStep(Math.max(0, currentStep - 1));
   };
 
-  const handleSubmit = () => {
-    const submissionData = {
-      sessionId: session?.sessionId,
-      questionId: question?.id,
-      questionText: question?.text,
-      documentFilename: session?.documentName,
-      provenanceCount: allProvenances?.length || 0,
-      provenancesViewed: Array.from(viewedProvenances),
-      processingTime: session?.completedAt && session?.createdAt 
-        ? (new Date(session.completedAt) - new Date(session.createdAt)) / 1000
-        : null,
-      feedback: {
-        ...feedback,
-        timestamp: new Date().toISOString(),
-        submissionTime: Date.now(),
-        algorithmMethod: session?.algorithmMethod, // Track which of the 10 combinations was used
-        userSessionId: session?.userSessionId
-      }
-    };
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
 
-    onSubmit(submissionData);
+    try {
+      // Enhanced submission data with session information
+      const submissionData = {
+        // Core session info
+        sessionId: currentSession?.session_id,
+        questionId: question?.id,
+        questionText: question?.text,
+        documentId: session?.documentId,
+        documentFilename: session?.documentName,
+        
+        // Processing info
+        provenanceCount: allProvenances?.length || 0,
+        provenancesViewed: Array.from(viewedProvenances),
+        processingTime: session?.processingTime || 
+          (session?.completedAt && session?.createdAt 
+            ? (new Date(session.completedAt) - new Date(session.createdAt)) / 1000
+            : null),
+        
+        // Session processing details
+        processingMethod: question?.processingMethod || 'unknown',
+        sessionQuestionId: question?.sessionQuestionId,
+        backendQuestionId: question?.backendQuestionId,
+        legacyMode: question?.legacyMode || false,
+        
+        // Feedback data
+        feedback: {
+          ...feedback,
+          timestamp: new Date().toISOString(),
+          submissionTime: Date.now(),
+          algorithmMethod: session?.algorithmMethod || 'default',
+          userSessionId: session?.userSessionId || currentSession?.session_id,
+          
+          // Additional context
+          documentType: session?.documentType || 'unknown',
+          sessionProcessed: question?.sessionProcessed || false
+        }
+      };
+
+      console.log('🔄 Submitting feedback:', submissionData);
+
+      // Try to submit via the API
+      try {
+        const response = await submitFeedback(submissionData);
+        if (response.success) {
+          console.log('✅ Feedback submitted successfully via API');
+        }
+      } catch (apiError) {
+        console.warn('⚠️ API feedback submission failed, using local callback:', apiError);
+      }
+
+      // Always call the local callback as well
+      onSubmit(submissionData);
+
+    } catch (error) {
+      console.error('❌ Error submitting feedback:', error);
+      setSubmitError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getCurrentQuestions = () => {
@@ -326,11 +379,26 @@ const FeedbackModal = ({ session, question, allProvenances, onSubmit, onClose })
       }
       return false;
     }).length;
-        return Math.round((completedQuestions / allQuestions.length) * 100);
+    return Math.round((completedQuestions / allQuestions.length) * 100);
   };
 
   const currentStepData = steps[currentStep];
   const isCommentsStep = currentStepData?.category === 'comments';
+
+  // Enhanced context display
+  const getSessionContext = () => {
+    return {
+      sessionId: currentSession?.session_id?.split('_')[1] || 'Unknown',
+      questionText: question?.text || 'Unknown question',
+      documentName: session?.documentName || 'Unknown document',
+      processingTime: session?.processingTime || question?.processingTime || 
+        (question?.provenanceSources?.[0]?.time) || null,
+      provenenceCount: allProvenances?.length || 0,
+      processingMethod: question?.processingMethod || 'Unknown'
+    };
+  };
+
+  const sessionContext = getSessionContext();
 
   return (
     <div className="feedback-modal-overlay">
@@ -340,19 +408,32 @@ const FeedbackModal = ({ session, question, allProvenances, onSubmit, onClose })
             <h3>USER_STUDY_EVALUATION</h3>
             <div className="evaluation-context">
               <div className="context-item">
+                <span className="context-label">Session:</span>
+                <span className="context-value">{sessionContext.sessionId}</span>
+              </div>
+              <div className="context-item">
                 <span className="context-label">Question:</span>
                 <span className="context-value">
-                  "{question?.text?.length > 60 ? question.text.substring(0, 60) + '...' : question?.text}"
+                  "{sessionContext.questionText.length > 60 
+                    ? sessionContext.questionText.substring(0, 60) + '...' 
+                    : sessionContext.questionText}"
                 </span>
               </div>
               <div className="context-item">
                 <span className="context-label">Evidence Found:</span>
-                <span className="context-value">{allProvenances?.length || 0} provenances</span>
+                <span className="context-value">{sessionContext.provenenceCount} provenances</span>
               </div>
               <div className="context-item">
                 <span className="context-label">Processing Time:</span>
                 <span className="context-value">
-                  {session?.processingTime ? `${session.processingTime.toFixed(1)}s` : 'N/A'}
+                  {sessionContext.processingTime ? `${sessionContext.processingTime.toFixed(1)}s` : 'N/A'}
+                </span>
+              </div>
+              <div className="context-item">
+                <span className="context-label">Method:</span>
+                <span className="context-value processing-method">
+                  {sessionContext.processingMethod === 'session-based' ? '🔄 Session' : 
+                   sessionContext.processingMethod === 'legacy' ? '⚡ Legacy' : '🔧 ' + sessionContext.processingMethod}
                 </span>
               </div>
             </div>
@@ -380,6 +461,14 @@ const FeedbackModal = ({ session, question, allProvenances, onSubmit, onClose })
               </span>
             </div>
           </div>
+
+          {/* Error Display */}
+          {submitError && (
+            <div className="submit-error">
+              <FontAwesomeIcon icon={faExclamationTriangle} />
+              <span>Error submitting feedback: {submitError}</span>
+            </div>
+          )}
 
           {/* Current Step Content */}
           {!isCommentsStep ? (
@@ -494,6 +583,7 @@ const FeedbackModal = ({ session, question, allProvenances, onSubmit, onClose })
           <button 
             className="secondary-btn" 
             onClick={currentStep === 0 ? onClose : handlePrevious}
+            disabled={isSubmitting}
           >
             {currentStep === 0 ? 'CANCEL' : 'PREVIOUS'}
           </button>
@@ -502,15 +592,25 @@ const FeedbackModal = ({ session, question, allProvenances, onSubmit, onClose })
             <button 
               className="primary-btn submit-btn" 
               onClick={handleSubmit}
+              disabled={isSubmitting}
             >
-              <FontAwesomeIcon icon={faComment} />
-              SUBMIT_EVALUATION
+              {isSubmitting ? (
+                <>
+                  <FontAwesomeIcon icon={faSpinner} spin />
+                  SUBMITTING...
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faComment} />
+                  SUBMIT_EVALUATION
+                </>
+              )}
             </button>
           ) : (
             <button 
               className="primary-btn" 
               onClick={handleNext}
-              disabled={!isStepComplete()}
+              disabled={!isStepComplete() || isSubmitting}
             >
               NEXT_STEP
             </button>

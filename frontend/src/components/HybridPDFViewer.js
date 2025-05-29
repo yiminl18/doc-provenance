@@ -14,12 +14,21 @@ import {
   faChevronLeft,
   faChevronRight,
   faAlignLeft,
-  faMapMarkedAlt
+  faMapMarkedAlt,
+  faDownload,
+  faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 import { SentencePDFMapper } from '../utils/SentencePDFMapper';
 import ProvenancePanel from './ProvenancePanel';
+import { getDocumentSentences } from '../services/api';
 
-const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode = false }) => {
+const HybridPDFViewer = ({ 
+  pdfDocument, 
+  selectedProvenance, 
+  onClose, 
+  isGridMode = false,
+  currentSession 
+}) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1.2);
   const [loading, setLoading] = useState(true);
@@ -50,7 +59,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
     }
   }, []);
 
-  // Generate PDF URL when document changes
+  // Generate PDF URL when document changes - with session-based and fallback support
   useEffect(() => {
     if (!pdfDocument) {
       setPdfUrl(null);
@@ -59,13 +68,25 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
 
     let url = '';
     
+    // Strategy 1: Use file blob if available (for newly uploaded files)
     if (pdfDocument.file) {
       url = URL.createObjectURL(pdfDocument.file);
       console.log('📁 Using file blob URL');
-    } else {
-      const docId = pdfDocument.backendDocumentId || pdfDocument.id;
-      url = `/api/documents/${docId}/pdf`;
-      console.log('🔗 Using backend PDF URL:', url);
+    } 
+    // Strategy 2: Use session-based document endpoint
+    else if (pdfDocument.backendDocumentId) {
+      url = `/api/documents/${pdfDocument.backendDocumentId}/pdf`;
+      console.log('🔗 Using session-based PDF URL:', url);
+    }
+    // Strategy 3: Fallback to uploads endpoint (legacy compatibility)
+    else if (pdfDocument.filename) {
+      url = `/uploads/${pdfDocument.filename}`;
+      console.log('📄 Using legacy uploads URL:', url);
+    }
+    else {
+      console.error('❌ No valid PDF source found');
+      setError('Unable to locate PDF file');
+      return;
     }
 
     setPdfUrl(url);
@@ -83,69 +104,143 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
     loadPDFAndSentences();
   }, [pdfUrl]);
 
-  const loadPDFAndSentences = async () => {
-    setLoading(true);
-    setError(null);
+  // Update this part of your HybridPDFViewer.js loadPDFAndSentences function
+
+const loadPDFAndSentences = async () => {
+  setLoading(true);
+  setError(null);
+
+  try {
+    console.log('🔄 Loading PDF and sentence data...');
+
+    // Test PDF accessibility with the new working endpoint
+    let pdfAccessible = false;
+    let finalUrl = pdfUrl;
 
     try {
-      console.log('🔄 Loading PDF and sentence data...');
-
+      console.log('🔍 Testing PDF URL:', pdfUrl);
       const testResponse = await fetch(pdfUrl, { method: 'HEAD' });
-      if (!testResponse.ok) {
-        throw new Error(`PDF not accessible: ${testResponse.status} ${testResponse.statusText}`);
+      console.log('📡 PDF HEAD response:', testResponse.status);
+      
+      if (testResponse.ok) {
+        pdfAccessible = true;
+        console.log('✅ PDF is accessible at primary URL');
       }
-
-      const loadingTask = window.pdfjsLib.getDocument({
-        url: pdfUrl,
-        verbosity: 0
-      });
-
-      const pdf = await loadingTask.promise;
-      console.log('✅ PDF loaded successfully:', pdf.numPages, 'pages');
-
-      setPdfDoc(pdf);
-      setTotalPages(pdf.numPages);
-      setCurrentPage(1);
-
-      // Load sentence mapping in parallel
-      loadSentenceMapping(pdf).catch(err => {
-        console.warn('Sentence mapping failed, continuing with basic PDF:', err);
-      });
-
-      setLoading(false);
-
-    } catch (err) {
-      console.error('❌ Error loading PDF:', err);
-      setError(`Failed to load document: ${err.message}`);
-      setLoading(false);
+    } catch (testError) {
+      console.warn('❌ Primary PDF URL failed:', testError);
+      
+      // Try alternative URLs only if primary fails
+      if (pdfDocument.backendDocumentId) {
+        const fallbackUrls = [
+          `/uploads/${pdfDocument.filename}`,
+          `/api/uploads/${pdfDocument.filename}`
+        ];
+        
+        for (const altUrl of fallbackUrls) {
+          try {
+            console.log('🔍 Trying fallback URL:', altUrl);
+            const altResponse = await fetch(altUrl, { method: 'HEAD' });
+            if (altResponse.ok) {
+              finalUrl = altUrl;
+              pdfAccessible = true;
+              console.log('✅ Fallback URL works:', altUrl);
+              break;
+            }
+          } catch (altError) {
+            console.warn('❌ Fallback URL failed:', altUrl, altError);
+          }
+        }
+      }
     }
-  };
+
+    if (!pdfAccessible) {
+      throw new Error(`PDF not accessible: ${finalUrl}`);
+    }
+
+    console.log('🔄 Loading PDF with PDF.js...');
+    const loadingTask = window.pdfjsLib.getDocument({
+      url: finalUrl,
+      verbosity: 0
+    });
+
+    const pdf = await loadingTask.promise;
+    console.log('✅ PDF loaded successfully:', pdf.numPages, 'pages');
+
+    setPdfDoc(pdf);
+    setTotalPages(pdf.numPages);
+    setCurrentPage(1);
+
+    // Load sentence mapping in parallel
+    loadSentenceMapping(pdf).catch(err => {
+      console.warn('⚠️ Sentence mapping failed, continuing with basic PDF:', err);
+    });
+
+    setLoading(false);
+
+  } catch (err) {
+    console.error('❌ Error loading PDF:', err);
+    setError(`Failed to load document: ${err.message}`);
+    setLoading(false);
+  }
+};
 
   const loadSentenceMapping = async (pdf) => {
     try {
-      
- 
       const docId = pdfDocument.backendDocumentId || pdfDocument.id;
       
-      const sentencesResponse = await fetch(`/api/documents/${docId}/sentences`);
-      if (!sentencesResponse.ok) {
-        throw new Error('Failed to load sentences');
+      if (!docId) {
+        console.warn('No document ID available for sentence mapping');
+        return;
       }
-      
-      const sentencesData = await sentencesResponse.json();
-      if (!sentencesData.success || !sentencesData.sentences) {
+
+      // Use unified sentence loading
+      let sentencesData;
+      try {
+        const response = await getDocumentSentences(docId);
+        if (response.success && response.sentences) {
+          sentencesData = response;
+        } else {
+          throw new Error('No sentence data in response');
+        }
+      } catch (sessionError) {
+        console.warn('Session-based sentence loading failed, trying legacy...');
+        
+        // Fallback to legacy endpoint if available
+        try {
+          const legacyUrl = `/api/sentences/${docId}?ids=${Array.from({length: 100}, (_, i) => i).join(',')}`;
+          const legacyResponse = await fetch(legacyUrl);
+          if (legacyResponse.ok) {
+            const legacyData = await legacyResponse.json();
+            if (legacyData.success && legacyData.sentences) {
+              sentencesData = { 
+                sentences: Object.values(legacyData.sentences),
+                total_sentences: Object.keys(legacyData.sentences).length 
+              };
+            }
+          }
+        } catch (legacyError) {
+          throw new Error('Both session and legacy sentence loading failed');
+        }
+      }
+
+      if (!sentencesData || !sentencesData.sentences) {
         throw new Error('No sentence data available');
       }
 
       setSentences(sentencesData.sentences);
       
-      const mapper = new SentencePDFMapper();
-      const result = await mapper.initialize(pdf, sentencesData.sentences);
-      
-      if (result.success) {
-        setSentenceMapper(mapper);
-        setMappingStats(mapper.getStatistics());
-        console.log('✅ Advanced sentence mapping completed:', result);
+      // Initialize sentence mapper if we have a PDF
+      if (window.SentencePDFMapper) {
+        const mapper = new window.SentencePDFMapper();
+        const result = await mapper.initialize(pdf, sentencesData.sentences);
+        
+        if (result.success) {
+          setSentenceMapper(mapper);
+          setMappingStats(mapper.getStatistics());
+          console.log('✅ Advanced sentence mapping completed:', result);
+        }
+      } else {
+        console.warn('SentencePDFMapper not available, using basic mapping');
       }
       
     } catch (error) {
@@ -328,6 +423,17 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
     }
   };
 
+  const handleDownloadPDF = () => {
+    if (pdfUrl && pdfDocument.filename) {
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = pdfDocument.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   // Render states
   if (!pdfDocument) {
     return (
@@ -348,6 +454,9 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
           <FontAwesomeIcon icon={faSpinner} spin size="2x" />
           <h3>Loading PDF...</h3>
           <p>{pdfDocument.filename}</p>
+          {currentSession && (
+            <small>Session: {currentSession.session_id?.split('_')[1] || 'Active'}</small>
+          )}
         </div>
       </div>
     );
@@ -357,11 +466,21 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
     return (
       <div className="pdf-viewer-error">
         <div className="error-content">
+          <FontAwesomeIcon icon={faExclamationTriangle} size="2x" />
           <h3>PDF Loading Error</h3>
           <p>{error}</p>
-          <button onClick={loadPDFAndSentences} className="retry-btn">
-            Retry
-          </button>
+          <div className="error-actions">
+            <button onClick={loadPDFAndSentences} className="retry-btn">
+              <FontAwesomeIcon icon={faSpinner} />
+              Retry
+            </button>
+            {pdfDocument.backendDocumentId && (
+              <button onClick={handleDownloadPDF} className="download-btn">
+                <FontAwesomeIcon icon={faDownload} />
+                Download PDF
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -380,6 +499,9 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
               ({selectedProvenance.sentences_ids?.length || 0} sentences)
             </span>
           )}
+          {pdfDocument.isPreloaded && (
+            <span className="preloaded-badge">📚 Research Paper</span>
+          )}
         </div>
 
         <div className="pdf-controls">
@@ -387,26 +509,30 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             <FontAwesomeIcon icon={faMapMarkedAlt} />
           </button>
           
-          <button onClick={toggleHighlights} className="control-btn">
+          <button onClick={toggleHighlights} className="control-btn" title="Toggle Highlights">
             <FontAwesomeIcon icon={showHighlights ? faEye : faEyeSlash} />
           </button>
           
-          <button onClick={handleZoomOut} className="control-btn">
+          <button onClick={handleZoomOut} className="control-btn" title="Zoom Out">
             <FontAwesomeIcon icon={faSearchMinus} />
           </button>
           
           <span className="zoom-display">{Math.round(zoomLevel * 100)}%</span>
           
-          <button onClick={handleZoomIn} className="control-btn">
+          <button onClick={handleZoomIn} className="control-btn" title="Zoom In">
             <FontAwesomeIcon icon={faSearchPlus} />
           </button>
+
+          <button onClick={handleDownloadPDF} className="control-btn" title="Download PDF">
+            <FontAwesomeIcon icon={faDownload} />
+          </button>
           
-          <button onClick={toggleFullscreen} className="control-btn">
+          <button onClick={toggleFullscreen} className="control-btn" title="Toggle Fullscreen">
             <FontAwesomeIcon icon={isFullscreen ? faCompress : faExpand} />
           </button>
           
           {onClose && (
-            <button onClick={onClose} className="control-btn close-btn">
+            <button onClick={onClose} className="control-btn close-btn" title="Close Viewer">
               <FontAwesomeIcon icon={faTimes} />
             </button>
           )}
@@ -437,18 +563,24 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
           <FontAwesomeIcon icon={faChevronRight} />
         </button>
 
-        {sentences.length > 0 && (
-          <div className="sentence-status">
-            <small>
-              📍 {sentences.length} sentences 
-              {mappingStats && (
-                <span className="mapping-quality">
-                  | {Math.round(mappingStats.averageConfidence * 100)}% avg confidence
-                </span>
-              )}
-            </small>
-          </div>
-        )}
+        {/* Document info */}
+        <div className="document-info">
+          {sentences.length > 0 && (
+            <span className="sentence-status">
+              📍 {sentences.length} sentences
+            </span>
+          )}
+          {mappingStats && (
+            <span className="mapping-quality">
+              | {Math.round(mappingStats.averageConfidence * 100)}% mapping confidence
+            </span>
+          )}
+          {pdfDocument.sessionProcessed && (
+            <span className="session-processed">
+              | ✅ Session processed
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Main Content - PDF + Detail Panel */}
@@ -473,40 +605,14 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
               currentPage={currentPage}
               sentenceMapper={sentenceMapper}
               showHighlights={showHighlights}
+              pdfDocument={pdfDocument}
+              currentSession={currentSession}
             />
           </div>
         )}
       </div>
 
-      {/* Provenance Info }
-      {selectedProvenance && showHighlights && (
-        <div className="provenance-info">
-          <h4>
-            <FontAwesomeIcon icon={faHighlighter} />
-            Current Evidence - Page {currentPage}
-          </h4>
-          <div className="provenance-summary">
-            <div className="summary-item">
-              <strong>Provenance ID:</strong> {selectedProvenance.provenance_id}
-            </div>
-            <div className="summary-item">
-              <strong>Total Sentences:</strong> {selectedProvenance.sentences_ids?.length || 0}
-            </div>
-            <div className="summary-item">
-              <strong>On This Page:</strong> {
-                selectedProvenance.sentences_ids?.filter(id => 
-                  sentenceMapper ? sentenceMapper.getPageForSentence(id) === currentPage : false
-                ).length || 0
-              }
-            </div>
-            <div className="summary-item">
-              <strong>Processing Time:</strong> {selectedProvenance.time?.toFixed(2) || 'N/A'}s
-            </div>
-          </div>
-        </div>
-      )*/}
-
-      {/* Styles */}
+      {/* Keep existing styles */}
       <style dangerouslySetInnerHTML={{
         __html: `
           .dual-view-pdf-viewer {
@@ -551,6 +657,15 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             font-size: 12px;
             font-weight: normal;
           }
+
+          .preloaded-badge {
+            background: #2196F3;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: normal;
+          }
           
           .pdf-controls {
             display: flex;
@@ -570,6 +685,11 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
           .control-btn:hover {
             background: #f0f0f0;
           }
+
+          .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
           
           .zoom-display {
             padding: 0 10px;
@@ -584,6 +704,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             padding: 10px;
             background: #f8f9fa;
             border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
           }
           
           .nav-btn {
@@ -596,6 +717,11 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             cursor: pointer;
             border-radius: 4px;
           }
+
+          .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
           
           .page-info {
             font-weight: bold;
@@ -603,14 +729,17 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             text-align: center;
           }
           
-          .sentence-status {
+          .document-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             color: #666;
             font-family: monospace;
+            font-size: 12px;
           }
           
-          .mapping-quality {
-            color: #666;
-            font-weight: normal;
+          .sentence-status, .mapping-quality, .session-processed {
+            white-space: nowrap;
           }
           
           .dual-view-content {
@@ -700,34 +829,6 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             overflow: hidden;
           }
           
-          .provenance-info {
-            padding: 15px;
-            background: #e3f2fd;
-            border-top: 1px solid #2196f3;
-          }
-          
-          .provenance-info h4 {
-            margin: 0 0 10px 0;
-            color: #1976d2;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-          
-          .provenance-summary {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-          }
-          
-          .summary-item {
-            font-size: 12px;
-          }
-          
-          .summary-item strong {
-            color: #1976d2;
-          }
-          
           .pdf-viewer-empty,
           .pdf-viewer-loading,
           .pdf-viewer-error {
@@ -735,6 +836,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #f5f5f5;
           }
           
           .empty-content,
@@ -742,16 +844,39 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
           .error-content {
             text-align: center;
             color: #666;
+            padding: 40px;
+          }
+
+          .error-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
           }
           
-          .retry-btn {
-            margin: 10px;
+          .retry-btn, .download-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             padding: 8px 16px;
             background: #2196f3;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.2s;
+          }
+
+          .retry-btn:hover, .download-btn:hover {
+            background: #1976d2;
+          }
+
+          .download-btn {
+            background: #4CAF50;
+          }
+
+          .download-btn:hover {
+            background: #388E3C;
           }
         `
       }} />

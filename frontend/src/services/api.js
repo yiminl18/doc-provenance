@@ -3,16 +3,68 @@ import axios from 'axios';
 // Base URL for API requests
 const API_URL = '/api';
 
-// ===== DOCUMENT MANAGEMENT ENDPOINTS =====
+// ===== SESSION MANAGEMENT =====
 
 /**
- * Upload a PDF document
- * @param {FormData} formData - Form data containing the PDF file
- * @returns {Promise} Response with document_id, filename, text_length, etc.
+ * Get or create current session
+ */
+export const getCurrentSession = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/sessions/current`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting current session:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Create new session
+ */
+export const createNewSession = async () => {
+  try {
+    const response = await axios.post(`${API_URL}/sessions/current`);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating new session:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Get session summary
+ */
+export const getSessionSummary = async (sessionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/sessions/${sessionId}/summary`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting session summary:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Get session statistics
+ */
+export const getSessionsStats = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/sessions/stats`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting sessions stats:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+// ===== UNIFIED DOCUMENT MANAGEMENT =====
+
+/**
+ * Upload a document - now unified with preloaded logic
  */
 export const uploadDocument = async (formData) => {
   try {
-    const response = await axios.post(`${API_URL}/documents`, formData, {
+    const response = await axios.post(`${API_URL}/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -25,60 +77,20 @@ export const uploadDocument = async (formData) => {
 };
 
 /**
- * Get document metadata
- * @param {string} documentId - The document ID
- * @returns {Promise} Document metadata
+ * Process a document for the current session
  */
-export const getDocument = async (documentId) => {
+export const processDocumentForSession = async (documentId) => {
   try {
-    const response = await axios.get(`${API_URL}/documents/${documentId}`);
+    const response = await axios.post(`${API_URL}/documents/${documentId}/process`);
     return response.data;
   } catch (error) {
-    console.error('Error getting document:', error);
+    console.error('Error processing document for session:', error);
     throw new Error(error.response?.data?.error || error.message);
   }
 };
 
 /**
- * Enhanced document text retrieval with multiple fallback strategies
- * @param {string} documentId - The document ID
- * @returns {Promise} Document text
- */
-export const getDocumentText = async (documentId) => {
-  try {
-    // First attempt: direct document text endpoint
-    const response = await axios.get(`${API_URL}/documents/${documentId}/text`);
-    return response.data;
-  } catch (error) {
-    console.error('Primary text retrieval failed:', error);
-    
-    try {
-      // Second attempt: check if it's a preloaded document
-      const preloadedResponse = await getPreloadedDocuments();
-      if (preloadedResponse.success && preloadedResponse.documents) {
-        const matchingDoc = preloadedResponse.documents.find(doc => 
-          doc.document_id === documentId
-        );
-        
-        if (matchingDoc) {
-          // Try to load and then get text
-          await loadPreloadedDocument(documentId);
-          const textResponse = await axios.get(`${API_URL}/documents/${documentId}`);
-          return textResponse.data;
-        }
-      }
-    } catch (secondError) {
-      console.error('Preloaded document fallback failed:', secondError);
-    }
-    
-    // Final fallback: return error info for graceful handling
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-/**
- * Get list of available preloaded documents with enhanced error handling
- * @returns {Promise} List of preloaded documents
+ * Get preloaded documents - UI compatibility wrapper
  */
 export const getPreloadedDocuments = async () => {
   try {
@@ -86,26 +98,22 @@ export const getPreloadedDocuments = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching preloaded documents:', error);
-        
     throw new Error(error.response?.data?.error || error.message);
   }
 };
 
 /**
- * Load a preloaded document for use with enhanced error handling
- * @param {string} documentId - The preloaded document ID
- * @returns {Promise} Success response
+ * Load any document (unified - works for both uploaded and preloaded)
  */
-export const loadPreloadedDocument = async (documentId) => {
+export const loadDocument = async (documentId) => {
   try {
-    const response = await axios.post(`${API_URL}/documents/preloaded/${documentId}`);
+    const response = await axios.post(`${API_URL}/documents/${documentId}/load`);
     return response.data;
   } catch (error) {
-    console.error('Error loading preloaded document:', error);
+    console.error('Error loading document:', error);
     
-    // For fallback, we can still return success to allow frontend handling
     if (error.response?.status === 404) {
-      console.warn(`Preloaded document ${documentId} not found on server, allowing fallback handling`);
+      console.warn(`Document ${documentId} not found on server, allowing fallback handling`);
       return {
         success: true,
         document_id: documentId,
@@ -118,376 +126,21 @@ export const loadPreloadedDocument = async (documentId) => {
   }
 };
 
-// ===== SESSION MANAGEMENT ENDPOINTS =====
-
 /**
- * Create a new analysis session
- * @returns {Promise} Session information with session_id
+ * Get document text - unified for all document types
  */
-export const createSession = async () => {
+export const getDocumentText = async (documentId) => {
   try {
-    const response = await axios.post(`${API_URL}/sessions`);
+    const response = await axios.get(`${API_URL}/documents/${documentId}/text`);
     return response.data;
   } catch (error) {
-    console.error('Error creating session:', error);
+    console.error('Error getting document text:', error);
     throw new Error(error.response?.data?.error || error.message);
   }
 };
 
 /**
- * Get session information
- * @param {string} sessionId - The session ID
- * @returns {Promise} Session data
- */
-export const getSession = async (sessionId) => {
-  try {
-    const response = await axios.get(`${API_URL}/sessions/${sessionId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting session:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-// ===== TEXT PROCESSING ENDPOINTS =====
-
-/**
- * Process a question against document text using provenance algorithm
- * @param {string} sessionId - The session ID
- * @param {string} questionText - The question to ask
- * @param {string} documentId - The document ID to analyze
- * @returns {Promise} Processing session information
- */
-export const processTextQuestion = async (sessionId, questionText, documentId, documentText) => {
-  try {
-
-    console.log('Processing text question:', {
-      sessionId,
-      questionText,
-      documentId,
-      documentText});
-
-    const response = await axios.post(`${API_URL}/sessions/${sessionId}/process-text`, {
-      question: questionText,
-      document_id: documentId,
-      document_text: documentText
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error processing text question:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-/**
- * Get progress of text processing
- * @param {string} sessionId - The session ID
- * @param {string} processingSessionId - The processing session ID
- * @returns {Promise} Processing progress
- */
-export const getTextProcessingProgress = async (sessionId, processingSessionId) => {
-  try {
-    const response = await axios.get(`${API_URL}/sessions/${sessionId}/processing/${processingSessionId}/progress`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting text processing progress:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-/**
- * Get results of text processing
- * @param {string} sessionId - The session ID
- * @param {string} processingSessionId - The processing session ID
- * @returns {Promise} Processing results with provenance data
- */
-export const getTextProcessingResults = async (sessionId, processingSessionId) => {
-  try {
-    const response = await axios.get(`${API_URL}/sessions/${sessionId}/processing/${processingSessionId}/results`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting text processing results:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-/**
- * Get sentences for a specific processing session
- * @param {string} sessionId - The session ID
- * @param {string} processingSessionId - The processing session ID
- * @param {Array<number>} sentenceIds - Array of sentence IDs to fetch
- * @returns {Promise} Sentences data
- */
-export const getProcessingSentences = async (sessionId, processingSessionId, sentenceIds) => {
-  try {
-    const idsParam = Array.isArray(sentenceIds) ? sentenceIds.join(',') : sentenceIds;
-    const response = await axios.get(`${API_URL}/sessions/${sessionId}/processing/${processingSessionId}/sentences?ids=${idsParam}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting processing sentences:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-// ===== QUESTION MANAGEMENT ENDPOINTS =====
-
-/**
- * Get all questions asked in a session
- * @param {string} sessionId - The session ID
- * @returns {Promise} List of questions in the session
- */
-export const getSessionQuestions = async (sessionId) => {
-  try {
-    const response = await axios.get(`${API_URL}/sessions/${sessionId}/questions`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting session questions:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-/**
- * Get all questions asked about a specific document in a session
- * @param {string} sessionId - The session ID
- * @param {string} documentId - The document ID
- * @returns {Promise} List of questions for the document
- */
-export const getDocumentQuestions = async (sessionId, documentId) => {
-  try {
-    const response = await axios.get(`${API_URL}/sessions/${sessionId}/documents/${documentId}/questions`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting document questions:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-/**
- * Get a specific question and its results
- * @param {string} sessionId - The session ID
- * @param {string} documentId - The document ID
- * @param {string} questionId - The question ID
- * @returns {Promise} Specific question data
- */
-export const getSpecificQuestion = async (sessionId, documentId, questionId) => {
-  try {
-    const response = await axios.get(`${API_URL}/sessions/${sessionId}/documents/${documentId}/questions/${questionId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error getting specific question:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-// ===== FEEDBACK ENDPOINTS =====
-
-/**
- * Submit comprehensive user feedback
- * @param {Object} feedbackData - Feedback data object
- * @returns {Promise} Success response
- */
-export const submitFeedback = async (feedbackData) => {
-  try {
-    const response = await axios.post(`${API_URL}/feedback`, feedbackData);
-    return response.data;
-  } catch (error) {
-    console.error('Error submitting feedback:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-// ===== UTILITY FUNCTIONS =====
-
-/**
- * Utility function to check if a document exists before operations
- * @param {string} documentId - The document ID to check
- * @returns {Promise<boolean>} Whether the document exists
- */
-export const checkDocumentExists = async (documentId) => {
-  try {
-    const response = await axios.get(`${API_URL}/documents/${documentId}`);
-    return response.data.success;
-  } catch (error) {
-    console.error('Error checking document existence:', error);
-    return false;
-  }
-};
-
-/**
- * Get comprehensive document information including metadata and availability
- * @param {string} documentId - The document ID
- * @returns {Promise} Complete document information
- */
-export const getDocumentComplete = async (documentId) => {
-  try {
-    const [metadataResponse, textAvailable] = await Promise.all([
-      getDocument(documentId),
-      checkDocumentExists(documentId)
-    ]);
-    
-    return {
-      ...metadataResponse,
-      textAvailable,
-      retrievedAt: new Date().toISOString()
-    };
-  } catch (error) {
-    console.error('Error getting complete document info:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
-
-/**
- * Generate a client-side content hash (for consistency checking)
- * @param {string|Object} content - Content to hash
- * @param {string} prefix - Optional prefix for the hash
- * @returns {Promise<string>} Generated hash
- */
-export const generateContentHash = async (content, prefix = "") => {
-  const encoder = new TextEncoder();
-  let data;
-  
-  if (typeof content === 'string') {
-    data = encoder.encode(content);
-  } else if (typeof content === 'object') {
-    data = encoder.encode(JSON.stringify(content));
-  } else {
-    data = encoder.encode(String(content));
-  }
-  
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  
-  return `${prefix}${hashHex.substring(0, 12)}`;
-};
-
-/**
- * Helper function to batch multiple processing operations
- * @param {Array<string>} processingSessionIds - Array of processing session IDs
- * @param {string} sessionId - The main session ID
- * @param {string} operation - Operation type ('progress' or 'results')
- * @returns {Promise} Batch operation results
- */
-export const batchProcessingOperations = async (processingSessionIds, sessionId, operation) => {
-  try {
-    const promises = processingSessionIds.map(processingSessionId => {
-      switch (operation) {
-        case 'progress':
-          return getTextProcessingProgress(sessionId, processingSessionId);
-        case 'results':
-          return getTextProcessingResults(sessionId, processingSessionId);
-        default:
-          throw new Error(`Unknown operation: ${operation}`);
-      }
-    });
-    
-    const results = await Promise.allSettled(promises);
-    
-    const successfulResults = [];
-    const failedResults = [];
-    
-    results.forEach((result, index) => {
-      if (result.status === 'fulfilled') {
-        successfulResults.push({
-          processingSessionId: processingSessionIds[index],
-          data: result.value
-        });
-      } else {
-        failedResults.push({
-          processingSessionId: processingSessionIds[index],
-          error: result.reason.message
-        });
-      }
-    });
-    
-    return {
-      successful: successfulResults,
-      failed: failedResults,
-      totalRequested: processingSessionIds.length,
-      successCount: successfulResults.length,
-      failureCount: failedResults.length
-    };
-    
-  } catch (error) {
-    console.error('Error in batch processing operations:', error);
-    throw new Error(error.message);
-  }
-};
-
-/**
- * Helper function to poll processing sessions until completion
- * @param {Array<string>} processingSessionIds - Array of processing session IDs
- * @param {string} sessionId - The main session ID
- * @param {Function} onProgress - Optional progress callback
- * @param {number} maxPollingTime - Maximum polling time in milliseconds (default: 5 minutes)
- * @returns {Promise} Polling results
- */
-export const pollProcessingUntilComplete = async (processingSessionIds, sessionId, onProgress = null, maxPollingTime = 300000) => {
-  const startTime = Date.now();
-  const completedSessions = new Set();
-  const sessionResults = new Map();
-  
-  while (completedSessions.size < processingSessionIds.length && (Date.now() - startTime) < maxPollingTime) {
-    const pendingSessions = processingSessionIds.filter(id => !completedSessions.has(id));
-    
-    try {
-      const batchResults = await batchProcessingOperations(pendingSessions, sessionId, 'progress');
-      
-      for (const result of batchResults.successful) {
-        const { processingSessionId, data } = result;
-        
-        if (data.done && data.status === 'completed') {
-          completedSessions.add(processingSessionId);
-          
-          // Get final results for completed session
-          try {
-            const finalResults = await getTextProcessingResults(sessionId, processingSessionId);
-            sessionResults.set(processingSessionId, finalResults);
-          } catch (error) {
-            console.error(`Error getting final results for processing session ${processingSessionId}:`, error);
-          }
-        }
-        
-        // Call progress callback if provided
-        if (onProgress) {
-          onProgress({
-            processingSessionId,
-            progress: data.progress,
-            done: data.done,
-            status: data.status,
-            totalCompleted: completedSessions.size,
-            totalSessions: processingSessionIds.length
-          });
-        }
-      }
-      
-      // Wait before next poll if not all completed
-      if (completedSessions.size < processingSessionIds.length) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-      
-    } catch (error) {
-      console.error('Error during polling:', error);
-      // Continue polling even if there's an error
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    }
-  }
-  
-  return {
-    completedSessions: Array.from(completedSessions),
-    sessionResults: Object.fromEntries(sessionResults),
-    totalRequested: processingSessionIds.length,
-    totalCompleted: completedSessions.size,
-    timedOut: completedSessions.size < processingSessionIds.length
-  };
-};
-
-/**
- * Get sentences for a document - optimized for sentence-based rendering
- * @param {string} documentId - The document ID
- * @param {number} start - Optional start index for sentence range
- * @param {number} end - Optional end index for sentence range
- * @returns {Promise} Sentences data
+ * Get document sentences - unified for all document types
  */
 export const getDocumentSentences = async (documentId, start = null, end = null) => {
   try {
@@ -509,127 +162,254 @@ export const getDocumentSentences = async (documentId, start = null, end = null)
   }
 };
 
+// ===== SESSION-BASED QUESTION PROCESSING =====
+
 /**
- * Get a specific sentence by ID
- * @param {string} documentId - The document ID
- * @param {number} sentenceId - The sentence ID
- * @returns {Promise} Sentence data
+ * Ask a question within a session
  */
-export const getSpecificSentence = async (documentId, sentenceIds) => {
+export const askQuestionInSession = async (sessionId, questionText, documentId) => {
   try {
-    const response = await axios.get(`${API_URL}/documents/${documentId}/sentences?ids=${sentenceIds.join(',')}`);
+    const response = await axios.post(`${API_URL}/sessions/${sessionId}/ask`, {
+      question: questionText,
+      document_id: documentId
+    });
     return response.data;
   } catch (error) {
-    console.error('Error getting specific sentence:', error);
+    console.error('Error asking question in session:', error);
     throw new Error(error.response?.data?.error || error.message);
   }
 };
 
-// ===== yash_code =====
+/**
+ * Get question progress in session
+ */
+export const getQuestionProgress = async (sessionId, questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/sessions/${sessionId}/questions/${questionId}/progress`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting question progress:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
 
-// Ask a question about a document
+/**
+ * Get question results in session
+ */
+export const getQuestionResults = async (sessionId, questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/sessions/${sessionId}/questions/${questionId}/results`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting question results:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Get question sentences in session
+ */
+export const getQuestionSentences = async (sessionId, questionId, sentenceIds) => {
+  try {
+    const idsParam = Array.isArray(sentenceIds) ? sentenceIds.join(',') : sentenceIds;
+    const response = await axios.get(`${API_URL}/sessions/${sessionId}/questions/${questionId}/sentences?ids=${idsParam}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error getting question sentences:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Check question status in session
+ */
+export const getQuestionStatus = async (sessionId, questionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/sessions/${sessionId}/questions/${questionId}/status`);
+    return response.data;
+  } catch (error) {
+    console.error('Error checking question status:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+// ===== CLEANUP MANAGEMENT =====
+
+/**
+ * Clean up session data
+ */
+export const cleanupSessionData = async (sessionId, type = 'all', confirm = true) => {
+  try {
+    const response = await axios.delete(`${API_URL}/sessions/${sessionId}/cleanup`, {
+      data: { type, confirm }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error cleaning up session data:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Remove specific document from session
+ */
+export const removeSessionDocument = async (sessionId, documentId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/sessions/${sessionId}/documents/${documentId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error removing session document:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Remove specific question from session
+ */
+export const removeSessionQuestion = async (sessionId, questionId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/sessions/${sessionId}/questions/${questionId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error removing session question:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Nuclear option - clean up all sessions
+ */
+export const cleanupAllSessions = async (confirmPhrase) => {
+  try {
+    const response = await axios.delete(`${API_URL}/sessions`, {
+      data: { 
+        confirm: true, 
+        confirm_phrase: confirmPhrase 
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error cleaning up all sessions:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+// ===== FEEDBACK =====
+
+export const submitFeedback = async (feedbackData) => {
+  try {
+    const response = await axios.post(`${API_URL}/feedback`, feedbackData);
+    return response.data;
+  } catch (error) {
+    console.error('Error submitting feedback:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+// ===== BACKWARD COMPATIBILITY (for gradual migration) =====
+
+/**
+ * Legacy simplified question processing - now routes to session-based approach
+ */
 export const askQuestion = async (question, filename) => {
   try {
+    // For backward compatibility, try the old endpoint first
     const response = await axios.post(`${API_URL}/ask`, {
       question,
       filename
     });
     return response.data;
   } catch (error) {
-    console.error('Error asking question:', error);
+    console.error('Error asking question (legacy):', error);
     throw new Error(error.response?.data?.error || error.message);
   }
 };
 
-// Check processing progress
 export const checkProgress = async (questionId) => {
   try {
     const response = await axios.get(`${API_URL}/check-progress/${questionId}`);
     return response.data;
   } catch (error) {
-    console.error('Error checking progress:', error);
+    console.error('Error checking progress (legacy):', error);
     throw new Error(error.response?.data?.error || error.message);
   }
 };
 
-// Get final results
 export const getResults = async (questionId) => {
   try {
     const response = await axios.get(`${API_URL}/results/${questionId}`);
     return response.data;
   } catch (error) {
-    console.error('Error getting results:', error);
+    console.error('Error getting results (legacy):', error);
     throw new Error(error.response?.data?.error || error.message);
   }
 };
 
-// Fetch sentences
-export const fetchSentences = async (documentId, sentenceIds) => {
+export const fetchSentences = async (questionId, sentenceIds) => {
   try {
-    const response = await axios.get(`${API_URL}/documents/${documentId}/sentences?ids=${sentenceIds.join(',')}`);
+    const idsParam = Array.isArray(sentenceIds) ? sentenceIds.join(',') : sentenceIds;
+    const response = await axios.get(`${API_URL}/sentences/${questionId}?ids=${idsParam}`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching sentences:', error);
+    console.error('Error fetching sentences (legacy):', error);
     throw new Error(error.response?.data?.error || error.message);
   }
 };
 
-// Check processing status
 export const checkStatus = async (questionId) => {
   try {
     const response = await axios.get(`${API_URL}/status/${questionId}`);
     return response.data;
   } catch (error) {
-    console.error('Error checking status:', error);
+    console.error('Error checking status (legacy):', error);
     throw new Error(error.response?.data?.error || error.message);
   }
-}; 
+};
 
-
-/**
- * @deprecated Use uploadDocument instead
- */
+// ===== COMPATIBILITY ALIASES =====
+export const loadPreloadedDocument = loadDocument;
 export const uploadFile = uploadDocument;
 
 // Export all functions as default object for convenience
 export default {
-  // Document Management
-  uploadDocument,
-  getDocument,
-  getDocumentText,
-  getPreloadedDocuments,
-  loadPreloadedDocument,
-  
   // Session Management
-  createSession,
-  getSession,
+  getCurrentSession,
+  createNewSession,
+  getSessionSummary,
+  getSessionsStats,
   
-  // Text Processing
-  processTextQuestion,
-  getTextProcessingProgress,
-  getTextProcessingResults,
-  getProcessingSentences,
+  // Unified Document Management
+  uploadDocument,
+  processDocumentForSession,
+  getPreloadedDocuments,
+  loadDocument,
+  getDocumentText,
+  getDocumentSentences,
   
-  // Question Management
-  getSessionQuestions,
-  getDocumentQuestions,
-  getSpecificQuestion,
+  // Session-Based Question Processing
+  askQuestionInSession,
+  getQuestionProgress,
+  getQuestionResults,
+  getQuestionSentences,
+  getQuestionStatus,
+  
+  // Cleanup Management
+  cleanupSessionData,
+  removeSessionDocument,
+  removeSessionQuestion,
+  cleanupAllSessions,
   
   // Feedback
   submitFeedback,
   
-  // Utilities
-  generateContentHash,
-  batchProcessingOperations,
-  pollProcessingUntilComplete,
-
-  // yash_code
+  // Legacy Support
   askQuestion,
   checkProgress,
   getResults,
   fetchSentences,
   checkStatus,
   
-  // Backward Compatibility (only safe ones)
+  // Compatibility Aliases
+  loadPreloadedDocument,
   uploadFile
 };

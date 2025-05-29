@@ -10,10 +10,15 @@ import {
   faFileAlt,
   faClock,
   faCheck,
-  faSpinner
+  faSpinner,
+  faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 
-const QuestionCollection = ({ pdfDocument, onQuestionSubmit, onReaskQuestion }) => {
+const QuestionCollection = ({ 
+  pdfDocument, 
+  onQuestionSubmit, // This should be the function from App.js
+  currentSession
+}) => {
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inputRef = useRef(null);
@@ -25,25 +30,35 @@ const QuestionCollection = ({ pdfDocument, onQuestionSubmit, onReaskQuestion }) 
       (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
     ) : [];
 
-  // Get the active question and its data
-  const activeQuestion = pdfDocument?.activeQuestionId
-    ? pdfDocument.questions.get(pdfDocument.activeQuestionId)
-    : null;
-
   // Check if currently processing any questions
   const isProcessing = questionsHistory.some(q => q.isProcessing);
 
-  // Handle question submission
+  // Simplified question submission - let App.js handle the complexity
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentQuestion.trim() || isSubmitting || isProcessing || !pdfDocument) return;
 
+    const questionText = currentQuestion.trim();
+    setCurrentQuestion('');
     setIsSubmitting(true);
+    
     try {
-      await onQuestionSubmit(currentQuestion.trim());
-      setCurrentQuestion('');
+      console.log('🔄 Submitting question via QuestionCollection:', questionText);
+      
+      // Just call the parent's question submit function
+      // App.js will handle session vs legacy logic
+      if (onQuestionSubmit) {
+        await onQuestionSubmit(questionText);
+        console.log('✅ Question submitted successfully');
+      } else {
+        console.error('❌ No onQuestionSubmit function provided');
+        throw new Error('Question submission not configured');
+      }
+      
     } catch (error) {
-      console.error('Error submitting question:', error);
+      console.error('❌ Error submitting question:', error);
+      // You could show a toast or error message here
+      alert(`Error submitting question: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -52,7 +67,10 @@ const QuestionCollection = ({ pdfDocument, onQuestionSubmit, onReaskQuestion }) 
   // Handle re-asking a question
   const handleReask = (questionText) => {
     if (isProcessing || isSubmitting) return;
-    onReaskQuestion(questionText);
+    setCurrentQuestion(questionText);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   };
 
   // Handle keyboard shortcuts
@@ -86,15 +104,30 @@ const QuestionCollection = ({ pdfDocument, onQuestionSubmit, onReaskQuestion }) 
 
   const getQuestionStatus = (question) => {
     if (question.isProcessing) {
-      return { icon: faSpinner, color: 'var(--warning-orange)', spin: true, text: 'Processing...' };
+      return { 
+        icon: faSpinner, 
+        color: '#ff9500', 
+        spin: true, 
+        text: 'Processing...' 
+      };
     } else if (question.answer) {
-      return { icon: faCheck, color: 'var(--success-green)', spin: false, text: 'Completed' };
+      return { 
+        icon: faCheck, 
+        color: '#00ff00', 
+        spin: false, 
+        text: 'Completed' 
+      };
     } else {
-      return { icon: faClock, color: 'var(--win95-text-muted)', spin: false, text: 'Pending' };
+      return { 
+        icon: faClock, 
+        color: '#888', 
+        spin: false, 
+        text: 'Pending' 
+      };
     }
   };
 
-    if (!pdfDocument) {
+  if (!pdfDocument) {
     return (
       <div className="qa-flow-empty">
         <div className="empty-icon">🤔</div>
@@ -115,11 +148,15 @@ const QuestionCollection = ({ pdfDocument, onQuestionSubmit, onReaskQuestion }) 
           <span className="question-count">
             {questionsHistory.length} questions
           </span>
+          {currentSession && (
+            <span className="session-indicator">
+              Session: {currentSession.session_id?.split('_')[1] || 'Active'}
+            </span>
+          )}
         </div>
       </div>
 
       <div className="question-collection-content">
-
         {/* Question Input Section */}
         <div className="question-input-container">
           <div className="question-input-header">
@@ -128,8 +165,8 @@ const QuestionCollection = ({ pdfDocument, onQuestionSubmit, onReaskQuestion }) 
           </div>
 
           <form onSubmit={handleSubmit} className="question-form">
-
             <textarea
+              ref={inputRef}
               className="question-textarea"
               value={currentQuestion}
               onChange={(e) => setCurrentQuestion(e.target.value)}
@@ -196,8 +233,15 @@ const QuestionCollection = ({ pdfDocument, onQuestionSubmit, onReaskQuestion }) 
                         />
                         <span className="status-text">{status.text}</span>
                       </div>
-                      <div className="question-timestamp">
-                        {formatTimestamp(question.createdAt)}
+                      <div className="question-meta">
+                        <div className="question-timestamp">
+                          {formatTimestamp(question.createdAt)}
+                        </div>
+                        {question.processingMethod && (
+                          <span className={`processing-method ${question.processingMethod}`}>
+                            {question.processingMethod === 'session-based' ? '🔄' : '⚡'}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -205,28 +249,40 @@ const QuestionCollection = ({ pdfDocument, onQuestionSubmit, onReaskQuestion }) 
                       {question.text}
                     </div>
 
-                          {/* Processing Indicator */}
-                          {isProcessing && (
-                            <div className="processing-indicator">
-                              <div className="processing-text">
-                                <div className="terminal-cursor"></div>
-                                <span>ANALYZING_DOCUMENT...</span>
-                              </div>
-                            </div>
-                          )}
+                    {/* Processing Indicator */}
+                    {question.isProcessing && (
+                      <div className="processing-indicator">
+                        <div className="processing-text">
+                          <div className="terminal-cursor"></div>
+                          <span>ANALYZING_DOCUMENT...</span>
+                        </div>
+                      </div>
+                    )}
                     
-                          {/* Answer Section */}
-                          {activeQuestion?.answer && (
-                            <div className="answer-container">
-                              <div className="answer-header">
-                                <FontAwesomeIcon icon={faFileAlt} />
-                                <span>Response</span>
-                              </div>
-                              <div className="answer-content">
-                                {activeQuestion.answer}
-                              </div>
-                            </div>
-                          )}
+                    {/* Answer Section */}
+                    {question.answer && (
+                      <div className="answer-container">
+                        <div className="answer-header">
+                          <FontAwesomeIcon icon={faFileAlt} />
+                          <span>Response</span>
+                        </div>
+                        <div className="answer-content">
+                          {question.answer}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Provenance Progress */}
+                    {question.provenanceSources && question.provenanceSources.length > 0 && (
+                      <div className="provenance-progress">
+                        <span className="provenance-count">
+                          📄 {question.provenanceSources.length} provenance sources found
+                        </span>
+                        {question.isProcessing && (
+                          <span className="loading-more">Loading more...</span>
+                        )}
+                      </div>
+                    )}
 
                     <div className="question-actions">
                       <button
@@ -242,6 +298,12 @@ const QuestionCollection = ({ pdfDocument, onQuestionSubmit, onReaskQuestion }) 
                       {question.feedback && (
                         <span className="feedback-indicator">
                           ✓ Feedback provided
+                        </span>
+                      )}
+
+                      {question.processingTime && (
+                        <span className="processing-time">
+                          ⏱️ {question.processingTime.toFixed(2)}s
                         </span>
                       )}
                     </div>

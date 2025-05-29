@@ -6,28 +6,35 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import QuestionCollection from './components/QuestionCollection';
 import ProvenanceNavigator from './components/ProvenanceNavigator';
-//import PDFViewer from './components/CleanPDFViewer'
-//import SentenceBasedPDFViewer from './components/SentenceBasedPDFViewer';
 import HybridPDFViewer from './components/HybridPDFViewer';
-//import PDFViewer from './components/PDFJSViewer'
-//import PDFViewer from './components/PDFViewer';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import {
-  uploadFile,
-  createSession,
-  askQuestion,
-  checkProgress as apiCheckProgress,
-  getResults as apiGetResults,
-  checkStatus,
-  processTextQuestion,
-  getTextProcessingProgress,
-  getTextProcessingResults,
-  getProcessingSentences,
+  // Session-based imports
+  getCurrentSession,
+  uploadDocument,
+  loadDocument,
+  processDocumentForSession,
   getDocumentText,
+  askQuestionInSession,
+  getQuestionProgress,
+  getQuestionResults,
+  getQuestionSentences,
+  getQuestionStatus,
+  getPreloadedDocuments,
+  // Legacy fallbacks
+  askQuestion,
+  checkProgress,
+  getResults,
+  fetchSentences,
+  checkStatus
 } from './services/api';
 
 function App() {
+  // Session management - simplified
+  const [currentSessionId, setCurrentSessionId] = useState(null);
+  const [sessionReady, setSessionReady] = useState(false);
+
   // Document management
   const [documents, setDocuments] = useState(new Map());
   const [activeDocumentId, setActiveDocumentId] = useState(null);
@@ -43,356 +50,428 @@ function App() {
   const [preloadedDocuments, setPreloadedDocuments] = useState([]);
   const [loadingPreloaded, setLoadingPreloaded] = useState(false);
 
+  // debugging
+  const [debugInfo, setDebugInfo] = useState(null);
+  const [showDebugInfo, setShowDebugInfo] = useState(false);
+
   // Get active document
   const activeDocument = activeDocumentId ? documents.get(activeDocumentId) : null;
 
+  // Initialize session on app start
+  useEffect(() => {
+    initializeSession();
+  }, []);
 
-  // Handle showing preloaded documents
-  const handleShowPreloaded = () => {
-    setLoadingPreloaded(true);
-    import('./services/api').then(({ getPreloadedDocuments }) => {
-      getPreloadedDocuments()
-        .then(response => {
-          if (response.success && response.documents) {
-            setPreloadedDocuments(response.documents);
-          } else {
-            setPreloadedDocuments([
-              {
-                document_id: 'preloaded_1',
-                filename: 'whatgoesaround-sigmodrec2024.pdf',
-          
-                text_length: 85000,
-                sentence_count: 450,
-                is_preloaded: true
-              }
-            ]);
-          }
-          setShowPreloadedModal(true);
-        })
-        .catch(error => {
-          console.error('Error fetching preloaded documents:', error);
-          setPreloadedDocuments([]);
-          setShowPreloadedModal(true);
-        })
-        .finally(() => {
-          setLoadingPreloaded(false);
-        });
-    });
+  const initializeSession = async () => {
+    try {
+      const response = await getCurrentSession();
+      if (response.success) {
+        setCurrentSessionId(response.session_id);
+        setSessionReady(true);
+        console.log('✅ Session initialized:', response.session_id);
+      }
+    } catch (error) {
+      console.error('❌ Failed to initialize session, continuing in legacy mode');
+      setSessionReady(true); // Continue without session features
+    }
   };
 
- // Update these functions in your App.js
+  // UNIFIED document upload handler
+  const handleDocumentUpload = async (formData) => {
+    const fileName = formData.get('file')?.name || 'Unknown file';
 
-const handlePreloadedSelect = async (document) => {
+    setUploadProgress({
+      success: false,
+      message: `Uploading: ${fileName}...`
+    });
+
+    try {
+      const response = await uploadDocument(formData);
+      
+      // Try to process for session if available
+      let textLength = 0;
+      let sentenceCount = 0;
+      
+      if (sessionReady && currentSessionId) {
+        try {
+          const processResponse = await processDocumentForSession(response.document_id);
+          textLength = processResponse.text_length;
+          sentenceCount = processResponse.sentence_count;
+        } catch (processError) {
+          console.warn('Session processing failed, continuing with basic upload');
+        }
+      }
+
+      const docId = createNewDocument(response.filename, false, {
+        document_id: response.document_id,
+        text_length: textLength,
+        sentence_count: sentenceCount
+      });
+
+      setUploadProgress({
+        success: true,
+        message: `Upload Complete: ${response.filename}`
+      });
+
+      setTimeout(() => setUploadProgress(null), 3000);
+      return docId;
+
+    } catch (error) {
+      console.error('Upload error:', error);
+      setUploadProgress({
+        success: false,
+        message: `Upload Error: ${error.message}`
+      });
+      setTimeout(() => setUploadProgress(null), 5000);
+      throw error;
+    }
+  };
+
+  // Add this function to debug document loading
+const debugDocumentLoading = async () => {
+  try {
+    console.log('🔍 Starting document loading debug...');
+    
+    // Test 1: Check preloaded documents endpoint
+    const preloadedResponse = await fetch('/api/documents/preloaded');
+    const preloadedData = await preloadedResponse.json();
+    
+    // Test 2: Check session status
+    const sessionResponse = await fetch('/api/sessions/current');
+    const sessionData = await sessionResponse.json();
+    
+    // Test 3: Test debug endpoint
+    const debugResponse = await fetch('/api/debug/preloaded-docs');
+    const debugData = await debugResponse.json();
+    
+    const debugInfo = {
+      preloaded_endpoint: {
+        status: preloadedResponse.status,
+        success: preloadedData.success,
+        documents_count: preloadedData.documents?.length || 0,
+        documents: preloadedData.documents || [],
+        error: preloadedData.error
+      },
+      session_endpoint: {
+        status: sessionResponse.status,
+        success: sessionData.success,
+        session_id: sessionData.session_id,
+        error: sessionData.error
+      },
+      debug_endpoint: {
+        status: debugResponse.status,
+        preload_dir: debugData.preload_dir,
+        preload_dir_exists: debugData.preload_dir_exists,
+        pdf_count: debugData.pdf_count,
+        processed_count: debugData.processed_count,
+        files_in_preload: debugData.files_in_preload,
+        error: debugData.error
+      },
+      frontend_state: {
+        sessionReady,
+        currentSessionId,
+        documentsCount: documents.size,
+        loadingPreloaded
+      }
+    };
+    
+    setDebugInfo(debugInfo);
+    setShowDebugInfo(true);
+    
+    console.log('🔍 Debug info collected:', debugInfo);
+    
+  } catch (error) {
+    console.error('❌ Debug failed:', error);
+    setDebugInfo({ error: error.message });
+    setShowDebugInfo(true);
+  }
+};
+
+
+  // Handle preloaded document selection
+  const handleShowPreloaded = async () => {
+    setLoadingPreloaded(true);
+    try {
+      const response = await getPreloadedDocuments();
+      if (response.success && response.documents) {
+        setPreloadedDocuments(response.documents);
+      } else {
+        setPreloadedDocuments([]);
+      }
+      setShowPreloadedModal(true);
+    } catch (error) {
+      console.error('Error fetching preloaded documents:', error);
+      setPreloadedDocuments([]);
+      setShowPreloadedModal(true);
+    } finally {
+      setLoadingPreloaded(false);
+    }
+  };
+
+ // Add this improved handleDocumentSelect function to your App.js
+
+const handleDocumentSelect = async (document) => {
+  if (!sessionReady) {
+    console.error('Session not ready for document processing');
+    return;
+  }
+
   try {
     setLoadingPreloaded(true);
-    console.log('🔄 Loading preloaded document:', document);
+    console.log('🔄 Loading document:', document);
     
-    const { loadPreloadedDocument } = await import('./services/api');
-    const response = await loadPreloadedDocument(document.document_id);
-    const responseText = await getDocumentText(document.document_id);
-    if (response.success) {
-      console.log('✅ Preloaded document loaded successfully:', responseText);
-      
-      const docId = createNewDocument(document.filename, true, {
-        document_id: document.document_id,
-        text_length: document.text_length || response.text_length,
-        sentence_count: document.sentence_count || response.sentence_count,
-        text: responseText.text || null
-      });
-
-      // Update the document with additional metadata needed for PDF viewing
-      setDocuments(prev => {
-        const newDocs = new Map(prev);
-        const doc = newDocs.get(docId);
-        if (doc) {
-          doc.isPreloaded = true;
-          doc.backendDocumentId = document.document_id; // This is crucial for PDF serving
-          doc.textLength = document.text_length || response.text_length;
-          doc.sentenceCount = document.sentence_count || response.sentence_count;
-          doc.text = responseText.text || null; // Store the text if available
-          console.log('📄 Updated document object:', {
-            id: doc.id,
-            filename: doc.filename,
-            backendDocumentId: doc.backendDocumentId,
-            isPreloaded: doc.isPreloaded
-          });
-          
-          newDocs.set(docId, doc);
-        }
-        return newDocs;
-      });
-
-      setShowPreloadedModal(false);
-    } else {
-      console.error('❌ Failed to load preloaded document:', response);
-      throw new Error(response.error || 'Failed to load preloaded document');
+    // Step 1: Load the document (this makes it available)
+    console.log('Step 1: Loading document...');
+    const loadResponse = await loadDocument(document.document_id);
+    
+    if (!loadResponse.success) {
+      throw new Error(loadResponse.error || 'Failed to load document');
     }
-  } catch (error) {
-    console.error('Error loading preloaded document:', error);
     
-    // Show error to user but still allow fallback
-    alert(`Error loading document: ${error.message}`);
+    console.log('✅ Document loaded:', loadResponse);
     
-    // Create document anyway for fallback handling
-    const docId = createNewDocument(document.filename, true, {
+    // Step 2: Process document for current session (extracts sentences, etc.)
+    console.log('Step 2: Processing document for session...');
+    let processResponse;
+    try {
+      processResponse = await processDocumentForSession(document.document_id);
+      console.log('✅ Document processed for session:', processResponse);
+    } catch (processError) {
+      console.warn('⚠️ Session processing failed, using basic document info:', processError);
+      // Continue with basic document info if session processing fails
+      processResponse = {
+        success: true,
+        text_length: document.text_length || 0,
+        sentence_count: document.sentence_count || 0,
+        document_id: document.document_id,
+        filename: document.filename
+      };
+    }
+    
+    // Step 3: Create the frontend document object
+    console.log('Step 3: Creating frontend document...');
+    const docId = createNewDocument(document.filename, document.is_preloaded || false, {
       document_id: document.document_id,
-      text_length: document.text_length,
-      sentence_count: document.sentence_count
+      text_length: processResponse.text_length || document.text_length || 0,
+      sentence_count: processResponse.sentence_count || document.sentence_count || 0
     });
-    
+
+    // Step 4: Update document with additional metadata
     setDocuments(prev => {
       const newDocs = new Map(prev);
       const doc = newDocs.get(docId);
       if (doc) {
-        doc.isPreloaded = true;
+        doc.isPreloaded = document.is_preloaded || false;
         doc.backendDocumentId = document.document_id;
-        doc.uploadStatus = {
-          success: false,
-          message: `Error loading ${document.filename}: ${error.message}`
-        };
+        doc.textLength = processResponse.text_length || document.text_length || 0;
+        doc.sentenceCount = processResponse.sentence_count || document.sentence_count || 0;
+        doc.sourceFolder = document.source_folder || (document.is_preloaded ? 'preloaded' : 'uploads');
+        doc.sessionProcessed = processResponse.success || false;
+        
+        // Add additional metadata for PDF loading
+        doc.originalDocument = document; // Keep reference to original
+        
         newDocs.set(docId, doc);
+        console.log('✅ Document created and configured:', doc);
       }
       return newDocs;
     });
+
+    // Step 5: Close modal and show success
+    if (showPreloadedModal) {
+      setShowPreloadedModal(false);
+    }
     
-    setShowPreloadedModal(false);
+    console.log('🎉 Document selection completed successfully');
+    
+  } catch (error) {
+    console.error('❌ Error loading document:', error);
+    alert(`Error loading document: ${error.message}`);
   } finally {
     setLoadingPreloaded(false);
   }
 };
 
-// Also update the createNewDocument function to better handle document IDs
-const createNewDocument = (filename, isPreloaded = false, backendData = null) => {
+  const createNewDocument = (filename, isPreloaded = false, backendData = null) => {
+    const docId = `doc_${Date.now()}`;
+    const newDoc = {
+      id: docId,
+      filename,
+      questions: new Map(),
+      activeQuestionId: null,
+      uploadStatus: { 
+        success: true, 
+        message: isPreloaded ? `${filename} loaded successfully` : `${filename} uploaded successfully` 
+      },
+      isPreloaded,
+      createdAt: new Date(),
+      sessionId: currentSessionId,
+      ...(backendData && {
+        backendDocumentId: backendData.document_id,
+        textLength: backendData.text_length,
+        sentenceCount: backendData.sentence_count
+      })
+    };
 
-
-
-
-  const docId = `doc_${Date.now()}`;
-  const newDoc = {
-    id: docId,
-    filename,
-    questions: new Map(),
-    activeQuestionId: null,
-    uploadStatus: { 
-      success: true, 
-      message: isPreloaded ? `${filename} loaded successfully` : `${filename} uploaded successfully` 
-    },
-    isPreloaded,
-    createdAt: new Date(),
-    ...(backendData && {
-      backendDocumentId: backendData.document_id,
-      textLength: backendData.text_length,
-      sentenceCount: backendData.sentence_count
-    })
+    setDocuments(prev => new Map(prev).set(docId, newDoc));
+    setActiveDocumentId(docId);
+    return docId;
   };
 
-  console.log('📄 Creating new document:', {
-    id: newDoc.id,
-    filename: newDoc.filename,
-    backendDocumentId: newDoc.backendDocumentId,
-    isPreloaded: newDoc.isPreloaded
-  });
-
-  setDocuments(prev => new Map(prev).set(docId, newDoc));
-  setActiveDocumentId(docId);
-  return docId;
-};
-
-// Update the handleDocumentUpload function too
-const handleDocumentUpload = async (formData) => {
-  const fileName = formData.get('file')?.name || 'Unknown file';
-
-  setUploadProgress({
-    success: false,
-    message: `Uploading: ${fileName}...`
-  });
-
-  try {
-    console.log('🔄 Uploading document:', fileName);
-    const response = await uploadFile(formData);
-    console.log('✅ Upload response:', response);
-
-    console.log('Getting document text...');
-
-    const responseText = await getDocumentText(response.document_id);
-    console.log('Document text retrieved:', responseText);
-
-    const docId = createNewDocument(response.filename, false, {
-      document_id: response.document_id,
-      text_length: response.text_length,
-      sentence_count: response.sentence_count,
-      text: responseText.text || null
-    });
-
-    setDocuments(prev => {
-      const newDocs = new Map(prev);
-      const doc = newDocs.get(docId);
-      if (doc) {
-        doc.uploadStatus = {
-          success: true,
-          message: response.message || `${response.filename} uploaded successfully`
-        };
-        doc.backendDocumentId = response.document_id;
-        doc.textLength = response.text_length;
-        doc.sentenceCount = response.sentence_count;
-        doc.text = responseText.text || null;
-        
-        console.log('📄 Updated uploaded document:', {
-          id: doc.id,
-          filename: doc.filename,
-          backendDocumentId: doc.backendDocumentId
-        });
-        
-        newDocs.set(docId, doc);
-      }
-      return newDocs;
-    });
-
-    setUploadProgress({
-      success: true,
-      message: `Upload Complete: ${response.filename}`
-    });
-
-    setTimeout(() => setUploadProgress(null), 3000);
-    return docId;
-
-  } catch (error) {
-    console.error('Upload error:', error);
-    setUploadProgress({
-      success: false,
-      message: `Upload Error: ${error.message}`
-    });
-    setTimeout(() => setUploadProgress(null), 5000);
-    throw error;
-  }
-};
-
-  // Add question to active document
+  // SIMPLIFIED question submission with progressive loading
   const addQuestionToDocument = async (questionText) => {
-    if (!activeDocumentId || !activeDocument) return;
-
-    const backendDocumentId = activeDocument.backendDocumentId;
-    if (!backendDocumentId) {
-      console.error('No backend document ID found');
+    if (!activeDocumentId || !activeDocument) {
+      console.error('No active document');
       return;
     }
 
     const tempQuestionId = `temp_${Date.now()}`;
+    const questionData = {
+      id: tempQuestionId,
+      text: questionText,
+      answer: null,
+      provenanceSources: [],
+      isProcessing: true,
+      logs: [],
+      createdAt: new Date()
+    };
 
-    try {
-      const questionData = {
-        id: tempQuestionId,
-        text: questionText,
-        answer: null,
-        provenanceSources: [],
-        isProcessing: true,
-        logs: [],
-        feedback: null,
-        createdAt: new Date()
-      };
-
-      setDocuments(prev => {
-        const newDocs = new Map(prev);
-        const doc = newDocs.get(activeDocumentId);
-        if (doc) {
-          doc.questions.set(tempQuestionId, questionData);
-          doc.activeQuestionId = tempQuestionId;
-          newDocs.set(activeDocumentId, doc);
-        }
-        return newDocs;
-      });
-
-      const sessionResponse = await createSession();
-      const sessionId = sessionResponse.session_id;
-
-      const documentText = activeDocument.text || '';
-
-      const response = await processTextQuestion(sessionId, questionText, backendDocumentId, documentText);
-      const processingSessionId = response.processing_session_id;
-
-      setDocuments(prev => {
-        const newDocs = new Map(prev);
-        const doc = newDocs.get(activeDocumentId);
-        if (doc && doc.questions.has(tempQuestionId)) {
-          const question = doc.questions.get(tempQuestionId);
-          question.sessionId = sessionId;
-          question.processingSessionId = processingSessionId;
-          newDocs.set(activeDocumentId, doc);
-        }
-        return newDocs;
-      });
-
-      startPollingForResults(tempQuestionId, sessionId, processingSessionId);
-
-    } catch (error) {
-      console.error('Error submitting question:', error);
-      setDocuments(prev => {
-        const newDocs = new Map(prev);
-        const doc = newDocs.get(activeDocumentId);
-        if (doc && doc.questions.has(tempQuestionId)) {
-          const question = doc.questions.get(tempQuestionId);
-          question.isProcessing = false;
-          question.answer = `Error: ${error.message}`;
-          newDocs.set(activeDocumentId, doc);
-        }
-        return newDocs;
-      });
-    }
-  };
-
-  // Start polling for results
-  const startPollingForResults = (questionId, sessionId, processingSessionId) => {
-    const pollInterval = setInterval(async () => {
-      try {
-        const progress = await getTextProcessingProgress(sessionId, processingSessionId);
-
-        if (progress.logs) {
-          updateQuestion(questionId, { logs: progress.logs });
-        }
-
-        if (progress.done && progress.status === 'completed') {
-          clearInterval(pollInterval);
-
-          const results = await getTextProcessingResults(sessionId, processingSessionId);
-
-          if (results.success && results.provenance) {
-            const enhancedProvenance = await enhanceProvenanceWithContent(
-              sessionId,
-              processingSessionId,
-              results.provenance
-            );
-
-            updateQuestion(questionId, {
-              isProcessing: false,
-              answer: results.answer || "Analysis completed - see provenance evidence below",
-              provenanceSources: enhancedProvenance
-            });
-          } else {
-            updateQuestion(questionId, {
-              isProcessing: false,
-              answer: "Processing completed but no results available"
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Polling error:', error);
-      }
-    }, 1000);
-
+    // Add question to document immediately
     setDocuments(prev => {
       const newDocs = new Map(prev);
       const doc = newDocs.get(activeDocumentId);
-      if (doc && doc.questions.has(questionId)) {
-        const question = doc.questions.get(questionId);
-        question.pollInterval = pollInterval;
+      if (doc) {
+        doc.questions.set(tempQuestionId, questionData);
+        doc.activeQuestionId = tempQuestionId;
         newDocs.set(activeDocumentId, doc);
       }
       return newDocs;
     });
+
+    try {
+      // Try session-based approach first
+      if (sessionReady && currentSessionId && activeDocument.backendDocumentId) {
+        const response = await askQuestionInSession(currentSessionId, questionText, activeDocument.backendDocumentId);
+        startSessionPolling(tempQuestionId, currentSessionId, response.question_id);
+      } else {
+        // Fallback to legacy
+        const response = await askQuestion(questionText, activeDocument.filename);
+        startLegacyPolling(tempQuestionId, response.question_id);
+      }
+    } catch (error) {
+      console.error('Error submitting question:', error);
+      updateQuestion(tempQuestionId, {
+        isProcessing: false,
+        answer: `Error: ${error.message}`
+      });
+    }
   };
 
-  // Enhance provenance with content
-  const enhanceProvenanceWithContent = async (sessionId, processingSessionId, provenanceArray) => {
+  // Session-based polling with progressive provenance loading
+  const startSessionPolling = (questionId, sessionId, sessionQuestionId) => {
+    let currentProvenanceCount = 0;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        // Check progress
+        const progress = await getQuestionProgress(sessionId, sessionQuestionId);
+        
+        // Update logs
+        if (progress.logs) {
+          updateQuestion(questionId, { logs: progress.logs });
+        }
+
+        // Progressive provenance loading
+        if (progress.data && progress.data.length > currentProvenanceCount) {
+          const newProvenances = await enhanceSessionProvenanceWithContent(
+            sessionId, sessionQuestionId, progress.data.slice(currentProvenanceCount)
+          );
+
+          updateQuestion(questionId, (prev) => ({
+            provenanceSources: [...(prev.provenanceSources || []), ...newProvenances]
+          }));
+          
+          currentProvenanceCount = progress.data.length;
+        }
+
+        // Try to get answer as soon as possible
+        if (progress.done || progress.data?.length > 0) {
+          try {
+            const results = await getQuestionResults(sessionId, sessionQuestionId);
+            if (results.success && results.answer) {
+              updateQuestion(questionId, { answer: results.answer });
+            }
+          } catch (error) {
+            console.warn('Answer not ready yet');
+          }
+        }
+
+        // Check if fully complete
+        const status = await getQuestionStatus(sessionId, sessionQuestionId);
+        if (status.completed) {
+          clearInterval(pollInterval);
+          updateQuestion(questionId, { isProcessing: false });
+        }
+
+      } catch (error) {
+        console.error('Session polling error:', error);
+        clearInterval(pollInterval);
+        updateQuestion(questionId, { isProcessing: false });
+      }
+    }, 1000);
+  };
+
+  // Legacy polling (fallback)
+  const startLegacyPolling = (questionId, backendQuestionId) => {
+    let currentProvenanceCount = 0;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const progress = await checkProgress(backendQuestionId);
+        
+        if (progress.logs) {
+          updateQuestion(questionId, { logs: progress.logs });
+        }
+
+        if (progress.data && progress.data.length > currentProvenanceCount) {
+          const newProvenances = await enhanceLegacyProvenanceWithContent(
+            backendQuestionId, progress.data.slice(currentProvenanceCount)
+          );
+
+          updateQuestion(questionId, (prev) => ({
+            provenanceSources: [...(prev.provenanceSources || []), ...newProvenances]
+          }));
+          
+          currentProvenanceCount = progress.data.length;
+        }
+
+        if (progress.done || progress.data?.length > 0) {
+          try {
+            const results = await getResults(backendQuestionId);
+            if (results.success && results.answer) {
+              updateQuestion(questionId, { answer: results.answer });
+            }
+          } catch (error) {
+            console.warn('Answer not ready yet');
+          }
+        }
+
+        const status = await checkStatus(backendQuestionId);
+        if (status.completed) {
+          clearInterval(pollInterval);
+          updateQuestion(questionId, { isProcessing: false });
+        }
+
+      } catch (error) {
+        console.error('Legacy polling error:', error);
+        clearInterval(pollInterval);
+        updateQuestion(questionId, { isProcessing: false });
+      }
+    }, 1000);
+  };
+
+  // Enhanced provenance loading for session-based approach
+  const enhanceSessionProvenanceWithContent = async (sessionId, sessionQuestionId, provenanceArray) => {
     if (!Array.isArray(provenanceArray) || provenanceArray.length === 0) {
       return [];
     }
@@ -407,10 +486,10 @@ const handleDocumentUpload = async (formData) => {
     let sentencesData = {};
     if (allSentenceIds.size > 0) {
       try {
-        const response = await getProcessingSentences(sessionId, processingSessionId, Array.from(allSentenceIds));
+        const response = await getQuestionSentences(sessionId, sessionQuestionId, Array.from(allSentenceIds));
         sentencesData = response.sentences || {};
       } catch (error) {
-        console.error('Error fetching sentences:', error);
+        console.error('Error fetching session sentences:', error);
       }
     }
 
@@ -431,7 +510,47 @@ const handleDocumentUpload = async (formData) => {
     );
   };
 
-  // Update question
+  // Enhanced provenance loading for legacy approach
+  const enhanceLegacyProvenanceWithContent = async (backendQuestionId, provenanceArray) => {
+    if (!Array.isArray(provenanceArray) || provenanceArray.length === 0) {
+      return [];
+    }
+
+    const allSentenceIds = new Set();
+    provenanceArray.forEach(source => {
+      if (source.sentences_ids) {
+        source.sentences_ids.forEach(id => allSentenceIds.add(id));
+      }
+    });
+
+    let sentencesData = {};
+    if (allSentenceIds.size > 0) {
+      try {
+        const response = await fetchSentences(backendQuestionId, Array.from(allSentenceIds));
+        sentencesData = response.sentences || {};
+      } catch (error) {
+        console.error('Error fetching legacy sentences:', error);
+      }
+    }
+
+    return provenanceArray.map(source => {
+      if (!source.sentences_ids || source.sentences_ids.length === 0) {
+        return source;
+      }
+
+      const content = source.sentences_ids.map(id =>
+        sentencesData[id] || `[SENTENCE_${id}_NOT_FOUND]`
+      );
+
+      return { ...source, content };
+    }).sort((a, b) =>
+      (a.provenance_id !== undefined && b.provenance_id !== undefined)
+        ? a.provenance_id - b.provenance_id
+        : 0
+    );
+  };
+
+  // Update question helper
   const updateQuestion = (questionId, updates) => {
     if (!activeDocumentId) return;
 
@@ -439,8 +558,11 @@ const handleDocumentUpload = async (formData) => {
       const newDocs = new Map(prev);
       const doc = newDocs.get(activeDocumentId);
       if (doc && doc.questions.has(questionId)) {
-        const question = { ...doc.questions.get(questionId), ...updates };
-        doc.questions.set(questionId, question);
+        const currentQuestion = doc.questions.get(questionId);
+        const newQuestion = typeof updates === 'function'
+          ? { ...currentQuestion, ...updates(currentQuestion) }
+          : { ...currentQuestion, ...updates };
+        doc.questions.set(questionId, newQuestion);
         newDocs.set(activeDocumentId, doc);
       }
       return newDocs;
@@ -449,18 +571,7 @@ const handleDocumentUpload = async (formData) => {
 
   // Handle provenance selection
   const handleProvenanceSelect = (provenance) => {
-    console.log('Provenance selected:', provenance);
     setSelectedProvenance(provenance);
-  };
-
-  // Handle highlighting in document viewer
-  const handleHighlightInPDF = (provenance) => {
-    console.log('🖍️ Highlighting provenance in document viewer:', {
-      provenance_id: provenance.provenance_id,
-      sentences_ids: provenance.sentences_ids
-    });
-    setSelectedProvenance(provenance);
-    // The SentenceBasedPDFViewer will handle the actual highlighting by sentence IDs
   };
 
   // Handle feedback
@@ -468,7 +579,6 @@ const handleDocumentUpload = async (formData) => {
     updateQuestion(questionId, { feedback });
     setFeedbackModalOpen(false);
     setSelectedQuestionForFeedback(null);
-    console.log('Submitting feedback:', { questionId, feedback });
   };
 
   const openFeedbackModal = (question) => {
@@ -496,14 +606,73 @@ const handleDocumentUpload = async (formData) => {
     fileInput.click();
   };
 
+  // Show loading screen while session is initializing
+  if (!sessionReady) {
+    return (
+      <div className="app-loading">
+        <div className="loading-content">
+          <div className="loading-spinner">🚀</div>
+          <h3>Initializing Session...</h3>
+          <p>Setting up your document analysis environment</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-improved">
-      {/* Streamlined Header */}
+      {/* Header */}
       <Header 
         activeDocument={activeDocument} 
         onShowPreloaded={handleShowPreloaded}
+        onUploadDocument={handleUploadNewDocument}
+        currentSession={{ session_id: currentSessionId }}
       />
-      
+
+      {process.env.NODE_ENV === 'development' && (
+  <>
+    <button 
+      onClick={debugDocumentLoading}
+      style={{
+        position: 'fixed',
+        top: '10px',
+        right: '10px',
+        zIndex: 9999,
+        padding: '5px 10px',
+        background: '#ff6b6b',
+        color: 'white',
+        border: 'none',
+        borderRadius: '3px',
+        fontSize: '12px'
+      }}
+    >
+      Debug Document Loading
+    </button>
+    
+    {showDebugInfo && debugInfo && (
+      <div style={{
+        position: 'fixed',
+        top: '50px',
+        right: '10px',
+        width: '400px',
+        maxHeight: '80vh',
+        background: 'white',
+        border: '2px solid #333',
+        padding: '10px',
+        zIndex: 9999,
+        overflow: 'auto',
+        fontSize: '12px',
+        fontFamily: 'monospace'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+          <h4>Document Loading Debug</h4>
+          <button onClick={() => setShowDebugInfo(false)}>✕</button>
+        </div>
+        <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
+      </div>
+    )}
+  </>
+)}
       
       {/* Main Content Grid */}
       <div className="app-content-grid">
@@ -514,19 +683,20 @@ const handleDocumentUpload = async (formData) => {
             activeDocumentId={activeDocumentId}
             onDocumentSelect={setActiveDocumentId}
             onUploadNewDocument={handleUploadNewDocument}
+            currentSessionId={currentSessionId}
+            onSessionChanged={setCurrentSessionId}
           />
         </div>
 
-        {/* Main Content Area */}
+        {/* Main Content Area - PDF Viewer */}
         <div className="main-content">
-          {/* PDF Section */}
           <div className="pdf-section">
-         
             {activeDocument ? (
               <HybridPDFViewer
                 pdfDocument={activeDocument}
                 selectedProvenance={selectedProvenance}
                 onClose={() => {}}
+                currentSession={{ session_id: currentSessionId }}
               />
             ) : (
               <div className="pdf-empty-state">
@@ -540,54 +710,59 @@ const handleDocumentUpload = async (formData) => {
                     onShowPreloaded={handleShowPreloaded}
                     uploadProgress={uploadProgress}
                     compactMode={false}
+                    currentSession={{ session_id: currentSessionId }}
+                    disabled={!sessionReady}
                   />
                 </div>
               </div>
             )}
           </div>
         </div>
-        {/* Right Sidebar */}
+        
+        {/* Right Panel - Q&A Flow */}
         <div className="right-panel">
-          {/* Q&A Flow Section */}
           <div className="qa-flow-section">
-
-                    {/* Question Collection Section */}
-          <QuestionCollection
-            pdfDocument={activeDocument}
-            onQuestionSubmit={addQuestionToDocument}
-            onReaskQuestion={(question) => addQuestionToDocument(question.text)}
-            />
-
-            <ProvenanceNavigator
-              pdfDocument={activeDocument}
-              onQuestionSubmit={addQuestionToDocument}
-              onProvenanceSelect={handleProvenanceSelect}
-              onFeedbackRequest={openFeedbackModal}
-              onHighlightInPDF={handleHighlightInPDF}
-            />
-          </div>
-  
+            {/* Question Collection - Top */}
+            <div className="question-section">
+              <QuestionCollection
+                pdfDocument={activeDocument}
+                onQuestionSubmit={addQuestionToDocument}
+                currentSession={{ session_id: currentSessionId }}
+              />
             </div>
+            
+            {/* Provenance Navigator - Bottom */}
+            <div className="provenance-section">
+              <ProvenanceNavigator
+                pdfDocument={activeDocument}
+                onProvenanceSelect={handleProvenanceSelect}
+                onFeedbackRequest={openFeedbackModal}
+                onHighlightInPDF={setSelectedProvenance}
+                currentSession={{ session_id: currentSessionId }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Feedback Modal */}
       {feedbackModalOpen && selectedQuestionForFeedback && (
         <FeedbackModal
           session={{
-            sessionId: selectedQuestionForFeedback.sessionId,
-            processingSessionId: selectedQuestionForFeedback.processingSessionId,
+            sessionId: currentSessionId,
             documentName: activeDocument?.filename,
             createdAt: selectedQuestionForFeedback.createdAt,
             completedAt: selectedQuestionForFeedback.isProcessing ? null : new Date(),
             processingTime: selectedQuestionForFeedback.time ||
               (selectedQuestionForFeedback.provenanceSources && selectedQuestionForFeedback.provenanceSources[0]?.time),
             algorithmMethod: 'default',
-            userSessionId: `user_${Date.now()}`
+            userSessionId: currentSessionId
           }}
           question={selectedQuestionForFeedback}
           allProvenances={selectedQuestionForFeedback.provenanceSources || []}
           onSubmit={handleFeedbackSubmit}
           onClose={() => setFeedbackModalOpen(false)}
+          currentSession={{ session_id: currentSessionId }}
         />
       )}
 
@@ -612,7 +787,7 @@ const handleDocumentUpload = async (formData) => {
                       <button
                         key={doc.document_id}
                         className="document-card"
-                        onClick={() => handlePreloadedSelect(doc)}
+                        onClick={() => handleDocumentSelect(doc)}
                         disabled={loadingPreloaded}
                       >
                         <div className="doc-icon">📄</div>
@@ -621,6 +796,9 @@ const handleDocumentUpload = async (formData) => {
                           <div className="doc-stats">
                             <span>{Math.round(doc.text_length / 1000)}k chars</span>
                             <span>{doc.sentence_count} sentences</span>
+                            <span className="source-badge">
+                              {doc.source_folder === 'preloaded' ? '📚' : '📄'}
+                            </span>
                           </div>
                         </div>
                       </button>

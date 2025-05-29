@@ -1,9 +1,15 @@
 import React from 'react';
 import '../styles/brutalist-design.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRocket, faTerminal, faFileAlt, faDatabase } from '@fortawesome/free-solid-svg-icons';
+import { faRocket, faTerminal, faFileAlt, faDatabase, faUpload } from '@fortawesome/free-solid-svg-icons';
 
-const Header = ({ activeDocument, onShowPreloaded }) => {
+const Header = ({ 
+  activeDocument, 
+  onShowPreloaded, 
+  onUploadDocument,
+  currentSession,
+  sessionStats 
+}) => {
 
   const getSessionStatus = () => {
     if (!activeDocument) {
@@ -13,7 +19,8 @@ const Header = ({ activeDocument, onShowPreloaded }) => {
       };
     }
 
-    const questions = Array.from(activeDocument.questions.values());
+    // Get questions from activeDocument if available
+    const questions = activeDocument.questions ? Array.from(activeDocument.questions.values()) : [];
     const processing = questions.filter(q => q.isProcessing).length;
     const completed = questions.filter(q => !q.isProcessing && q.answer).length;
     
@@ -39,6 +46,27 @@ const Header = ({ activeDocument, onShowPreloaded }) => {
 
   const sessionStatus = getSessionStatus();
 
+  // Session info display
+  const getSessionInfo = () => {
+    if (!currentSession) {
+      return {
+        id: 'No Session',
+        stats: 'Initializing...'
+      };
+    }
+
+    const stats = sessionStats || {};
+    const totalQuestions = stats.total_questions || 0;
+    const totalDocuments = stats.total_documents || 0;
+
+    return {
+      id: currentSession.session_id || 'Current Session',
+      stats: `${totalDocuments} docs, ${totalQuestions} questions`
+    };
+  };
+
+  const sessionInfo = getSessionInfo();
+
   return (
     <div className="app-header-compact">
       <div className="header-left">
@@ -46,10 +74,13 @@ const Header = ({ activeDocument, onShowPreloaded }) => {
           <FontAwesomeIcon icon={faRocket} />
           <span>PROVENANCE</span>
         </div>
+        
         <div className="session-status" style={{ color: sessionStatus.color }}>
           <FontAwesomeIcon icon={faTerminal} />
           <span>{sessionStatus.status}</span>
         </div>
+
+
       </div>
       
       <div className="header-right">
@@ -65,6 +96,17 @@ const Header = ({ activeDocument, onShowPreloaded }) => {
             </div>
           )}
           
+          {/* Upload Button */}
+          <button 
+            className="header-action-btn upload-btn"
+            onClick={onUploadDocument}
+            title="Upload PDF Document"
+          >
+            <FontAwesomeIcon icon={faUpload} />
+            <span>Upload PDF</span>
+          </button>
+          
+          {/* Browse Papers Button */}
           <button 
             className="header-action-btn"
             onClick={onShowPreloaded}

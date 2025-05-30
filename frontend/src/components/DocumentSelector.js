@@ -14,7 +14,7 @@ import {
 
 const DocumentSelector = ({ 
   onDocumentUpload, 
-  onShowPreloaded,
+  onShowPreloaded,  // Now shows session documents
   uploadProgress,
   compactMode = false,
   currentSession,
@@ -94,15 +94,15 @@ const DocumentSelector = ({
             disabled={disabled}
           />
           
-          {/* Browse Button */}
+          {/* Browse Button - Updated */}
           <button 
             className={`browse-btn compact ${disabled ? 'disabled' : ''}`}
             onClick={handleBrowseClick}
             disabled={disabled}
-            title={disabled ? 'Session not ready' : 'Browse Research Papers'}
+            title={disabled ? 'Session not ready' : 'Browse Session Documents'}
           >
             <FontAwesomeIcon icon={disabled ? faSpinner : faDatabase} spin={disabled} />
-            <span>Browse Papers</span>
+            <span>Browse Documents</span>
           </button>
         </div>
       </div>
@@ -179,12 +179,12 @@ const DocumentSelector = ({
             disabled={disabled}
           />
           
-          {/* Browse Button */}
+          {/* Browse Button - Updated */}
           <button 
             className={`browse-btn secondary ${disabled ? 'disabled' : ''}`}
             onClick={handleBrowseClick}
             disabled={disabled}
-            title={disabled ? 'Session initializing, please wait...' : 'Browse preloaded research papers'}
+            title={disabled ? 'Session initializing, please wait...' : 'Browse documents in your session'}
           >
             <FontAwesomeIcon 
               icon={disabled ? faSpinner : faDatabase} 
@@ -192,15 +192,15 @@ const DocumentSelector = ({
               size="lg" 
             />
             <div className="btn-content">
-              <span className="btn-title">Browse Research Papers</span>
+              <span className="btn-title">Browse Session Documents</span>
               <span className="btn-subtitle">
-                {disabled ? 'Loading papers...' : 'Select from our collection'}
+                {disabled ? 'Loading documents...' : 'Select from your session'}
               </span>
             </div>
           </button>
         </div>
 
-        {/* Additional Info */}
+        {/* Additional Info - Updated */}
         <div className="document-info">
           <div className="info-section">
             <h5>📄 Supported Format</h5>
@@ -213,8 +213,8 @@ const DocumentSelector = ({
           </div>
           
           <div className="info-section">
-            <h5>🎯 Best Results</h5>
-            <p>Research papers, reports, and academic documents</p>
+            <h5>📋 Session Documents</h5>
+            <p>Research papers and uploaded documents available in your session</p>
           </div>
         </div>
       </div>

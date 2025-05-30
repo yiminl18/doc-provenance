@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import '../styles/provenance.css';
 import { 
   faChevronLeft, 
   faChevronRight, 
@@ -11,7 +12,9 @@ import {
   faEye,
   faInfoCircle,
   faClock,
-  faQuestionCircle
+  faQuestionCircle,
+  faSearch,
+  faPlay
 } from '@fortawesome/free-solid-svg-icons';
 
 const ProvenanceNavigator = ({ 
@@ -22,6 +25,12 @@ const ProvenanceNavigator = ({
   currentSession 
 }) => {
   const [currentProvenanceIndex, setCurrentProvenanceIndex] = useState(0);
+  const [showProvenance, setShowProvenance] = useState(false); // New state to control provenance visibility
+  
+  // Add refs to prevent infinite loops
+  const lastActiveQuestionId = useRef(null);
+  const lastProvenanceCount = useRef(0);
+  const lastSelectedProvenance = useRef(null);
 
   // Get the active question and its provenance data
   const activeQuestion = pdfDocument?.activeQuestionId 
@@ -37,42 +46,96 @@ const ProvenanceNavigator = ({
   const processingStatus = activeQuestion?.processingStatus || 'processing';
   const userMessage = activeQuestion?.userMessage;
   const explanation = activeQuestion?.explanation;
+  const hasAnswer = activeQuestion?.answer && activeQuestion.answer.trim().length > 0;
 
-  // Reset provenance index when active question changes
+  // Reset provenance index and visibility when active question changes
   useEffect(() => {
-    setCurrentProvenanceIndex(0);
+    const currentQuestionId = pdfDocument?.activeQuestionId;
+    
+    // Only reset if the question actually changed
+    if (currentQuestionId !== lastActiveQuestionId.current) {
+      console.log('🔄 Active question changed, resetting provenance navigator');
+      lastActiveQuestionId.current = currentQuestionId;
+      setCurrentProvenanceIndex(0);
+      setShowProvenance(false); // Reset provenance visibility
+      lastProvenanceCount.current = 0;
+      lastSelectedProvenance.current = null;
+      
+      // Clear any existing provenance selection
+      onProvenanceSelect?.(null);
+    }
+  }, [pdfDocument?.activeQuestionId]);
+
+  // Handle provenance updates but only when we're showing provenance
+  useEffect(() => {
+    if (!showProvenance) return; // Don't auto-select provenance until user requests it
+    
+    const currentCount = availableProvenances.length;
+    
+    // Only update if the count actually changed or we have a new provenance to select
+    if (currentCount !== lastProvenanceCount.current || 
+        (currentProvenance && currentProvenance !== lastSelectedProvenance.current)) {
+      
+      console.log(`📊 Provenance count changed: ${lastProvenanceCount.current} -> ${currentCount}`);
+      lastProvenanceCount.current = currentCount;
+      
+      if (currentProvenance && currentProvenance !== lastSelectedProvenance.current) {
+        console.log('✅ Selecting updated provenance:', currentProvenance);
+        onProvenanceSelect?.(currentProvenance);
+        onHighlightInPDF?.(currentProvenance);
+        lastSelectedProvenance.current = currentProvenance;
+      } else if (!currentProvenance && lastSelectedProvenance.current) {
+        console.log('❌ No current provenance, clearing selection');
+        onProvenanceSelect?.(null);
+        lastSelectedProvenance.current = null;
+      }
+    }
+  }, [availableProvenances.length, currentProvenanceIndex, showProvenance]);
+
+  const handleGetProvenance = () => {
+    console.log('🔍 User requested provenance, showing navigator');
+    setShowProvenance(true);
+    
+    // Immediately select the first provenance if available
     if (availableProvenances.length > 0) {
+      console.log('✅ Selecting first provenance:', availableProvenances[0]);
       onProvenanceSelect?.(availableProvenances[0]);
+      onHighlightInPDF?.(availableProvenances[0]);
+      lastSelectedProvenance.current = availableProvenances[0];
     }
-  }, [pdfDocument?.activeQuestionId, availableProvenances.length]);
-
-  // Auto-select provenance when index changes
-  useEffect(() => {
-    if (currentProvenance) {
-      onProvenanceSelect?.(currentProvenance);
-    }
-  }, [currentProvenanceIndex, currentProvenance]);
+  };
 
   const handlePreviousProvenance = () => {
     if (currentProvenanceIndex > 0) {
-      setCurrentProvenanceIndex(prev => prev - 1);
+      const newIndex = currentProvenanceIndex - 1;
+      console.log('⬅️ Moving to previous provenance:', newIndex);
+      setCurrentProvenanceIndex(newIndex);
     }
   };
 
   const handleNextProvenance = () => {
     if (currentProvenanceIndex < availableProvenances.length - 1) {
-      setCurrentProvenanceIndex(prev => prev + 1);
+      const newIndex = currentProvenanceIndex + 1;
+      console.log('➡️ Moving to next provenance:', newIndex);
+      setCurrentProvenanceIndex(newIndex);
     }
+  };
+
+  const handleProvenanceDotClick = (index) => {
+    console.log('🎯 Clicked provenance dot:', index);
+    setCurrentProvenanceIndex(index);
   };
 
   const handleHighlightInPDF = () => {
     if (currentProvenance) {
+      console.log('🔍 Manual highlight request for provenance:', currentProvenance.provenance_id);
       onHighlightInPDF?.(currentProvenance);
     }
   };
 
   const handleFeedback = () => {
     if (activeQuestion) {
+      console.log('💬 Opening feedback for question:', activeQuestion.id);
       onFeedbackRequest?.(activeQuestion);
     }
   };
@@ -104,7 +167,8 @@ const ProvenanceNavigator = ({
   }
 
   // Handle special processing states
-  if (processingStatus === 'no_provenance_found' || (userMessage && userMessage.includes('No atomic evidence'))) {
+  if (processingStatus === 'no_provenance_found' || processingStatus === 'completed_no_provenance' || 
+      (userMessage && userMessage.includes('No atomic evidence'))) {
     return (
       <div className="provenance-navigator no-provenance">
         <div className="no-provenance-state">
@@ -130,7 +194,7 @@ const ProvenanceNavigator = ({
           </div>
           
           <button 
-            className="action-btn feedback-btn"
+            className="action-btn secondary feedback-btn"
             onClick={handleFeedback}
           >
             <FontAwesomeIcon icon={faComment} />
@@ -158,7 +222,7 @@ const ProvenanceNavigator = ({
           </div>
           
           <button 
-            className="action-btn feedback-btn"
+            className="action-btn secondary feedback-btn"
             onClick={handleFeedback}
           >
             <FontAwesomeIcon icon={faComment} />
@@ -170,7 +234,7 @@ const ProvenanceNavigator = ({
   }
 
   // Question is processing but no provenance yet
-  if (isProcessing && availableProvenances.length === 0) {
+  if (isProcessing && availableProvenances.length === 0 && !hasAnswer) {
     return (
       <div className="provenance-navigator processing">
         <div className="processing-state">
@@ -195,26 +259,102 @@ const ProvenanceNavigator = ({
     );
   }
 
-  // Error state - question completed but no results
-  if (!isProcessing && availableProvenances.length === 0 && !activeQuestion.answer && !explanation) {
+  // NEW: Show "Get Provenance" button when we have an answer but haven't started showing provenance
+  if (hasAnswer && !showProvenance && (availableProvenances.length > 0 || !isProcessing)) {
+    return (
+      <div className="provenance-navigator get-provenance">
+        <div className="get-provenance-state">
+          <FontAwesomeIcon icon={faSearch} size="2x" />
+          <h4>Answer Ready</h4>
+          <p>Your question has been answered. Would you like to see the supporting evidence?</p>
+          
+          <div className="answer-preview">
+            <div className="answer-label">Answer:</div>
+            <div className="answer-text">
+              {activeQuestion.answer.length > 200 
+                ? `${activeQuestion.answer.substring(0, 200)}...` 
+                : activeQuestion.answer}
+            </div>
+          </div>
+          
+          <div className="provenance-info">
+            {availableProvenances.length > 0 ? (
+              <p>✅ {availableProvenances.length} evidence source{availableProvenances.length !== 1 ? 's' : ''} found and ready to explore</p>
+            ) : isProcessing ? (
+              <p>🔄 Still searching for evidence sources...</p>
+            ) : (
+              <p>⚠️ No evidence sources found for this answer</p>
+            )}
+          </div>
+          
+          <div className="get-provenance-actions">
+            <button 
+              className="action-btn primary get-provenance-btn"
+              onClick={handleGetProvenance}
+              disabled={availableProvenances.length === 0 && !isProcessing}
+            >
+              <FontAwesomeIcon icon={faPlay} />
+              <span>Get Evidence Sources</span>
+            </button>
+            
+            <button 
+              className="action-btn secondary feedback-btn"
+              onClick={handleFeedback}
+            >
+              <FontAwesomeIcon icon={faComment} />
+              <span>Provide Feedback</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state - question completed but no results and no answer
+  if (!isProcessing && availableProvenances.length === 0 && !hasAnswer && !explanation) {
     return (
       <div className="provenance-navigator error">
         <div className="error-state">
           <FontAwesomeIcon icon={faExclamationTriangle} size="2x" />
           <h4>No Evidence Found</h4>
           <p>Unable to find supporting evidence for this question</p>
+          
+          <button 
+            className="action-btn secondary feedback-btn"
+            onClick={handleFeedback}
+          >
+            <FontAwesomeIcon icon={faComment} />
+            Provide Feedback
+          </button>
         </div>
       </div>
     );
   }
 
-  // Main provenance navigator - only show if we have provenance
-  if (availableProvenances.length === 0) {
+  // Still waiting for provenance but we might have an answer
+  if (availableProvenances.length === 0 && !showProvenance) {
     return (
       <div className="provenance-navigator waiting">
         <div className="waiting-state">
           <FontAwesomeIcon icon={faSpinner} spin />
           <p>Waiting for evidence sources...</p>
+          {hasAnswer && (
+            <div className="answer-available">
+              <p>✅ Answer is ready! Evidence analysis in progress...</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Main provenance navigator - only show if user has requested provenance and we have some
+  if (!showProvenance || availableProvenances.length === 0) {
+    return (
+      <div className="provenance-navigator waiting">
+        <div className="waiting-state">
+          <FontAwesomeIcon icon={faSpinner} spin />
+          <p>Loading evidence sources...</p>
         </div>
       </div>
     );
@@ -225,8 +365,10 @@ const ProvenanceNavigator = ({
       {/* Provenance Header */}
       <div className="provenance-header">
         <div className="section-header">
-          <FontAwesomeIcon icon={faHighlighter} />
-          <h4>Evidence Sources</h4>
+          <h4>
+            <FontAwesomeIcon icon={faHighlighter} />
+            Evidence Sources
+          </h4>
           {currentSession && (
             <span className="session-badge">
               Session: {currentSession.session_id?.split('_')[1] || 'Active'}
@@ -235,20 +377,20 @@ const ProvenanceNavigator = ({
         </div>
         
         <div className="provenance-counter">
-          Evidence {currentProvenanceIndex + 1} of {Math.min(availableProvenances.length, 5)}
-          {isProcessing && availableProvenances.length < 5 && (
-            <span className="loading-indicator">
-              <FontAwesomeIcon icon={faSpinner} spin />
-              Loading more...
-            </span>
-          )}
-          {/* Show hidden results indicator */}
-          {activeQuestion?.hiddenResultsMessage && (
-            <div className="hidden-results-indicator">
-              <FontAwesomeIcon icon={faInfoCircle} />
-              <span className="hidden-results-text">
-                {activeQuestion.hiddenResultsMessage}
+          <div>
+            Evidence {currentProvenanceIndex + 1} of {Math.min(availableProvenances.length, 5)}
+            {isProcessing && availableProvenances.length < 5 && (
+              <span className="loading-indicator">
+                <FontAwesomeIcon icon={faSpinner} spin />
+                Loading more...
               </span>
+            )}
+          </div>
+          
+          {/* Show completion indicator when done */}
+          {!isProcessing && availableProvenances.length > 0 && (
+            <div className="completion-indicator">
+              ✅ Analysis Complete ({availableProvenances.length} evidence sources found)
             </div>
           )}
         </div>
@@ -271,7 +413,7 @@ const ProvenanceNavigator = ({
             <button
               key={index}
               className={`dot ${index === currentProvenanceIndex ? 'active' : ''}`}
-              onClick={() => setCurrentProvenanceIndex(index)}
+              onClick={() => handleProvenanceDotClick(index)}
               title={`Evidence ${index + 1}`}
             />
           ))}
@@ -315,7 +457,7 @@ const ProvenanceNavigator = ({
             )}
           </div>
 
-          {/* Evidence Text - This is the key fix */}
+          {/* Evidence Text */}
           <div className="evidence-content">
             <div className="evidence-header">
               <FontAwesomeIcon icon={faFileAlt} />
@@ -327,13 +469,14 @@ const ProvenanceNavigator = ({
                 <div className="evidence-sentences">
                   {Array.isArray(currentProvenance.content) ? (
                     currentProvenance.content.map((sentence, idx) => (
-                      <div key={idx} className="evidence-sentence">
-                        <span className="sentence-number">{idx + 1}.</span>
+                      <div key={idx} className="evidence-sentence" data-sentence-id={currentProvenance.sentences_ids?.[idx]}>
+                        <span className="sentence-number">{idx + 1}</span>
                         <span className="sentence-text">{sentence}</span>
                       </div>
                     ))
                   ) : (
-                    <div className="evidence-sentence">
+                    <div className="evidence-sentence" data-sentence-id={currentProvenance.sentences_ids?.[0]}>
+                      <span className="sentence-number">1</span>
                       <span className="sentence-text">{currentProvenance.content}</span>
                     </div>
                   )}
@@ -378,258 +521,6 @@ const ProvenanceNavigator = ({
           </div>
         </div>
       )}
-
-      {/* Progressive Loading Indicator */}
-      {isProcessing && availableProvenances.length > 0 && (
-        <div className="progressive-loading">
-          <div className="loading-bar">
-            <div className="loading-progress" />
-          </div>
-          <span className="loading-text">
-            <FontAwesomeIcon icon={faSpinner} spin />
-            Loading additional evidence sources... ({availableProvenances.length}/5)
-          </span>
-        </div>
-      )}
-
-      {/* Enhanced Styles */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .provenance-navigator {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background: white;
-            font-family: var(--font-display, -apple-system, BlinkMacSystemFont, sans-serif);
-          }
-          
-          .provenance-navigator.no-provenance,
-          .provenance-navigator.timeout {
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
-          }
-          
-          .no-provenance-state,
-          .timeout-state {
-            max-width: 400px;
-            color: #666;
-          }
-          
-          .no-provenance-state h4,
-          .timeout-state h4 {
-            color: #333;
-            margin: 16px 0;
-          }
-          
-          .explanation-box {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 16px;
-            margin: 16px 0;
-            text-align: left;
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-          }
-          
-          .explanation-box svg {
-            color: #007bff;
-            margin-top: 2px;
-            flex-shrink: 0;
-          }
-          
-          .explanation-box ul {
-            margin: 8px 0 0 0;
-            padding-left: 16px;
-          }
-          
-          .explanation-box li {
-            margin-bottom: 4px;
-          }
-          
-          .suggestion-box {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 16px 0;
-            color: #155724;
-          }
-          
-          .evidence-content {
-            flex: 1;
-            margin: 16px 0;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            overflow: hidden;
-          }
-          
-          .evidence-header {
-            background: #f8f9fa;
-            padding: 12px 16px;
-            border-bottom: 1px solid #dee2e6;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: bold;
-            color: #495057;
-          }
-          
-          .evidence-text {
-            padding: 16px;
-            max-height: 300px;
-            overflow-y: auto;
-          }
-          
-          .evidence-sentences {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-          }
-          
-          .evidence-sentence {
-            display: flex;
-            gap: 12px;
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            border-left: 4px solid #007bff;
-          }
-          
-          .sentence-number {
-            font-weight: bold;
-            color: #007bff;
-            min-width: 24px;
-            font-family: monospace;
-          }
-          
-          .sentence-text {
-            flex: 1;
-            line-height: 1.5;
-            font-family: 'Times New Roman', serif;
-          }
-          
-          .loading-evidence,
-          .no-evidence {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            padding: 20px;
-            color: #666;
-          }
-          
-          .evidence-ids {
-            font-family: monospace;
-            font-size: 12px;
-            color: #999;
-            background: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 4px;
-            margin-top: 8px;
-          }
-          
-          .provenance-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-          }
-          
-          .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 16px;
-            border-radius: 6px;
-            border: none;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            flex: 1;
-            justify-content: center;
-          }
-          
-          .action-btn.primary {
-            background: #007bff;
-            color: white;
-          }
-          
-          .action-btn.primary:hover:not(:disabled) {
-            background: #0056b3;
-          }
-          
-          .action-btn.secondary {
-            background: #6c757d;
-            color: white;
-          }
-          
-          .action-btn.secondary:hover:not(:disabled) {
-            background: #545b62;
-          }
-          
-          .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-          }
-          
-          .progressive-loading {
-            margin-top: 16px;
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            text-align: center;
-          }
-          
-          .loading-bar {
-            height: 4px;
-            background: #e9ecef;
-            border-radius: 2px;
-            margin-bottom: 8px;
-            overflow: hidden;
-          }
-          
-          .loading-progress {
-            height: 100%;
-            background: linear-gradient(90deg, #007bff, #28a745, #007bff);
-            background-size: 200% 100%;
-            animation: loading-wave 2s infinite;
-          }
-          
-          @keyframes loading-wave {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-          }
-          
-          .hidden-results-indicator {
-            background: #e3f2fd;
-            border: 1px solid #2196F3;
-            border-radius: 6px;
-            padding: 8px 12px;
-            margin-top: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: #1976d2;
-          }
-          
-          .hidden-results-text {
-            font-weight: 500;
-          }
-          
-          .loading-text {
-            font-size: 12px;
-            color: #666;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-          }
-        `
-      }} />
     </div>
   );
 };

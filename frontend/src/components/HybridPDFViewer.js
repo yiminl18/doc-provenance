@@ -16,10 +16,11 @@ import {
   faAlignLeft,
   faMapMarkedAlt
 } from '@fortawesome/free-solid-svg-icons';
+import '../styles/pdf-viewer.css'
 import { SentencePDFMapper } from '../utils/SentencePDFMapper';
 import ProvenancePanel from './ProvenancePanel';
 
-const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode = false }) => {
+const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode = false, navigationTrigger }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1.2);
   const [loading, setLoading] = useState(true);
@@ -30,7 +31,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [pdfUrl, setPdfUrl] = useState(null);
-  
+
   // Enhanced sentence mapping
   const [sentences, setSentences] = useState([]);
   const [sentenceMapper, setSentenceMapper] = useState(null);
@@ -40,6 +41,8 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
   const textLayerRef = useRef(null);
   const containerRef = useRef(null);
   const highlightLayerRef = useRef(null);
+
+
 
   // Initialize PDF.js worker once
   useEffect(() => {
@@ -58,7 +61,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
     }
 
     let url = '';
-    
+
     if (pdfDocument.file) {
       url = URL.createObjectURL(pdfDocument.file);
       console.log('📁 Using file blob URL');
@@ -69,7 +72,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
     }
 
     setPdfUrl(url);
-    
+
     return () => {
       if (pdfDocument.file && url.startsWith('blob:')) {
         URL.revokeObjectURL(url);
@@ -124,56 +127,51 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
   const loadSentenceMapping = async (pdf) => {
     try {
       const docId = pdfDocument.backendDocumentId || pdfDocument.id;
-      
+
       const sentencesResponse = await fetch(`/api/documents/${docId}/sentences`);
       if (!sentencesResponse.ok) {
         throw new Error('Failed to load sentences');
       }
-      
+
       const sentencesData = await sentencesResponse.json();
       if (!sentencesData.success || !sentencesData.sentences) {
         throw new Error('No sentence data available');
       }
 
       setSentences(sentencesData.sentences);
-      
+
       const mapper = new SentencePDFMapper();
       const result = await mapper.initialize(pdf, sentencesData.sentences);
-      
+
       if (result.success) {
         setSentenceMapper(mapper);
         setMappingStats(mapper.getStatistics());
         console.log('✅ Advanced sentence mapping completed:', result);
       }
-      
+
     } catch (error) {
       console.warn('Could not load sentence mapping:', error);
     }
   };
 
-  // Auto-navigate to provenance page
+  // Add effect to handle navigation triggers
   useEffect(() => {
-    if (selectedProvenance && sentenceMapper && showHighlights) {
-      navigateToProvenance();
-    }
-  }, [selectedProvenance, sentenceMapper, showHighlights]);
+    if (navigationTrigger && sentenceMapper && navigationTrigger.sentenceId) {
+      console.log('🎯 PDF Viewer: Handling navigation trigger:', navigationTrigger);
 
-  const navigateToProvenance = () => {
-    if (!selectedProvenance?.sentences_ids || !sentenceMapper) return;
+      const targetPage = sentenceMapper.getPageForSentence(navigationTrigger.sentenceId);
 
-    // Find the first page that contains any of the highlighted sentences
-    let targetPage = currentPage;
-    for (const sentenceId of selectedProvenance.sentences_ids) {
-      const sentencePage = sentenceMapper.getPageForSentence(sentenceId);
-      if (sentencePage) {
-        targetPage = sentencePage;
-        break;
+      if (targetPage && targetPage !== currentPage) {
+        console.log(`📖 PDF Viewer: Auto-navigating to page ${targetPage} for sentence ${navigationTrigger.sentenceId}`);
+        setCurrentPage(targetPage);
       }
     }
+  }, [navigationTrigger, sentenceMapper, currentPage]);
 
-    if (targetPage !== currentPage) {
-      console.log(`📖 Auto-navigating to page ${targetPage} for provenance ${selectedProvenance.provenance_id}`);
-      setCurrentPage(targetPage);
+
+  const goToPage = (pageNum) => {
+    if (pageNum >= 1 && pageNum <= totalPages) {
+      setCurrentPage(pageNum);
     }
   };
 
@@ -197,7 +195,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
 
     try {
       console.log(`🔄 Rendering page ${pageNum}...`);
-      
+
       const page = await pdfDoc.getPage(pageNum);
       const viewport = page.getViewport({ scale: zoomLevel });
 
@@ -234,7 +232,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
     try {
       const textContent = await page.getTextContent();
       const textLayer = textLayerRef.current;
-      
+
       textLayer.innerHTML = '';
       textLayer.style.left = '0px';
       textLayer.style.top = '0px';
@@ -283,15 +281,15 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
   const addSubtleHighlight = (sentence, index) => {
     const textSpans = textLayerRef.current.querySelectorAll('span, div');
     const searchWords = sentence.toLowerCase().split(/\s+/).filter(word => word.length > 3);
-    
+
     textSpans.forEach(span => {
       const spanText = span.textContent.toLowerCase();
       const matchCount = searchWords.filter(word => spanText.includes(word)).length;
-      
+
       if (matchCount >= Math.max(1, searchWords.length * 0.3)) {
         const highlight = document.createElement('div');
         highlight.className = 'pdf-light-highlight';
-        
+
         const computedStyle = window.getComputedStyle(span);
         highlight.style.position = 'absolute';
         highlight.style.left = span.style.left || computedStyle.left;
@@ -320,11 +318,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
   const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
   const toggleHighlights = () => setShowHighlights(!showHighlights);
   const toggleDetailPanel = () => setShowDetailPanel(!showDetailPanel);
-  const goToPage = (pageNum) => {
-    if (pageNum >= 1 && pageNum <= totalPages) {
-      setCurrentPage(pageNum);
-    }
-  };
+
 
   // Render states
   if (!pdfDocument) {
@@ -374,7 +368,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
           <span>{pdfDocument.filename}</span>
           {selectedProvenance && (
             <span className="provenance-badge">
-              Evidence {selectedProvenance.provenance_id || 1} 
+              Evidence {selectedProvenance.provenance_id || 1}
               ({selectedProvenance.sentences_ids?.length || 0} sentences)
             </span>
           )}
@@ -384,25 +378,25 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
           <button onClick={toggleDetailPanel} className="control-btn" title="Toggle Detail Panel">
             <FontAwesomeIcon icon={faMapMarkedAlt} />
           </button>
-          
+
           <button onClick={toggleHighlights} className="control-btn">
             <FontAwesomeIcon icon={showHighlights ? faEye : faEyeSlash} />
           </button>
-          
+
           <button onClick={handleZoomOut} className="control-btn">
             <FontAwesomeIcon icon={faSearchMinus} />
           </button>
-          
+
           <span className="zoom-display">{Math.round(zoomLevel * 100)}%</span>
-          
+
           <button onClick={handleZoomIn} className="control-btn">
             <FontAwesomeIcon icon={faSearchPlus} />
           </button>
-          
+
           <button onClick={toggleFullscreen} className="control-btn">
             <FontAwesomeIcon icon={isFullscreen ? faCompress : faExpand} />
           </button>
-          
+
           {onClose && (
             <button onClick={onClose} className="control-btn close-btn">
               <FontAwesomeIcon icon={faTimes} />
@@ -413,21 +407,21 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
 
       {/* Page Navigation */}
       <div className="page-navigation">
-        <button 
-          onClick={() => goToPage(currentPage - 1)} 
+        <button
+          onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage <= 1}
           className="nav-btn"
         >
           <FontAwesomeIcon icon={faChevronLeft} />
           Previous
         </button>
-        
+
         <span className="page-info">
           Page {currentPage} of {totalPages}
         </span>
-        
-        <button 
-          onClick={() => goToPage(currentPage + 1)} 
+
+        <button
+          onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage >= totalPages}
           className="nav-btn"
         >
@@ -435,10 +429,11 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
           <FontAwesomeIcon icon={faChevronRight} />
         </button>
 
+        {/* Keep ONLY the simple sentence status */}
         {sentences.length > 0 && (
           <div className="sentence-status">
             <small>
-              📍 {sentences.length} sentences 
+              📍 {sentences.length} sentences
               {mappingStats && (
                 <span className="mapping-quality">
                   | {Math.round(mappingStats.averageConfidence * 100)}% avg confidence
@@ -492,7 +487,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             </div>
             <div className="summary-item">
               <strong>On This Page:</strong> {
-                selectedProvenance.sentences_ids?.filter(id => 
+                selectedProvenance.sentences_ids?.filter(id =>
                   sentenceMapper ? sentenceMapper.getPageForSentence(id) === currentPage : false
                 ).length || 0
               }

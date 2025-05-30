@@ -1134,7 +1134,100 @@ def get_document(document_id):
 # =============================================================================
 # UPDATED DOCUMENT PROCESSING WITH SESSION ORGANIZATION
 # =============================================================================
+def initialize_session_with_preloaded_documents(session_id):
+    """Initialize a new session by copying all preloaded documents into it"""
+    try:
+        logger.info(f"🔄 Initializing session {session_id} with preloaded documents...")
+        
+        # Ensure session directories exist
+        session_dir, docs_dir, questions_dir = ensure_session_dirs(session_id)
+        
+        # Get all preloaded documents
+        all_docs = get_all_available_pdfs()
+        preloaded_docs = [doc for doc in all_docs if doc.get('is_preloaded', False)]
+        
+        copied_count = 0
+        
+        for doc in preloaded_docs:
+            try:
+                # Create document directory in session
+                doc_session_dir = os.path.join(docs_dir, doc['document_id'])
+                os.makedirs(doc_session_dir, exist_ok=True)
+                
+                # Copy document metadata to session
+                processed_data = {
+                    'document_id': doc['document_id'],
+                    'session_id': session_id,
+                    'filename': doc['filename'],
+                    'source_filepath': doc['filepath'],
+                    'text_length': doc.get('text_length', 0),
+                    'sentence_count': doc.get('sentence_count', 0),
+                    'processed_at': time.time(),
+                    'processed_at_iso': datetime.utcnow().isoformat(),
+                    'is_preloaded_origin': True,  # Mark as originally from preloaded
+                    'source_folder': 'preloaded'
+                }
+                
+                processed_file = os.path.join(doc_session_dir, 'processed_data.json')
+                with open(processed_file, 'w', encoding='utf-8') as f:
+                    json.dump(processed_data, f, indent=2, ensure_ascii=False)
+                
+                # Copy sentences to session if available
+                sentences = doc.get('sentences', [])
+                if sentences:
+                    sentences_file = os.path.join(doc_session_dir, 'sentences.json')
+                    with open(sentences_file, 'w', encoding='utf-8') as f:
+                        json.dump(sentences, f, indent=2, ensure_ascii=False)
+                
+                # Copy full text to session if possible
+                if doc.get('filepath') and os.path.exists(doc['filepath']):
+                    try:
+                        pdf_text = extract_text(doc['filepath'])
+                        text_file = os.path.join(doc_session_dir, 'full_text.txt')
+                        with open(text_file, 'w', encoding='utf-8') as f:
+                            f.write(pdf_text)
+                    except Exception as e:
+                        logger.warning(f"Could not extract text for {doc['filename']}: {e}")
+                
+                copied_count += 1
+                logger.info(f"✅ Copied {doc['filename']} to session {session_id}")
+                
+            except Exception as e:
+                logger.error(f"❌ Error copying {doc.get('filename', 'unknown')} to session: {e}")
+                continue
+        
+        # Update session metadata
+        metadata_file = os.path.join(session_dir, 'session_metadata.json')
+        if os.path.exists(metadata_file):
+            with open(metadata_file, 'r') as f:
+                metadata = json.load(f)
+        else:
+            metadata = {
+                'session_id': session_id,
+                'created_at': time.time(),
+                'created_at_iso': datetime.utcnow().isoformat(),
+                'documents_processed': 0,
+                'questions_asked': 0,
+                'status': 'active'
+            }
+        
+        metadata['documents_processed'] = copied_count
+        metadata['preloaded_documents_copied'] = copied_count
+        metadata['initialized_with_preloaded'] = True
+        metadata['last_updated'] = time.time()
+        metadata['last_updated_iso'] = datetime.utcnow().isoformat()
+        
+        with open(metadata_file, 'w') as f:
+            json.dump(metadata, f, indent=2)
+        
+        logger.info(f"✅ Session {session_id} initialized with {copied_count} preloaded documents")
+        return copied_count
+        
+    except Exception as e:
+        logger.error(f"❌ Error initializing session with preloaded documents: {e}")
+        return 0
 
+# Update the existing manage_current_session function
 @main.route('/sessions/current', methods=['GET', 'POST'])
 def manage_current_session():
     """Get current session or create new one"""
@@ -1147,14 +1240,19 @@ def manage_current_session():
         # Create session directories
         ensure_session_dirs(new_session_id)
         
+        # Initialize with preloaded documents
+        preloaded_count = initialize_session_with_preloaded_documents(new_session_id)
+        
         # Log session creation
         session_metadata = {
             'session_id': new_session_id,
             'created_at': time.time(),
             'created_at_iso': datetime.utcnow().isoformat(),
-            'documents_processed': 0,
+            'documents_processed': preloaded_count,
             'questions_asked': 0,
-            'status': 'active'
+            'status': 'active',
+            'initialized_with_preloaded': True,
+            'preloaded_documents_copied': preloaded_count
         }
         
         metadata_path = os.path.join(get_session_data_dir(new_session_id), 'session_metadata.json')
@@ -1164,17 +1262,87 @@ def manage_current_session():
         return jsonify({
             'success': True,
             'session_id': new_session_id,
-            'message': 'New session created'
+            'preloaded_documents_available': preloaded_count,
+            'message': f'New session created with {preloaded_count} documents available'
         })
     else:
         # Get current session
         current_session = get_current_session_id()
-        ensure_session_dirs(current_session)
+        
+        # Check if session is initialized, if not, initialize it
+        session_dir = get_session_data_dir(current_session)
+        metadata_file = os.path.join(session_dir, 'session_metadata.json')
+        
+        if not os.path.exists(metadata_file):
+            # Initialize existing session
+            ensure_session_dirs(current_session)
+            preloaded_count = initialize_session_with_preloaded_documents(current_session)
+            
+            return jsonify({
+                'success': True,
+                'session_id': current_session,
+                'initialized': True,
+                'preloaded_documents_available': preloaded_count
+            })
         
         return jsonify({
             'success': True,
             'session_id': current_session
         })
+
+# Add new endpoint to get documents available in current session
+@main.route('/sessions/<session_id>/documents', methods=['GET'])
+def get_session_documents(session_id):
+    """Get all documents available in the current session"""
+    try:
+        docs_dir = get_session_documents_dir(session_id)
+        
+        if not os.path.exists(docs_dir):
+            return jsonify({
+                'success': True,
+                'documents': [],
+                'message': 'No documents in session yet'
+            })
+        
+        documents = []
+        
+        for doc_id in os.listdir(docs_dir):
+            doc_path = os.path.join(docs_dir, doc_id)
+            if not os.path.isdir(doc_path):
+                continue
+                
+            processed_file = os.path.join(doc_path, 'processed_data.json')
+            if os.path.exists(processed_file):
+                try:
+                    with open(processed_file, 'r', encoding='utf-8') as f:
+                        doc_data = json.load(f)
+                    
+                    # Add session-specific metadata
+                    doc_data['available_in_session'] = True
+                    doc_data['session_document_id'] = doc_id
+                    
+                    documents.append(doc_data)
+                    
+                except Exception as e:
+                    logger.warning(f"Error reading document {doc_id} metadata: {e}")
+                    continue
+        
+        # Sort by processing time (newest first)
+        documents.sort(key=lambda x: x.get('processed_at', 0), reverse=True)
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'documents': documents,
+            'total_documents': len(documents)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting session documents: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @main.route('/documents/<document_id>/process', methods=['POST'])
 def process_document_for_session(document_id):
@@ -1774,7 +1942,6 @@ def parse_provenance_output(output, question_dir):
 # =============================================================================
 # SESSION DATA ACCESS ENDPOINTS
 # =============================================================================
-
 @main.route('/sessions/<session_id>/questions/<question_id>/progress', methods=['GET'])
 def get_question_progress(session_id, question_id):
     """Get progress for a specific question in a session"""
@@ -1797,31 +1964,98 @@ def get_question_progress(session_id, question_id):
                     status = log_data.get('status', 'processing')
             except:
                 pass
-        
+        # Check if we have an answer file - if so, mark as completed
+        answer_file = os.path.join(question_dir, 'answers.txt')
+        has_answer = os.path.exists(answer_file) and os.path.getsize(answer_file) > 0
+
         # Get current provenance
         provenance_file = os.path.join(question_dir, 'provenance.json')
         provenance_data = []
+        processing_status = status
+        user_message = None
+        explanation = None
         
         if os.path.exists(provenance_file):
             try:
                 with open(provenance_file, 'r', encoding='utf-8') as f:
-                    provenance_data = json.load(f)
+                    data = json.load(f)
+                
+                # Handle both formats: direct array or nested structure
+                if isinstance(data, dict):
+                    provenance_data = data.get('provenance_entries', [])
+                    processing_status = data.get('status', status)
+                    explanation = data.get('explanation')
+                    
+                    # Set user messages based on status
+                    if processing_status == 'no_provenance_found':
+                        user_message = "No atomic evidence found in the document."
+                    elif processing_status == 'timeout':
+                        user_message = "Processing timed out. The document may be too complex."
+                    elif processing_status == 'error':
+                        user_message = "An error occurred during processing."
+                        
+                elif isinstance(data, list):
+                    provenance_data = data
+                    
+            except Exception as e:
+                logger.error(f"Error reading provenance file: {e}")
+                pass
+        
+        # Check completion status
+        completion_file = os.path.join(question_dir, 'completion_status.json')
+        done = False
+        
+        if os.path.exists(completion_file):
+            try:
+                with open(completion_file, 'r') as f:
+                    completion_data = json.load(f)
+                    done = completion_data.get('completed', False)
+                    if not processing_status or processing_status == 'processing':
+                        processing_status = completion_data.get('status', 'completed')
             except:
                 pass
         
-        done = status == 'completed' or len(provenance_data) > 0
+        # Determine if done based on answer, status or provenance availability
+        if not done:
+            if has_answer or len(provenance_data) > 0:
+                done = True
+                processing_status = 'completed'
+                
+                # Update the logs file to reflect completion
+                if status in ['started', 'processing']:
+                    try:
+                        updated_logs = {
+                            'status': 'completed',
+                            'logs': logs + [f"[{time.strftime('%H:%M:%S')}] Answer generated - processing complete"],
+                            'timestamp': time.time()
+                        }
+                        with open(logs_file, 'w') as f:
+                            json.dump(updated_logs, f, indent=2)
+                        
+                        logger.info(f"✅ Updated question {question_id} status to completed")
+                        status = 'completed'
+                        logs = updated_logs['logs']
+                    except Exception as e:
+                        logger.error(f"Error updating logs file: {e}")
+            elif processing_status in ['completed', 'completed_no_provenance', 'no_provenance_found', 'timeout', 'error']:
+                done = True
         
         return jsonify({
             'session_id': session_id,
             'question_id': question_id,
             'progress': len(provenance_data),
             'done': done,
-            'data': provenance_data,
+            'data': provenance_data[:5],  # Limit to top-5 for frontend
             'logs': logs,
-            'status': status
+            'status': status,
+            'processing_status': processing_status,
+            'user_message': user_message,
+            'explanation': explanation,
+            "has_answer": has_answer
         })
         
     except Exception as e:
+        logger.error(f"Error getting question progress: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1842,7 +2076,13 @@ def get_question_results(session_id, question_id):
         
         if os.path.exists(provenance_file):
             with open(provenance_file, 'r', encoding='utf-8') as f:
-                provenance_data = json.load(f)
+                data = json.load(f)
+                
+                # Handle both formats: direct array or nested structure
+                if isinstance(data, dict):
+                    provenance_data = data.get('provenance_entries', [])
+                elif isinstance(data, list):
+                    provenance_data = data
         
         # Check for answer file
         answer_file = os.path.join(question_dir, 'answers.txt')
@@ -1855,11 +2095,12 @@ def get_question_results(session_id, question_id):
             'success': True,
             'session_id': session_id,
             'question_id': question_id,
-            'provenance': provenance_data,
+            'provenance': provenance_data[:5],  # Limit to top-5
             'answer': answer
         })
         
     except Exception as e:
+        logger.error(f"Error getting question results: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -3253,7 +3494,7 @@ def cleanup_all_sessions():
 
 @main.route('/sessions/stats', methods=['GET'])
 def get_sessions_stats():
-    """Get statistics about all sessions"""
+    """Get statistics about all sessions - with None value handling"""
     try:
         sessions_root = os.path.join(RESULT_DIR, 'sessions')
         
@@ -3284,36 +3525,56 @@ def get_sessions_stats():
                 'documents_count': 0,
                 'questions_count': 0,
                 'size_bytes': 0,
-                'created_at': None
+                'created_at': 0,  # Default to 0 instead of None
+                'created_at_iso': None
             }
             
             # Count documents
             docs_dir = os.path.join(session_path, 'documents')
             if os.path.exists(docs_dir):
-                session_info['documents_count'] = len([d for d in os.listdir(docs_dir) 
-                                                      if os.path.isdir(os.path.join(docs_dir, d))])
+                try:
+                    session_info['documents_count'] = len([d for d in os.listdir(docs_dir) 
+                                                          if os.path.isdir(os.path.join(docs_dir, d))])
+                except Exception as e:
+                    print(f"Error counting documents in {session_name}: {e}")
+                    session_info['documents_count'] = 0
             
             # Count questions
             questions_dir = os.path.join(session_path, 'questions')
             if os.path.exists(questions_dir):
-                session_info['questions_count'] = len([q for q in os.listdir(questions_dir) 
-                                                      if os.path.isdir(os.path.join(questions_dir, q))])
+                try:
+                    session_info['questions_count'] = len([q for q in os.listdir(questions_dir) 
+                                                          if os.path.isdir(os.path.join(questions_dir, q))])
+                except Exception as e:
+                    print(f"Error counting questions in {session_name}: {e}")
+                    session_info['questions_count'] = 0
             
-            # Calculate size
-            for root, dirs, files in os.walk(session_path):
-                for file in files:
-                    file_size = os.path.getsize(os.path.join(root, file))
-                    session_info['size_bytes'] += file_size
+            # Calculate size safely
+            try:
+                for root, dirs, files in os.walk(session_path):
+                    for file in files:
+                        try:
+                            file_size = os.path.getsize(os.path.join(root, file))
+                            session_info['size_bytes'] += file_size
+                        except (OSError, IOError):
+                            # Skip files that can't be accessed
+                            continue
+            except Exception as e:
+                print(f"Error calculating size for {session_name}: {e}")
+                session_info['size_bytes'] = 0
             
-            # Get metadata
+            # Get metadata safely
             metadata_file = os.path.join(session_path, 'session_metadata.json')
             if os.path.exists(metadata_file):
                 try:
                     with open(metadata_file, 'r') as f:
                         metadata = json.load(f)
-                        session_info['created_at'] = metadata.get('created_at')
+                        # Safely get created_at with default fallback
+                        session_info['created_at'] = metadata.get('created_at', 0) or 0
                         session_info['created_at_iso'] = metadata.get('created_at_iso')
-                except:
+                except Exception as e:
+                    print(f"Error reading metadata for {session_name}: {e}")
+                    # Keep defaults
                     pass
             
             stats['sessions'].append(session_info)
@@ -3323,15 +3584,23 @@ def get_sessions_stats():
         
         stats['total_sessions'] = len(stats['sessions'])
         
-        # Sort sessions by creation time (newest first)
-        stats['sessions'].sort(key=lambda x: x.get('created_at', 0), reverse=True)
+        # Sort sessions by creation time (newest first) - safely handle None values
+        stats['sessions'].sort(key=lambda x: x.get('created_at', 0) or 0, reverse=True)
         
         return jsonify(stats)
         
     except Exception as e:
+        logger.error(f"Error getting sessions stats: {e}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': str(e),
+            'total_sessions': 0,
+            'total_documents': 0,
+            'total_questions': 0,
+            'total_size_bytes': 0,
+            'sessions': []
         }), 500
 
 @main.route('/sessions/<session_id>/summary', methods=['GET'])

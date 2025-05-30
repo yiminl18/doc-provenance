@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import '../styles/brutalist-design.css';
 import '../styles/feedback-modal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 

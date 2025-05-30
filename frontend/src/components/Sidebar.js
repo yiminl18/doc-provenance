@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/brutalist-design.css';
 import '../styles/sidebar.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 

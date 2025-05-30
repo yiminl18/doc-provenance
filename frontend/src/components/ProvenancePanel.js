@@ -6,51 +6,197 @@ import {
   faSearchPlus,
   faSearchMinus,
   faExpand,
+  faEye,
+  faEyeSlash,
   faCompress,
   faMapPin,
   faListOl
 } from '@fortawesome/free-solid-svg-icons';
 
-const ProvenancePanel = ({ 
-  sentences, 
-  selectedProvenance, 
-  currentPage, 
-  sentenceMapper, 
-  showHighlights 
+const ProvenancePanel = ({
+  sentences,
+  selectedProvenance,
+  currentPage,
+  sentenceMapper,
+  showHighlights,
+  scrollTrigger
 }) => {
   const [zoomLevel, setZoomLevel] = useState(1.0);
   const [viewMode, setViewMode] = useState('context'); // 'context' or 'evidence-only'
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   const containerRef = useRef(null);
   const sentenceRefs = useRef({});
 
-  // Auto-scroll to first highlighted sentence when provenance changes
-  useEffect(() => {
-    if (selectedProvenance && showHighlights && sentenceMapper) {
-      scrollToFirstEvidence();
-    }
-  }, [selectedProvenance, showHighlights, sentenceMapper]);
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+  const [lastScrolledProvenance, setLastScrolledProvenance] = useState(null);
 
+  // Enhanced auto-scroll with better logic
+  useEffect(() => {
+    if (selectedProvenance && showHighlights && sentenceMapper && autoScrollEnabled) {
+      // Only scroll if this is a different provenance than last time
+      if (lastScrolledProvenance !== selectedProvenance.provenance_id) {
+        console.log('📜 ProvenancePanel: Auto-scrolling to new provenance:', selectedProvenance.provenance_id);
+        scrollToFirstEvidence();
+        setLastScrolledProvenance(selectedProvenance.provenance_id);
+      }
+    }
+  }, [selectedProvenance, showHighlights, sentenceMapper, autoScrollEnabled]);
+
+  // Enhanced scroll to first evidence
   const scrollToFirstEvidence = () => {
     if (!selectedProvenance?.sentences_ids || selectedProvenance.sentences_ids.length === 0) return;
 
-    const firstSentenceId = selectedProvenance.sentences_ids[0];
-    const firstElement = sentenceRefs.current[firstSentenceId];
-    
-    if (firstElement && containerRef.current) {
-      firstElement.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'center',
-        inline: 'nearest'
+    // Find the first sentence that should be visible
+    let targetSentenceId = null;
+
+    if (viewMode === 'evidence-only') {
+      // In evidence-only mode, scroll to the first evidence sentence
+      targetSentenceId = selectedProvenance.sentences_ids[0];
+    } else {
+      // In context mode, find the first evidence sentence on the current page
+      const sentencesOnCurrentPage = selectedProvenance.sentences_ids.filter(id => {
+        const sentencePage = sentenceMapper.getPageForSentence(id);
+        return sentencePage === currentPage;
       });
-      
-      // Add pulse animation
-      firstElement.classList.add('pulse-highlight');
-      setTimeout(() => {
-        firstElement.classList.remove('pulse-highlight');
-      }, 2000);
+
+      if (sentencesOnCurrentPage.length > 0) {
+        targetSentenceId = sentencesOnCurrentPage[0];
+        console.log(`📜 Found ${sentencesOnCurrentPage.length} sentences on current page ${currentPage}`);
+      } else {
+        // Fallback to first sentence overall
+        targetSentenceId = selectedProvenance.sentences_ids[0];
+        console.log('📜 No sentences on current page, scrolling to first sentence overall');
+      }
     }
+
+    if (targetSentenceId !== null) {
+      scrollToSentence(targetSentenceId);
+    }
+  };
+
+  // Enhanced scroll to specific sentence
+  const scrollToSentence = (sentenceId, highlight = true) => {
+    const sentenceElement = sentenceRefs.current[sentenceId];
+
+    if (sentenceElement && containerRef.current) {
+      console.log('📜 ProvenancePanel: Scrolling to sentence:', sentenceId);
+
+      // Calculate the position to center the sentence
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const sentenceRect = sentenceElement.getBoundingClientRect();
+
+      const scrollTop = containerRef.current.scrollTop +
+        sentenceRect.top - containerRect.top -
+        (containerRect.height / 2) +
+        (sentenceRect.height / 2);
+
+      // Smooth scroll to position
+      containerRef.current.scrollTo({
+        top: Math.max(0, scrollTop),
+        behavior: 'smooth'
+      });
+
+      if (highlight) {
+        // Add highlight animation
+        sentenceElement.classList.add('sentence-scroll-highlight');
+        setTimeout(() => {
+          sentenceElement.classList.remove('sentence-scroll-highlight');
+        }, 3000);
+      }
+
+    } else {
+      console.warn('📜 ProvenancePanel: Could not find sentence element for ID:', sentenceId);
+
+      // Fallback: scroll to top of evidence sentences
+      if (containerRef.current) {
+        const firstEvidenceElement = containerRef.current.querySelector('.evidence-sentence');
+        if (firstEvidenceElement) {
+          firstEvidenceElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }
+      }
+    }
+  };
+
+  // Add click handler for sentences to scroll to them
+  const handleSentenceClick = (sentenceId) => {
+    console.log('📜 ProvenancePanel: User clicked sentence:', sentenceId);
+    scrollToSentence(sentenceId, true);
+
+    // Optionally trigger page navigation in PDF viewer
+    if (sentenceMapper) {
+      const targetPage = sentenceMapper.getPageForSentence(sentenceId);
+      if (targetPage) {
+        console.log('📖 Requesting PDF navigation to page:', targetPage);
+        // This could trigger a callback to the parent component
+      }
+    }
+  };
+
+  // Enhanced sentence rendering with click handlers and better data attributes
+  const renderSentence = (item, index) => {
+    const isEvidence = item.isEvidence;
+    const sentenceId = item.id;
+    const isOnCurrentPage = item.isOnCurrentPage;
+
+    return (
+      <span
+        key={sentenceId}
+        ref={el => sentenceRefs.current[sentenceId] = el}
+        className={`
+          sentence
+          ${isEvidence ? 'evidence-sentence-text' : 'context-sentence'}
+          ${isOnCurrentPage ? 'on-current-page' : 'other-page'}
+          ${isEvidence ? `highlight-${(selectedProvenance.sentences_ids.indexOf(sentenceId)) % 3}` : ''}
+        `}
+        data-sentence-id={sentenceId}
+        data-is-evidence={isEvidence}
+        data-page={sentenceMapper ? sentenceMapper.getPageForSentence(sentenceId) : 'unknown'}
+        onClick={() => isEvidence ? handleSentenceClick(sentenceId) : null}
+        title={`
+          Sentence ${sentenceId}${isEvidence ? ' (Evidence)' : ' (Context)'}
+          ${sentenceMapper ? ` - Page ${sentenceMapper.getPageForSentence(sentenceId)}` : ''}
+          ${isEvidence ? ' - Click to focus' : ''}
+        `}
+      >
+        {item.sentence}
+        {index < sentencesToDisplay.length - 1 ? ' ' : ''}
+      </span>
+    );
+  };
+
+  // Add scroll controls to the panel header
+  const renderScrollControls = () => {
+    if (!selectedProvenance?.sentences_ids || selectedProvenance.sentences_ids.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="scroll-controls">
+        <button
+          onClick={() => setAutoScrollEnabled(!autoScrollEnabled)}
+          className="control-btn auto-scroll-toggle"
+          title={autoScrollEnabled ? 'Disable auto-scroll' : 'Enable auto-scroll'}
+        >
+          <FontAwesomeIcon icon={autoScrollEnabled ? faEye : faEyeSlash} />
+        </button>
+
+        <button
+          onClick={() => scrollToFirstEvidence()}
+          className="control-btn scroll-to-evidence"
+          title="Scroll to first evidence"
+        >
+          <FontAwesomeIcon icon={faSearchPlus} />
+        </button>
+
+        <span className="scroll-info">
+          {selectedProvenance.sentences_ids.length} evidence sentences
+        </span>
+      </div>
+    );
   };
 
   // Get sentences to display based on view mode
@@ -68,16 +214,16 @@ const ProvenancePanel = ({
       // Show context around evidence (current page + some surrounding sentences)
       const evidenceSentences = new Set(selectedProvenance.sentences_ids);
       const contextSentences = [];
-      
+
       // Find all sentences on current page
       const sentencesOnPage = sentenceMapper.getSentencesOnPage(currentPage);
-      
+
       // Add some sentences before and after for context
       const contextRange = 5; // Show 5 sentences before and after evidence
       const allEvidenceIds = [...evidenceSentences];
       const minId = Math.max(0, Math.min(...allEvidenceIds) - contextRange);
       const maxId = Math.min(sentences.length - 1, Math.max(...allEvidenceIds) + contextRange);
-      
+
       for (let i = minId; i <= maxId; i++) {
         if (sentences[i]) {
           contextSentences.push({
@@ -88,7 +234,7 @@ const ProvenancePanel = ({
           });
         }
       }
-      
+
       return contextSentences;
     }
   };
@@ -125,26 +271,27 @@ const ProvenancePanel = ({
             {selectedProvenance.provenance_id}
           </span>
         </div>
-        
+
         <div className="panel-controls">
-          <button 
-            onClick={toggleViewMode} 
+          {renderScrollControls()}
+          <button
+            onClick={toggleViewMode}
             className="control-btn"
             title={viewMode === 'context' ? 'Show evidence only' : 'Show with context'}
           >
             <FontAwesomeIcon icon={viewMode === 'context' ? faListOl : faMapPin} />
           </button>
-          
+
           <button onClick={handleZoomOut} className="control-btn">
             <FontAwesomeIcon icon={faSearchMinus} />
           </button>
-          
+
           <span className="zoom-display">{Math.round(zoomLevel * 100)}%</span>
-          
+
           <button onClick={handleZoomIn} className="control-btn">
             <FontAwesomeIcon icon={faSearchPlus} />
           </button>
-          
+
           <button onClick={toggleExpanded} className="control-btn">
             <FontAwesomeIcon icon={isExpanded ? faCompress : faExpand} />
           </button>
@@ -166,32 +313,14 @@ const ProvenancePanel = ({
 
       {/* Sentence Content */}
       <div className="sentence-content" ref={containerRef}>
-        <div 
+        <div
           className="sentence-container"
-          style={{ 
+          style={{
             fontSize: `${zoomLevel}rem`,
             lineHeight: 1.6
           }}
         >
-          {sentencesToDisplay.map((item, index) => (
-            <span
-              key={item.id}
-              ref={el => sentenceRefs.current[item.id] = el}
-              className={`
-                sentence
-                ${item.isEvidence ? 'evidence-sentence' : 'context-sentence'}
-                ${item.isOnCurrentPage ? 'on-current-page' : 'other-page'}
-                ${item.isEvidence ? `highlight-${(selectedProvenance.sentences_ids.indexOf(item.id)) % 3}` : ''}
-              `}
-              data-sentence-id={item.id}
-              title={`Sentence ${item.id}${item.isEvidence ? ' (Evidence)' : ' (Context)'}${
-                sentenceMapper ? ` - Page ${sentenceMapper.getPageForSentence(item.id)}` : ''
-              }`}
-            >
-              {item.sentence}
-              {index < sentencesToDisplay.length - 1 ? ' ' : ''}
-            </span>
-          ))}
+          {sentencesToDisplay.map((item, index) => renderSentence(item, index))}
         </div>
       </div>
 
@@ -206,10 +335,10 @@ const ProvenancePanel = ({
                 const mappingInfo = sentenceMapper?.getMappingInfo(sentenceId);
                 const confidence = mappingInfo?.confidence || 0;
                 return (
-                  <div 
+                  <div
                     key={sentenceId}
                     className="confidence-segment"
-                    style={{ 
+                    style={{
                       width: `${100 / selectedProvenance.sentences_ids.length}%`,
                       backgroundColor: `hsl(${confidence * 120}, 70%, 50%)`,
                       opacity: 0.7
@@ -220,7 +349,7 @@ const ProvenancePanel = ({
               })}
             </div>
           </div>
-          
+
           <div className="summary-item">
             <strong>Page Distribution:</strong>
             <div className="page-distribution">

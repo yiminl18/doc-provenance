@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import '../styles/brutalist-design.css';
+import '../styles/preloaded-docs-modal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUpload, faArrowRight, faFileAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { 

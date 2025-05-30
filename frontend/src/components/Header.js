@@ -5,7 +5,7 @@ import { faRocket, faTerminal, faFileAlt, faDatabase, faUpload } from '@fortawes
 
 const Header = ({ 
   activeDocument, 
-  onShowPreloaded, 
+  onShowPreloaded,
   onUploadDocument,
   currentSession,
   sessionStats 
@@ -79,8 +79,6 @@ const Header = ({
           <FontAwesomeIcon icon={faTerminal} />
           <span>{sessionStatus.status}</span>
         </div>
-
-
       </div>
       
       <div className="header-right">
@@ -90,8 +88,11 @@ const Header = ({
             <div className="active-document-info">
               <FontAwesomeIcon icon={faFileAlt} />
               <span className="doc-name">{activeDocument.filename}</span>
-              {activeDocument.isPreloaded && (
+              {activeDocument.isPreloadedOrigin && (
                 <span className="preloaded-badge">📚</span>
+              )}
+              {activeDocument.isSessionDocument && (
+                <span className="session-badge">📋</span>
               )}
             </div>
           )}
@@ -106,14 +107,14 @@ const Header = ({
             <span>Upload PDF</span>
           </button>
           
-          {/* Browse Papers Button */}
+          {/* Browse Documents Button - Updated */}
           <button 
             className="header-action-btn"
             onClick={onShowPreloaded}
-            title="Browse Research Papers"
+            title="Browse Session Documents"
           >
             <FontAwesomeIcon icon={faDatabase} />
-            <span>Browse Papers</span>
+            <span>Browse Documents</span>
           </button>
         </div>
       </div>

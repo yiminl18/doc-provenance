@@ -47,6 +47,7 @@ export const getSessionSummary = async (sessionId) => {
 /**
  * Get session statistics
  */
+
 export const getSessionsStats = async () => {
   try {
     const response = await axios.get(`${API_URL}/sessions/stats`);
@@ -56,6 +57,7 @@ export const getSessionsStats = async () => {
     throw new Error(error.response?.data?.error || error.message);
   }
 };
+
 
 // ===== UNIFIED DOCUMENT MANAGEMENT =====
 
@@ -77,6 +79,49 @@ export const uploadDocument = async (formData) => {
 };
 
 /**
+ * Load a document that's already in the session
+ */
+export const loadSessionDocument = async (sessionId, documentId) => {
+  try {
+    // For session documents, they're already "loaded" - just verify they exist
+    const sessionDocs = await getSessionDocuments(sessionId);
+    const targetDoc = sessionDocs.documents?.find(doc => doc.document_id === documentId);
+    
+    if (!targetDoc) {
+      throw new Error('Document not found in current session');
+    }
+    
+    return {
+      success: true,
+      document_id: documentId,
+      filename: targetDoc.filename,
+      text_length: targetDoc.text_length || 0,
+      sentence_count: targetDoc.sentence_count || 0,
+      is_session_document: true,
+      source_folder: targetDoc.source_folder || 'session',
+      message: `Document ${targetDoc.filename} ready for analysis`
+    };
+    
+  } catch (error) {
+    console.error('Error loading session document:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Get documents available in the current session (replaces getPreloadedDocuments)
+ */
+export const getSessionDocuments = async (sessionId) => {
+  try {
+    const response = await axios.get(`${API_URL}/sessions/${sessionId}/documents`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching session documents:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
  * Process a document for the current session
  */
 export const processDocumentForSession = async (documentId) => {
@@ -90,17 +135,88 @@ export const processDocumentForSession = async (documentId) => {
 };
 
 /**
- * Get preloaded documents - UI compatibility wrapper
+ * Enhanced document upload that automatically adds to current session
  */
-export const getPreloadedDocuments = async () => {
+export const uploadDocumentToSession = async (formData, sessionId) => {
   try {
-    const response = await axios.get(`${API_URL}/documents/preloaded`);
-    return response.data;
+    // First upload the document
+    const uploadResponse = await uploadDocument(formData);
+    
+    // Then process it for the session
+    if (sessionId && uploadResponse.success) {
+      try {
+        const processResponse = await processDocumentForSession(uploadResponse.document_id);
+        return {
+          ...uploadResponse,
+          session_processed: true,
+          session_id: sessionId,
+          text_length: processResponse.text_length || uploadResponse.text_length,
+          sentence_count: processResponse.sentence_count || uploadResponse.sentence_count
+        };
+      } catch (processError) {
+        console.warn('Document uploaded but session processing failed:', processError);
+        // Return upload success even if session processing fails
+        return {
+          ...uploadResponse,
+          session_processed: false,
+          session_processing_error: processError.message
+        };
+      }
+    }
+    
+    return uploadResponse;
   } catch (error) {
-    console.error('Error fetching preloaded documents:', error);
+    console.error('Error uploading document to session:', error);
     throw new Error(error.response?.data?.error || error.message);
   }
 };
+
+/**
+ * Enhanced session creation that includes document initialization info
+ */
+export const createNewSessionWithDocuments = async () => {
+  try {
+    const response = await axios.post(`${API_URL}/sessions/current`);
+    
+    if (response.data.success) {
+      // Get the documents that were initialized
+      const sessionDocs = await getSessionDocuments(response.data.session_id);
+      
+      return {
+        ...response.data,
+        available_documents: sessionDocs.documents || [],
+        total_documents_available: sessionDocs.total_documents || 0
+      };
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error creating new session with documents:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Get session summary including document availability
+ */
+export const getSessionSummaryWithDocuments = async (sessionId) => {
+  try {
+    const [summaryResponse, documentsResponse] = await Promise.all([
+      getSessionSummary(sessionId),
+      getSessionDocuments(sessionId)
+    ]);
+    
+    return {
+      ...summaryResponse,
+      available_documents: documentsResponse.documents || [],
+      total_documents_available: documentsResponse.total_documents || 0
+    };
+  } catch (error) {
+    console.error('Error getting session summary with documents:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
 
 /**
  * Load any document (unified - works for both uploaded and preloaded)
@@ -598,14 +714,18 @@ export default {
   // Session Management
   getCurrentSession,
   createNewSession,
+  createNewSessionWithDocuments,
   getSessionSummary,
   getSessionsStats,
+  getSessionSummaryWithDocuments,
   
-  // Unified Document Management
+ // Document Management - Updated
   uploadDocument,
+  uploadDocumentToSession,
   processDocumentForSession,
-  getPreloadedDocuments,
+  getSessionDocuments,      // Primary way to get documents
   loadDocument,
+  loadSessionDocument,      // Load documents from session
   getDocumentText,
   getDocumentSentences,
   
@@ -633,6 +753,6 @@ export default {
   checkStatus,
   
   // Compatibility Aliases
-  loadPreloadedDocument,
-  uploadFile
+  loadPreloadedDocument: loadSessionDocument,
+  uploadFile: uploadDocumentToSession
 };

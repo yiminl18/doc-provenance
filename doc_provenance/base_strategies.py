@@ -6,6 +6,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 from openai import OpenAI
+from difflib import SequenceMatcher
 client = OpenAI()
 embedding_model = "text-embedding-3-small"
 from collections import deque
@@ -15,7 +16,7 @@ nltk.download("punkt")
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 sys.path.append(current_file_directory)
-from model import model #[gpt4o, gpt4vision, gpt4omini]
+from model import model 
 model_name = 'gpt4omini'
 
 def extract_text_from_pdf(pdf_path):
@@ -123,16 +124,20 @@ def eval_equivelance_rules(s):
     s = s.strip('.')
     return s
 
+def str_similarity(str1, str2):
+    similarity = SequenceMatcher(None, str1, str2).ratio()
+    return similarity
+
 def equal_string(res1, res2):
-    if(len(res1) != len(res2)):
-        return False
-    res1_lower = []
     for r in res1:
         if 'null' in r.lower():
             return False
     for r in res2:
         if 'null' in r.lower():
             return False
+    if(len(res1) != len(res2)):
+        return False
+    res1_lower = []
     # print('before:',res1)
     # print('before:',res2)
     for r in res1:
@@ -141,8 +146,14 @@ def equal_string(res1, res2):
     res2_lower = []
     for r in res2:
         res2_lower.append(eval_equivelance_rules(r).lower())
-    # print('after:',res1_lower)
-    # print('after:',res2_lower)
+
+    if len(res1_lower) == 1 and len(res2_lower) == 1:
+        str1 = res1_lower[0]
+        str2 = res2_lower[0]
+        #print('str_similarity:', str_similarity(str1, str2))
+        if len(str1) > 20 and len(str2) > 20 and str_similarity(str1, str2) > 0.9:
+            return True
+
     for r in res1_lower:
         if r not in res2_lower:
             return False
@@ -151,7 +162,8 @@ def equal_string(res1, res2):
             return False
     return True
 
-def equal(res1, res2, metric = 'string'):
+        
+def equal(res1, res2, question, metric = 'string'):
     res1 = sorted(res1)
     res2 = sorted(res2)
     #print(len(res1), len(res2))
@@ -159,14 +171,20 @@ def equal(res1, res2, metric = 'string'):
     if(metric == 'string'):
         return equal_string(res1, res2)
     else:
-        instruct_prompt = 'Determine if two strings are equivalent in meaning, not just in format. Lists must contain the same elements, allowing for alternative spellings, transliterations, or equivalent name variations. Missing or extra elements make them unequal. Dates in different formats should be considered equivalent if they represent the same time. Ignore case, punctuation, and spacing unless they change meaning. Return True if the strings are equivalent and False otherwise. Do not add explanations. ' 
+        #check NULL answer
+        for r in res1:
+            if 'null' in r.lower():
+                return False
+        for r in res2:
+            if 'null' in r.lower():
+                return False
+        instruction = 'I have two answers to the given question. If these two answers are equivalent in meaning, return True; otherwise, return False. Do not provide any explanation. ' + 'Answer 1: ' + ''.join(res1) + ' Answer 2: ' + ''.join(res2) + ' Question: ' + question[0] 
         if equal_string(res1, res2):
+            #print('Return true in string metric')
             return True
         if len(res1) != len(res2):
             return False 
         if(len(res1) > 1 or len(res2) > 1):
-            print('LLM evaluation1')
-            instruction = instruct_prompt + ' String 1 is: ' + " ".join(res1) + ' String 2 is: ' + " ".join(res2)
             response = model(model_name, (instruction, ''))
             if('true' in response.lower()):
                 return True
@@ -174,13 +192,7 @@ def equal(res1, res2, metric = 'string'):
         if(len(res1) == 1 and len(res2) == 1):
             str1 = res1[0]
             str2 = res2[0]
-            if len(str1) > 2*len(str2) or len(str2) > 2*len(str1):
-                print('length mis-match')
-                return False
-            print('LLM evaluation2')
-            instruction = 'Given the following two strings, String 1 is: '  + res1[0] + '. String 2 is: ' + res2[0] + '. ' + instruct_prompt
             response = model(model_name, (instruction, ''))
-            #print(instruction)
             if('true' in response.lower()):
                 return True
             return False
@@ -285,7 +297,7 @@ def exponential_greedy_core(question, answers, sentences, sorted_idx = [], metri
         input_tokens += input_token
         output_tokens += output_token
 
-        #print(skip_ids, eval_result)
+        print(skip_ids, eval_result)
 
         if eval_result == True:#if removing this sentence does not change the final answers, then these sentences can be removed 
             removed_sentences += skip_ids
@@ -300,7 +312,7 @@ def exponential_greedy_core(question, answers, sentences, sorted_idx = [], metri
 
     provenance = []
     provenance_id = []
-    for i in range(len(sentences)):
+    for i in sorted_idx:
         if i in removed_sentences:
             continue
         provenance_id.append(i)
@@ -379,9 +391,6 @@ def sequential_greedy_core(question, answers, sentences, title, sorted_idx = [],
 
     return out 
 
-binary_out_ids = []
-sum_input_tokens = 0
-sum_output_tokens = 0
 
 def block_labeler(sentences, question, answers, blk_num):
     blocks = []
@@ -415,8 +424,8 @@ def block_labeler(sentences, question, answers, blk_num):
         context += 'Block ' + str(id) + ': ' + blocks[id] + '\n'
     prompt = (instruction, context)
     print(count_tokens(context))
-    response = model(model_name, prompt)
-    #print(response)
+    response = model('gpt4o', prompt)
+    print(response)
     scores = [int(num.strip()) for num in response.split(",")]
     block_scores = {}
     #print(scores)
@@ -439,73 +448,40 @@ def block_labeler(sentences, question, answers, blk_num):
 
 
 
-def divide_and_conquer_progressive_API(raw_question, text, result_path, k=5, stop_sentence_length = 5,  metric = 'string'):
-    global binary_out_ids,sum_input_tokens,sum_output_tokens
-    sum_input_tokens = 0
-    sum_output_tokens = 0
-    binary_out_ids = []
-    instruction = 'Only return the answer. Do not add explanations. '
+def divide_and_conquer_progressive_API(raw_question, text, result_path, k=5, stop_sentence_length = 5, metric = 'string'):
+    print('model', model_name)
+    instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
     question = (raw_question, instruction)
     answers, input_tokens, output_tokens = QA(question,text)
-    print('Answers:',answers)
+    #print('Answers:',answers)
     sentences = extract_sentences_from_pdf(text)
-    answer_path = result_path + '/answers.txt'
-    #print(answers)
-    write_string_to_file(answer_path, ''.join(answers))
+    # answer_path = result_path.replace('.json', '_answer.json')  
+    # provenance_path = result_path.replace('.json', '_provenance.json') 
+    answer_path = result_path + 'answer.json' 
+    provenance_path = result_path + 'provenance.json' 
+    print(result_path, provenance_path)
+    answer_log = {}
+    answer_log['question'] = question
+    answer_log['answer'] = answers
+    answers_str = ''.join(answers)
+    if 'null' in answers_str.lower():
+        answer_log['answer'] = 'Answer is not found.'
+        write_json_to_file(answer_path, answer_log)
+        write_json_to_file(provenance_path, [])
+        return 
+    write_json_to_file(answer_path, answer_log)
     blk_num = len(sentences)/k
     blk_num = min(20, blk_num)
-    #print(blk_num, len(sentences))
-    block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
 
-    for id, score in block_scores.items():
-        print(score)
+    block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
 
     ids = []
     for i in range(len(sentences)):
         ids.append(i)
     
-    provenance_path = result_path + '/provenance.json'
-    divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric = metric, result_path = provenance_path)
+    print('starting topk...')
+    divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, provenance_path, metric = metric)
 
-def divide_and_conquer_progressive(question, text, title, path, k, stop_sentence_length = 5,  metric = 'string'):
-    #k: the length of sentnces in the interval to stop iteration, k can be decided based on the cost of divide_and_conquer and greedy on last mile, in different scenarios  
-    global binary_out_ids,sum_input_tokens,sum_output_tokens
-    sum_input_tokens = 0
-    sum_output_tokens = 0
-    binary_out_ids = []
-    
-    answers, input_tokens, output_tokens = QA(question,text)
-    sentences = extract_sentences_from_pdf(text)
-    print(answers, len(text), question)
-    blk_num = len(sentences)/k
-    blk_num = min(20, blk_num)
-    print(blk_num, len(sentences))
-    block_scores, blocks_sentences_id = block_labeler(sentences, question, answers, blk_num)
-
-
-    out = {}
-    out['title'] = title
-    out['question'] = question
-    out['answers'] = answers
-    out['path'] = path
-    out['context_size'] = count_tokens(text)
-
-    ids = []
-    
-    for i in range(len(sentences)):
-        ids.append(i)
-    st = time.time()
-
-    break_down_latency, break_down_cost, break_down_provenance_ids = divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric)
-    et = time.time()
-    out['time'] = et-st
-    out['time_breakdown'] = break_down_latency
-
-    out['tokens'] = (sum_input_tokens, sum_output_tokens)
-    out['tokens_breakdown'] = break_down_cost
-
-    out['provenance_ids_breakdown'] = break_down_provenance_ids 
-    write_json_to_file(path, out)
 
 def block_decider(left_ids, right_ids, block_scores, blocks_sentences_id):
     # print(left_ids)
@@ -560,12 +536,11 @@ def block_decider(left_ids, right_ids, block_scores, blocks_sentences_id):
     return right_ids
 
 provenance_topk_results = []
-topk_provenance_id = 0
 
 def store_provenance():
     a=0
 
-def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, metric = 'string', result_path = ''):
+def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, result_path, metric = 'string'):
     """
     Attempt to find a smaller subset of `sentences` that returns True for H,
     using a divide-and-conquer approach but in a non-recursive (queue-based) way.
@@ -574,17 +549,12 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
     Returns:
         True if the entire input `ids` subset is True under `evaluate`,
         False otherwise.
-    
-    Side-effects:
-        - Appends to the global list `binary_out_ids` those IDs that
-          we deem necessary.
-        - Accumulates token usage in `sum_input_tokens` and `sum_output_tokens`.
     """
-    global binary_out_ids, sum_input_tokens, sum_output_tokens, topk_provenance_id, provenance_topk_results
 
-    break_down_latency = {}
-    break_down_provenance_ids = {}
-    break_down_cost = {}
+    topk_provenance_id = 0
+    sum_input_tokens = 0
+    sum_output_tokens = 0
+    provenance_topk_results = []
 
     father = {}
     rib = {}
@@ -612,16 +582,17 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
 
     # Use a queue to perform an iterative, divide-and-conquer approach
     stack = [ids]
+    set_cached(ids, True) 
 
     # current_ids has alredy been runed, set its status 
     #set_cached(ids, True)
+    print('topk_provenance_id',topk_provenance_id)
 
     while stack:
         current_ids = stack.pop()
         #print(current_ids)
         if topk_provenance_id >= k:
             continue
-
         # Evaluate the entire set once, storing the result
         if is_cached(current_ids) == 'NULL':
             eval_result, input_token, output_token = evaluate(answers, question, current_ids, sentences, metric = metric)
@@ -631,7 +602,7 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
         else:
             eval_result = is_cached(current_ids)
 
-        #print(current_ids, eval_result)
+        print(current_ids, eval_result)
         # If the entire set doesn't yield True, no need to proceed
 
         tuple_current_ids = tuple(current_ids)
@@ -646,6 +617,8 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
                 if not eval_rib:
                     #in this case, father node is true, but both childs are false, add father node into last_mile operator
                     #print('Starting exponential_greedy_core...')
+                    # if len(list(father_node)) >= 20:
+                    #     continue
                     out = exponential_greedy_core(question, answers, sentences, sorted_idx = list(father_node))
                     provenance_ids = out['provenance_ids']
                     print('Top-'+ str(topk_provenance_id),' provenance:',provenance_ids)
@@ -657,13 +630,15 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
                     print('Output tokens:', sum_output_tokens)
                     print('Time:', time.time() - st)
 
-                    break_down_latency[topk_provenance_id] = time.time()-st
-                    break_down_cost[topk_provenance_id] = (sum_input_tokens,sum_output_tokens)
-                    break_down_provenance_ids[topk_provenance_id] = provenance_ids
+                    # break_down_latency[topk_provenance_id] = time.time()-st
+                    # break_down_cost[topk_provenance_id] = (sum_input_tokens,sum_output_tokens)
+                    # break_down_provenance_ids[topk_provenance_id] = provenance_ids
 
                     provenance_object = {}
                     provenance_object['provenance_id'] = topk_provenance_id
-                    provenance_object['sentences_ids'] = provenance_ids
+                    provenance_object['input_sentence_ids'] = list(father_node)
+                    provenance_object['provenance_ids'] = provenance_ids
+                    provenance_object['provenance'] = provenance_context
                     provenance_object['time'] = time.time() - st
                     provenance_object['input_token_size'] = sum_input_tokens
                     provenance_object['output_token_size'] = sum_output_tokens
@@ -687,13 +662,15 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
             print('Output tokens:', sum_output_tokens)
             print('Time:', time.time() - st)
 
-            break_down_latency[topk_provenance_id] = time.time()-st
-            break_down_cost[topk_provenance_id] = (sum_input_tokens,sum_output_tokens)
-            break_down_provenance_ids[topk_provenance_id] = provenance_ids
+            # break_down_latency[topk_provenance_id] = time.time()-st
+            # break_down_cost[topk_provenance_id] = (sum_input_tokens,sum_output_tokens)
+            # break_down_provenance_ids[topk_provenance_id] = provenance_ids
 
             provenance_object = {}
             provenance_object['provenance_id'] = topk_provenance_id
-            provenance_object['sentences_ids'] = provenance_ids
+            provenance_object['input_sentence_ids'] = current_ids
+            provenance_object['provenance_ids'] = provenance_ids
+            provenance_object['provenance'] = provenance_context
             provenance_object['time'] = time.time() - st
             provenance_object['input_token_size'] = sum_input_tokens
             provenance_object['output_token_size'] = sum_output_tokens
@@ -729,141 +706,9 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
             if is_cached(right) == 'NULL':
                 stack.append(right)
 
-    return break_down_latency, break_down_cost, break_down_provenance_ids
+    #return break_down_latency, break_down_cost, break_down_provenance_ids
             
         
-
-def divide_and_conquer(question, text, title, path,metric = 'string'):
-    global binary_out_ids,sum_input_tokens,sum_output_tokens
-    sum_input_tokens = 0
-    sum_output_tokens = 0
-    binary_out_ids = []
-    answers, input_tokens, output_tokens = QA(question,text)
-    print(answers)
-
-    out = {}
-    out['title'] = title
-    out['question'] = question
-    out['answers'] = answers
-    out['path'] = path
-    out['context_size'] = count_tokens(text)
-
-    st = time.time()
-    ids = []
-    sentences = extract_sentences_from_pdf(text)
-    for i in range(len(sentences)):
-        ids.append(i)
-    divide_and_conquer_iterative_with_cache(answers, question, ids, sentences, metric)
-    binary_out_ids = list(set(binary_out_ids))
-    binary_out_ids = sorted(binary_out_ids)
-    #print(binary_out_ids)
-    et = time.time()
-    out['time'] = et-st
-    out['tokens'] = (input_tokens, output_tokens)
-    out['provenance_ids'] = binary_out_ids 
-    provenance = []
-    for id in binary_out_ids:
-        provenance.append(sentences[id])
-    out['provenance'] = provenance
-    out['provenance_size'] = count_tokens(''.join(provenance))
-    write_json_to_file(path, out)
-
-
-
-
-def divide_and_conquer_iterative_with_cache(answers, question, ids, sentences, metric = 'string'):
-    """
-    Attempt to find a smaller subset of `sentences` that returns True for H,
-    using a divide-and-conquer approach but in a non-recursive (queue-based) way.
-    Adds a caching mechanism to avoid re-evaluating the same subsets.
-    
-    Returns:
-        True if the entire input `ids` subset is True under `evaluate`,
-        False otherwise.
-    
-    Side-effects:
-        - Appends to the global list `binary_out_ids` those IDs that
-          we deem necessary.
-        - Accumulates token usage in `sum_input_tokens` and `sum_output_tokens`.
-    """
-    global binary_out_ids, sum_input_tokens, sum_output_tokens
-    
-    # A dictionary to cache evaluation results: { (ids_as_tuple): (eval_result, input_tokens, output_tokens) }
-    eval_cache = {}
-    
-    def is_cached(sub_ids):
-        """
-        A helper function to wrap 'evaluate', storing and retrieving results from 'eval_cache'.
-        """
-        # Convert the list of IDs to a tuple so it can be used as a dictionary key
-        key = tuple(sub_ids)
-        
-        # Return cached result if we already have it
-        if key in eval_cache:
-            return eval_cache[key]
-        
-        return 'NULL'
-    
-    def set_cached(sub_ids, result):
-        key = tuple(sub_ids)
-        eval_cache[key] = result 
-
-    # Use a queue to perform an iterative, divide-and-conquer approach
-    queue = deque()
-    queue.append(ids)
-
-    while queue:
-        current_ids = queue.popleft()
-
-        # Evaluate the entire set once, storing the result
-        if is_cached(current_ids) == 'NULL':
-            eval_result, input_token, output_token = evaluate(answers, question, current_ids, sentences, metric)
-            sum_input_tokens += input_token
-            sum_output_tokens += output_token
-            set_cached(current_ids, eval_result)
-        else:
-            eval_result = is_cached(current_ids)
-
-        print(current_ids, eval_result)
-        # If the entire set doesn't yield True, no need to proceed
-        if not eval_result:
-            continue
-        if eval_result and len(current_ids) <= 1:
-            binary_out_ids += current_ids
-            continue
-
-        # Split the current subset into two halves
-        mid = len(current_ids) // 2
-        left = current_ids[:mid]
-        right = current_ids[mid:]
-
-        # Evaluate left and right subsets (using cache)
-        if is_cached(left) == 'NULL':
-            eval_result_left, input_token_left, output_token_left = evaluate(answers, question, left, sentences, metric)
-            sum_input_tokens += input_token_left
-            sum_output_tokens += output_token_left
-            set_cached(left, eval_result_left)
-        else:
-            eval_result_left = is_cached(left)
-
-        if is_cached(right) == 'NULL':
-            eval_result_right, input_token_right, output_token_right = evaluate(answers, question, right, sentences, metric)
-            sum_input_tokens += input_token_right
-            sum_output_tokens += output_token_right
-            set_cached(right, eval_result_right)
-        else:
-            eval_result_right = is_cached(right)
-
-        # If both halves fail individually (False) but the entire set was True,
-        # we consider the whole subset as necessary and skip further splitting
-        if (not eval_result_left) and (not eval_result_right) and eval_result:
-            binary_out_ids += current_ids
-            continue
-        
-        if(eval_result_left):
-            queue.append(left)
-        if(eval_result_right):
-            queue.append(right)
 
 def cosine_sim(vec1, vec2):
     return cosine_similarity([vec1], [vec2])[0][0]
@@ -1093,49 +938,6 @@ def verification(metric='string'):
 
         #print(strategy, accuracy, len(runs[strategy]))
 
-def test_paper_pipeline():
-    data_path = parent_directory + '/data/papers.json'
-    folder_path = parent_directory + '/out/papers'
-    paper_objects = data_digestion.digest_paper_dataset(data_path)
-    sample_paper_questions = data_digestion.sample_paper_questions()
-
-    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk','exponential_greedy','divide_and_conquer_progressive']
-    strategy = 'divide_and_conquer_progressive'
-    doc_num = 5
-
-    for q_id in range(len(sample_paper_questions)):
-        q = sample_paper_questions[q_id]
-        for p_id in range(len(paper_objects)):
-            paper = paper_objects[p_id]
-            path = folder_path + '/results/' + 'doc' + str(p_id) + '_q' + str(q_id) + '_' + strategy + '.json'
-            if p_id != 0 or q_id != 0:
-                continue
-            # if os.path.isfile(path):
-            #     continue
-            if(p_id >= doc_num):
-                break
-            text = paper['text']
-            title = paper['title']
-            print(path)
-            print(title,q)
-            embedding_path = folder_path + '/embeddings/' + 'doc' + str(p_id) + '_embeddings.npy'
-            if strategy == 'vallina_LLM':
-                vallina_LLM(q, text, title, path)
-            elif strategy == 'sequential_greedy':
-                sequential_greedy(q, text, title, path) 
-            elif strategy == 'divide_and_conquer': 
-                divide_and_conquer(q, text, title, path)
-            elif strategy == 'divide_and_conquer_progressive': 
-                divide_and_conquer_progressive(q, text, title, path, 5)
-            elif strategy == 'heuristic_greedy':
-                heuristic_greedy(q, text, title, path, embedding_path) 
-            elif strategy == 'heuristic_topk':
-                heuristic_topk(q, text, title, path, embedding_path)
-            elif strategy == 'exponential_greedy':
-                exponential_greedy(q, text, title, path)
-    
-            #break
-        #break
 
 def if_rerun(path):
     df = read_json(path)
@@ -1143,51 +945,6 @@ def if_rerun(path):
         return False
     return True
 
-def test_hotpot_pipeline():
-    data_path = parent_directory + '/data/hotpotQA_fullwiki.json'
-    folder_path = parent_directory + '/out/hotpotQA'
-    hotpot_objects = data_digestion.digest_hotpotQA_dataset(data_path)
-
-    strategies = ['vallina_LLM','sequential_greedy','divide_and_conquer','heuristic_greedy','heuristic_topk','exponential_greedy','divide_and_conquer_progressive']
-    strategy = 'divide_and_conquer_progressive'
-    num_of_case = 10
-
-    i = -1
-    for e in hotpot_objects:
-        i += 1
-        question = e['question']
-        instruction = e['instruction']
-        q = (question, instruction)
-        text = e['context']
-        title = e['document_name']
-        path = folder_path + '/results/' + 'hotpot' + '_q' + str(i) + '_' + strategy + '.json'
-        if not os.path.exists(folder_path + '/results'):
-            os.makedirs(folder_path + '/results')
-        # if if_rerun(path):
-        #     continue
-        if i != 11:
-            continue
-        # if os.path.isfile(path):
-        #     continue
-        print(path)
-        embedding_path = folder_path + '/embeddings/' + 'hotpot' + '_q' + str(i) + '_embeddings.npy'
-        if strategy == 'vallina_LLM':
-            vallina_LLM(q, text, title, path)
-        elif strategy == 'sequential_greedy':
-            sequential_greedy(q, text, title, path, metric = 'LLM') 
-        elif strategy == 'divide_and_conquer': 
-            divide_and_conquer(q, text, title, path)
-        elif strategy == 'divide_and_conquer_progressive': 
-            divide_and_conquer_progressive(q, text, title, path, 5)
-        elif strategy == 'heuristic_greedy':
-            heuristic_greedy(q, text, title, path, embedding_path) 
-        elif strategy == 'heuristic_topk':
-            heuristic_topk(q, text, title, path, embedding_path)
-        elif strategy == 'exponential_greedy':
-            exponential_greedy(q, text, title, path)
-        #break
-        if(i > num_of_case):
-            break
 
 def verify_evaluation_equivelance(text, question):
     out = {}

@@ -28,7 +28,7 @@ def set_model(model_name):
     global model_cheap
     global model_expensive
     model_cheap = model_name
-    model_expensive = model_name
+    model_expensive = 'gpt4o'
 
 def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path)
@@ -224,21 +224,20 @@ def equal(res1, res2, question, metric = 'string'):
             return False 
         if(len(res1) > 1 or len(res2) > 1):
             #print('LLM evaluation with different lengths')
-            response = model(model_cheap, (instruction, ''))
+            response = model(model_expensive, (instruction, ''))
             if('true' in response.lower()):
                 return True
             return False
         if(len(res1) == 1 and len(res2) == 1):
             str1 = res1[0]
             str2 = res2[0]
-            if len(str1) > 2*len(str2) or len(str2) > 2*len(str1):
-                #print('length mis-match')
-                return False
-            if len(str1) < 20 and len(str2) < 20: 
-                #print('Evaluated in string')
-                return equal_string(res1, res2)
-            #print('LLM evaluation with same length')
-            response = model(model_cheap, (instruction, ''))
+            # if len(str1) > 2*len(str2) or len(str2) > 2*len(str1):
+            #     print('length mis-match')
+            #     return False
+            # if len(str1) < 20 and len(str2) < 20: 
+            #     #print('Evaluated in string')
+            #     return equal_string(res1, res2)
+            response = model(model_expensive, (instruction, ''))
             #print(instruction)
             if('true' in response.lower()):
                 return True
@@ -742,9 +741,10 @@ def LLM_score_sufficient_bottem_up_operator(question, answers, sentences, sorted
 
 
 def LLM_vanilla(question, context, title, path, model_name):
-    answers, input_tokens, output_tokens = QA(question,context)
-    print(question)
-    print(answers)
+    # print(question)
+    # answers, input_tokens, output_tokens = QA(question,context)
+    answers = ['Officer Christopher Messick']
+    #print(answers)
     answers_str = ''.join(answers)
     if 'null' in answers_str.lower():
         out = {}
@@ -765,6 +765,7 @@ def LLM_vanilla(question, context, title, path, model_name):
     instruction = 'Given the following question: ' + question[0] + ', the corresponding answers are: ' + ','.join(answers) +  '. Your task is to extract the set of sentences from the provided context that contribute to generating these answers. Identify the most relevant sentences that support the given answers. Make sure these sentences are raw sentences from the document. Do not add explanations. Do not create new words or sentences. The context is as follows: '
     prompt = (instruction, context)
     response = model(model_name, prompt)
+    print(response)
     et = time.time()
     out['time'] = et-st
     out['provenance'] = response
@@ -772,7 +773,7 @@ def LLM_vanilla(question, context, title, path, model_name):
     input_tokens = count_tokens(instruction + context)
     output_tokens = count_tokens(response)
     out['tokens'] = (input_tokens, output_tokens)
-    write_json_to_file(path, out)
+    #write_json_to_file(path, out)
     return out
 
 def caller(question, answers, sentences, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = '', sufficient_time = -1, sufficient_tokens = (-1,-1), sufficient_provenance_ids = [-1], sufficient_eval_latency  = -1):
@@ -824,11 +825,11 @@ def caller(question, answers, sentences, find_sufficient_provenance_strategy, fi
     return minimal_provenance_ids, (sufficient_input_tokens + minimal_input_tokens, sufficient_output_tokens + minimal_output_tokens), sufficient_eval_latency + minimal_eval_latency
 
 def logger(text, q, title, model_name, path, find_sufficient_provenance_strategy, find_minimal_provenance_strategy, metric = 'string', embedding_path = '', sufficient_time = -1, sufficient_tokens = (-1,-1), sufficient_provenance_ids = [-1], sufficient_eval_latency = -1):     
-    set_model(model_name)
+    set_model('gpt4o')
     print('used models:', model_cheap, model_expensive)
     global question
     question = q 
-    logs = {}
+    logs = {} 
     logs['title'] = title
     logs['question'] = question
     logs['document_size'] = count_tokens(text)
@@ -854,6 +855,7 @@ def logger(text, q, title, model_name, path, find_sufficient_provenance_strategy
         logs['status'] = 'NA'#null answers
         write_json_to_file(path, logs)
         return logs 
+    print(len(answers_str))
     if len(answers_str) > 300:
         logs['status'] = 'LA'#long answers
         write_json_to_file(path, logs)
@@ -888,3 +890,15 @@ def logger(text, q, title, model_name, path, find_sufficient_provenance_strategy
     #print('provenance time:', logs['time'])
     print(input_tokens, output_tokens)
     return logs 
+
+if __name__ == "__main__":
+    pdf_path = '/Users/yiminglin/Documents/Codebase/doc-provenance/tests/data/police_records/1715882251765-owf-1.pdf'
+    out_path = '/Users/yiminglin/Documents/Codebase/doc-provenance/tests/out/1715882251765-owf-1.json' 
+
+    question = 'What are the names of police officers who used force with both a Baton and Knee before February 10? Only return the officer names. Exclude explanation. ' 
+
+    pdf_text = extract_text_from_pdf(pdf_path)
+    set_model('gpt4o')
+    LLM_vanilla(question, pdf_text, '1715882251765-owf-1', out_path, 'gpt4o')
+
+    

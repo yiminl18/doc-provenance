@@ -16,62 +16,17 @@ import {
   faRefresh,
   faTrash
 } from '@fortawesome/free-solid-svg-icons';
-import CleanupManager from './CleanupManager';
-import { getSessionsStats, createNewSession } from '../services/api';
 
 const Sidebar = ({ 
   documents, 
   activeDocumentId, 
   onDocumentSelect, 
-  onUploadNewDocument,
-  currentSessionId,
-  onSessionChanged
+  onUploadNewDocument
 }) => {
-  const [showCleanupManager, setShowCleanupManager] = useState(false);
-  const [sessionStats, setSessionStats] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
 
   const documentList = Array.from(documents.values()).sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
-
-  // Load session stats
-  useEffect(() => {
-    loadSessionStats();
-  }, [currentSessionId]);
-
-  const loadSessionStats = async () => {
-    try {
-      const stats = await getSessionsStats();
-      setSessionStats(stats);
-    } catch (error) {
-      console.error('Error loading session stats:', error);
-    }
-  };
-
-  const handleNewSession = async () => {
-    try {
-      setRefreshing(true);
-      const response = await createNewSession();
-      if (response.success) {
-        // Notify parent component
-        onSessionChanged?.(response.session_id);
-        await loadSessionStats();
-      }
-    } catch (error) {
-      console.error('Error creating new session:', error);
-      alert('Failed to create new session');
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
-  const handleCleanupComplete = async () => {
-    // Refresh stats after cleanup
-    await loadSessionStats();
-    // Notify parent that session may have changed
-    onSessionChanged?.(currentSessionId);
-  };
 
   const getDocumentStats = (doc) => {
     const questions = Array.from(doc.questions.values());
@@ -108,65 +63,13 @@ const Sidebar = ({
     return date.toLocaleDateString().replace(/\//g, '.');
   };
 
-  const formatBytes = (bytes) => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-  };
+  
 
   return (
     <>
       <div className="sidebar">
         <div className="sidebar-content">
-          {/* Session Info */}
-          <div className="session-info">
-            <div className="session-header">
-              <FontAwesomeIcon icon={faRocket} />
-              <span className="session-label">Current Session</span>
-            </div>
-            <div className="session-id">
-              {currentSessionId ? currentSessionId.split('_')[1] : 'Loading...'}
-            </div>
-            {sessionStats && (
-              <div className="session-stats-mini">
-                <div className="mini-stat">
-                  <span>{sessionStats.total_documents}</span>
-                  <span>docs</span>
-                </div>
-                <div className="mini-stat">
-                  <span>{sessionStats.total_questions}</span>
-                  <span>questions</span>
-                </div>
-                <div className="mini-stat">
-                  <span>{formatBytes(sessionStats.total_size_bytes)}</span>
-                  <span>data</span>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          {/* Session Controls */}
-          <div className="session-controls">
-            <button 
-              className="session-control-btn new-session"
-              onClick={handleNewSession}
-              disabled={refreshing}
-            >
-              <FontAwesomeIcon icon={refreshing ? faRefresh : faPlus} spin={refreshing} />
-              <span>New Session</span>
-            </button>
-            
-            <button 
-              className="session-control-btn cleanup"
-              onClick={() => setShowCleanupManager(true)}
-            >
-              <FontAwesomeIcon icon={faBroom} />
-              <span>Manage Data</span>
-            </button>
-          </div>
-
+         
           {/* Upload New Document */}
           <button className="upload-new-document-btn" onClick={onUploadNewDocument}>
             <FontAwesomeIcon icon={faUpload} style={{ marginRight: '8px' }} />
@@ -272,143 +175,13 @@ const Sidebar = ({
             </div>
           </div>
           
-          <div className="sidebar-nav">
-            <div className="nav-item active">
-              <FontAwesomeIcon icon={faFileAlt} />
-              <span>Documents</span>
-              <div className="nav-badge">{documentList.length}</div>
-            </div>
-            <div className="nav-item">
-              <FontAwesomeIcon icon={faChartLine} />
-              <span>Analytics</span>
-              <div className="nav-badge">
-                {documentList.reduce((acc, doc) => 
-                  acc + getDocumentStats(doc).totalQuestions, 0
-                )}
-              </div>
-            </div>
-            <div className="nav-item" onClick={() => setShowCleanupManager(true)}>
-              <FontAwesomeIcon icon={faCog} />
-              <span>Settings</span>
-            </div>
-          </div>
+
         </div>
       </div>
 
-      {/* Cleanup Manager Modal */}
-      {showCleanupManager && (
-        <CleanupManager
-          currentSessionId={currentSessionId}
-          onSessionCleared={handleCleanupComplete}
-          onClose={() => setShowCleanupManager(false)}
-        />
-      )}
 
-      {/* Additional Styles */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .session-info {
-            background: #1a1a1a;
-            padding: 15px;
-            margin: 0 0 15px 0;
-            border-radius: 6px;
-            border: 1px solid #333;
-          }
-          
-          .session-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-          }
-          
-          .session-label {
-            font-size: 12px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-          }
-          
-          .session-id {
-            font-family: monospace;
-            font-size: 14px;
-            color: #00ff00;
-            margin-bottom: 10px;
-          }
-          
-          .session-stats-mini {
-            display: flex;
-            gap: 10px;
-          }
-          
-          .mini-stat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 10px;
-          }
-          
-          .mini-stat span:first-child {
-            font-weight: bold;
-            color: #fff;
-          }
-          
-          .mini-stat span:last-child {
-            color: #888;
-          }
-          
-          .session-controls {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-          }
-          
-          .session-control-btn {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #333;
-            background: #2a2a2a;
-            color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 11px;
-            transition: all 0.2s;
-          }
-          
-          .session-control-btn:hover:not(:disabled) {
-            background: #3a3a3a;
-            border-color: #555;
-          }
-          
-          .session-control-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-          }
-          
-          .session-control-btn.new-session {
-            border-color: #007bff;
-            color: #007bff;
-          }
-          
-          .session-control-btn.cleanup {
-            border-color: #ffc107;
-            color: #ffc107;
-          }
-          
-          .nav-item {
-            cursor: pointer;
-            transition: background-color 0.2s;
-          }
-          
-          .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-          }
-        `
-      }} />
+
+ 
     </>
   );
 };

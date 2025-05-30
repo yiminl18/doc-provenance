@@ -66,14 +66,7 @@
   margin-bottom: var(--space-4);
 }
 
-.provenance-output .session-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--primary-blue);
-}
+
 
 /* Chat history container */
 .provenance-output .chat-history {

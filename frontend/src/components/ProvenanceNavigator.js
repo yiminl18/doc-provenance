@@ -21,8 +21,7 @@ const ProvenanceNavigator = ({
   pdfDocument,
   onProvenanceSelect,
   onFeedbackRequest,
-  onHighlightInPDF,
-  currentSession 
+  onHighlightInPDF 
 }) => {
   const [currentProvenanceIndex, setCurrentProvenanceIndex] = useState(0);
   const [showProvenance, setShowProvenance] = useState(false); // New state to control provenance visibility
@@ -264,7 +263,7 @@ const ProvenanceNavigator = ({
     return (
       <div className="provenance-navigator get-provenance">
         <div className="get-provenance-state">
-          <FontAwesomeIcon icon={faSearch} size="2x" />
+          {/*<FontAwesomeIcon icon={faSearch} size="2x" />
           <h4>Answer Ready</h4>
           <p>Your question has been answered. Would you like to see the supporting evidence?</p>
           
@@ -275,7 +274,7 @@ const ProvenanceNavigator = ({
                 ? `${activeQuestion.answer.substring(0, 200)}...` 
                 : activeQuestion.answer}
             </div>
-          </div>
+          </div>*/}
           
           <div className="provenance-info">
             {availableProvenances.length > 0 ? (
@@ -369,11 +368,7 @@ const ProvenanceNavigator = ({
             <FontAwesomeIcon icon={faHighlighter} />
             Evidence Sources
           </h4>
-          {currentSession && (
-            <span className="session-badge">
-              Session: {currentSession.session_id?.split('_')[1] || 'Active'}
-            </span>
-          )}
+
         </div>
         
         <div className="provenance-counter">

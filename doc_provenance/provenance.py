@@ -888,4 +888,3 @@ def logger(text, q, title, model_name, path, find_sufficient_provenance_strategy
     #print('provenance time:', logs['time'])
     print(input_tokens, output_tokens)
     return logs 
-

@@ -6,6 +6,8 @@ import {
   faPaperPlane,
   faHistory,
   faRedo,
+  faEye,
+  faComment,
   faFileAlt,
   faClock,
   faCheck,
@@ -16,12 +18,13 @@ import {
 
 const QuestionCollection = ({ 
   pdfDocument, 
-  onQuestionSubmit, // function from App.js
-  currentSession
+  onQuestionSubmit,
+  onReaskQuestion
 }) => {
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [selectedHistoryQuestion, setSelectedHistoryQuestion] = useState(null);
   const inputRef = useRef(null);
   const historyRef = useRef(null);
 
@@ -63,7 +66,7 @@ const QuestionCollection = ({
       // Show user-friendly error message
       let errorMessage = 'Failed to submit question';
       if (error.message.includes('500')) {
-        errorMessage = 'Server error - please check your session and try again';
+        errorMessage = 'Server error';
       } else if (error.message.includes('network')) {
         errorMessage = 'Network error - please check your connection';
       } else if (error.message.includes('session')) {
@@ -80,8 +83,17 @@ const QuestionCollection = ({
     }
   };
 
-  // Handle re-asking a question
-  const handleReask = (questionText) => {
+  
+// Handle re-asking a question
+  const handleReask = (question) => {
+    if (isProcessing || isSubmitting) return;
+    
+    console.log('🔄 QuestionCollection: Re-asking question:', question.text);
+    onReaskQuestion(question);
+  };
+
+  // Handle quick-fill from history
+  const handleQuickFill = (questionText) => {
     if (isProcessing || isSubmitting) return;
     setCurrentQuestion(questionText);
     setSubmitError(null);
@@ -97,7 +109,6 @@ const QuestionCollection = ({
       inputRef.current.focus();
     }
   };
-
   // Handle keyboard shortcuts
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -106,19 +117,20 @@ const QuestionCollection = ({
     }
   };
 
-  // Auto-scroll history to bottom when new questions are added
+// Auto-scroll history to bottom when new questions are added
   useEffect(() => {
-    if (historyRef.current) {
-      historyRef.current.scrollTop = historyRef.current.scrollHeight;
+    if (historyRef.current && questionsHistory.length > 0) {
+      // Scroll to top to show most recent question
+      historyRef.current.scrollTop = 0;
     }
   }, [questionsHistory.length]);
 
-  // Focus input when component mounts
+  // Focus input when component mounts or document changes
   useEffect(() => {
-    if (inputRef.current) {
+    if (inputRef.current && pdfDocument) {
       inputRef.current.focus();
     }
-  }, []);
+  }, [pdfDocument]);
 
   // Clear submit error when user starts typing
   useEffect(() => {
@@ -135,7 +147,7 @@ const QuestionCollection = ({
   };
 
   const getQuestionStatus = (question) => {
-    if (question.hasError || question.processingStatus === 'error') {
+    if (question.processingStatus === 'error') {
       return { 
         icon: faExclamationTriangle, 
         color: '#dc3545', 
@@ -191,11 +203,7 @@ const QuestionCollection = ({
           <span className="question-count">
             {questionsHistory.length} questions
           </span>
-          {currentSession && (
-            <span className="session-indicator">
-              Session: {currentSession.session_id?.split('_')[1] || 'Active'}
-            </span>
-          )}
+         
         </div>
       </div>
 
@@ -270,7 +278,7 @@ const QuestionCollection = ({
             )}
           </div>
 
-          <div className="questions-history" ref={historyRef}>
+                    <div className="questions-history" ref={historyRef}>
             {questionsHistory.length === 0 ? (
               <div className="empty-history">
                 <div className="empty-icon">❓</div>
@@ -280,10 +288,13 @@ const QuestionCollection = ({
             ) : (
               questionsHistory.map((question) => {
                 const status = getQuestionStatus(question);
+                const isSelected = selectedHistoryQuestion?.id === question.id;
+                
                 return (
                   <div
                     key={question.id}
-                    className={`question-history-item ${status.className}`}
+                    className={`question-history-item ${status.className} ${isSelected ? 'selected' : ''}`}
+                    onClick={() => setSelectedHistoryQuestion(isSelected ? null : question)}
                   >
                     <div className="question-header">
                       <div className="question-status">
@@ -298,11 +309,6 @@ const QuestionCollection = ({
                         <div className="question-timestamp">
                           {formatTimestamp(question.createdAt)}
                         </div>
-                        {question.processingMethod && (
-                          <span className={`processing-method ${question.processingMethod}`}>
-                            {question.processingMethod === 'session-based' ? '🔄' : '⚡'}
-                          </span>
-                        )}
                       </div>
                     </div>
 
@@ -311,18 +317,12 @@ const QuestionCollection = ({
                     </div>
 
                     {/* Error Display */}
-                    {question.hasError && (
+                    {question.processingStatus === 'error' && (
                       <div className="question-error">
                         <FontAwesomeIcon icon={faExclamationTriangle} />
                         <span className="error-message">
                           {question.userMessage || 'Processing failed'}
                         </span>
-                        {question.errorDetails && (
-                          <details className="error-details">
-                            <summary>Error Details</summary>
-                            <pre>{JSON.stringify(question.errorDetails, null, 2)}</pre>
-                          </details>
-                        )}
                       </div>
                     )}
 
@@ -367,18 +367,30 @@ const QuestionCollection = ({
                         {question.isProcessing && (
                           <span className="loading-more">Loading more...</span>
                         )}
-                        {question.hiddenResultsMessage && (
-                          <span className="hidden-results">
-                            💡 {question.hiddenResultsMessage}
-                          </span>
-                        )}
                       </div>
                     )}
 
+                    {/* Question Actions */}
                     <div className="question-actions">
                       <button
-                        className="reask-btn"
-                        onClick={() => handleReask(question.text)}
+                        className="action-btn quick-fill"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleQuickFill(question.text);
+                        }}
+                        disabled={isProcessing || isSubmitting}
+                        title="Fill this question into the input box"
+                      >
+                        <FontAwesomeIcon icon={faEye} />
+                        <span>Use Question</span>
+                      </button>
+
+                      <button
+                        className="action-btn reask"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleReask(question);
+                        }}
                         disabled={isProcessing || isSubmitting}
                         title="Ask this question again"
                       >
@@ -388,7 +400,8 @@ const QuestionCollection = ({
 
                       {question.feedback && (
                         <span className="feedback-indicator">
-                          ✓ Feedback provided
+                          <FontAwesomeIcon icon={faComment} />
+                          <span>Feedback provided</span>
                         </span>
                       )}
 
@@ -405,8 +418,6 @@ const QuestionCollection = ({
           </div>
         </div>
       </div>
-
- 
     </div>
   );
 };

@@ -23,4 +23,3 @@ def chatGPT_api(message_content,temperature=0):
 def gpt_4o(prompt):
     message_content = prompt[0] + prompt[1]
     return chatGPT_api(message_content)
-

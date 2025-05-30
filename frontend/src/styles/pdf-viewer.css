@@ -587,3 +587,185 @@
   background-color: var(--win95-lightest);
   border-color: var(--primary-blue);
 }
+
+/* PDF Provenance Overlay Styles */
+
+.pdf-highlight-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.provenance-overlay {
+  position: absolute;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  
+  /* Ensure overlays are clickable */
+  pointer-events: auto;
+}
+
+.provenance-overlay:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  z-index: 15;
+}
+
+/* Different highlight styles for multiple provenances */
+.provenance-overlay[data-provenance-index="0"] {
+  background-color: rgba(255, 235, 59, 0.3);
+  border: 2px solid rgba(255, 235, 59, 0.8);
+}
+
+.provenance-overlay[data-provenance-index="1"] {
+  background-color: rgba(76, 175, 80, 0.3);
+  border: 2px solid rgba(76, 175, 80, 0.8);
+}
+
+.provenance-overlay[data-provenance-index="2"] {
+  background-color: rgba(33, 150, 243, 0.3);
+  border: 2px solid rgba(33, 150, 243, 0.8);
+}
+
+.provenance-overlay[data-provenance-index="3"] {
+  background-color: rgba(255, 152, 0, 0.3);
+  border: 2px solid rgba(255, 152, 0, 0.8);
+}
+
+.provenance-overlay[data-provenance-index="4"] {
+  background-color: rgba(156, 39, 176, 0.3);
+  border: 2px solid rgba(156, 39, 176, 0.8);
+}
+
+/* Pulse animation for newly added overlays */
+@keyframes provenance-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+.provenance-overlay.pulse {
+  animation: provenance-pulse 1s ease-in-out;
+}
+
+/* Highlight flash effect for clicked sentences */
+@keyframes sentence-highlight-flash {
+  0% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+  25% {
+    background-color: rgba(255, 235, 59, 0.6);
+    box-shadow: 0 0 0 4px rgba(255, 235, 59, 0.3);
+  }
+  75% {
+    background-color: rgba(255, 235, 59, 0.4);
+    box-shadow: 0 0 0 2px rgba(255, 235, 59, 0.2);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+.sentence-highlight-flash {
+  animation: sentence-highlight-flash 2s ease-in-out;
+}
+
+/* Focus state for overlays */
+.provenance-overlay:focus {
+  outline: 3px solid rgba(33, 150, 243, 0.8);
+  outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .provenance-overlay {
+    border-width: 3px; /* Thicker borders on mobile for better visibility */
+    min-height: 20px; /* Ensure minimum touch target */
+  }
+  
+  .provenance-overlay:hover {
+    transform: scale(1.05); /* Slightly more emphasis on mobile */
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .provenance-overlay {
+    border-width: 3px;
+    background-color: rgba(255, 255, 0, 0.5) !important;
+    border-color: rgba(0, 0, 0, 0.9) !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .provenance-overlay {
+    transition: none;
+  }
+  
+  .provenance-overlay:hover {
+    transform: none;
+  }
+  
+  .provenance-overlay.pulse {
+    animation: none;
+  }
+  
+  .sentence-highlight-flash {
+    animation: none;
+    background-color: rgba(255, 235, 59, 0.4);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .provenance-overlay {
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
+  }
+  
+  .provenance-overlay:hover {
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
+  }
+  
+  .provenance-overlay[data-provenance-index="0"] {
+    background-color: rgba(255, 235, 59, 0.4);
+    border-color: rgba(255, 235, 59, 0.9);
+  }
+  
+  .provenance-overlay[data-provenance-index="1"] {
+    background-color: rgba(76, 175, 80, 0.4);
+    border-color: rgba(76, 175, 80, 0.9);
+  }
+  
+  .provenance-overlay[data-provenance-index="2"] {
+    background-color: rgba(33, 150, 243, 0.4);
+    border-color: rgba(33, 150, 243, 0.9);
+  }
+  
+  .provenance-overlay[data-provenance-index="3"] {
+    background-color: rgba(255, 152, 0, 0.4);
+    border-color: rgba(255, 152, 0, 0.9);
+  }
+  
+  .provenance-overlay[data-provenance-index="4"] {
+    background-color: rgba(156, 39, 176, 0.4);
+    border-color: rgba(156, 39, 176, 0.9);
+  }
+}

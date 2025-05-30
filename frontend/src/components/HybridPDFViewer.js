@@ -20,7 +20,7 @@ import '../styles/pdf-viewer.css'
 import { SentencePDFMapper } from '../utils/SentencePDFMapper';
 import ProvenancePanel from './ProvenancePanel';
 
-const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode = false, navigationTrigger }) => {
+const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, navigationTrigger }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1.2);
   const [loading, setLoading] = useState(true);
@@ -42,8 +42,6 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
   const containerRef = useRef(null);
   const highlightLayerRef = useRef(null);
 
-
-
   // Initialize PDF.js worker once
   useEffect(() => {
     if (window.pdfjsLib && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
@@ -63,11 +61,10 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
     let url = '';
 
     if (pdfDocument.file) {
-      url = URL.createObjectURL(pdfDocument.file);
+      url = URL.createObjectURL(pdfDocument.filename);
       console.log('📁 Using file blob URL');
     } else {
-      const docId = pdfDocument.backendDocumentId || pdfDocument.id;
-      url = `/api/documents/${docId}/pdf`;
+      url = `/api/documents/${pdfDocument.filename}`;
       console.log('🔗 Using backend PDF URL:', url);
     }
 
@@ -123,36 +120,54 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
       setLoading(false);
     }
   };
-
-  const loadSentenceMapping = async (pdf) => {
-    try {
-      const docId = pdfDocument.backendDocumentId || pdfDocument.id;
-
-      const sentencesResponse = await fetch(`/api/documents/${docId}/sentences`);
-      if (!sentencesResponse.ok) {
-        throw new Error('Failed to load sentences');
-      }
-
-      const sentencesData = await sentencesResponse.json();
-      if (!sentencesData.success || !sentencesData.sentences) {
-        throw new Error('No sentence data available');
-      }
-
-      setSentences(sentencesData.sentences);
-
-      const mapper = new SentencePDFMapper();
-      const result = await mapper.initialize(pdf, sentencesData.sentences);
-
-      if (result.success) {
-        setSentenceMapper(mapper);
-        setMappingStats(mapper.getStatistics());
-        console.log('✅ Advanced sentence mapping completed:', result);
-      }
-
-    } catch (error) {
-      console.warn('Could not load sentence mapping:', error);
+const loadSentenceMapping = async (pdf) => {
+  try {
+  // Use the backend filename to construct sentences filename
+    const backendFilename = pdfDocument.filename;
+    console.log('🔄 PDF Document:', pdfDocument);
+    console.log('📄 Backend filename:', backendFilename);
+    const baseFilename = backendFilename.replace('.pdf', '');
+    const sentencesFilename = `${baseFilename}_sentences.json`;
+    
+    
+    console.log('📝 Base filename:', baseFilename);
+    console.log('📋 Sentences filename:', sentencesFilename);
+    
+    
+    // Use your existing file serving endpoint
+    const sentencesResponse = await fetch(`/api/documents/${backendFilename}/sentences`);
+    
+    if (!sentencesResponse.ok) {
+      throw new Error(`Sentences file not found: ${sentencesResponse.status}`);
     }
-  };
+    console.log('sentencesResponse:', sentencesResponse);
+    const sentences = await sentencesResponse.json();
+    console.log('📄 Loaded sentences data:', sentences);
+    
+    if (!Array.isArray(sentences['sentences'])) {
+      throw new Error('Invalid sentences data format - expected array');
+    }
+
+    setSentences(sentences['sentences']);
+    console.log('✅ Loaded', sentences['sentences'].length, 'sentences from', sentencesFilename);
+
+    // Initialize the sentence mapper
+    const mapper = new SentencePDFMapper();
+    const result = await mapper.initialize(pdf, sentences['sentences']);
+
+    if (result.success) {
+      setSentenceMapper(mapper);
+      setMappingStats(mapper.getStatistics());
+      console.log('✅ Sentence mapping completed:', result);
+    } else {
+      console.warn('⚠️ Sentence mapping failed:', result);
+    }
+
+  } catch (error) {
+    console.warn('Could not load sentence mapping:', error);
+    console.log('📄 PDF will work without sentence highlighting');
+  }
+};
 
   // Add effect to handle navigation triggers
   useEffect(() => {
@@ -168,33 +183,32 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
     }
   }, [navigationTrigger, sentenceMapper, currentPage]);
 
-
   const goToPage = (pageNum) => {
     if (pageNum >= 1 && pageNum <= totalPages) {
       setCurrentPage(pageNum);
     }
   };
 
-  // Render page when ready
+  // Enhanced render page with provenance overlay support
   useEffect(() => {
     if (pdfDoc && !loading) {
       const checkAndRender = () => {
         if (canvasRef.current) {
-          console.log('🎯 Canvas ready, rendering page', currentPage);
-          renderPage(currentPage);
+          console.log('🎯 Canvas ready, rendering page with provenance', currentPage);
+          renderPageWithProvenance(currentPage);
         } else {
           setTimeout(checkAndRender, 100);
         }
       };
       checkAndRender();
     }
-  }, [pdfDoc, loading, currentPage, zoomLevel]);
+  }, [pdfDoc, loading, currentPage, zoomLevel, selectedProvenance, showHighlights]);
 
-  const renderPage = async (pageNum) => {
+  const renderPageWithProvenance = async (pageNum) => {
     if (!pdfDoc || !canvasRef.current) return;
 
     try {
-      console.log(`🔄 Rendering page ${pageNum}...`);
+      console.log(`🔄 Rendering page ${pageNum} with provenance overlay...`);
 
       const page = await pdfDoc.getPage(pageNum);
       const viewport = page.getViewport({ scale: zoomLevel });
@@ -211,15 +225,18 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
         viewport: viewport
       };
 
+      // Render the PDF page
       await page.render(renderContext).promise;
+      
+      // Render text layer (important for text matching)
       await renderTextLayer(page, viewport);
 
-      // Light highlighting on main PDF (just to show general area)
+      // Add provenance overlays after a short delay to ensure text layer is ready
       if (selectedProvenance && showHighlights) {
-        setTimeout(() => addLightHighlighting(), 100);
+        setTimeout(() => addProvenanceOverlays(), 150);
       }
 
-      console.log(`✅ Page ${pageNum} rendered successfully`);
+      console.log(`✅ Page ${pageNum} rendered with provenance support`);
 
     } catch (err) {
       console.error(`❌ Error rendering page ${pageNum}:`, err);
@@ -254,62 +271,245 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
     }
   };
 
-  // Light highlighting on main PDF - just to show general area
-  const addLightHighlighting = () => {
-    if (!selectedProvenance?.sentences_ids || !sentenceMapper || !textLayerRef.current) return;
+  // Main function to add provenance overlays
+  const addProvenanceOverlays = () => {
+    if (!selectedProvenance?.sentences_ids || !textLayerRef.current || !highlightLayerRef.current) return;
 
+    // Clear existing overlays
     clearHighlights();
 
     const sentencesToHighlight = selectedProvenance.sentences_ids.filter(sentenceId => {
-      const sentencePage = sentenceMapper.getPageForSentence(sentenceId);
+      const sentencePage = sentenceMapper?.getPageForSentence(sentenceId);
       return sentencePage === currentPage;
     });
 
     if (sentencesToHighlight.length === 0) return;
 
-    console.log(`💡 Adding light highlights for ${sentencesToHighlight.length} sentences on page ${currentPage}`);
+    console.log(`💡 Adding overlays for ${sentencesToHighlight.length} sentences on page ${currentPage}`);
 
-    // Very subtle highlighting - just to indicate general area
     sentencesToHighlight.forEach((sentenceId, index) => {
       const sentence = sentences[sentenceId];
       if (sentence) {
-        addSubtleHighlight(sentence, index);
+        createProvenanceOverlay(sentence, sentenceId, index);
       }
     });
   };
 
-  const addSubtleHighlight = (sentence, index) => {
+  // Create overlay for a specific sentence
+  const createProvenanceOverlay = (sentence, sentenceId, index) => {
     const textSpans = textLayerRef.current.querySelectorAll('span, div');
-    const searchWords = sentence.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+    
+    // Clean and prepare sentence for matching
+    const cleanSentence = sentence.toLowerCase().trim();
+    const sentenceWords = cleanSentence.split(/\s+/).filter(word => word.length > 2);
+    
+    // Find matching text spans using fuzzy matching
+    const matchingSpans = findMatchingTextSpans(textSpans, sentenceWords, cleanSentence);
+    
+    if (matchingSpans.length > 0) {
+      // Create bounding box overlay
+      const boundingBox = calculateBoundingBox(matchingSpans);
+      createOverlayDiv(boundingBox, sentenceId, index);
+      
+      console.log(`✅ Created overlay for sentence ${sentenceId} with ${matchingSpans.length} spans`);
+    } else {
+      console.warn(`⚠️ No matching spans found for sentence ${sentenceId}`);
+    }
+  };
 
-    textSpans.forEach(span => {
-      const spanText = span.textContent.toLowerCase();
-      const matchCount = searchWords.filter(word => spanText.includes(word)).length;
-
-      if (matchCount >= Math.max(1, searchWords.length * 0.3)) {
-        const highlight = document.createElement('div');
-        highlight.className = 'pdf-light-highlight';
-
-        const computedStyle = window.getComputedStyle(span);
-        highlight.style.position = 'absolute';
-        highlight.style.left = span.style.left || computedStyle.left;
-        highlight.style.top = span.style.top || computedStyle.top;
-        highlight.style.width = span.style.width || computedStyle.width;
-        highlight.style.height = span.style.height || computedStyle.height;
-        highlight.style.pointerEvents = 'none';
-        highlight.style.zIndex = '5';
-
-        if (highlightLayerRef.current) {
-          highlightLayerRef.current.appendChild(highlight);
+  // Find text spans that match the sentence
+  const findMatchingTextSpans = (textSpans, sentenceWords, fullSentence) => {
+    const matchingSpans = [];
+    const spansArray = Array.from(textSpans);
+    
+    // Strategy 1: Direct substring match (most reliable)
+    for (let span of spansArray) {
+      const spanText = span.textContent.toLowerCase().trim();
+      if (spanText.length > 10 && fullSentence.includes(spanText)) {
+        matchingSpans.push(span);
+      }
+    }
+    
+    // Strategy 2: Word-based matching if direct match fails
+    if (matchingSpans.length === 0) {
+      for (let span of spansArray) {
+        const spanText = span.textContent.toLowerCase().trim();
+        const spanWords = spanText.split(/\s+/);
+        
+        // Check if span contains significant words from sentence
+        const matchCount = spanWords.filter(word => 
+          word.length > 2 && sentenceWords.includes(word)
+        ).length;
+        
+        if (matchCount >= Math.min(3, spanWords.length * 0.6)) {
+          matchingSpans.push(span);
         }
       }
-    });
+    }
+    
+    // Strategy 3: Partial word matching (most permissive)
+    if (matchingSpans.length === 0) {
+      for (let span of spansArray) {
+        const spanText = span.textContent.toLowerCase().trim();
+        
+        // Check if any significant words from sentence appear in span
+        const hasMatch = sentenceWords.some(word => 
+          word.length > 4 && spanText.includes(word)
+        );
+        
+        if (hasMatch) {
+          matchingSpans.push(span);
+        }
+      }
+    }
+    
+    return matchingSpans;
   };
 
+  // Calculate bounding box from multiple spans
+  const calculateBoundingBox = (spans) => {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    
+    spans.forEach(span => {
+      const computedStyle = window.getComputedStyle(span);
+      const left = parseFloat(span.style.left) || parseFloat(computedStyle.left) || 0;
+      const top = parseFloat(span.style.top) || parseFloat(computedStyle.top) || 0;
+      const width = parseFloat(span.style.width) || parseFloat(computedStyle.width) || 0;
+      const height = parseFloat(span.style.height) || parseFloat(computedStyle.height) || 14; // default height
+      
+      minX = Math.min(minX, left);
+      minY = Math.min(minY, top);
+      maxX = Math.max(maxX, left + width);
+      maxY = Math.max(maxY, top + height);
+    });
+    
+    // Add some padding to make the highlight more visible
+    const padding = 4;
+    return {
+      left: minX - padding,
+      top: minY - padding,
+      width: (maxX - minX) + (padding * 2),
+      height: (maxY - minY) + (padding * 2)
+    };
+  };
+
+  // Create the actual overlay div
+  const createOverlayDiv = (boundingBox, sentenceId, index) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'provenance-overlay';
+    overlay.setAttribute('data-sentence-id', sentenceId);
+    overlay.setAttribute('data-provenance-index', index);
+    
+    // Position and style the overlay
+    overlay.style.position = 'absolute';
+    overlay.style.left = `${boundingBox.left}px`;
+    overlay.style.top = `${boundingBox.top}px`;
+    overlay.style.width = `${boundingBox.width}px`;
+    overlay.style.height = `${boundingBox.height}px`;
+    overlay.style.pointerEvents = 'auto';
+    overlay.style.cursor = 'pointer';
+    overlay.style.zIndex = '10';
+    
+    // Style based on provenance index (rotating colors)
+    const colors = [
+      'rgba(255, 235, 59, 0.3)',  // Yellow
+      'rgba(76, 175, 80, 0.3)',   // Green  
+      'rgba(33, 150, 243, 0.3)',  // Blue
+      'rgba(255, 152, 0, 0.3)',   // Orange
+      'rgba(156, 39, 176, 0.3)'   // Purple
+    ];
+    
+    const borderColors = [
+      'rgba(255, 235, 59, 0.8)',
+      'rgba(76, 175, 80, 0.8)',
+      'rgba(33, 150, 243, 0.8)',
+      'rgba(255, 152, 0, 0.8)',
+      'rgba(156, 39, 176, 0.8)'
+    ];
+    
+    const colorIndex = index % colors.length;
+    overlay.style.backgroundColor = colors[colorIndex];
+    overlay.style.border = `2px solid ${borderColors[colorIndex]}`;
+    overlay.style.borderRadius = '4px';
+    overlay.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+    
+    // Add subtle animation
+    overlay.style.transition = 'all 0.3s ease';
+    overlay.style.opacity = '0';
+    
+    // Add tooltip
+    overlay.title = `Provenance Evidence ${index + 1}\nSentence ID: ${sentenceId}\nClick to focus`;
+    
+    // Add click handler to focus this sentence
+    overlay.addEventListener('click', () => {
+      console.log(`📍 User clicked provenance overlay for sentence ${sentenceId}`);
+      onProvenanceClick(sentenceId, index);
+    });
+
+    // Add hover effects
+    overlay.addEventListener('mouseenter', () => {
+      overlay.style.transform = 'scale(1.02)';
+      overlay.style.zIndex = '15';
+      overlay.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.25)';
+    });
+
+    overlay.addEventListener('mouseleave', () => {
+      overlay.style.transform = 'scale(1)';
+      overlay.style.zIndex = '10';
+      overlay.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+    });
+    
+    // Add to highlight layer
+    highlightLayerRef.current.appendChild(overlay);
+    
+    // Animate in
+    setTimeout(() => {
+      overlay.style.opacity = '1';
+    }, 50);
+    
+    // Add pulse animation for emphasis
+    setTimeout(() => {
+      overlay.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        overlay.style.transform = 'scale(1)';
+      }, 200);
+    }, 100 + (index * 100)); // Stagger animation for multiple overlays
+  };
+
+  // Enhanced clear function
   const clearHighlights = () => {
     if (highlightLayerRef.current) {
-      highlightLayerRef.current.innerHTML = '';
+      // Fade out existing overlays before removing
+      const existingOverlays = highlightLayerRef.current.querySelectorAll('.provenance-overlay');
+      existingOverlays.forEach(overlay => {
+        overlay.style.opacity = '0';
+        overlay.style.transform = 'scale(0.95)';
+      });
+      
+      setTimeout(() => {
+        highlightLayerRef.current.innerHTML = '';
+      }, 150);
     }
+  };
+
+  // Callback when user clicks on a provenance overlay
+  const onProvenanceClick = (sentenceId, index) => {
+    // Scroll to sentence in provenance panel
+    const sentenceElement = document.querySelector(`[data-sentence-id="${sentenceId}"]`);
+    if (sentenceElement) {
+      sentenceElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+      
+      // Add temporary highlight to sentence in panel
+      sentenceElement.classList.add('sentence-highlight-flash');
+      setTimeout(() => {
+        sentenceElement.classList.remove('sentence-highlight-flash');
+      }, 2000);
+    }
+    
+    console.log(`🔗 Provenance overlay clicked: sentence ${sentenceId}`);
   };
 
   // Control handlers
@@ -319,8 +519,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
   const toggleHighlights = () => setShowHighlights(!showHighlights);
   const toggleDetailPanel = () => setShowDetailPanel(!showDetailPanel);
 
-
-  // Render states
+  // Render states (keeping existing render states...)
   if (!pdfDocument) {
     return (
       <div className="pdf-viewer-empty">
@@ -379,8 +578,11 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             <FontAwesomeIcon icon={faMapMarkedAlt} />
           </button>
 
-          <button onClick={toggleHighlights} className="control-btn">
+          <button onClick={toggleHighlights} className="control-btn" title="Toggle Highlights">
             <FontAwesomeIcon icon={showHighlights ? faEye : faEyeSlash} />
+            <span style={{marginLeft: '4px', fontSize: '12px'}}>
+              {showHighlights ? 'Hide' : 'Show'}
+            </span>
           </button>
 
           <button onClick={handleZoomOut} className="control-btn">
@@ -429,7 +631,6 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
           <FontAwesomeIcon icon={faChevronRight} />
         </button>
 
-        {/* Keep ONLY the simple sentence status */}
         {sentences.length > 0 && (
           <div className="sentence-status">
             <small>
@@ -499,9 +700,58 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
         </div>
       )}
 
-      {/* Styles */}
+      {/* Add the CSS for overlays inline */}
       <style dangerouslySetInnerHTML={{
         __html: `
+          .pdf-highlight-layer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 10;
+          }
+
+          .provenance-overlay {
+            position: absolute;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            pointer-events: auto;
+          }
+
+          .provenance-overlay:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            z-index: 15;
+          }
+
+          @keyframes sentence-highlight-flash {
+            0% {
+              background-color: transparent;
+              box-shadow: none;
+            }
+            25% {
+              background-color: rgba(255, 235, 59, 0.6);
+              box-shadow: 0 0 0 4px rgba(255, 235, 59, 0.3);
+            }
+            75% {
+              background-color: rgba(255, 235, 59, 0.4);
+              box-shadow: 0 0 0 2px rgba(255, 235, 59, 0.2);
+            }
+            100% {
+              background-color: transparent;
+              box-shadow: none;
+            }
+          }
+
+          .sentence-highlight-flash {
+            animation: sentence-highlight-flash 2s ease-in-out;
+          }
+
+          /* Other existing PDF viewer styles remain the same... */
           .dual-view-pdf-viewer {
             height: 100%;
             display: flex;
@@ -558,6 +808,9 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             cursor: pointer;
             border-radius: 4px;
             transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
           }
           
           .control-btn:hover {
@@ -655,7 +908,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             right: 0;
             bottom: 0;
             overflow: hidden;
-            opacity: 0.2;
+            opacity: 0.1;
             line-height: 1.0;
           }
           
@@ -666,22 +919,6 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, isGridMode 
             white-space: pre;
             cursor: text;
             transform-origin: 0% 0%;
-          }
-          
-          .pdf-highlight-layer {
-            position: absolute;
-            left: 0;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            z-index: 10;
-          }
-          
-          .pdf-light-highlight {
-            background-color: rgba(255, 235, 59, 0.2);
-            border: 1px solid rgba(255, 235, 59, 0.4);
-            border-radius: 2px;
           }
           
           .detail-panel {

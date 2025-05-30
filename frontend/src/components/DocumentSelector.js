@@ -17,7 +17,6 @@ const DocumentSelector = ({
   onShowPreloaded,  // Now shows session documents
   uploadProgress,
   compactMode = false,
-  currentSession,
   disabled = false
 }) => {
   const fileInputRef = useRef(null);
@@ -54,14 +53,6 @@ const DocumentSelector = ({
   if (compactMode) {
     return (
       <div className="document-selector compact">
-        {/* Session Info */}
-        {currentSession && (
-          <div className="session-info compact">
-            <span className="session-label">
-              Session: {currentSession.session_id?.split('_')[1] || 'Active'}
-            </span>
-          </div>
-        )}
 
         {/* Upload Progress */}
         {uploadProgress && (
@@ -112,22 +103,7 @@ const DocumentSelector = ({
   // Full mode for empty state
   return (
     <div className="document-selector">
-      {/* Session Status */}
-      {currentSession && (
-        <div className="session-status">
-          <div className="session-info-full">
-            <h4>Document Analysis Session</h4>
-            <div className="session-details">
-              <span className="session-id">
-                Session ID: {currentSession.session_id?.split('_')[1] || 'Unknown'}
-              </span>
-              <span className="session-ready">
-                {disabled ? '⏳ Initializing...' : '✅ Ready for documents'}
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Upload Progress */}
       {uploadProgress && (
@@ -223,7 +199,7 @@ const DocumentSelector = ({
       {disabled && (
         <div className="processing-status">
           <FontAwesomeIcon icon={faSpinner} spin />
-          <span>Initializing document analysis session...</span>
+          <span>Initializing document analysis...</span>
         </div>
       )}
     </div>

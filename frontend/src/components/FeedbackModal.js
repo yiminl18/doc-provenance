@@ -17,12 +17,12 @@ import {
 import { submitFeedback } from '../services/api';
 
 const FeedbackModal = ({ 
-  session, 
+  pdfDocument, 
   question, 
   allProvenances, 
   onSubmit, 
-  onClose,
-  currentSession 
+  onClose
+   
 }) => {
   const [feedback, setFeedback] = useState({
     // Provenance Quality Assessment (for each provenance viewed)
@@ -282,37 +282,26 @@ const FeedbackModal = ({
       // Enhanced submission data with session information
       const submissionData = {
         // Core session info
-        sessionId: currentSession?.session_id,
         questionId: question?.id,
         questionText: question?.text,
-        documentId: session?.documentId,
-        documentFilename: session?.documentName,
+        documentId: pdfDocument.documentId,
+        documentFilename: pdfDocument.documentName,
         
         // Processing info
         provenanceCount: allProvenances?.length || 0,
         provenancesViewed: Array.from(viewedProvenances),
-        processingTime: session?.processingTime || 
-          (session?.completedAt && session?.createdAt 
-            ? (new Date(session.completedAt) - new Date(session.createdAt)) / 1000
-            : null),
+        //processingTime: session?.processingTime || 
+        //  (session?.completedAt && session?.createdAt 
+        //    ? (new Date(session.completedAt) - new Date(session.createdAt)) / 1000
+        //    : null),
         
-        // Session processing details
-        processingMethod: question?.processingMethod || 'unknown',
-        sessionQuestionId: question?.sessionQuestionId,
-        backendQuestionId: question?.backendQuestionId,
-        legacyMode: question?.legacyMode || false,
         
         // Feedback data
         feedback: {
           ...feedback,
           timestamp: new Date().toISOString(),
-          submissionTime: Date.now(),
-          algorithmMethod: session?.algorithmMethod || 'default',
-          userSessionId: session?.userSessionId || currentSession?.session_id,
-          
-          // Additional context
-          documentType: session?.documentType || 'unknown',
-          sessionProcessed: question?.sessionProcessed || false
+          submissionTime: Date.now()//,
+          //algorithmMethod: session?.algorithmMethod || 'default'
         }
       };
 
@@ -387,11 +376,8 @@ const FeedbackModal = ({
   // Enhanced context display
   const getSessionContext = () => {
     return {
-      sessionId: currentSession?.session_id?.split('_')[1] || 'Unknown',
       questionText: question?.text || 'Unknown question',
-      documentName: session?.documentName || 'Unknown document',
-      processingTime: session?.processingTime || question?.processingTime || 
-        (question?.provenanceSources?.[0]?.time) || null,
+      documentName: pdfDocument?.documentName || 'Unknown document',
       provenenceCount: allProvenances?.length || 0,
       processingMethod: question?.processingMethod || 'Unknown'
     };

@@ -11,7 +11,7 @@
   font-family: var(--font-display);
 }
 
-/* ===== STREAMLINED HEADER - SESSION AWARE ===== */
+/* ===== STREAMLINED HEADER ===== */
 .app-header-compact {
   height: 48px;
   background-color: var(--bg-panel);
@@ -42,32 +42,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-}
-
-.session-status {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.session-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-}
-
-.session-id {
-  color: var(--primary-blue);
-  font-weight: var(--font-semibold);
-}
-
-.session-stats {
-  color: var(--win95-text-muted);
 }
 
 .header-right {
@@ -146,7 +120,7 @@
   transform: translate(1px, 1px);
 }
 
-/* ===== 3-COLUMN LAYOUT WITH SESSION SUPPORT ===== */
+/* ===== 3-COLUMN LAYOUT ===== */
 .app-content-grid {
   flex: 1;
   display: grid;
@@ -156,7 +130,7 @@
   overflow: hidden;
 }
 
-/* ===== SIDEBAR WITH SESSION INFO ===== */
+/* ===== SIDEBAR ===== */
 .sidebar-panel {
   background-color: var(--bg-panel);
   border-right: var(--border-medium) solid var(--win95-border-dark);
@@ -174,7 +148,7 @@
   padding: var(--space-4);
 }
 
-/* ===== MAIN CONTENT AREA - PDF WITH SESSION AWARENESS ===== */
+/* ===== MAIN CONTENT AREA ===== */
 .main-content {
   display: flex;
   flex-direction: column;
@@ -192,7 +166,7 @@
   min-height: 0;
 }
 
-/* ===== PDF EMPTY STATE WITH SESSION INFO ===== */
+/* ===== PDF EMPTY STATE ===== */
 .pdf-empty-state {
   flex: 1;
   display: flex;
@@ -365,8 +339,7 @@
 }
 
 .sentence-status,
-.mapping-quality,
-.session-processed {
+.mapping-quality {
   white-space: nowrap;
 }
 
@@ -601,9 +574,6 @@
     gap: var(--space-4);
   }
   
-  .session-info {
-    display: none; /* Hide detailed session info on smaller screens */
-  }
 }
 
 @media (max-width: 900px) {

@@ -18,7 +18,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/pdf-viewer.css'
 import { SentencePDFMapper } from '../utils/SentencePDFMapper';
-import ProvenancePanel from './ProvenancePanel';
+//import ProvenancePanel from './ProvenancePanel';
 
 const HybridPDFViewer = ({ pdfDocument, selectedProvenance, onClose, navigationTrigger }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -658,7 +658,7 @@ const loadSentenceMapping = async (pdf) => {
           </div>
         </div>
 
-        {/* Sentence Detail Panel */}
+        {/* Sentence Detail Panel
         {showDetailPanel && (
           <div className="detail-panel">
             <ProvenancePanel
@@ -669,7 +669,7 @@ const loadSentenceMapping = async (pdf) => {
               showHighlights={showHighlights}
             />
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Provenance Info */}

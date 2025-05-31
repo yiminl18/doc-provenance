@@ -28,18 +28,6 @@ const Sidebar = ({
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
-  const getDocumentStats = (doc) => {
-    const questions = Array.from(doc.questions.values());
-    const totalQuestions = questions.length;
-    const completedQuestions = questions.filter(q => !q.isProcessing && q.answer).length;
-    const processingQuestions = questions.filter(q => q.isProcessing).length;
-    const totalProvenances = questions.reduce((acc, q) => 
-      acc + (q.provenanceSources ? q.provenanceSources.length : 0), 0
-    );
-    
-    return { totalQuestions, completedQuestions, processingQuestions, totalProvenances };
-  };
-
   const formatFileName = (filename) => {
     // Remove extension and truncate if too long
     const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
@@ -99,7 +87,6 @@ const Sidebar = ({
                 </div>
               ) : (
                 documentList.map((doc) => {
-                  const stats = getDocumentStats(doc);
                   const isActive = doc.id === activeDocumentId;
                   
                   return (
@@ -117,11 +104,7 @@ const Sidebar = ({
                           )}
                         </div>
                         <div className="document-status">
-                          {stats.processingQuestions > 0 && (
-                            <div className="status-indicator processing">
-                              <FontAwesomeIcon icon={faClock} />
-                            </div>
-                          )}
+                  
                           {doc.uploadStatus && !doc.uploadStatus.success && (
                             <div className="status-indicator error" title={doc.uploadStatus.message}>
                               ⚠️
@@ -130,32 +113,7 @@ const Sidebar = ({
                         </div>
                       </div>
                       
-                      <div className="document-stats">
-                        <div className="stat-row">
-                          <div className="stat-item">
-                            <FontAwesomeIcon icon={faQuestionCircle} />
-                            <span className="stat-label">Q:</span>
-                            <span className="stat-value">{stats.totalQuestions}</span>
-                          </div>
-                          
-                          <div className="stat-item">
-                            <FontAwesomeIcon icon={faFileAlt} />
-                            <span className="stat-label">P:</span>
-                            <span className="stat-value">{stats.totalProvenances}</span>
-                          </div>
-                        </div>
-                        
-                        {stats.completedQuestions > 0 && (
-                          <div className="completion-bar">
-                            <div 
-                              className="completion-fill"
-                              style={{ 
-                                width: `${(stats.completedQuestions / stats.totalQuestions) * 100}%` 
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
+                  
                       
                       <div className="document-timestamp">
                         {formatTimestamp(new Date(doc.createdAt))}

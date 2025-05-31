@@ -275,139 +275,136 @@ const ProvenanceQA = forwardRef(({
         }, 2000); // Initial 2-second delay before starting checks
     };
 
-// Enhanced status monitoring with more debugging
-const startStatusMonitoring = (questionId, backendQuestionId) => {
-    let statusCheckCount = 0;
-    const maxStatusChecks = 150; // 5 minutes max (with 2-second intervals)
-    let consecutiveErrors = 0;
-    const maxConsecutiveErrors = 5;
+    // Enhanced status monitoring with interval tracking
+    const startStatusMonitoring = (questionId, backendQuestionId) => {
+        let statusCheckCount = 0;
+        const maxStatusChecks = 150; // 5 minutes max
+        let consecutiveErrors = 0;
+        const maxConsecutiveErrors = 5;
 
-    console.log(`🎬 Starting status monitoring for question ${questionId} (backend: ${backendQuestionId})`);
+        console.log(`🎬 Starting status monitoring for question ${questionId} (backend: ${backendQuestionId})`);
 
-    const statusInterval = setInterval(async () => {
-        statusCheckCount++;
-        console.log(`🔄 Status check #${statusCheckCount} for question ${questionId}`);
+        const statusInterval = setInterval(async () => {
+            statusCheckCount++;
+            console.log(`🔄 Status check #${statusCheckCount} for question ${questionId} - interval still running`);
 
-        try {
-            const statusResponse = await getQuestionStatus(backendQuestionId);
-            console.log(`📊 Status response #${statusCheckCount}:`, statusResponse);
-            
-            // Reset error counter on successful call
-            consecutiveErrors = 0;
+            try {
+                const statusResponse = await getQuestionStatus(backendQuestionId);
+                console.log(`📊 Status response #${statusCheckCount}:`, statusResponse);
 
-            if (statusResponse.success) {
-                const status = statusResponse.status;
-                console.log(`📈 Processing status details:`, {
-                    provenance_count: status.provenance_count,
-                    user_provenance_count: status.user_provenance_count,
-                    processing_complete: status.processing_complete,
-                    can_request_more: status.can_request_more
-                });
+                consecutiveErrors = 0;
 
-                updateQuestion(questionId, {
-                    provenanceCount: status.provenance_count || 0,
-                    userProvenanceCount: status.user_provenance_count || 0,
-                    canRequestMore: status.can_request_more || false,
-                    isProcessing: !status.processing_complete,
-                    processingStatus: status.processing_complete ? 'completed' : 'processing'
-                });
+                if (statusResponse.success) {
+                    const status = statusResponse.status;
 
-                console.log(`📝 Updated question ${questionId} with:`, {
-                    provenanceCount: status.provenance_count || 0,
-                    canRequestMore: status.can_request_more || false,
-                    isProcessing: !status.processing_complete,
-                    processingStatus: status.processing_complete ? 'completed' : 'processing'
-                });
-
-                // If processing is complete, stop monitoring
-                if (status.processing_complete) {
-                    console.log('✅ Processing completed for question:', questionId);
-                    clearInterval(statusInterval);
-
-                    // Update final status
-                    updateQuestion(questionId, {
-                        processingTime: status.processing_time,
-                        finalProvenanceCount: status.provenance_count
+                    // Log detailed status
+                    console.log(`📈 Status details for check #${statusCheckCount}:`, {
+                        provenance_count: status.provenance_count,
+                        user_provenance_count: status.user_provenance_count,
+                        processing_complete: status.processing_complete,
+                        can_request_more: status.can_request_more,
+                        answer_ready: status.answer_ready
                     });
 
-                    console.log('🏁 Status monitoring stopped - processing complete');
-                    return; // Exit the interval
+                    updateQuestion(questionId, {
+                        provenanceCount: status.provenance_count || 0,
+                        userProvenanceCount: status.user_provenance_count || 0,
+                        canRequestMore: status.can_request_more || false,
+                        isProcessing: !status.processing_complete,
+                        processingStatus: status.processing_complete ? 'completed' : 'processing',
+                        processingComplete: status.processing_complete // Add this field
+                    });
+
+                    console.log(`📝 Updated question state for ${questionId}`);
+
+                    // Check if we should stop monitoring
+                    if (status.processing_complete) {
+                        console.log(`✅ Processing completed for question ${questionId} - stopping monitoring`);
+                        clearInterval(statusInterval);
+
+                        updateQuestion(questionId, {
+                            processingTime: status.processing_time,
+                            finalProvenanceCount: status.provenance_count
+                        });
+
+                        console.log(`🏁 Status monitoring stopped for ${questionId} after ${statusCheckCount} checks`);
+                        return;
+                    } else {
+                        console.log(`⏳ Processing still ongoing for ${questionId} - continuing monitoring`);
+                    }
+                } else {
+                    console.warn(`⚠️ Status check #${statusCheckCount} returned unsuccessful response:`, statusResponse);
                 }
+
+                if (statusCheckCount >= maxStatusChecks) {
+                    console.log(`⏰ Status monitoring timeout for question ${questionId} after ${statusCheckCount} checks`);
+                    clearInterval(statusInterval);
+                    updateQuestion(questionId, {
+                        isProcessing: false,
+                        processingStatus: 'timeout',
+                        userMessage: 'Status monitoring timed out, but processing may have completed.'
+                    });
+                    return;
+                }
+
+            } catch (error) {
+                consecutiveErrors++;
+                console.error(`❌ Error in status check #${statusCheckCount} (consecutive errors: ${consecutiveErrors}):`, error);
+
+                if (consecutiveErrors >= maxConsecutiveErrors) {
+                    console.error(`💥 Too many consecutive errors (${consecutiveErrors}), stopping status monitoring for ${questionId}`);
+                    clearInterval(statusInterval);
+                    updateQuestion(questionId, {
+                        isProcessing: false,
+                        processingStatus: 'error',
+                        userMessage: 'Unable to monitor processing status. Provenance may still be available.'
+                    });
+                    return;
+                }
+            }
+        }, 2000); // Check every 2 seconds
+
+        // Store interval for cleanup and debugging
+        updateQuestion(questionId, { statusInterval });
+        console.log(`⏰ Status monitoring interval created for question ${questionId} - interval ID:`, statusInterval);
+
+        // Debug: Log that the interval was created successfully
+        setTimeout(() => {
+            console.log(`🔍 Debug: Checking if interval is still active for ${questionId} after 3 seconds`);
+        }, 3000);
+    };
+
+    // Also check the updateQuestion function to make sure it's not accidentally clearing intervals
+    const updateQuestion = (questionId, updates) => {
+        console.log(`🔄 updateQuestion called for ${questionId}:`, updates);
+
+        // Check if we're accidentally clearing intervals
+        if (updates.statusInterval === null || updates.answerInterval === null) {
+            console.warn(`⚠️ WARNING: Clearing interval in updates for ${questionId}:`, updates);
+        }
+
+        setQuestionsHistory(prev => {
+            const newHistory = new Map(prev);
+            const currentQuestion = newHistory.get(questionId);
+
+            if (currentQuestion) {
+                const updatedQuestion = { ...currentQuestion, ...updates };
+
+                // Debug logging
+                if (currentQuestion.statusInterval && !updatedQuestion.statusInterval) {
+                    console.warn(`⚠️ Status interval was removed for question ${questionId}`);
+                }
+
+                newHistory.set(questionId, updatedQuestion);
             } else {
-                console.warn('⚠️ Status check returned unsuccessful response:', statusResponse);
+                console.error(`❌ Question ${questionId} not found in history!`);
             }
 
-            if (statusCheckCount >= maxStatusChecks) {
-                console.log('⏰ Status monitoring timeout for question:', questionId);
-                clearInterval(statusInterval);
-                updateQuestion(questionId, {
-                    isProcessing: false,
-                    processingStatus: 'timeout',
-                    userMessage: 'Status monitoring timed out, but processing may have completed.'
-                });
-                return;
-            }
+            return newHistory;
+        });
+    };
 
-        } catch (error) {
-            consecutiveErrors++;
-            console.error(`❌ Error in status check #${statusCheckCount} (consecutive errors: ${consecutiveErrors}):`, error);
-
-            // If we hit too many consecutive errors, stop trying
-            if (consecutiveErrors >= maxConsecutiveErrors) {
-                console.error('💥 Too many consecutive errors, stopping status monitoring');
-                clearInterval(statusInterval);
-                updateQuestion(questionId, {
-                    isProcessing: false,
-                    processingStatus: 'error',
-                    userMessage: 'Unable to monitor processing status. Provenance may still be available.'
-                });
-                return;
-            }
-
-            // Slow down on repeated errors
-            if (consecutiveErrors > 2) {
-                statusCheckCount += 1; // Skip some checks
-            }
-        }
-    }, 2000); // Check every 2 seconds
-
-    // Store interval for cleanup
-    updateQuestion(questionId, { statusInterval });
-    console.log(`⏰ Status monitoring interval created for question ${questionId}`);
-};
-
-// Enhanced updateQuestion with debugging
-const updateQuestion = (questionId, updates) => {
-    console.log(`🔄 updateQuestion called for ${questionId}:`, updates);
-    
-    setQuestionsHistory(prev => {
-        const newHistory = new Map(prev);
-        const currentQuestion = newHistory.get(questionId);
-        
-        if (currentQuestion) {
-            const updatedQuestion = { ...currentQuestion, ...updates };
-            console.log(`✅ Question ${questionId} updated from:`, {
-                isProcessing: currentQuestion.isProcessing,
-                processingStatus: currentQuestion.processingStatus,
-                provenanceCount: currentQuestion.provenanceCount,
-                canRequestMore: currentQuestion.canRequestMore
-            });
-            console.log(`✅ Question ${questionId} updated to:`, {
-                isProcessing: updatedQuestion.isProcessing,
-                processingStatus: updatedQuestion.processingStatus,
-                provenanceCount: updatedQuestion.provenanceCount,
-                canRequestMore: updatedQuestion.canRequestMore
-            });
-            newHistory.set(questionId, updatedQuestion);
-        } else {
-            console.error(`❌ Question ${questionId} not found in history!`);
-        }
-        
-        return newHistory;
-    });
-};
-
-// Updated handleGetNextProvenance to handle processing ongoing
+   // Updated handleGetNextProvenance to handle your backend format
 const handleGetNextProvenance = async () => {
     if (!activeQuestion) {
         console.log('❌ No active question');
@@ -439,27 +436,46 @@ const handleGetNextProvenance = async () => {
 
         if (provenanceResponse.success && provenanceResponse.has_more) {
             const newProvenance = provenanceResponse.provenance;
-            console.log('✨ New provenance received:', newProvenance);
+            console.log('✨ Raw provenance received:', newProvenance);
 
-            // Enhance with content if needed
-            let enhancedProvenance = newProvenance;
-            if (newProvenance.sentences_ids && newProvenance.sentences_ids.length > 0) {
-                try {
-                    console.log('📖 Fetching sentences for IDs:', newProvenance.sentences_ids);
-                    const sentencesResponse = await fetchSentences(
-                        pdfDocument.filename,
-                        newProvenance.sentences_ids
-                    );
+            // FIXED: Handle your backend format correctly
+            let enhancedProvenance = { ...newProvenance };
 
-                    if (sentencesResponse.success) {
-                        const content = newProvenance.sentences_ids.map(id =>
-                            sentencesResponse.sentences[id] || `[SENTENCE_${id}_NOT_FOUND]`
+            // Your backend uses 'provenance_ids' and 'provenance' fields
+            if (newProvenance.provenance_ids && newProvenance.provenance) {
+                // Map your format to what the frontend expects
+                enhancedProvenance.sentences_ids = newProvenance.provenance_ids;
+                enhancedProvenance.content = [newProvenance.provenance]; // Wrap in array for consistency
+                
+                console.log('✅ Enhanced provenance with your format:', {
+                    sentences_ids: enhancedProvenance.sentences_ids,
+                    content: enhancedProvenance.content,
+                    provenance_id: enhancedProvenance.provenance_id,
+                    time: enhancedProvenance.time
+                });
+            } else {
+                console.warn('⚠️ Provenance missing expected fields:', newProvenance);
+                // Fallback: try to fetch sentences using the old method
+                if (newProvenance.sentences_ids && newProvenance.sentences_ids.length > 0) {
+                    try {
+                        console.log('📖 Fallback: Fetching sentences for IDs:', newProvenance.sentences_ids);
+                        const sentencesResponse = await fetchSentences(
+                            pdfDocument.filename,
+                            newProvenance.sentences_ids
                         );
-                        enhancedProvenance = { ...newProvenance, content };
-                        console.log('✅ Enhanced provenance with content:', enhancedProvenance);
+
+                        if (sentencesResponse.success) {
+                            const content = newProvenance.sentences_ids.map(id =>
+                                sentencesResponse.sentences[id] || `[SENTENCE_${id}_NOT_FOUND]`
+                            );
+                            enhancedProvenance.content = content;
+                            console.log('✅ Enhanced provenance with fetched content:', enhancedProvenance);
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Failed to enhance provenance with content:', error);
+                        // Set a fallback message
+                        enhancedProvenance.content = ['Content not available'];
                     }
-                } catch (error) {
-                    console.warn('⚠️ Failed to enhance provenance with content:', error);
                 }
             }
 
@@ -608,19 +624,23 @@ const handleGetNextProvenance = async () => {
         }
     }, [currentQuestion]);
 
-    // Cleanup intervals on unmount
+    // FIXED: Cleanup intervals only on component unmount
     useEffect(() => {
+        // This cleanup function will only run when the component unmounts
         return () => {
+            console.log('🧹 Component unmounting - clearing all intervals');
             questionsHistory.forEach((question) => {
                 if (question.answerInterval) {
+                    console.log('🧹 Clearing answer interval');
                     clearInterval(question.answerInterval);
                 }
                 if (question.statusInterval) {
+                    console.log('🧹 Clearing status interval');
                     clearInterval(question.statusInterval);
                 }
             });
         };
-    }, [questionsHistory]);
+    }, []); // ✅ Empty dependency array - only runs on unmount
 
     // Auto-select first provenance when available
     useEffect(() => {

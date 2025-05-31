@@ -19,7 +19,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test:mock": "playwright test user-task.spec.js",
+    "test:mock-headed": "playwright test user-task.spec.js --headed",
+    "test:mock-debug": "playwright test user-task.spec.js --debug --grep 'Complete user journey'"
   },
   "eslintConfig": {
     "extends": [
@@ -39,5 +42,10 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5000"
+  "proxy": "http://localhost:3001",
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
 }

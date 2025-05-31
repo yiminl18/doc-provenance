@@ -25,6 +25,8 @@ results/
 uploads/
 out/
 tests/
+test-results/
+playwright*
 backup/
 *egg-info/
 

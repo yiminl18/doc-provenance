@@ -89,7 +89,7 @@ const ProvenanceQA = forwardRef(({
     }));
 
     // Add this near the top of your ProvenanceQA component, after the state definitions
-    useEffect(() => {
+   /* useEffect(() => {
         console.log('🔍 ProvenanceQA State Debug:', {
             hasAnswer: activeQuestion?.answer && activeQuestion.answer.trim().length > 0,
             answerValue: activeQuestion?.answer,
@@ -99,7 +99,7 @@ const ProvenanceQA = forwardRef(({
             processingStatus: activeQuestion?.processingStatus
         });
     }, [activeQuestion?.answer, showProvenance, availableProvenances.length, activeQuestion?.isProcessing]);
-
+*/
 
     // Enhanced question submission with better error handling and timing
     const handleSubmit = async (e, questionTextOverride = null) => {

@@ -672,34 +672,7 @@ const loadSentenceMapping = async (pdf) => {
         )} */}
       </div>
 
-      {/* Provenance Info */}
-      {selectedProvenance && showHighlights && (
-        <div className="provenance-info">
-          <h4>
-            <FontAwesomeIcon icon={faHighlighter} />
-            Current Evidence - Page {currentPage}
-          </h4>
-          <div className="provenance-summary">
-            <div className="summary-item">
-              <strong>Provenance ID:</strong> {selectedProvenance.provenance_id}
-            </div>
-            <div className="summary-item">
-              <strong>Total Sentences:</strong> {selectedProvenance.sentences_ids?.length || 0}
-            </div>
-            <div className="summary-item">
-              <strong>On This Page:</strong> {
-                selectedProvenance.sentences_ids?.filter(id =>
-                  sentenceMapper ? sentenceMapper.getPageForSentence(id) === currentPage : false
-                ).length || 0
-              }
-            </div>
-            <div className="summary-item">
-              <strong>Processing Time:</strong> {selectedProvenance.time?.toFixed(2) || 'N/A'}s
-            </div>
-          </div>
-        </div>
-      )}
-
+  
       {/* Add the CSS for overlays inline */}
       <style dangerouslySetInnerHTML={{
         __html: `

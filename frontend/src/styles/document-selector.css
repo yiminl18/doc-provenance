@@ -36,12 +36,15 @@
   display: flex;
   gap: var(--space-4);
   align-items: center;
+  flex-direction: column;
 }
 
 .document-selector .upload-btn,
 .document-selector .browse-btn {
   display: inline-flex;
   align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap;
   justify-content: center;
   gap: var(--space-3);
   padding: var(--space-4) var(--space-6);

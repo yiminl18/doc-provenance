@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import '../styles/brutalist-design.css';
 import '../styles/document-selector.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -14,7 +13,7 @@ import {
 
 const DocumentSelector = ({ 
   onDocumentUpload, 
-  onShowPreloaded,  // Now shows session documents
+  onShowPreloaded, 
   uploadProgress,
   compactMode = false,
   disabled = false
@@ -125,13 +124,32 @@ const DocumentSelector = ({
 
       {/* Main Controls */}
       <div className="document-controls">
+
+  {/* Additional Info - Updated */}
+        <div className="document-info">
+          <div className="info-section">
+            <h5>📄 Supported Format</h5>
+            <p>PDF documents up to 50MB</p>
+          </div>
+          
+          <div className="info-section">
+            <h5>🔍 Analysis Features</h5>
+            <p>Question answering with document provenance</p>
+          </div>
+          
+          <div className="info-section">
+            <h5>📋 Session Documents</h5>
+            <p>Research papers and uploaded documents available in your session</p>
+          </div>
+        </div>
+
         <div className="primary-actions">
           {/* Upload Button */}
           <button 
             className={`upload-btn primary ${disabled ? 'disabled' : ''}`}
             onClick={handleUploadClick}
             disabled={disabled}
-            title={disabled ? 'Session initializing, please wait...' : 'Upload your PDF document'}
+            title={disabled ? 'Session initializing, please wait...' : 'Upload PDF'}
           >
             <FontAwesomeIcon 
               icon={disabled ? faSpinner : faUpload} 
@@ -139,10 +157,7 @@ const DocumentSelector = ({
               size="lg" 
             />
             <div className="btn-content">
-              <span className="btn-title">Upload Your PDF</span>
-              <span className="btn-subtitle">
-                {disabled ? 'Session initializing...' : 'Drag & drop or click to select'}
-              </span>
+              <span className="btn-title">Upload PDF</span>
             </div>
           </button>
           
@@ -160,7 +175,7 @@ const DocumentSelector = ({
             className={`browse-btn secondary ${disabled ? 'disabled' : ''}`}
             onClick={handleBrowseClick}
             disabled={disabled}
-            title={disabled ? 'Session initializing, please wait...' : 'Browse documents in your session'}
+            title={disabled ? 'Session initializing, please wait...' : 'Browse documents'}
           >
             <FontAwesomeIcon 
               icon={disabled ? faSpinner : faDatabase} 
@@ -168,31 +183,13 @@ const DocumentSelector = ({
               size="lg" 
             />
             <div className="btn-content">
-              <span className="btn-title">Browse Session Documents</span>
-              <span className="btn-subtitle">
-                {disabled ? 'Loading documents...' : 'Select from your session'}
-              </span>
+              <span className="btn-title">Browse Documents</span>
+           
             </div>
           </button>
         </div>
 
-        {/* Additional Info - Updated */}
-        <div className="document-info">
-          <div className="info-section">
-            <h5>📄 Supported Format</h5>
-            <p>PDF documents up to 50MB</p>
-          </div>
-          
-          <div className="info-section">
-            <h5>🔍 Analysis Features</h5>
-            <p>Question answering with evidence-based provenance</p>
-          </div>
-          
-          <div className="info-section">
-            <h5>📋 Session Documents</h5>
-            <p>Research papers and uploaded documents available in your session</p>
-          </div>
-        </div>
+      
       </div>
 
       {/* Processing Status */}

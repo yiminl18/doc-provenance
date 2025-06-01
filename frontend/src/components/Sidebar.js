@@ -58,18 +58,10 @@ const Sidebar = ({
       <div className="sidebar">
         <div className="sidebar-content">
          
-          {/* Upload New Document */}
-          <button className="upload-new-document-btn" onClick={onUploadNewDocument}>
-            <FontAwesomeIcon icon={faUpload} style={{ marginRight: '8px' }} />
-            Upload New Document
-          </button>
+       
           
           <div className="documents-section">
-            <div className="section-header">
-              <FontAwesomeIcon icon={faDatabase} />
-              <span className="section-title">Document Library</span>
-              <div className="document-count">{documentList.length}</div>
-            </div>
+     
             
             <div className="documents-list">
               {documentList.length === 0 ? (

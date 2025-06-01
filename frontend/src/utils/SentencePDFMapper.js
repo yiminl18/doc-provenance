@@ -81,10 +81,19 @@ export class SentencePDFMapper {
     }
   }
 
-  /**
+ /**
    * Map sentences to their most likely pages and positions
    */
   async mapSentencesToPages(sentences) {
+    console.log('🗺️ Starting sentence-to-page mapping...');
+    console.log(`📋 Input sentences: ${sentences?.length || 0}`);
+    console.log(`📄 Available pages: ${this.pageTextCache.size}`);
+    
+    if (!sentences || sentences.length === 0) {
+      console.warn('⚠️ No sentences provided for mapping');
+      return;
+    }
+    
     const mappingResults = {
       highConfidence: 0,
       mediumConfidence: 0,
@@ -93,6 +102,12 @@ export class SentencePDFMapper {
     };
 
     sentences.forEach((sentence, sentenceId) => {
+      if (!sentence || typeof sentence !== 'string') {
+        console.warn(`⚠️ Invalid sentence at index ${sentenceId}:`, sentence);
+        mappingResults.unmapped++;
+        return;
+      }
+      
       const mapping = this.findBestPageMatch(sentence, sentenceId);
       
       if (mapping.confidence > 0.8) {
@@ -110,6 +125,18 @@ export class SentencePDFMapper {
     });
 
     console.log('📊 Sentence mapping results:', mappingResults);
+    
+    // Log some successful mappings for debugging
+    const successfulMappings = Array.from(this.sentencePositionMap.entries())
+      .filter(([_, mapping]) => mapping.confidence > 0.5)
+      .slice(0, 3);
+      
+    if (successfulMappings.length > 0) {
+      console.log('✅ Sample successful mappings:');
+      successfulMappings.forEach(([sentenceId, mapping]) => {
+        console.log(`  Sentence ${sentenceId} → Page ${mapping.pageNum} (${mapping.confidence.toFixed(2)} confidence)`);
+      });
+    }
   }
 
   /**
@@ -171,7 +198,6 @@ export class SentencePDFMapper {
       }
     }
 
-    console.log(`📍 Sentence ${sentenceId} → Page ${bestMatch.pageNum} (${bestMatch.matchType}, confidence: ${bestMatch.confidence.toFixed(2)})`);
     return bestMatch;
   }
 

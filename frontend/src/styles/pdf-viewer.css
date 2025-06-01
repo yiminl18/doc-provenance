@@ -4,7 +4,7 @@
    ======================================== */
 
 /* ===== MAIN PDF VIEWER CONTAINER ===== */
-.dual-view-pdf-viewer {
+.hybrid-pdf-viewer {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -13,7 +13,7 @@
   overflow: hidden;
 }
 
-.dual-view-pdf-viewer.fullscreen {
+.hybrid-pdf-viewer.fullscreen {
   position: fixed;
   top: 0;
   left: 0;
@@ -26,7 +26,7 @@
 }
 
 /* ===== PDF HEADER ===== */
-.dual-view-pdf-viewer .pdf-header {
+.hybrid-pdf-viewer .pdf-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -37,7 +37,7 @@
   flex-shrink: 0;
 }
 
-.dual-view-pdf-viewer .pdf-title {
+.hybrid-pdf-viewer .pdf-title {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -48,12 +48,12 @@
   letter-spacing: 0.05em;
 }
 
-.dual-view-pdf-viewer .pdf-title svg {
+.hybrid-pdf-viewer .pdf-title svg {
   color: var(--primary-blue);
   font-size: var(--text-base);
 }
 
-.dual-view-pdf-viewer .provenance-badge {
+.hybrid-pdf-viewer .provenance-badge {
   background-color: var(--success-green);
   color: white;
   padding: var(--space-1) var(--space-3);
@@ -66,13 +66,13 @@
   box-shadow: var(--shadow-raised);
 }
 
-.dual-view-pdf-viewer .pdf-controls {
+.hybrid-pdf-viewer .pdf-controls {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
-.dual-view-pdf-viewer .control-btn {
+.hybrid-pdf-viewer .control-btn {
   padding: var(--space-2) var(--space-3);
   border: var(--border-medium) solid var(--win95-border-dark);
   background-color: var(--win95-lighter);
@@ -88,24 +88,24 @@
   box-shadow: var(--shadow-raised);
 }
 
-.dual-view-pdf-viewer .control-btn:hover {
+.hybrid-pdf-viewer .control-btn:hover {
   background-color: var(--win95-lightest);
   border-color: var(--primary-blue);
 }
 
-.dual-view-pdf-viewer .control-btn:active {
+.hybrid-pdf-viewer .control-btn:active {
   box-shadow: var(--shadow-pressed);
   transform: translate(1px, 1px);
 }
 
-.dual-view-pdf-viewer .control-btn:disabled {
+.hybrid-pdf-viewer .control-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   background-color: var(--bg-secondary);
   color: var(--win95-text-muted);
 }
 
-.dual-view-pdf-viewer .zoom-display {
+.hybrid-pdf-viewer .zoom-display {
   padding: var(--space-2) var(--space-3);
   font-weight: var(--font-bold);
   color: var(--primary-blue);
@@ -118,19 +118,19 @@
   box-shadow: var(--shadow-soft);
 }
 
-.dual-view-pdf-viewer .close-btn {
+.hybrid-pdf-viewer .close-btn {
   background-color: var(--danger-red);
   border-color: var(--danger-red);
   color: white;
 }
 
-.dual-view-pdf-viewer .close-btn:hover {
+.hybrid-pdf-viewer .close-btn:hover {
   background-color: var(--danger-red-hover);
   border-color: var(--danger-red-hover);
 }
 
 /* ===== PAGE NAVIGATION ===== */
-.dual-view-pdf-viewer .page-navigation {
+.hybrid-pdf-viewer .page-navigation {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -142,7 +142,7 @@
   box-shadow: var(--shadow-pressed);
 }
 
-.dual-view-pdf-viewer .nav-btn {
+.hybrid-pdf-viewer .nav-btn {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -160,24 +160,24 @@
   box-shadow: var(--shadow-raised);
 }
 
-.dual-view-pdf-viewer .nav-btn:hover:not(:disabled) {
+.hybrid-pdf-viewer .nav-btn:hover:not(:disabled) {
   background-color: var(--win95-lightest);
   border-color: var(--primary-blue);
 }
 
-.dual-view-pdf-viewer .nav-btn:active:not(:disabled) {
+.hybrid-pdf-viewer .nav-btn:active:not(:disabled) {
   box-shadow: var(--shadow-pressed);
   transform: translate(1px, 1px);
 }
 
-.dual-view-pdf-viewer .nav-btn:disabled {
+.hybrid-pdf-viewer .nav-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   background-color: var(--bg-secondary);
   color: var(--win95-text-muted);
 }
 
-.dual-view-pdf-viewer .page-info {
+.hybrid-pdf-viewer .page-info {
   font-weight: var(--font-bold);
   color: var(--primary-blue);
   font-family: var(--font-mono);
@@ -192,7 +192,7 @@
   letter-spacing: 0.05em;
 }
 
-.dual-view-pdf-viewer .sentence-status {
+.hybrid-pdf-viewer .sentence-status {
   color: var(--win95-text-muted);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -203,20 +203,20 @@
   letter-spacing: 0.05em;
 }
 
-.dual-view-pdf-viewer .mapping-quality {
+.hybrid-pdf-viewer .mapping-quality {
   color: var(--success-green);
   font-weight: var(--font-semibold);
 }
 
 /* ===== MAIN CONTENT LAYOUT ===== */
-.dual-view-pdf-viewer .dual-view-content {
+.hybrid-pdf-viewer .hybrid-content {
   flex: 1;
   display: flex;
   overflow: hidden;
   background-color: var(--bg-paper);
 }
 
-.dual-view-pdf-viewer .pdf-main-view {
+.hybrid-pdf-viewer .pdf-main-view {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -225,16 +225,16 @@
   background-color: var(--bg-paper);
 }
 
-.dual-view-pdf-viewer .pdf-main-view.with-detail-panel {
+.hybrid-pdf-viewer .pdf-main-view.with-detail-panel {
   flex: 0 0 70%;
   border-right: var(--border-medium) solid var(--win95-border-dark);
 }
 
-.dual-view-pdf-viewer .pdf-main-view.full-width {
+.hybrid-pdf-viewer .pdf-main-view.full-width {
   flex: 1;
 }
 
-.dual-view-pdf-viewer .pdf-content {
+.hybrid-pdf-viewer .pdf-content {
   flex: 1;
   overflow: auto;
   padding: var(--space-4);
@@ -244,7 +244,7 @@
   background-color: var(--bg-paper);
 }
 
-.dual-view-pdf-viewer .pdf-page-container {
+.hybrid-pdf-viewer .pdf-page-container {
   position: relative;
   display: inline-block;
   border: var(--border-medium) solid var(--win95-border-dark);
@@ -252,12 +252,12 @@
   box-shadow: var(--shadow-raised);
 }
 
-.dual-view-pdf-viewer .pdf-canvas {
+.hybrid-pdf-viewer .pdf-canvas {
   display: block;
   border: none;
 }
 
-.dual-view-pdf-viewer .pdf-text-layer {
+.hybrid-pdf-viewer .pdf-text-layer {
   position: absolute;
   left: 0;
   top: 0;
@@ -269,8 +269,8 @@
   pointer-events: none;
 }
 
-.dual-view-pdf-viewer .pdf-text-layer span,
-.dual-view-pdf-viewer .pdf-text-layer div {
+.hybrid-pdf-viewer .pdf-text-layer span,
+.hybrid-pdf-viewer .pdf-text-layer div {
   color: transparent;
   position: absolute;
   white-space: pre;
@@ -278,7 +278,7 @@
   transform-origin: 0% 0%;
 }
 
-.dual-view-pdf-viewer .pdf-highlight-layer {
+.hybrid-pdf-viewer .pdf-highlight-layer {
   position: absolute;
   left: 0;
   top: 0;
@@ -288,7 +288,7 @@
   z-index: 10;
 }
 
-.dual-view-pdf-viewer .pdf-light-highlight {
+.hybrid-pdf-viewer .pdf-light-highlight {
   background-color: var(--warning-orange-light);
   border: var(--border-medium) solid var(--warning-orange);
   box-shadow: var(--shadow-soft);
@@ -308,7 +308,7 @@
 }
 
 /* ===== DETAIL PANEL ===== */
-.dual-view-pdf-viewer .detail-panel {
+.hybrid-pdf-viewer .detail-panel {
   flex: 0 0 30%;
   background-color: var(--bg-panel);
   display: flex;
@@ -318,7 +318,7 @@
 }
 
 /* ===== PROVENANCE INFO FOOTER ===== */
-.dual-view-pdf-viewer .provenance-info {
+.hybrid-pdf-viewer .provenance-info {
   padding: var(--space-4);
   background-color: var(--accent-purple-light);
   border-top: var(--border-medium) solid var(--accent-purple);
@@ -326,7 +326,7 @@
   box-shadow: var(--shadow-raised);
 }
 
-.dual-view-pdf-viewer .provenance-info h4 {
+.hybrid-pdf-viewer .provenance-info h4 {
   margin: 0 0 var(--space-3) 0;
   color: var(--win95-text);
   display: flex;
@@ -338,24 +338,24 @@
   letter-spacing: 0.05em;
 }
 
-.dual-view-pdf-viewer .provenance-info svg {
+.hybrid-pdf-viewer .provenance-info svg {
   color: var(--accent-purple);
 }
 
-.dual-view-pdf-viewer .provenance-summary {
+.hybrid-pdf-viewer .provenance-summary {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
 }
 
-.dual-view-pdf-viewer .summary-item {
+.hybrid-pdf-viewer .summary-item {
   font-size: var(--text-xs);
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
 }
 
-.dual-view-pdf-viewer .summary-item strong {
+.hybrid-pdf-viewer .summary-item strong {
   color: var(--accent-purple);
   font-weight: var(--font-semibold);
   text-transform: uppercase;
@@ -364,9 +364,9 @@
 }
 
 /* ===== EMPTY STATES ===== */
-.dual-view-pdf-viewer .pdf-viewer-empty,
-.dual-view-pdf-viewer .pdf-viewer-loading,
-.dual-view-pdf-viewer .pdf-viewer-error {
+.hybrid-pdf-viewer .pdf-viewer-empty,
+.hybrid-pdf-viewer .pdf-viewer-loading,
+.hybrid-pdf-viewer .pdf-viewer-error {
   height: 100%;
   display: flex;
   align-items: center;
@@ -374,9 +374,9 @@
   background-color: var(--bg-panel);
 }
 
-.dual-view-pdf-viewer .empty-content,
-.dual-view-pdf-viewer .loading-content,
-.dual-view-pdf-viewer .error-content {
+.hybrid-pdf-viewer .empty-content,
+.hybrid-pdf-viewer .loading-content,
+.hybrid-pdf-viewer .error-content {
   text-align: center;
   color: var(--win95-text-muted);
   max-width: 400px;
@@ -386,18 +386,18 @@
   box-shadow: var(--shadow-raised);
 }
 
-.dual-view-pdf-viewer .empty-content svg,
-.dual-view-pdf-viewer .loading-content svg,
-.dual-view-pdf-viewer .error-content svg {
+.hybrid-pdf-viewer .empty-content svg,
+.hybrid-pdf-viewer .loading-content svg,
+.hybrid-pdf-viewer .error-content svg {
   font-size: var(--text-4xl);
   color: var(--primary-blue);
   margin-bottom: var(--space-4);
   opacity: 0.7;
 }
 
-.dual-view-pdf-viewer .empty-content h3,
-.dual-view-pdf-viewer .loading-content h3,
-.dual-view-pdf-viewer .error-content h3 {
+.hybrid-pdf-viewer .empty-content h3,
+.hybrid-pdf-viewer .loading-content h3,
+.hybrid-pdf-viewer .error-content h3 {
   color: var(--win95-text);
   margin-bottom: var(--space-3);
   font-size: var(--text-lg);
@@ -406,15 +406,15 @@
   letter-spacing: 0.05em;
 }
 
-.dual-view-pdf-viewer .empty-content p,
-.dual-view-pdf-viewer .loading-content p,
-.dual-view-pdf-viewer .error-content p {
+.hybrid-pdf-viewer .empty-content p,
+.hybrid-pdf-viewer .loading-content p,
+.hybrid-pdf-viewer .error-content p {
   margin-bottom: var(--space-4);
   line-height: var(--leading-normal);
   font-size: var(--text-sm);
 }
 
-.dual-view-pdf-viewer .retry-btn {
+.hybrid-pdf-viewer .retry-btn {
   padding: var(--space-3) var(--space-6);
   background-color: var(--primary-blue);
   color: white;
@@ -429,97 +429,97 @@
   box-shadow: var(--shadow-raised);
 }
 
-.dual-view-pdf-viewer .retry-btn:hover {
+.hybrid-pdf-viewer .retry-btn:hover {
   background-color: var(--primary-blue-hover);
   border-color: var(--primary-blue-hover);
 }
 
-.dual-view-pdf-viewer .retry-btn:active {
+.hybrid-pdf-viewer .retry-btn:active {
   box-shadow: var(--shadow-pressed);
   transform: translate(1px, 1px);
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1200px) {
-  .dual-view-pdf-viewer .pdf-main-view.with-detail-panel {
+  .hybrid-pdf-viewer .pdf-main-view.with-detail-panel {
     flex: 0 0 65%;
   }
   
-  .dual-view-pdf-viewer .detail-panel {
+  .hybrid-pdf-viewer .detail-panel {
     flex: 0 0 35%;
   }
 }
 
 @media (max-width: 900px) {
-  .dual-view-pdf-viewer .dual-view-content {
+  .hybrid-pdf-viewer .hybrid-content {
     flex-direction: column;
   }
   
-  .dual-view-pdf-viewer .pdf-main-view {
+  .hybrid-pdf-viewer .pdf-main-view {
     flex: 0 0 60%;
     border-right: none;
     border-bottom: var(--border-medium) solid var(--win95-border-dark);
   }
   
-  .dual-view-pdf-viewer .detail-panel {
+  .hybrid-pdf-viewer .detail-panel {
     flex: 0 0 40%;
     border-left: none;
     border-top: var(--border-medium) solid var(--win95-border-dark);
   }
   
-  .dual-view-pdf-viewer .pdf-header {
+  .hybrid-pdf-viewer .pdf-header {
     padding: var(--space-2) var(--space-3);
     flex-wrap: wrap;
     gap: var(--space-2);
   }
   
-  .dual-view-pdf-viewer .pdf-controls {
+  .hybrid-pdf-viewer .pdf-controls {
     flex-wrap: wrap;
     gap: var(--space-1);
   }
   
-  .dual-view-pdf-viewer .control-btn {
+  .hybrid-pdf-viewer .control-btn {
     min-width: 28px;
     min-height: 28px;
     padding: var(--space-1) var(--space-2);
   }
   
-  .dual-view-pdf-viewer .page-navigation {
+  .hybrid-pdf-viewer .page-navigation {
     padding: var(--space-2) var(--space-3);
     gap: var(--space-3);
     flex-wrap: wrap;
   }
   
-  .dual-view-pdf-viewer .nav-btn {
+  .hybrid-pdf-viewer .nav-btn {
     padding: var(--space-2) var(--space-3);
     font-size: var(--text-xs);
   }
   
-  .dual-view-pdf-viewer .provenance-summary {
+  .hybrid-pdf-viewer .provenance-summary {
     grid-template-columns: 1fr;
     gap: var(--space-2);
   }
 }
 
 @media (max-width: 640px) {
-  .dual-view-pdf-viewer .pdf-content {
+  .hybrid-pdf-viewer .pdf-content {
     padding: var(--space-2);
   }
   
-  .dual-view-pdf-viewer .pdf-header {
+  .hybrid-pdf-viewer .pdf-header {
     padding: var(--space-2);
   }
   
-  .dual-view-pdf-viewer .page-navigation {
+  .hybrid-pdf-viewer .page-navigation {
     padding: var(--space-2);
     gap: var(--space-2);
   }
   
-  .dual-view-pdf-viewer .provenance-info {
+  .hybrid-pdf-viewer .provenance-info {
     padding: var(--space-3);
   }
   
-  .dual-view-pdf-viewer .provenance-badge {
+  .hybrid-pdf-viewer .provenance-badge {
     padding: var(--space-1) var(--space-2);
     font-size: var(--text-xs);
   }
@@ -527,25 +527,25 @@
 
 /* ===== PRINT STYLES ===== */
 @media print {
-  .dual-view-pdf-viewer {
+  .hybrid-pdf-viewer {
     background-color: white;
   }
   
-  .dual-view-pdf-viewer .pdf-header,
-  .dual-view-pdf-viewer .page-navigation,
-  .dual-view-pdf-viewer .detail-panel {
+  .hybrid-pdf-viewer .pdf-header,
+  .hybrid-pdf-viewer .page-navigation,
+  .hybrid-pdf-viewer .detail-panel {
     display: none;
   }
   
-  .dual-view-pdf-viewer .pdf-main-view {
+  .hybrid-pdf-viewer .pdf-main-view {
     flex: 1;
   }
   
-  .dual-view-pdf-viewer .pdf-content {
+  .hybrid-pdf-viewer .pdf-content {
     padding: 0;
   }
   
-  .dual-view-pdf-viewer .pdf-light-highlight {
+  .hybrid-pdf-viewer .pdf-light-highlight {
     background-color: #ffeb3b !important;
     border: var(--border-medium) solid #000 !important;
     animation: none !important;
@@ -554,218 +554,215 @@
 
 /* ===== ACCESSIBILITY ===== */
 @media (prefers-reduced-motion: reduce) {
-  .dual-view-pdf-viewer * {
+  .hybrid-pdf-viewer * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-.dual-view-pdf-viewer .control-btn:focus,
-.dual-view-pdf-viewer .nav-btn:focus {
+.hybrid-pdf-viewer .control-btn:focus,
+.hybrid-pdf-viewer .nav-btn:focus {
   outline: none;
   box-shadow: var(--shadow-raised), var(--focus-ring);
 }
 
 /* ===== SCROLLBAR STYLING ===== */
-.dual-view-pdf-viewer .pdf-content::-webkit-scrollbar {
+.hybrid-pdf-viewer .pdf-content::-webkit-scrollbar {
   width: 12px;
 }
 
-.dual-view-pdf-viewer .pdf-content::-webkit-scrollbar-track {
+.hybrid-pdf-viewer .pdf-content::-webkit-scrollbar-track {
   background-color: var(--bg-secondary);
   border: var(--border-thin) solid var(--win95-border);
 }
 
-.dual-view-pdf-viewer .pdf-content::-webkit-scrollbar-thumb {
+.hybrid-pdf-viewer .pdf-content::-webkit-scrollbar-thumb {
   background-color: var(--win95-lighter);
   border: var(--border-thin) solid var(--win95-border-dark);
   box-shadow: var(--shadow-raised);
 }
 
-.dual-view-pdf-viewer .pdf-content::-webkit-scrollbar-thumb:hover {
+.hybrid-pdf-viewer .pdf-content::-webkit-scrollbar-thumb:hover {
   background-color: var(--win95-lightest);
   border-color: var(--primary-blue);
 }
 
 /* PDF Provenance Overlay Styles */
 
-.pdf-highlight-layer {
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 10;
+/* Add this to your pdf-viewer.css file - Critical CSS for highlighting system */
+
+/* ===== PDF CONTAINER STRUCTURE ===== */
+.pdf-page-container {
+  position: relative; /* CRITICAL: Must be relative for absolute positioning of children */
+  display: inline-block;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* ===== PDF LAYERS ===== */
+.pdf-canvas {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+.pdf-text-layer {
+  position: absolute; /* CRITICAL: Absolute positioning */
+  top: 0;
+  left: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none; /* Allow clicks to pass through */
+  
+  /* PDF.js text layer styling */
+  color: transparent;
+  white-space: pre;
+  cursor: text;
+}
+
+.pdf-text-layer span {
+  position: absolute;
+  color: transparent;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+.pdf-highlight-layer {
+  position: absolute; /* CRITICAL: Must be absolute */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10; /* Above text layer */
+  pointer-events: none; /* Allow individual overlays to handle their own events */
+  overflow: hidden;
+}
+
+/* ===== PROVENANCE OVERLAYS ===== */
 .provenance-overlay {
   position: absolute;
-  border-radius: 4px;
+  pointer-events: auto; /* Enable clicks on overlays */
   transition: all 0.3s ease;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+  opacity: 0; /* Start hidden, animate in */
   
-  /* Ensure overlays are clickable */
-  pointer-events: auto;
+  /* Default appearance */
+  background-color: rgba(255, 193, 7, 0.25);
+  border: 2px solid rgba(255, 193, 7, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .provenance-overlay:hover {
   transform: scale(1.02);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  z-index: 15;
+  z-index: 15 !important;
 }
 
-/* Different highlight styles for multiple provenances */
-.provenance-overlay[data-provenance-index="0"] {
-  background-color: rgba(255, 235, 59, 0.3);
-  border: 2px solid rgba(255, 235, 59, 0.8);
+.provenance-overlay:active {
+  transform: scale(0.98);
 }
 
-.provenance-overlay[data-provenance-index="1"] {
-  background-color: rgba(76, 175, 80, 0.3);
-  border: 2px solid rgba(76, 175, 80, 0.8);
+/* ===== OVERLAY VARIANTS ===== */
+.provenance-overlay.fallback-overlay {
+  background-color: rgba(255, 69, 0, 0.7) !important;
+  border-color: rgba(255, 69, 0, 1) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-.provenance-overlay[data-provenance-index="2"] {
-  background-color: rgba(33, 150, 243, 0.3);
-  border: 2px solid rgba(33, 150, 243, 0.8);
+.provenance-overlay.test-overlay {
+  background-color: rgba(255, 0, 0, 0.5) !important;
+  border-color: red !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
 }
 
-.provenance-overlay[data-provenance-index="3"] {
-  background-color: rgba(255, 152, 0, 0.3);
-  border: 2px solid rgba(255, 152, 0, 0.8);
+/* ===== ANIMATION CLASSES ===== */
+.provenance-overlay.animate-in {
+  animation: overlayFadeIn 0.5s ease-out forwards;
 }
 
-.provenance-overlay[data-provenance-index="4"] {
-  background-color: rgba(156, 39, 176, 0.3);
-  border: 2px solid rgba(156, 39, 176, 0.8);
-}
-
-/* Pulse animation for newly added overlays */
-@keyframes provenance-pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.7;
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
   }
-  50% {
-    transform: scale(1.05);
+  to {
     opacity: 1;
-  }
-  100% {
     transform: scale(1);
-    opacity: 0.8;
   }
 }
 
-.provenance-overlay.pulse {
-  animation: provenance-pulse 1s ease-in-out;
+.provenance-overlay.animate-out {
+  animation: overlayFadeOut 0.3s ease-in forwards;
 }
 
-/* Highlight flash effect for clicked sentences */
-@keyframes sentence-highlight-flash {
-  0% {
-    background-color: transparent;
-    box-shadow: none;
+@keyframes overlayFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
   }
-  25% {
-    background-color: rgba(255, 235, 59, 0.6);
-    box-shadow: 0 0 0 4px rgba(255, 235, 59, 0.3);
-  }
-  75% {
-    background-color: rgba(255, 235, 59, 0.4);
-    box-shadow: 0 0 0 2px rgba(255, 235, 59, 0.2);
-  }
-  100% {
-    background-color: transparent;
-    box-shadow: none;
+  to {
+    opacity: 0;
+    transform: scale(0.8);
   }
 }
 
+/* ===== SENTENCE HIGHLIGHT FLASH (for provenance panel) ===== */
 .sentence-highlight-flash {
-  animation: sentence-highlight-flash 2s ease-in-out;
+  background-color: rgba(255, 193, 7, 0.3) !important;
+  animation: highlightFlash 2s ease-out;
 }
 
-/* Focus state for overlays */
+@keyframes highlightFlash {
+  0% { background-color: rgba(255, 193, 7, 0.6); }
+  100% { background-color: transparent; }
+}
+
+/* ===== DEBUG STYLES ===== */
+.debug-text-span {
+  border: 1px solid rgba(255, 0, 0, 0.3) !important;
+  background-color: rgba(255, 0, 0, 0.1) !important;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+  .provenance-overlay {
+    min-height: 30px; /* Ensure overlays are touchable on mobile */
+    min-width: 30px;
+  }
+  
+  .fallback-overlay {
+    font-size: 10px;
+    padding: 5px;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
 .provenance-overlay:focus {
-  outline: 3px solid rgba(33, 150, 243, 0.8);
+  outline: 2px solid #007bff;
   outline-offset: 2px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .provenance-overlay {
-    border-width: 3px; /* Thicker borders on mobile for better visibility */
-    min-height: 20px; /* Ensure minimum touch target */
-  }
-  
-  .provenance-overlay:hover {
-    transform: scale(1.05); /* Slightly more emphasis on mobile */
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .provenance-overlay {
-    border-width: 3px;
-    background-color: rgba(255, 255, 0, 0.5) !important;
-    border-color: rgba(0, 0, 0, 0.9) !important;
-  }
-}
-
-/* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   .provenance-overlay {
     transition: none;
   }
   
-  .provenance-overlay:hover {
-    transform: none;
-  }
-  
-  .provenance-overlay.pulse {
+  .provenance-overlay.animate-in,
+  .provenance-overlay.animate-out {
     animation: none;
-  }
-  
-  .sentence-highlight-flash {
-    animation: none;
-    background-color: rgba(255, 235, 59, 0.4);
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .provenance-overlay {
-    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
-  }
-  
-  .provenance-overlay:hover {
-    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.25);
-  }
-  
-  .provenance-overlay[data-provenance-index="0"] {
-    background-color: rgba(255, 235, 59, 0.4);
-    border-color: rgba(255, 235, 59, 0.9);
-  }
-  
-  .provenance-overlay[data-provenance-index="1"] {
-    background-color: rgba(76, 175, 80, 0.4);
-    border-color: rgba(76, 175, 80, 0.9);
-  }
-  
-  .provenance-overlay[data-provenance-index="2"] {
-    background-color: rgba(33, 150, 243, 0.4);
-    border-color: rgba(33, 150, 243, 0.9);
-  }
-  
-  .provenance-overlay[data-provenance-index="3"] {
-    background-color: rgba(255, 152, 0, 0.4);
-    border-color: rgba(255, 152, 0, 0.9);
-  }
-  
-  .provenance-overlay[data-provenance-index="4"] {
-    background-color: rgba(156, 39, 176, 0.4);
-    border-color: rgba(156, 39, 176, 0.9);
   }
 }

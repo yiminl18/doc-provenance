@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/feedback-modal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -15,31 +15,31 @@ import {
   faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons';
 import { submitFeedback } from '../services/api';
+import userStudyLogger from '../services/UserStudyLogger';
 
 const FeedbackModal = ({ 
   pdfDocument, 
   question, 
   allProvenances, 
   onSubmit, 
-  onClose
-   
+  onClose   
 }) => {
   const [feedback, setFeedback] = useState({
     // Provenance Quality Assessment (for each provenance viewed)
     provenanceQuality: {
-      correctness: null, // 'correct_answer', 'correct_but_wrong_context', 'partially_correct', 'incorrect'
-      relevance: null,   // 'highly_relevant', 'somewhat_relevant', 'barely_relevant', 'not_relevant'
-      completeness: null, // 'complete', 'mostly_complete', 'incomplete', 'missing_key_info'
-      contextual_appropriateness: null // 'perfectly_appropriate', 'mostly_appropriate', 'somewhat_off', 'wrong_context'
+      correctness: null,
+      relevance: null,
+      completeness: null,
+      contextual_appropriateness: null
     },
     
     // Overall Experience Assessment
     overallExperience: {
-      waitTime: null, // 'faster_than_expected', 'as_expected', 'slower_than_desired', 'too_slow'
-      waitTimePerception: null, // 'very_quick', 'quick', 'reasonable', 'slow', 'very_slow'
-      satisfaction: null, // 'very_satisfied', 'satisfied', 'neutral', 'dissatisfied', 'very_dissatisfied'
-      taskCompletion: null, // 'fully_completed', 'mostly_completed', 'partially_completed', 'not_completed'
-      wouldUseAgain: null // 'definitely', 'probably', 'maybe', 'probably_not', 'definitely_not'
+      waitTime: null,
+      waitTimePerception: null,
+      satisfaction: null,
+      taskCompletion: null,
+      wouldUseAgain: null
     },
     
     // Specific Issues
@@ -48,7 +48,7 @@ const FeedbackModal = ({
     // Open-ended feedback
     comments: '',
     improvements: '',
-    contextualIssues: '', // New: for cases where answer is technically correct but contextually wrong
+    contextualIssues: '',
     
     // Algorithm perception
     trustworthiness: null,
@@ -56,9 +56,23 @@ const FeedbackModal = ({
   });
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [viewedProvenances] = useState(new Set()); // Track which provenances user has seen
+  const [viewedProvenances] = useState(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [modalOpenTime] = useState(Date.now());
+  const [modalOpenLogged, setModalOpenLogged] = useState(false);
+
+  // Log modal opening
+  useEffect(() => {
+    if (!modalOpenLogged && question) {
+      userStudyLogger.logFeedbackModalOpened(
+        question.id || question.questionId,
+        allProvenances?.length || 0,
+        question.processingTime || null
+      );
+      setModalOpenLogged(true);
+    }
+  }, [question, allProvenances, modalOpenLogged]);
 
   const steps = [
     {
@@ -279,43 +293,56 @@ const FeedbackModal = ({
     setSubmitError(null);
 
     try {
+      const timeSpent = (Date.now() - modalOpenTime) / 1000;
+
       // Enhanced submission data with session information
       const submissionData = {
         // Core session info
-        questionId: question?.id,
-        questionText: question?.text,
-        documentId: pdfDocument.documentId,
-        documentFilename: pdfDocument.documentName,
+        questionId: question?.id || question?.questionId,
+        questionText: question?.text || question?.questionText,
+        documentId: pdfDocument?.id || pdfDocument?.documentId,
+        documentFilename: pdfDocument?.filename || pdfDocument?.documentName,
         
         // Processing info
         provenanceCount: allProvenances?.length || 0,
         provenancesViewed: Array.from(viewedProvenances),
-        //processingTime: session?.processingTime || 
-        //  (session?.completedAt && session?.createdAt 
-        //    ? (new Date(session.completedAt) - new Date(session.createdAt)) / 1000
-        //    : null),
-        
+        processingTime: question?.processingTime || null,
         
         // Feedback data
         feedback: {
           ...feedback,
           timestamp: new Date().toISOString(),
-          submissionTime: Date.now()//,
-          //algorithmMethod: session?.algorithmMethod || 'default'
+          submissionTime: Date.now(),
+          timeSpentInModal: timeSpent
         }
       };
 
       console.log('🔄 Submitting feedback:', submissionData);
 
-      // Try to submit via the API
+      // Log the comprehensive feedback submission
+      await userStudyLogger.logFeedbackSubmitted(
+        submissionData.questionId,
+        submissionData.documentId,
+        submissionData
+      );
+
+      // Try to submit via the API (if endpoint exists)
       try {
         const response = await submitFeedback(submissionData);
         if (response.success) {
           console.log('✅ Feedback submitted successfully via API');
         }
       } catch (apiError) {
-        console.warn('⚠️ API feedback submission failed, using local callback:', apiError);
+        console.warn('⚠️ API feedback submission failed, but logged locally:', apiError);
+        // Don't fail the entire process if API is unavailable
       }
+
+      // Log modal closure with successful submission
+      await userStudyLogger.logFeedbackModalClosed(
+        submissionData.questionId,
+        'submitted',
+        timeSpent
+      );
 
       // Always call the local callback as well
       onSubmit(submissionData);
@@ -323,9 +350,29 @@ const FeedbackModal = ({
     } catch (error) {
       console.error('❌ Error submitting feedback:', error);
       setSubmitError(error.message);
+      
+      // Log the error
+      await userStudyLogger.logError(
+        'feedback_submission_error',
+        error.message,
+        { question_id: question?.id || question?.questionId }
+      );
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleClose = async () => {
+    const timeSpent = (Date.now() - modalOpenTime) / 1000;
+    
+    // Log modal closure without submission
+    await userStudyLogger.logFeedbackModalClosed(
+      question?.id || question?.questionId,
+      'cancelled',
+      timeSpent
+    );
+    
+    onClose();
   };
 
   const getCurrentQuestions = () => {
@@ -357,7 +404,6 @@ const FeedbackModal = ({
   const getCompletionPercentage = () => {
     const allQuestions = [...qualityQuestions, ...timingQuestions, ...experienceQuestions];
     const completedQuestions = allQuestions.filter(q => {
-      // Check the correct category for each question type
       if (qualityQuestions.includes(q)) {
         return feedback.provenanceQuality[q.key] !== null;
       } else if (timingQuestions.includes(q)) {
@@ -376,9 +422,10 @@ const FeedbackModal = ({
   // Enhanced context display
   const getSessionContext = () => {
     return {
-      questionText: question?.text || 'Unknown question',
-      documentName: pdfDocument?.documentName || 'Unknown document',
-      provenenceCount: allProvenances?.length || 0,
+      questionText: question?.text || question?.questionText || 'Unknown question',
+      documentName: pdfDocument?.filename || pdfDocument?.documentName || 'Unknown document',
+      provenanceCount: allProvenances?.length || 0,
+      processingTime: question?.processingTime || null,
       processingMethod: question?.processingMethod || 'Unknown'
     };
   };
@@ -393,10 +440,6 @@ const FeedbackModal = ({
             <h3>USER_STUDY_EVALUATION</h3>
             <div className="evaluation-context">
               <div className="context-item">
-                <span className="context-label">Session:</span>
-                <span className="context-value">{sessionContext.sessionId}</span>
-              </div>
-              <div className="context-item">
                 <span className="context-label">Question:</span>
                 <span className="context-value">
                   "{sessionContext.questionText.length > 60 
@@ -406,7 +449,7 @@ const FeedbackModal = ({
               </div>
               <div className="context-item">
                 <span className="context-label">Evidence Found:</span>
-                <span className="context-value">{sessionContext.provenenceCount} provenances</span>
+                <span className="context-value">{sessionContext.provenanceCount} provenances</span>
               </div>
               <div className="context-item">
                 <span className="context-label">Processing Time:</span>
@@ -423,7 +466,7 @@ const FeedbackModal = ({
               </div>
             </div>
           </div>
-          <button className="close-btn" onClick={onClose}>
+          <button className="close-btn" onClick={handleClose}>
             <FontAwesomeIcon icon={faTimes} />
           </button>
         </div>
@@ -567,7 +610,7 @@ const FeedbackModal = ({
         <div className="modal-footer">
           <button 
             className="secondary-btn" 
-            onClick={currentStep === 0 ? onClose : handlePrevious}
+            onClick={currentStep === 0 ? handleClose : handlePrevious}
             disabled={isSubmitting}
           >
             {currentStep === 0 ? 'CANCEL' : 'PREVIOUS'}

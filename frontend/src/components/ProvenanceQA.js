@@ -38,7 +38,8 @@ const ProvenanceQA = forwardRef(({
     onAddQuestionToLibrary,
     onProvenanceSelect,
     onFeedbackRequest,
-    onHighlightInPDF
+    onHighlightInPDF,
+    onNavigationTrigger
 }, ref) => {
     // Question input state
     const [currentQuestion, setCurrentQuestion] = useState('');
@@ -53,7 +54,6 @@ const ProvenanceQA = forwardRef(({
     const [currentProvenanceIndex, setCurrentProvenanceIndex] = useState(0);
     const [selectedProvenance, setSelectedProvenance] = useState(null);
     const [showProvenance, setShowProvenance] = useState(false);
-
     const inputRef = useRef(null);
     const historyRef = useRef(null);
 
@@ -64,6 +64,7 @@ const ProvenanceQA = forwardRef(({
 
     // Check if currently processing any questions
     const isProcessing = Array.from(questionsHistory.values()).some(q => q.isProcessing);
+
 
     useEffect(() => {
         // Reset provenance display when active question changes
@@ -88,18 +89,7 @@ const ProvenanceQA = forwardRef(({
         }
     }));
 
-    // Add this near the top of your ProvenanceQA component, after the state definitions
-   /* useEffect(() => {
-        console.log('🔍 ProvenanceQA State Debug:', {
-            hasAnswer: activeQuestion?.answer && activeQuestion.answer.trim().length > 0,
-            answerValue: activeQuestion?.answer,
-            showProvenance,
-            availableProvenancesLength: availableProvenances.length,
-            isProcessing: activeQuestion?.isProcessing,
-            processingStatus: activeQuestion?.processingStatus
-        });
-    }, [activeQuestion?.answer, showProvenance, availableProvenances.length, activeQuestion?.isProcessing]);
-*/
+
 
     // Enhanced question submission with better error handling and timing
     const handleSubmit = async (e, questionTextOverride = null) => {
@@ -404,167 +394,223 @@ const ProvenanceQA = forwardRef(({
         });
     };
 
-   // Updated handleGetNextProvenance to handle your backend format
-const handleGetNextProvenance = async () => {
-    if (!activeQuestion) {
-        console.log('❌ No active question');
-        return;
-    }
-
-    const questionId = activeQuestion.id;
-    const backendQuestionId = activeQuestion.backendQuestionId;
-    const currentCount = activeQuestion.userProvenanceCount;
-
-    console.log('🔍 handleGetNextProvenance called:', {
-        questionId,
-        backendQuestionId,
-        currentCount,
-        canRequestMore: activeQuestion.canRequestMore,
-        isProcessing: activeQuestion.isProcessing,
-        provenanceCount: activeQuestion.provenanceCount,
-        processingComplete: activeQuestion.processingComplete
-    });
-
-    try {
-        console.log(`🔍 Requesting provenance ${currentCount + 1} for question:`, questionId);
-
-        updateQuestion(questionId, { requestingProvenance: true });
-
-        const provenanceResponse = await getNextProvenance(backendQuestionId, currentCount);
-        
-        console.log('📦 Provenance response:', provenanceResponse);
-
-        if (provenanceResponse.success && provenanceResponse.has_more) {
-            const newProvenance = provenanceResponse.provenance;
-            console.log('✨ Raw provenance received:', newProvenance);
-
-            // FIXED: Handle your backend format correctly
-            let enhancedProvenance = { ...newProvenance };
-
-            // Your backend uses 'provenance_ids' and 'provenance' fields
-            if (newProvenance.provenance_ids && newProvenance.provenance) {
-                // Map your format to what the frontend expects
-                enhancedProvenance.sentences_ids = newProvenance.provenance_ids;
-                enhancedProvenance.content = [newProvenance.provenance]; // Wrap in array for consistency
-                
-                console.log('✅ Enhanced provenance with your format:', {
-                    sentences_ids: enhancedProvenance.sentences_ids,
-                    content: enhancedProvenance.content,
-                    provenance_id: enhancedProvenance.provenance_id,
-                    time: enhancedProvenance.time
-                });
-            } else {
-                console.warn('⚠️ Provenance missing expected fields:', newProvenance);
-                // Fallback: try to fetch sentences using the old method
-                if (newProvenance.sentences_ids && newProvenance.sentences_ids.length > 0) {
-                    try {
-                        console.log('📖 Fallback: Fetching sentences for IDs:', newProvenance.sentences_ids);
-                        const sentencesResponse = await fetchSentences(
-                            pdfDocument.filename,
-                            newProvenance.sentences_ids
-                        );
-
-                        if (sentencesResponse.success) {
-                            const content = newProvenance.sentences_ids.map(id =>
-                                sentencesResponse.sentences[id] || `[SENTENCE_${id}_NOT_FOUND]`
-                            );
-                            enhancedProvenance.content = content;
-                            console.log('✅ Enhanced provenance with fetched content:', enhancedProvenance);
-                        }
-                    } catch (error) {
-                        console.warn('⚠️ Failed to enhance provenance with content:', error);
-                        // Set a fallback message
-                        enhancedProvenance.content = ['Content not available'];
-                    }
-                }
-            }
-
-            // Add to provenance sources
-            const updatedProvenances = [...activeQuestion.provenanceSources, enhancedProvenance];
-
-            updateQuestion(questionId, {
-                provenanceSources: updatedProvenances,
-                userProvenanceCount: currentCount + 1,
-                requestingProvenance: false,
-                canRequestMore: provenanceResponse.remaining > 0
-            });
-
-            // Auto-select the new provenance
-            const newIndex = updatedProvenances.length - 1;
-            setCurrentProvenanceIndex(newIndex);
-            setSelectedProvenance(enhancedProvenance);
-            setShowProvenance(true);
-
-            // Notify parent components
-            if (onProvenanceSelect) {
-                onProvenanceSelect(enhancedProvenance);
-            }
-            if (onHighlightInPDF) {
-                onHighlightInPDF(enhancedProvenance);
-            }
-
-            console.log('✅ Provenance added successfully');
-
-        } else {
-            console.log('ℹ️ No provenances available:', provenanceResponse);
-            
-            // Handle different reasons
-            if (provenanceResponse.reason === 'processing_ongoing') {
-                // Still processing - keep the button available but show message
-                updateQuestion(questionId, {
-                    requestingProvenance: false,
-                    userMessage: provenanceResponse.message,
-                    canRequestMore: true // Keep button available for retry
-                });
-                
-                // Auto-retry after a delay if suggested
-                if (provenanceResponse.retry_suggested) {
-                    setTimeout(() => {
-                        console.log('🔄 Auto-retrying provenance request...');
-                        handleGetNextProvenance();
-                    }, 3000); // Retry after 3 seconds
-                }
-            } else {
-                // No more provenances available
-                updateQuestion(questionId, {
-                    requestingProvenance: false,
-                    canRequestMore: false,
-                    userMessage: provenanceResponse.message || 'No more provenances available'
-                });
-            }
+    // Updated handleGetNextProvenance to handle your backend format
+    const handleGetNextProvenance = async () => {
+        if (!activeQuestion) {
+            console.log('❌ No active question');
+            return;
         }
 
-    } catch (error) {
-        console.error('❌ Error getting next provenance:', error);
-        updateQuestion(questionId, {
-            requestingProvenance: false,
-            userMessage: `Error getting provenance: ${error.message}`
+        const questionId = activeQuestion.id;
+        const backendQuestionId = activeQuestion.backendQuestionId;
+        const currentCount = activeQuestion.userProvenanceCount;
+
+        console.log('🔍 handleGetNextProvenance called:', {
+            questionId,
+            backendQuestionId,
+            currentCount,
+            canRequestMore: activeQuestion.canRequestMore,
+            isProcessing: activeQuestion.isProcessing,
+            provenanceCount: activeQuestion.provenanceCount,
+            processingComplete: activeQuestion.processingComplete
         });
+
+        try {
+            console.log(`🔍 Requesting provenance ${currentCount + 1} for question:`, questionId);
+
+            updateQuestion(questionId, { requestingProvenance: true });
+
+            const provenanceResponse = await getNextProvenance(backendQuestionId, currentCount);
+
+            console.log('📦 Provenance response:', provenanceResponse);
+
+            if (provenanceResponse.success && provenanceResponse.has_more) {
+                const newProvenance = provenanceResponse.provenance;
+                console.log('✨ Raw provenance received:', newProvenance);
+
+                let enhancedProvenance = { ...newProvenance };
+
+                if (newProvenance.provenance_ids && newProvenance.provenance) {
+                    enhancedProvenance.sentences_ids = newProvenance.provenance_ids;
+                    enhancedProvenance.content = [newProvenance.provenance];
+
+                    console.log('✅ Enhanced provenance with your format:', {
+                        sentences_ids: enhancedProvenance.sentences_ids,
+                        content: enhancedProvenance.content,
+                        provenance_id: enhancedProvenance.provenance_id,
+                        time: enhancedProvenance.time
+                    });
+                } else {
+                    console.warn('⚠️ Provenance missing expected fields:', newProvenance);
+                    // Fallback: try to fetch sentences using the old method
+                    if (newProvenance.sentences_ids && newProvenance.sentences_ids.length > 0) {
+                        try {
+                            console.log('📖 Fallback: Fetching sentences for IDs:', newProvenance.sentences_ids);
+                            const sentencesResponse = await fetchSentences(
+                                pdfDocument.filename,
+                                newProvenance.sentences_ids
+                            );
+
+                            if (sentencesResponse.success) {
+                                const content = newProvenance.sentences_ids.map(id =>
+                                    sentencesResponse.sentences[id] || `[SENTENCE_${id}_NOT_FOUND]`
+                                );
+                                enhancedProvenance.content = content;
+                                console.log('✅ Enhanced provenance with fetched content:', enhancedProvenance);
+                            }
+                        } catch (error) {
+                            console.warn('⚠️ Failed to enhance provenance with content:', error);
+                            // Set a fallback message
+                            enhancedProvenance.content = ['Content not available'];
+                        }
+                    }
+                }
+
+                // Add to provenance sources
+                const updatedProvenances = [...activeQuestion.provenanceSources, enhancedProvenance];
+
+                updateQuestion(questionId, {
+                    provenanceSources: updatedProvenances,
+                    userProvenanceCount: currentCount + 1,
+                    requestingProvenance: false,
+                    canRequestMore: provenanceResponse.remaining > 0
+                });
+
+                // Auto-select the new provenance
+                const newIndex = updatedProvenances.length - 1;
+                setCurrentProvenanceIndex(newIndex);
+                setSelectedProvenance(enhancedProvenance);
+                setShowProvenance(true);
+
+                if (enhancedProvenance.sentences_ids && enhancedProvenance.sentences_ids.length > 0) {
+                    const firstSentenceId = enhancedProvenance.sentences_ids[0];
+                    console.log('🎯 ProvenanceQA: Triggering navigation for sentence:', firstSentenceId);
+
+                    // Set navigation trigger that will be passed to PDF viewer
+                    onNavigationTrigger({
+                        sentenceId: firstSentenceId,
+                        timestamp: Date.now(),
+                        provenanceId: enhancedProvenance.provenance_id
+                    });
+                }
+
+                // Notify parent components
+                if (onProvenanceSelect) {
+                    onProvenanceSelect(enhancedProvenance);
+                }
+                if (onHighlightInPDF) {
+                    onHighlightInPDF(enhancedProvenance);
+                }
+
+                console.log('✅ Provenance added successfully');
+
+            } else {
+                console.log('ℹ️ No provenances available:', provenanceResponse);
+
+                // Handle different reasons
+                if (provenanceResponse.reason === 'processing_ongoing') {
+                    // Still processing - keep the button available but show message
+                    updateQuestion(questionId, {
+                        requestingProvenance: false,
+                        userMessage: provenanceResponse.message,
+                        canRequestMore: true // Keep button available for retry
+                    });
+
+                    // Auto-retry after a delay if suggested
+                    if (provenanceResponse.retry_suggested) {
+                        setTimeout(() => {
+                            console.log('🔄 Auto-retrying provenance request...');
+                            handleGetNextProvenance();
+                        }, 3000); // Retry after 3 seconds
+                    }
+                } else {
+                    // No more provenances available
+                    updateQuestion(questionId, {
+                        requestingProvenance: false,
+                        canRequestMore: false,
+                        userMessage: provenanceResponse.message || 'No more provenances available'
+                    });
+                }
+            }
+
+        } catch (error) {
+            console.error('❌ Error getting next provenance:', error);
+            updateQuestion(questionId, {
+                requestingProvenance: false,
+                userMessage: `Error getting provenance: ${error.message}`
+            });
+        }
+    };
+
+  
+ const handleDotNavigation = (index) => {
+    setCurrentProvenanceIndex(index);
+    const provenance = activeQuestion.provenanceSources[index];
+    setSelectedProvenance(provenance);
+    
+    // Send navigation trigger directly (no state)
+    if (provenance.sentences_ids && provenance.sentences_ids.length > 0 && onNavigationTrigger) {
+        const firstSentenceId = provenance.sentences_ids[0];
+        console.log('🎯 ProvenanceQA: Dot nav - Sending navigation trigger for sentence:', firstSentenceId);
+        
+        onNavigationTrigger({
+            sentenceId: firstSentenceId,
+            timestamp: Date.now(),
+            provenanceId: provenance.provenance_id
+        });
+    }
+    
+    if (onProvenanceSelect) onProvenanceSelect(provenance);
+    if (onHighlightInPDF) onHighlightInPDF(provenance);
+};
+
+const handlePreviousProvenance = () => {
+    if (currentProvenanceIndex > 0) {
+        const newIndex = currentProvenanceIndex - 1;
+        setCurrentProvenanceIndex(newIndex);
+        const provenance = availableProvenances[newIndex];
+        setSelectedProvenance(provenance);
+        
+        // Send navigation trigger directly
+        if (provenance.sentences_ids && provenance.sentences_ids.length > 0 && onNavigationTrigger) {
+            const firstSentenceId = provenance.sentences_ids[0];
+            console.log('🎯 ProvenanceQA: Previous - Sending navigation trigger for sentence:', firstSentenceId);
+            
+            onNavigationTrigger({
+                sentenceId: firstSentenceId,
+                timestamp: Date.now(),
+                provenanceId: provenance.provenance_id
+            });
+        }
+        
+        if (onProvenanceSelect) onProvenanceSelect(provenance);
+        if (onHighlightInPDF) onHighlightInPDF(provenance);
     }
 };
 
-    // Navigate between provenances
-    const handlePreviousProvenance = () => {
-        if (currentProvenanceIndex > 0) {
-            const newIndex = currentProvenanceIndex - 1;
-            setCurrentProvenanceIndex(newIndex);
-            const provenance = availableProvenances[newIndex];
-            setSelectedProvenance(provenance);
-            if (onProvenanceSelect) onProvenanceSelect(provenance);
-            if (onHighlightInPDF) onHighlightInPDF(provenance);
+const handleNextProvenance = () => {
+    if (currentProvenanceIndex < availableProvenances.length - 1) {
+        const newIndex = currentProvenanceIndex + 1;
+        setCurrentProvenanceIndex(newIndex);
+        const provenance = availableProvenances[newIndex];
+        setSelectedProvenance(provenance);
+        
+        // Send navigation trigger directly
+        if (provenance.sentences_ids && provenance.sentences_ids.length > 0 && onNavigationTrigger) {
+            const firstSentenceId = provenance.sentences_ids[0];
+            console.log('🎯 ProvenanceQA: Next - Sending navigation trigger for sentence:', firstSentenceId);
+            
+            onNavigationTrigger({
+                sentenceId: firstSentenceId,
+                timestamp: Date.now(),
+                provenanceId: provenance.provenance_id
+            });
         }
-    };
-
-    const handleNextProvenance = () => {
-        if (currentProvenanceIndex < availableProvenances.length - 1) {
-            const newIndex = currentProvenanceIndex + 1;
-            setCurrentProvenanceIndex(newIndex);
-            const provenance = availableProvenances[newIndex];
-            setSelectedProvenance(provenance);
-            if (onProvenanceSelect) onProvenanceSelect(provenance);
-            if (onHighlightInPDF) onHighlightInPDF(provenance);
-        }
-    };
+        
+        if (onProvenanceSelect) onProvenanceSelect(provenance);
+        if (onHighlightInPDF) onHighlightInPDF(provenance);
+    }
+};
 
     // Handle adding question to library from history
     const handleAddQuestionFromHistory = async (questionText) => {
@@ -735,7 +781,7 @@ const handleGetNextProvenance = async () => {
                 <div className="section-header">
                     <FontAwesomeIcon icon={faTerminal} />
                     <h4>Ask Questions</h4>
-                    <div className="header-actions">
+                    {/*<div className="header-actions">
                         <span className="question-count">{questionsArray.length} questions</span>
                         <button
                             className="library-btn"
@@ -744,7 +790,7 @@ const handleGetNextProvenance = async () => {
                         >
                             <FontAwesomeIcon icon={faBookOpen} />
                         </button>
-                    </div>
+                    </div>*/}
                 </div>
 
                 {/* Error Display */}
@@ -863,13 +909,7 @@ const handleGetNextProvenance = async () => {
                                                 <button
                                                     key={index}
                                                     className={`dot ${index === currentProvenanceIndex ? 'active' : ''}`}
-                                                    onClick={() => {
-                                                        setCurrentProvenanceIndex(index);
-                                                        const provenance = activeQuestion.provenanceSources[index];
-                                                        setSelectedProvenance(provenance);
-                                                        if (onProvenanceSelect) onProvenanceSelect(provenance);
-                                                        if (onHighlightInPDF) onHighlightInPDF(provenance);
-                                                    }}
+                                                    onClick={() => handleDotNavigation(index)}
                                                 />
                                             ))}
                                         </div>
@@ -1068,7 +1108,7 @@ const handleGetNextProvenance = async () => {
                 </div>
             )}
 
-            {/* Questions History */}
+            {/* Questions History 
             {questionsArray.length > 1 && (
                 <div className="questions-history-section">
                     <div className="section-header">
@@ -1147,7 +1187,7 @@ const handleGetNextProvenance = async () => {
                         })}
                     </div>
                 </div>
-            )}
+            )*/}
         </div>
     );
 });

@@ -35,6 +35,7 @@ const LayoutBasedPDFViewer = ({
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [pdfUrl, setPdfUrl] = useState(null);
+    const [fixedDimensions, setFixedDimensions] = useState(null);
 
     // Layout-specific state
     const [layoutData, setLayoutData] = useState(null);
@@ -46,6 +47,7 @@ const LayoutBasedPDFViewer = ({
     const [isRendering, setIsRendering] = useState(false);
     const [renderError, setRenderError] = useState(null);
     const [lastRenderedPage, setLastRenderedPage] = useState(null);
+    const [provenanceVisibility, setProvenanceVisibility] = useState({ visible: true, warnings: [] });
 
     // Highlight persistence state
     const [activeHighlights, setActiveHighlights] = useState(new Map());
@@ -108,21 +110,227 @@ const LayoutBasedPDFViewer = ({
         }
     }, [pdfDoc, loading, currentPage, zoomLevel, layoutData, lastRenderedPage]);
 
+    // 1. Simple function to calculate initial fit-to-width zoom
+    const calculateFixedViewerDimensions = () => {
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+
+        // Use device screen dimensions, not viewport
+        const minWidth = Math.max(screenWidth * 0.5, 600); // At least 50% screen width or 600px
+        const minHeight = Math.max(screenHeight * 0.75, 800); // At least 75% screen height or 800px
+
+        // Cap at reasonable maximums for very large screens
+        const maxWidth = Math.min(minWidth, 800);
+        const maxHeight = Math.min(minHeight, 1200);
+
+        return {
+            width: maxWidth,
+            height: maxHeight,
+            screenWidth,
+            screenHeight
+        };
+    };
+
+
+    // 3. Initialize fixed dimensions on component mount
+    useEffect(() => {
+        const dimensions = calculateFixedViewerDimensions();
+        setFixedDimensions(dimensions);
+
+        console.log('📐 Fixed PDF viewer dimensions calculated:', {
+            viewerSize: `${dimensions.width}x${dimensions.height}`,
+            screenSize: `${dimensions.screenWidth}x${dimensions.screenHeight}`,
+            percentages: {
+                width: `${((dimensions.width / dimensions.screenWidth) * 100).toFixed(1)}%`,
+                height: `${((dimensions.height / dimensions.screenHeight) * 100).toFixed(1)}%`
+            }
+        });
+    }, []); // Only run once on mount
+
+    // 4. Updated initial zoom calculation for fixed dimensions
+    const calculateInitialZoomFixed = (viewport, fixedWidth) => {
+        if (!viewport || !fixedWidth) return 1.0;
+
+        // Fit page width to fixed viewer width with padding
+        const padding = 40; // 20px on each side
+        const availableWidth = fixedWidth - padding;
+        const scale = availableWidth / viewport.width;
+
+        // Clamp to reasonable bounds - can be more generous since we have fixed space
+        return Math.max(0.4, Math.min(2.5, scale));
+    };
+
+    const validateAndFilterBoundingBox = (bbox, sentenceText, pageLayout) => {
+        if (!bbox || typeof bbox.x0 !== 'number' || typeof bbox.y0 !== 'number') {
+            console.warn('⚠️ Invalid bbox coordinates:', bbox);
+            return null;
+        }
+
+        const width = bbox.x1 - bbox.x0;
+        const height = bbox.y1 - bbox.y0;
+
+        // Basic dimension validation
+        if (width <= 0 || height <= 0) {
+            console.warn('⚠️ Bbox has invalid dimensions:', { width, height });
+            return null;
+        }
+
+        // Calculate expected text dimensions
+        const textLength = sentenceText?.length || 0;
+        const estimatedCharsPerLine = 80; // Rough estimate
+        const estimatedLines = Math.ceil(textLength / estimatedCharsPerLine);
+        const estimatedHeight = estimatedLines * 12; // ~12pt font height
+        const estimatedWidth = Math.min(textLength * 8, 500); // ~8px per char, max 500px
+
+        // Validate against expected dimensions
+        const heightRatio = height / estimatedHeight;
+        const widthRatio = width / estimatedWidth;
+
+        // Flags for oversized bboxes
+        const isTooTall = heightRatio > 3.0; // More than 3x expected height
+        const isTooWide = widthRatio > 2.0;  // More than 2x expected width
+        const isTooLarge = width > 600 || height > 200; // Absolute size limits
+
+        if (isTooTall || isTooWide || isTooLarge) {
+            console.warn('⚠️ Bbox appears oversized:', {
+                bbox: { width: width.toFixed(1), height: height.toFixed(1) },
+                estimated: { width: estimatedWidth.toFixed(1), height: estimatedHeight.toFixed(1) },
+                ratios: { width: widthRatio.toFixed(2), height: heightRatio.toFixed(2) },
+                flags: { isTooTall, isTooWide, isTooLarge },
+                textLength,
+                confidence: bbox.confidence
+            });
+
+            // For oversized boxes, try to create a more reasonable approximation
+            if (pageLayout) {
+                const adjustedBbox = attemptBboxCorrection(bbox, sentenceText, pageLayout);
+                if (adjustedBbox) {
+                    console.log('✅ Corrected oversized bbox');
+                    return adjustedBbox;
+                }
+            }
+
+            // If confidence is low and bbox is oversized, skip it
+            if (bbox.confidence < 0.6) {
+                console.warn('❌ Rejecting oversized bbox with low confidence');
+                return null;
+            }
+        }
+
+        // Additional validation: check if bbox is reasonable for the confidence level
+        const minConfidenceForLargeBox = 0.7;
+        if ((isTooWide || isTooTall) && bbox.confidence < minConfidenceForLargeBox) {
+            console.warn('❌ Rejecting large bbox with insufficient confidence:', {
+                confidence: bbox.confidence,
+                required: minConfidenceForLargeBox
+            });
+            return null;
+        }
+
+        console.log('✅ Bbox validation passed:', {
+            dimensions: { width: width.toFixed(1), height: height.toFixed(1) },
+            confidence: bbox.confidence,
+            ratios: { width: widthRatio.toFixed(2), height: heightRatio.toFixed(2) }
+        });
+
+        return bbox;
+    };
+
+    const attemptBboxCorrection = (bbox, sentenceText, pageLayout) => {
+        if (!pageLayout?.elements || !sentenceText) return null;
+
+        // Find elements that might contain parts of our sentence
+        const words = sentenceText.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+        if (words.length === 0) return null;
+
+        // Look for text elements that contain our words
+        const matchingElements = pageLayout.elements.filter(el => {
+            if (!el.text || el.width > 400 || el.height > 100) return false; // Skip large elements
+
+            const elementText = el.text.toLowerCase();
+            const matchCount = words.filter(word => elementText.includes(word)).length;
+            return matchCount >= Math.min(2, words.length * 0.3); // At least 30% word match
+        });
+
+        if (matchingElements.length === 0) return null;
+
+        // Create a union of matching elements
+        const leftMost = Math.min(...matchingElements.map(el => el.x0));
+        const rightMost = Math.max(...matchingElements.map(el => el.x1));
+        const topMost = Math.max(...matchingElements.map(el => el.y1)); // PDF coords
+        const bottomMost = Math.min(...matchingElements.map(el => el.y0));
+
+        const correctedBbox = {
+            ...bbox,
+            x0: leftMost,
+            y0: bottomMost,
+            x1: rightMost,
+            y1: topMost,
+            confidence: Math.max(0.5, bbox.confidence * 0.8), // Reduce confidence for corrected bbox
+            corrected: true
+        };
+
+        const correctedWidth = correctedBbox.x1 - correctedBbox.x0;
+        const correctedHeight = correctedBbox.y1 - correctedBbox.y0;
+
+        // Validate the correction
+        if (correctedWidth > 0 && correctedHeight > 0 &&
+            correctedWidth < bbox.x1 - bbox.x0 &&
+            correctedHeight < bbox.y1 - bbox.y0) {
+
+            console.log('✅ Successfully corrected bbox:', {
+                original: { width: (bbox.x1 - bbox.x0).toFixed(1), height: (bbox.y1 - bbox.y0).toFixed(1) },
+                corrected: { width: correctedWidth.toFixed(1), height: correctedHeight.toFixed(1) },
+                matchingElements: matchingElements.length
+            });
+
+            return correctedBbox;
+        }
+
+        return null;
+    };
+
+
+    const createPreciseHighlightEnhanced = (bbox, sentenceId, index, bboxIndex, provenanceId, sentenceText) => {
+        // First validate the bounding box
+        const pageLayout = layoutData?.pages_layout?.find(p => p.page_num === bbox.page);
+        const validatedBbox = validateAndFilterBoundingBox(bbox, sentenceText, pageLayout);
+
+        if (!validatedBbox) {
+            console.warn(`❌ Skipping invalid bbox for sentence ${sentenceId}`);
+            return null;
+        }
+
+        // Use the existing createPreciseHighlight function with validated bbox
+        return createPreciseHighlight(validatedBbox, sentenceId, index, bboxIndex, provenanceId, sentenceText);
+    };
+
+
+    // 8. Add a manual "Fit to Content" button (optional)
+    const handleFitToContent = () => {
+        if (!layoutData || !containerRef.current) return;
+
+        const containerWidth = containerRef.current.clientWidth;
+        const optimalZoom = calculateInitialZoomFixed(containerRef.current.getViewport(), containerWidth);
+
+        setZoomLevel(optimalZoom);
+        setLastRenderedPage(null);
+    };
 
     // Handle provenance highlighting
     const stableCreateHighlights = useCallback(() => {
         if (selectedProvenance && layoutData && currentViewport && !isRendering && highlightLayerRef.current) {
             const provenanceId = selectedProvenance.provenance_id;
 
-            
+
             // Only recreate highlights if provenance actually changed
             if (provenanceId !== currentProvenanceId) {
                 console.log('🎯 Creating NEW layout-based highlights for provenance:', provenanceId);
                 setCurrentProvenanceId(provenanceId);
-                createLayoutBasedHighlights();
+                createLayoutBasedHighlightsEnhanced();
             } else if (!highlightsPersisted) {
                 console.log('🔄 Restoring highlights for current provenance:', provenanceId);
-                createLayoutBasedHighlights();
+                createLayoutBasedHighlightsEnhanced();
             }
         }
     }, [selectedProvenance?.provenance_id, currentPage, currentViewport, layoutData, currentProvenanceId, highlightsPersisted]);
@@ -180,6 +388,125 @@ const LayoutBasedPDFViewer = ({
             }
         }
     }, [navigationTrigger, layoutData, enhancedSentences, currentPage]);
+
+    useEffect(() => {
+        // Only log resize events, don't change zoom
+        const handleResize = () => {
+            if (fixedDimensions) {
+                console.log('📐 Window resized - PDF viewer maintains fixed size:', {
+                    viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+                    viewerSize: `${fixedDimensions.width}x${fixedDimensions.height}`,
+                    scrollable: {
+                        horizontal: fixedDimensions.width > window.innerWidth,
+                        vertical: fixedDimensions.height > window.innerHeight
+                    }
+                });
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [fixedDimensions]);
+
+    const checkProvenanceVisibilityFixed = (selectedProvenance, enhancedSentences, currentPage, zoomLevel, currentViewport, fixedDimensions) => {
+        if (!selectedProvenance?.sentences_ids || !enhancedSentences || !currentViewport || !fixedDimensions) {
+            return { visible: true, warnings: [] };
+        }
+
+        const warnings = [];
+        let hasVisibleProvenance = false;
+        let tooSmallCount = 0;
+        let outsideViewerCount = 0;
+
+        selectedProvenance.sentences_ids.forEach(sentenceId => {
+            const sentenceData = enhancedSentences[sentenceId];
+            if (!sentenceData?.bounding_boxes) return;
+
+            const pageBoxes = sentenceData.bounding_boxes.filter(bbox =>
+                bbox.page === currentPage && bbox.confidence > 0.2
+            );
+
+            pageBoxes.forEach(bbox => {
+                // Convert to viewport coordinates
+                const pdfToViewport = (pdfX, pdfY) => {
+                    const viewportX = pdfX * currentViewport.scale;
+                    const viewportY = (currentViewport.height / currentViewport.scale - pdfY) * currentViewport.scale;
+                    return { x: viewportX, y: viewportY };
+                };
+
+                const topLeft = pdfToViewport(bbox.x0, bbox.y1);
+                const bottomRight = pdfToViewport(bbox.x1, bbox.y0);
+                const width = bottomRight.x - topLeft.x;
+                const height = bottomRight.y - topLeft.y;
+
+                // Check if highlight would be too small to see clearly
+                if (width < 20 || height < 8) {
+                    tooSmallCount++;
+                } else {
+                    hasVisibleProvenance = true;
+                }
+
+                // Check if highlight is outside fixed viewer area
+                if (topLeft.x > fixedDimensions.width || bottomRight.x < 0 ||
+                    topLeft.y > fixedDimensions.height || bottomRight.y < 0) {
+                    outsideViewerCount++;
+                }
+            });
+        });
+
+        // Generate warnings
+        if (tooSmallCount > 0) {
+            warnings.push({
+                type: 'too_small',
+                message: `${tooSmallCount} highlight${tooSmallCount > 1 ? 's are' : ' is'} very small - try zooming in`,
+                severity: tooSmallCount > 2 ? 'high' : 'medium'
+            });
+        }
+
+        if (outsideViewerCount > 0) {
+            warnings.push({
+                type: 'outside_viewer',
+                message: `${outsideViewerCount} highlight${outsideViewerCount > 1 ? 's are' : ' is'} outside viewer area - scroll to see them`,
+                severity: 'medium'
+            });
+        }
+
+        if (!hasVisibleProvenance && selectedProvenance.sentences_ids.length > 0) {
+            warnings.push({
+                type: 'none_visible',
+                message: 'No highlights are clearly visible - try zooming out or reset zoom',
+                severity: 'high'
+            });
+        }
+
+        return {
+            visible: hasVisibleProvenance,
+            warnings,
+            stats: {
+                total: selectedProvenance.sentences_ids.length,
+                tooSmall: tooSmallCount,
+                outsideViewer: outsideViewerCount
+            }
+        };
+    };
+
+    // 8. Update the visibility checking effect
+    useEffect(() => {
+        if (selectedProvenance && currentViewport && fixedDimensions && !isRendering) {
+            const visibility = checkProvenanceVisibilityFixed(
+                selectedProvenance,
+                enhancedSentences,
+                currentPage,
+                zoomLevel,
+                currentViewport,
+                fixedDimensions
+            );
+            setProvenanceVisibility(visibility);
+        } else {
+            setProvenanceVisibility({ visible: true, warnings: [] });
+        }
+    }, [selectedProvenance, currentViewport, zoomLevel, currentPage, fixedDimensions, isRendering]);
+
 
 
     const loadPDFWithLayoutData = async () => {
@@ -291,6 +618,7 @@ const LayoutBasedPDFViewer = ({
             renderTaskRef.current = null;
         }
 
+
         setIsRendering(true);
         setRenderError(null);
         setHighlightsPersisted(false);
@@ -316,28 +644,26 @@ const LayoutBasedPDFViewer = ({
         const page = await pdfDoc.getPage(pageNum);
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
-        const container = containerRef.current;
 
-        // Calculate optimal scale
-        const containerWidth = container.clientWidth;
-        const containerHeight = container.clientHeight;
-        const originalViewport = page.getViewport({ scale: 1.0 });
+        const baseViewport = page.getViewport({ scale: 1.0 });
 
-        const availableWidth = containerWidth - 40;
-        const availableHeight = containerHeight - 40;
-        const scaleToFit = Math.min(
-            availableWidth / originalViewport.width,
-            availableHeight / originalViewport.height,
-            2.0 // Maximum scale
-        );
+        // Calculate initial zoom only on first render or when explicitly reset
+        let finalScale;
+        if (lastRenderedPage === null || zoomLevel === 1.0) {
+            // First time or reset - fit to fixed width
+            const initialZoom = calculateInitialZoomFixed(baseViewport, fixedDimensions.width);
+            setZoomLevel(initialZoom);
+            finalScale = initialZoom;
+            console.log(`📏 Setting initial zoom for fixed width (${fixedDimensions.width}px): ${(initialZoom * 100).toFixed(0)}%`);
+        } else {
+            // Use current zoom level
+            finalScale = zoomLevel;
+        }
 
-        const finalScale = scaleToFit * zoomLevel;
         const viewport = page.getViewport({ scale: finalScale });
-
         setCurrentViewport(viewport);
-        console.log(`📏 Viewport: ${viewport.width}x${viewport.height} at scale ${finalScale}`);
 
-        // Setup canvas
+        // Setup canvas with fixed dimensions consideration
         const devicePixelRatio = window.devicePixelRatio || 1;
         canvas.width = viewport.width * devicePixelRatio;
         canvas.height = viewport.height * devicePixelRatio;
@@ -363,7 +689,7 @@ const LayoutBasedPDFViewer = ({
         // Setup highlight layer
         setupHighlightLayer();
 
-        console.log(`✅ Page ${pageNum} rendered successfully`);
+        console.log(`✅ Page ${pageNum} rendered at ${(finalScale * 100).toFixed(0)}% zoom in fixed viewer`);
     };
 
     const setupTextLayer = async (page, viewport) => {
@@ -501,6 +827,79 @@ const LayoutBasedPDFViewer = ({
         console.log(`✅ Created ${highlightsCreated} PERSISTENT highlights on page ${currentPage}`);
     };
 
+    // Replace the createLayoutBasedHighlights function:
+    const createLayoutBasedHighlightsEnhanced = () => {
+        if (!selectedProvenance || !enhancedSentences || !currentViewport || !highlightLayerRef.current) {
+            console.warn('⚠️ Missing requirements for layout-based highlighting');
+            return;
+        }
+
+        // Clear existing highlights
+        clearHighlights();
+
+        const { sentences_ids, provenance_id } = selectedProvenance;
+        if (!sentences_ids || sentences_ids.length === 0) {
+            console.warn('⚠️ No sentence IDs in provenance');
+            return;
+        }
+
+        console.log(`🎨 Creating PERSISTENT highlights for ${sentences_ids.length} sentences on page ${currentPage}`);
+
+        let highlightsCreated = 0;
+        const newHighlights = new Map();
+
+        sentences_ids.forEach((sentenceId, index) => {
+            const sentenceData = enhancedSentences[sentenceId];
+
+            if (!sentenceData) {
+                console.warn(`⚠️ No data for sentence ${sentenceId}`);
+                return;
+            }
+
+            // Get and validate bounding boxes for current page
+            const pageBoxes = sentenceData.bounding_boxes?.filter(bbox => {
+                if (bbox.page !== currentPage) return false;
+
+                // Enhanced filtering with validation
+                const pageLayout = layoutData?.pages_layout?.find(p => p.page_num === bbox.page);
+                const validatedBbox = validateAndFilterBoundingBox(bbox, sentenceData.text, pageLayout);
+                return validatedBbox !== null;
+            }) || [];
+
+            if (pageBoxes.length === 0) {
+                return;
+            }
+
+            console.log(`📍 Sentence ${sentenceId} has ${pageBoxes.length} boxes on page ${currentPage}:`);
+            pageBoxes.forEach((bbox, i) => {
+                console.log(`  Box ${i}: confidence=${bbox.confidence.toFixed(2)}, coords=(${bbox.x0.toFixed(1)}, ${bbox.y0.toFixed(1)})`);
+            });
+
+            if (highlightMode === 'precise') {
+                // Use precise layout-based highlighting for ALL boxes above threshold
+                pageBoxes.forEach((bbox, bboxIndex) => {
+                    const highlightElement = createPreciseHighlightEnhanced(bbox, sentenceId, index, bboxIndex, provenance_id, sentenceData.text);
+                    if (highlightElement) {
+                        newHighlights.set(`${sentenceId}_${bboxIndex}`, highlightElement);
+                        highlightsCreated++;
+                    }
+                });
+            } else {
+                // Fallback highlighting
+                const highlightElement = createFallbackHighlight(sentenceData.text, sentenceId, index, provenance_id);
+                if (highlightElement) {
+                    newHighlights.set(`${sentenceId}_fallback`, highlightElement);
+                    highlightsCreated++;
+                }
+            }
+        });
+
+        setActiveHighlights(newHighlights);
+        setHighlightsPersisted(true);
+
+        console.log(`✅ Created ${highlightsCreated} PERSISTENT highlights on page ${currentPage}`);
+    };
+
     const scrollToHighlight = (sentenceId, bbox = null) => {
         if (!containerRef.current || !currentViewport) return;
 
@@ -551,6 +950,8 @@ const LayoutBasedPDFViewer = ({
             }
         }
     };
+
+
 
     const createPreciseHighlight = (bbox, sentenceId, index, bboxIndex, provenanceId, sentenceText) => {
         if (!currentViewport || !highlightLayerRef.current) return;
@@ -759,7 +1160,52 @@ const LayoutBasedPDFViewer = ({
         setLastRenderedPage(null); // Reset last rendered page to force re-render
     };
 
-    const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
+    const handleResetZoom = () => {
+        if (isRendering) return;
+        setZoomLevel(1.0); // This will trigger initial fit-to-width calculation
+        setLastRenderedPage(null);
+    };
+
+
+    // 5. Provenance visibility warning component
+    const ProvenanceVisibilityWarning = ({ visibility }) => {
+        if (!visibility.warnings.length) return null;
+
+        const highSeverityWarnings = visibility.warnings.filter(w => w.severity === 'high');
+        const otherWarnings = visibility.warnings.filter(w => w.severity !== 'high');
+
+        return (
+            <div className="provenance-warnings">
+                {highSeverityWarnings.map((warning, idx) => (
+                    <div key={idx} className={`warning warning-${warning.severity}`}>
+                        <FontAwesomeIcon icon={faExclamationTriangle} />
+                        <span>{warning.message}</span>
+                        <button
+                            onClick={handleResetZoom}
+                            className="fix-zoom-btn"
+                            title="Reset zoom to fit page width"
+                        >
+                            Reset Zoom
+                        </button>
+                    </div>
+                ))}
+
+                {otherWarnings.length > 0 && (
+                    <div className="warning warning-info">
+                        <FontAwesomeIcon icon={faLayerGroup} />
+                        <span>
+                            {otherWarnings.length} visibility issue{otherWarnings.length > 1 ? 's' : ''}
+                        </span>
+                        <button onClick={handleResetZoom} className="fix-zoom-btn">
+                            Reset Zoom
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+
 
 
 
@@ -812,7 +1258,7 @@ const LayoutBasedPDFViewer = ({
     }
 
     return (
-        <div className={`hybrid-pdf-viewer layout-based ${isFullscreen ? 'fullscreen' : ''}`}>
+        <div className={`hybrid-pdf-viewer layout-based fixed-size ${isFullscreen ? 'fullscreen' : ''}`}>
             {/* Header */}
             <div className="pdf-header">
                 <div className="pdf-title">
@@ -825,32 +1271,42 @@ const LayoutBasedPDFViewer = ({
                         {selectedProvenance && selectedProvenance.input_token_size && selectedProvenance.output_token_size && (
                             <div className="provenance-meta">
 
-                                                <span><strong>Time Elapsed:</strong> {selectedProvenance.time?.toFixed(2) || 'N/A'}s</span>
-                                          
-                            | <span className="cost-estimate">
-                            
-                                <>
-                                     <strong>Cost Estimate:</strong> {calculateProvenanceCost(
-                                        selectedProvenance.input_token_size,
-                                        selectedProvenance.output_token_size
-                                    ).formattedCost}
-                                </>
-                            
+                                <span><strong>Time Elapsed:</strong> {selectedProvenance.time?.toFixed(2) || 'N/A'}s</span>
 
-                        </span>
-                        </div>
-                    )}
+                                | <span className="cost-estimate">
+
+                                    <>
+                                        <strong>Cost Estimate:</strong> {calculateProvenanceCost(
+                                            selectedProvenance.input_token_size,
+                                            selectedProvenance.output_token_size
+                                        ).formattedCost}
+                                    </>
+
+
+                                </span>
+                            </div>
+                        )}
                     </div>
                 )}
-                    {isRendering && (
-                        <span className="rendering-indicator">
-                            <FontAwesomeIcon icon={faSpinner} spin />
-                            Rendering...
-                        </span>
-                    )}
-                
+                {isRendering && (
+                    <span className="rendering-indicator">
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                        Rendering...
+                    </span>
+                )}
 
-                
+                {/* Add fixed size indicator */}
+                {fixedDimensions && !isFullscreen && (
+                    <div className="viewer-size-info">
+                        <span className="size-display">
+                            📐 {fixedDimensions.width}×{fixedDimensions.height}px
+                        </span>
+                    </div>
+                )}
+
+
+
+
             </div>
 
             {/* Page Navigation */}
@@ -877,7 +1333,15 @@ const LayoutBasedPDFViewer = ({
                     <FontAwesomeIcon icon={faChevronRight} />
                 </button>
 
-                    <div className="pdf-controls">
+                <div className="pdf-controls">
+                    {selectedProvenance && (
+                        <ProvenanceVisibilityWarning visibility={provenanceVisibility} />
+                    )}
+                </div>
+
+
+
+                <div className="pdf-controls">
                     <button onClick={handleZoomOut} className="control-btn" disabled={isRendering}>
                         <FontAwesomeIcon icon={faSearchMinus} />
                     </button>
@@ -888,9 +1352,29 @@ const LayoutBasedPDFViewer = ({
                         <FontAwesomeIcon icon={faSearchPlus} />
                     </button>
 
-                    <button onClick={toggleFullscreen} className="control-btn">
-                        <FontAwesomeIcon icon={isFullscreen ? faCompress : faExpand} />
+
+
+
+
+                    {/* NEW: Fit to Content button */}
+                    <button
+                        onClick={handleFitToContent}
+                        className="control-btn fit-content-btn"
+                        disabled={isRendering || !layoutData}
+                        title="Fit content to width"
+                    >
+                        <FontAwesomeIcon icon={faExpand} />
+                        <span className="btn-text">Fit</span>
                     </button>
+
+                    <button
+                        onClick={handleResetZoom}
+                        className="control-btn reset-zoom-btn"
+                        disabled={isRendering}
+                        title="Reset to fit page width"
+                    ></button>
+
+
                 </div>
             </div>
 

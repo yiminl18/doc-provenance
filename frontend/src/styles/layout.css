@@ -4,23 +4,38 @@
 
 .app-improved {
   height: 100vh;
-  display: flex;
-  flex-direction: column;
+
   background-color: var(--bg-primary);
   overflow: hidden;
   font-family: var(--font-display);
 }
 
-/* ===== STREAMLINED HEADER ===== */
+/* ===== 3-COLUMN LAYOUT ===== */
+.app-content-grid {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: var(--left-sidebar-width) 1fr var(--right-panel-width);
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-areas: 
+    "sidebar header right-panel"
+    "sidebar main right-panel";
+  background-color: var(--bg-primary);
+  overflow: hidden;
+  font-family: var(--font-display);
+}
+
+/* ===== UPDATED HEADER - SANDWICHED BETWEEN PANELS ===== */
 .app-header-compact {
-  height: 48px;
+  grid-area: header;
+  height: var(--header-height);
   background-color: var(--bg-panel);
   border-bottom: var(--border-medium) solid var(--win95-border-dark);
+  border-left: var(--border-medium) solid var(--win95-border-dark);
+  border-right: var(--border-medium) solid var(--win95-border-dark);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--space-2) var(--space-4);
-  flex-shrink: 0;
   box-shadow: var(--shadow-raised);
   position: relative;
   z-index: 10;
@@ -47,15 +62,18 @@
 .header-right {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  max-width: var(--right-panel-width)
-}
+  gap: var(--space-2);}
 
 .document-actions {
   display: flex;
   align-items: right;
   gap: var(--space-3);
-  padding: var(--space-4) var(--space-4);
+}
+
+.document-actions.compact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .active-document-info {
@@ -83,57 +101,10 @@
   font-size: var(--text-xs);
   opacity: 0.8;
 }
+/* ===== LEFT HISTORY SIDEBAR ===== */
 
-.header-action-btn {
-  background-color: var(--success-green);
-  color: white;
-  border: var(--border-medium) solid var(--success-green);
-  padding: var(--space-1) var(--space-2);
-  font-family: var(--font-display);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: var(--transition-fast);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  box-shadow: var(--shadow-raised);
-}
-
-.header-action-btn.upload-btn {
-  background-color: var(--warning-orange);
-  border-color: var(--warning-orange);
-}
-
-.header-action-btn.upload-btn:hover {
-  background-color: var(--warning-orange-hover);
-  border-color: var(--warning-orange-hover);
-}
-
-.header-action-btn:hover {
-  background-color: var(--success-green-hover);
-  border-color: var(--success-green-hover);
-}
-
-.header-action-btn:active {
-  box-shadow: var(--shadow-pressed);
-  transform: translate(1px, 1px);
-}
-
-/* ===== 3-COLUMN LAYOUT ===== */
-.app-content-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: var(--left-sidebar-width) 1fr var(--right-panel-width);
-  grid-template-rows: 1fr;
-  gap: 0;
-  overflow: hidden;
-}
-
-/* ===== SIDEBAR ===== */
 .sidebar-panel {
+  grid-area: sidebar;
   background-color: var(--bg-panel);
   border-right: var(--border-medium) solid var(--win95-border-dark);
   display: flex;
@@ -144,14 +115,9 @@
   z-index: 5;
 }
 
-.sidebar-panel .sidebar {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-4);
-}
-
 /* ===== MAIN CONTENT AREA ===== */
 .main-content {
+  grid-area: main;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -168,7 +134,41 @@
   min-height: 0;
 }
 
-/* ===== PDF EMPTY STATE ===== */
+/* ===== RIGHT PANEL - FULL HEIGHT ===== */
+.right-panel {
+  grid-area: right-panel;
+  background-color: var(--bg-panel);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-raised);
+  position: relative;
+  z-index: 5;
+}
+
+/* PROVENANCE QA COMPONENT */
+.provenance-qa-component {
+  background-color: var(--bg-paper);
+  border: var(--border-medium) solid var(--win95-border-dark);
+  margin: 0 var(--space-4) var(--space-4) var(--space-4);
+  margin-top: 0; /* Remove top margin to align with header */
+  box-shadow: var(--shadow-raised);
+  flex-shrink: 0;
+}
+
+.qa-input-section .section-header {
+  background-color: var(--bg-secondary);
+  border-bottom: var(--border-medium) solid var(--win95-border);
+  padding: var(--space-3) var(--space-4);
+  height: var(--header-height); /* Match header height */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+
+/* ===== UPDATED PDF EMPTY STATE ===== */
 .pdf-empty-state {
   flex: 1;
   display: flex;
@@ -208,25 +208,53 @@
   max-width: 500px;
 }
 
-.pdf-empty-actions {
+/* Updated document selector buttons in empty state with win95 colors */
+.pdf-empty-actions .upload-btn,
+.pdf-empty-actions .browse-btn {
+  background-color: var(--success-green);
+  color: white;
+  border: var(--border-medium) solid var(--success-green);
+  padding: var(--space-4) var(--space-6);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: var(--transition-fast);
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: var(--space-4);
-  width: 100%;
-  max-width: 400px;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-raised);
+  min-height: 52px;
 }
 
-/* ===== RIGHT PANEL ===== */
-.right-panel {
-  background-color: var(--bg-panel);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: var(--shadow-raised);
-  position: relative;
-  z-index: 5;
+.pdf-empty-actions .upload-btn {
+  background-color: var(--warning-orange);
+  border-color: var(--warning-orange);
 }
+
+.pdf-empty-actions .upload-btn:hover {
+  background-color: var(--warning-orange-hover);
+  border-color: var(--warning-orange-hover);
+}
+
+.pdf-empty-actions .browse-btn {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+.pdf-empty-actions .browse-btn:hover {
+  background-color: var(--primary-blue-hover);
+  border-color: var(--primary-blue-hover);
+}
+
+.pdf-empty-actions .upload-btn:active,
+.pdf-empty-actions .browse-btn:active {
+  box-shadow: var(--shadow-pressed);
+  transform: translate(1px, 1px);
+}
+
 
 .qa-flow-section {
   flex: 1;
@@ -675,8 +703,8 @@
   flex-direction: column;
 }
 
-.document-selector .upload-btn,
-.document-selector .browse-btn {
+.upload-btn,
+.browse-btn {
   display: inline-flex;
   align-items: center;
   flex-direction: row;
@@ -700,35 +728,35 @@
   flex: 1;
 }
 
-.document-selector .upload-btn {
+.upload-btn {
   background-color: var(--success-green);
   border-color: var(--success-green);
   color: white;
 }
 
-.document-selector .upload-btn:hover {
+.upload-btn:hover {
   background-color: var(--success-green-hover);
   border-color: var(--success-green-hover);
 }
 
-.document-selector .browse-btn {
+.browse-btn {
   background-color: var(--bg-panel);
   border-color: var(--primary-blue);
   color: var(--primary-blue);
 }
 
-.document-selector .browse-btn:hover {
+.browse-btn:hover {
   background-color: var(--primary-blue-light);
 }
 
-.document-selector .upload-btn:active,
-.document-selector .browse-btn:active {
+.upload-btn:active,
+.browse-btn:active {
   box-shadow: var(--shadow-pressed);
   transform: translate(1px, 1px);
 }
 
-.document-selector .upload-btn:focus,
-.document-selector .browse-btn:focus {
+.upload-btn:focus,
+.browse-btn:focus {
   outline: none;
   box-shadow: var(--shadow-raised), var(--focus-ring);
 }
@@ -752,50 +780,64 @@
   gap: var(--space-3);
   align-items: center;
 }
-
-.document-selector.compact .upload-btn.compact,
-.document-selector.compact .browse-btn.compact {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-sm);
-  min-height: 36px;
-  flex: 1;
-}
-
-.document-selector.compact .upload-btn.compact {
+/* Updated header buttons styling with win95 colors */
+.upload-btn.compact,
+.browse-btn.compact {
   background-color: var(--success-green);
-  border-color: var(--success-green);
   color: white;
+  border: var(--border-medium) solid var(--success-green);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  box-shadow: var(--shadow-raised);
 }
 
-.document-selector.compact .browse-btn.compact {
-  background-color: var(--bg-panel);
-  border-color: var(--win95-border-dark);
-  color: var(--win95-text);
+.upload-btn.compact {
+  background-color: var(--warning-orange);
+  border-color: var(--warning-orange);
 }
 
-.document-selector.compact .upload-btn.compact:hover {
-  background-color: var(--success-green-hover);
+.upload-btn.compact:hover {
+  background-color: var(--warning-orange-hover);
+  border-color: var(--warning-orange-hover);
 }
 
-.document-selector.compact .browse-btn.compact:hover {
-  background-color: var(--win95-lightest);
+.browse-btn.compact {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
 }
+
+.browse-btn.compact:hover {
+  background-color: var(--primary-blue-hover);
+  border-color: var(--primary-blue-hover);
+}
+
+.upload-btn.compact:active,
+.browse-btn.compact:active {
+  box-shadow: var(--shadow-pressed);
+  transform: translate(1px, 1px);
+}
+
 
 /* ===== INTEGRATION WITH EXISTING LAYOUT ===== */
 
-/* Update pdf-panel to handle document selector */
-.pdf-panel .document-selector-section {
-  flex-shrink: 0;
-  border-top: var(--border-medium) solid var(--win95-border-dark);
-  background-color: var(--bg-secondary);
+.document-selector-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background-color: var(--bg-panel);
+  border-bottom: var(--border-medium) solid var(--win95-border-dark);
+  box-shadow: var(--shadow-raised);
 }
-
-.pdf-panel .document-selector-section.compact {
-  /* Compact selector sits at bottom of PDF panel */
-  border-top: var(--border-medium) solid var(--win95-border-dark);
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-}
-
 
 /* ===== RESPONSIVE ADJUSTMENTS ===== */
 @media (max-width: 1200px) {
@@ -803,8 +845,8 @@
     flex-direction: column;
   }
   
-  .document-selector .upload-btn,
-  .document-selector .browse-btn {
+  .upload-btn,
+  .browse-btn {
     width: 100%;
   }
   
@@ -812,8 +854,8 @@
     gap: var(--space-2);
   }
   
-  .document-selector.compact .upload-btn.compact,
-  .document-selector.compact .browse-btn.compact {
+  .upload-btn.compact,
+  .browse-btn.compact {
     padding: var(--space-2) var(--space-3);
     font-size: var(--text-xs);
     min-height: 32px;

@@ -142,10 +142,10 @@ const DocumentSelector = ({
           </div>
         </div>
 
-        <div className="primary-actions">
+        <div className="document-selector-section">
           {/* Upload Button */}
           <button 
-            className={`upload-btn primary ${disabled ? 'disabled' : ''}`}
+            className={`upload-btn ${disabled ? 'disabled' : ''}`}
             onClick={handleUploadClick}
             disabled={disabled}
             title={disabled ? 'Session initializing, please wait...' : 'Upload PDF'}
@@ -171,7 +171,7 @@ const DocumentSelector = ({
           
           {/* Browse Button - Updated */}
           <button 
-            className={`browse-btn secondary ${disabled ? 'disabled' : ''}`}
+            className={`browse-btn ${disabled ? 'disabled' : ''}`}
             onClick={handleBrowseClick}
             disabled={disabled}
             title={disabled ? 'Session initializing, please wait...' : 'Browse documents'}

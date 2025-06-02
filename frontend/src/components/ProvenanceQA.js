@@ -697,11 +697,9 @@ const handleNextProvenance = () => {
 
     if (!pdfDocument) {
         return (
-            <div className="integrated-qa-empty">
-                <div className="empty-icon">🤔</div>
-                <h4>Ready for Questions</h4>
-                <p>Upload a document to start asking questions and analyzing provenance.</p>
-
+            <div className="provenance-qa-empty">
+                <div className="empty-icon"></div>
+    
      
             </div>
         );
@@ -712,7 +710,7 @@ const handleNextProvenance = () => {
     );
 
     return (
-        <div className="integrated-qa-component">
+        <div className="provenance-qa-component">
             {/* Question Input Section */}
             <div className="qa-input-section">
                 <div className="section-header">

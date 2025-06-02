@@ -158,7 +158,7 @@ const HistorySidebar = ({
               {documentList.length === 0 ? (
                 <div className="empty-section">
                   <FontAwesomeIcon icon={faFileAlt} className="empty-icon" />
-                  <span className="empty-text">No documents loaded</span>
+                  <span className="empty-text">No active documents</span>
                   <span className="empty-hint">Upload or browse to get started</span>
                 </div>
               ) : (
@@ -215,7 +215,7 @@ const HistorySidebar = ({
             icon={questionsExpanded ? faChevronDown : faChevronRight} 
             className="expand-icon"
           />
-          <FontAwesomeIcon icon={faHistory} />
+          <FontAwesomeIcon icon={faQuestionCircle} />
           <span className="section-title">QUESTIONS</span>
           <span className="item-count">({questionsArray.length})</span>
         </div>
@@ -230,7 +230,7 @@ const HistorySidebar = ({
                 <div className="empty-section">
                   <FontAwesomeIcon icon={faQuestionCircle} className="empty-icon" />
                   <span className="empty-text">
-                    {searchTerm ? 'No matching questions' : 'No questions yet'}
+                    {searchTerm ? 'No matching questions' : 'No active questions'}
                   </span>
                   {!searchTerm && (
                     <span className="empty-hint">Ask questions to see history</span>

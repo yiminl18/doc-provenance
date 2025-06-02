@@ -3,7 +3,6 @@ import './styles/brutalist-design.css';
 import './styles/layout.css';
 import HistorySidebar from './components/HistorySidebar';
 import Header from './components/Header';
-import HybridPDFViewer from './components/HybridPDFViewer';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import ProvenanceQA from './components/ProvenanceQA';
@@ -458,6 +457,10 @@ const handleHighlightInPDF = async (provenance) => {
 
   return (
     <div className="app-improved">
+ 
+
+      {/* Main Content Grid */}
+      <div className="app-content-grid">
       {/* Header */}
       <Header
         activeDocument={activeDocument}
@@ -467,9 +470,6 @@ const handleHighlightInPDF = async (provenance) => {
           handleUploadNewDocument();
         }}
       />
-
-      {/* Main Content Grid */}
-      <div className="app-content-grid">
         {/* Left Sidebar */}
         <div className="sidebar-panel">
           <HistorySidebar
@@ -486,14 +486,6 @@ const handleHighlightInPDF = async (provenance) => {
             onFeedbackRequest={openFeedbackModal}
           />
         </div>
-
-         {/*<HybridPDFViewer
-                pdfDocument={activeDocument}
-                selectedProvenance={selectedProvenance}
-                activeQuestionId={activeQuestionId}
-                navigationTrigger={navigationTrigger}
-                onClose={() => { }}
-              />*/}
 
         {/* Main Content Area */}
         <div className="main-content">

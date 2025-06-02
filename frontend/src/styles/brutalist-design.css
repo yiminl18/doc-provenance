@@ -9,25 +9,25 @@
 /* ===== ROOT VARIABLES - MUTED PALETTE ===== */
 :root {
   /* Muted Color System - Soft but clear */
-  --primary-blue: #4a90e2;
-  --primary-blue-hover: #3a7bc8;
-  --primary-blue-light: #e8f4fd;
+ --primary-blue: #2c5282;        /* Deep steel blue */
+  --primary-blue-hover: #1a365d;  /* Darker steel blue */
+  --primary-blue-light: #e2e8f0;  /* Very light blue-gray */
   
-  --success-green: #5cb85c;
-  --success-green-hover: #4cae4c;
-  --success-green-light: #f0f8f0;
+  --success-green: #38a169;       /* Forest green */
+  --success-green-hover: #2f855a; /* Darker forest green */
+  --success-green-light: #f0fff4; /* Very light mint */
   
-  --warning-orange: #f0ad4e;
-  --warning-orange-hover: #ec971f;
-  --warning-orange-light: #fcf8e3;
+  --warning-orange: #d69e2e;      /* Deep amber/gold */
+  --warning-orange-hover: #b7791f; /* Darker amber */
+  --warning-orange-light: #fffaf0; /* Ivory */
   
-  --danger-red: #d9534f;
-  --danger-red-hover: #c9302c;
-  --danger-red-light: #f2dede;
+  --danger-red: #c53030;          /* Deep brick red */
+  --danger-red-hover: #9c1c1c;    /* Darker brick red */
+  --danger-red-light: #fed7d7;    /* Light rose */
   
-  --accent-purple: #7b68ee;
-  --accent-purple-hover: #6a5acd;
-  --accent-purple-light: #f0eeff;
+  --accent-purple: #553c9a;       /* Deep royal purple */
+  --accent-purple-hover: #44337a; /* Darker royal purple */
+  --accent-purple-light: #f7f0ff; /* Very light lavender */
   
   /* Windows 95 Inspired Neutrals */
   --win95-dark: #2c2c2c;
@@ -40,78 +40,90 @@
   --win95-text: #000000;
   --win95-text-muted: #606060;
   
-  /* Background colors - soft and easy on eyes */
-  --bg-primary: #f5f5f0;      /* Soft off-white */
-  --bg-secondary: #ececec;     /* Light gray */
-  --bg-tertiary: #d8d8d8;     /* Medium gray */
-  --bg-panel: #e8e8e8;        /* Panel background */
+/* Background colors - True Windows 95 palette */
+  --bg-primary: #c0c0c0;      /* Classic Windows 95 gray */
+  --bg-secondary: #d4d0c8;     /* Window frame gray */
+  --bg-tertiary: #a0a0a0;     /* Darker panel gray */
+  --bg-panel: #d4d0c8;        /* Panel background - matches secondary */
   --bg-paper: #ffffff;        /* Pure white for documents */
-  --bg-input: #fafafa;        /* Input backgrounds */
-  
-  /* Typography - Clean and readable */
-  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
-  
-  /* Font Scale - Clear hierarchy */
-  --text-xs: 0.75rem;   /* 12px */
-  --text-sm: 0.875rem;  /* 14px */
-  --text-base: 1rem;    /* 16px */
-  --text-lg: 1.125rem;  /* 18px */
-  --text-xl: 1.25rem;   /* 20px */
-  --text-2xl: 1.5rem;   /* 24px */
-  --text-3xl: 1.875rem; /* 30px */
-  --text-4xl: 2.25rem;  /* 36px */
-  
-  /* Font Weights */
+  --bg-input: #ffffff;        /* White input backgrounds */
+ 
+  /* Typography - Windows 95 style fonts */
+  --font-display: 'MS Sans Serif', 'Segoe UI', 'Tahoma', sans-serif;
+  --font-mono: 'Courier New', 'Consolas', 'Monaco', monospace;
+ 
+  /* Font Scale - Slightly smaller for that retro feel */
+  --text-xs: 0.6875rem; /* 11px */
+  --text-sm: 0.75rem;   /* 12px */
+  --text-base: 0.875rem; /* 14px */
+  --text-lg: 1rem;      /* 16px */
+  --text-xl: 1.125rem;  /* 18px */
+  --text-2xl: 1.375rem; /* 22px */
+  --text-3xl: 1.75rem;  /* 28px */
+  --text-4xl: 2.125rem; /* 34px */
+ 
+  /* Font Weights - Windows 95 was mostly normal/bold */
   --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
+  --font-medium: 400;    /* Same as normal for authenticity */
+  --font-semibold: 700;  /* Jump to bold */
   --font-bold: 700;
-  
-  /* Line Heights */
-  --leading-tight: 1.25;
-  --leading-snug: 1.375;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.625;
-  
-  /* Spacing System - 8px base */
+ 
+  /* Line Heights - Tighter for that compact 90s feel */
+  --leading-tight: 1.1;
+  --leading-snug: 1.2;
+  --leading-normal: 1.3;
+  --leading-relaxed: 1.4;
+ 
+  /* Spacing System - 4px base for denser layout */
   --space-0: 0;
-  --space-1: 0.25rem;  /* 4px */
-  --space-2: 0.5rem;   /* 8px */
-  --space-3: 0.75rem;  /* 12px */
-  --space-4: 1rem;     /* 16px */
-  --space-5: 1.25rem;  /* 20px */
-  --space-6: 1.5rem;   /* 24px */
-  --space-8: 2rem;     /* 32px */
-  --space-10: 2.5rem;  /* 40px */
-  --space-12: 3rem;    /* 48px */
-  --space-16: 4rem;    /* 64px */
-  --space-20: 5rem;    /* 80px */
-  
-  /* Windows 95 Style Borders */
+  --space-1: 0.125rem; /* 2px */
+  --space-2: 0.25rem;  /* 4px */
+  --space-3: 0.5rem;   /* 8px */
+  --space-4: 0.75rem;  /* 12px */
+  --space-5: 1rem;     /* 16px */
+  --space-6: 1.25rem;  /* 20px */
+  --space-8: 1.5rem;   /* 24px */
+  --space-10: 2rem;    /* 32px */
+  --space-12: 2.5rem;  /* 40px */
+  --space-16: 3rem;    /* 48px */
+  --space-20: 4rem;    /* 64px */
+ 
+  /* Windows 95 Style Borders - Thicker and more pronounced */
   --border-thin: 1px;
   --border-medium: 2px;
-  --border-thick: 3px;
-  
-  /* Soft Shadows - Less harsh than pure brutalist */
+  --border-thick: 4px;   /* Thicker for that chunky 90s look */
+  --border-extra-thick: 6px; /* For really pronounced elements */
+ 
+  /* Authentic Windows 95 Shadows - High contrast */
   --shadow-none: none;
-  --shadow-soft: 1px 1px 2px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 2px 2px 4px rgba(0, 0, 0, 0.15);
-  --shadow-raised: inset 1px 1px 0px rgba(255, 255, 255, 0.8), inset -1px -1px 0px rgba(0, 0, 0, 0.2);
-  --shadow-pressed: inset -1px -1px 0px rgba(255, 255, 255, 0.8), inset 1px 1px 0px rgba(0, 0, 0, 0.2);
+  --shadow-soft: 1px 1px 0px rgba(0, 0, 0, 0.25);
+  --shadow-medium: 2px 2px 0px rgba(0, 0, 0, 0.3);
+  --shadow-hard: 3px 3px 0px rgba(0, 0, 0, 0.4); /* New hard shadow */
   
-  /* Layout Constants */
-  --left-sidebar-width: 240px;
-  --right-panel-width: 360px;
-  --header-height: 64px;
-  
-  /* Smooth Transitions */
-  --transition-fast: 0.15s ease;
-  --transition-medium: 0.25s ease;
-  --transition-slow: 0.35s ease;
-  
-  /* Focus ring - Subtle but visible */
-  --focus-ring: 0 0 0 2px var(--primary-blue);
+  /* Classic Win95 raised/pressed effects - more pronounced */
+  --shadow-raised: 
+    inset 2px 2px 0px rgba(255, 255, 255, 0.9), 
+    inset -2px -2px 0px rgba(128, 128, 128, 0.8),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.3);
+    
+  --shadow-pressed: 
+    inset -2px -2px 0px rgba(255, 255, 255, 0.9), 
+    inset 2px 2px 0px rgba(128, 128, 128, 0.8),
+    inset 1px 1px 0px rgba(0, 0, 0, 0.3);
+ 
+  /* Layout Constants - Slightly more compact */
+  --left-sidebar-width: 220px;
+  --right-panel-width: 340px;
+  --header-height: 56px; /* Shorter header */
+ 
+  /* No Transitions - Windows 95 was instant */
+  --transition-fast: none;
+  --transition-medium: none;
+  --transition-slow: none;
+ 
+  /* Focus ring - Dotted line like Windows 95 */
+  --focus-ring: 0 0 0 1px var(--win95-text);
+  --focus-ring-dotted: 1px dotted var(--win95-text);
 }
 
 /* ===== RESET & BASE STYLES ===== */

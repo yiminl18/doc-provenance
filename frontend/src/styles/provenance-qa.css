@@ -4,14 +4,7 @@
    ======================================== */
 
 /* ===== MAIN CONTAINER - TWO SECTION LAYOUT ===== */
-.integrated-qa-component {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background-color: var(--bg-panel);
-  font-family: var(--font-display);
-  overflow: hidden;
-}
+
 
 /* ===== TWO-SECTION SPLIT LAYOUT ===== */
 .qa-top-section {

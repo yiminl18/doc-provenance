@@ -126,26 +126,7 @@ const HistorySidebar = ({
 
         {documentsExpanded && (
           <div className="section-content">
-            {/* Document Actions */}
-            <div className="document-actions">
-              <button 
-                className="action-btn upload-btn"
-                onClick={onUploadNewDocument}
-                title="Upload new PDF document"
-              >
-                <FontAwesomeIcon icon={faUpload} />
-                <span>Upload PDF</span>
-              </button>
-              
-              <button 
-                className="action-btn browse-btn"
-                onClick={onShowPreloaded}
-                title="Browse session documents"
-              >
-                <FontAwesomeIcon icon={faDatabase} />
-                <span>Browse Documents</span>
-              </button>
-            </div>
+
 
             <div className="history-list">
               {documentList.length === 0 ? (
@@ -300,7 +281,7 @@ const HistorySidebar = ({
                             <div className="provenance-previews">
                               <div className="provenance-header">
                                 <span className="provenance-count">
-                                  {question.provenanceSources.length} evidence sources
+                                  {question.provenanceSources.length} provenance sources
                                 </span>
                               </div>
                               <div className="provenance-list">
@@ -312,10 +293,10 @@ const HistorySidebar = ({
                                       e.stopPropagation();
                                       onProvenanceSelect(prov);
                                     }}
-                                    title={`View evidence ${idx + 1}`}
+                                    title={`View provenance ${idx + 1}`}
                                   >
                                     <FontAwesomeIcon icon={faHighlighter} />
-                                    <span>Evidence {idx + 1}</span>
+                                    <span>Provenance {idx + 1}</span>
                                     {prov.sentences_ids && (
                                       <span className="sentence-count">
                                         ({prov.sentences_ids.length})

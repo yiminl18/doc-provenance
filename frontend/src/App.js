@@ -8,7 +8,7 @@ import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import ProvenanceQA from './components/ProvenanceQA';
 import userStudyLogger from './services/UserStudyLogger';
-
+import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
 import {
   uploadFile,
   getDocuments,
@@ -41,6 +41,7 @@ function App() {
   const [loadingPreloaded, setLoadingPreloaded] = useState(false);
 
   const [navigationTrigger, setNavigationTrigger] = useState(null);
+
 
   // Get active document
   const activeDocument = activeDocumentId ? documents.get(activeDocumentId) : null;
@@ -251,33 +252,15 @@ function App() {
   };
 
 
+const handleHighlightInPDF = async (provenance) => {
+  console.log('🔍 App: Highlighting provenance in PDF:', provenance?.provenance_id);
 
-  const handleHighlightInPDF = async (provenance) => {
-    console.log('🔍 App: Highlighting provenance in PDF:', provenance?.provenance_id);
 
-    // Log PDF highlighting
-    if (provenance && activeDocument) {
-      await userStudyLogger.logProvenanceHighlighted(
-        provenance.questionId || 'unknown',
-        provenance.provenance_id || provenance.id,
-        1, // You could pass actual page number here
-        'automatic'
-      );
-    }
+  // Also update selected provenance for normal highlights
+  setSelectedProvenance(provenance);
+  
 
-    // Always update the selected provenance first
-    setSelectedProvenance(provenance);
-
-    if (provenance && provenance.sentences_ids?.length > 0) {
-      console.log('✨ Triggering highlight for sentences:', provenance.sentences_ids);
-
-      // Scroll to provenance sentence in panel
-      setTimeout(() => {
-        scrollToProvenanceSentence(provenance);
-      }, 300);
-    }
-  };
-
+};
 
 
   // Function to scroll to specific sentence in provenance panel
@@ -504,17 +487,28 @@ function App() {
           />
         </div>
 
-        {/* Main Content Area */}
-        <div className="main-content">
-          <div className="pdf-section">
-            {activeDocument ? (
-              <HybridPDFViewer
+         {/*<HybridPDFViewer
                 pdfDocument={activeDocument}
                 selectedProvenance={selectedProvenance}
                 activeQuestionId={activeQuestionId}
                 navigationTrigger={navigationTrigger}
                 onClose={() => { }}
-              />
+              />*/}
+
+        {/* Main Content Area */}
+        <div className="main-content">
+          <div className="pdf-section">
+            {activeDocument ? (
+              <LayoutBasedPDFViewer
+                pdfDocument={activeDocument}
+                selectedProvenance={selectedProvenance}
+                activeQuestionId={activeQuestionId}
+                navigationTrigger={navigationTrigger}
+                onClose={() => { }}
+                />
+             
+              
+
             ) : (
               <div className="pdf-empty-state">
                 <div className="empty-icon">📄</div>

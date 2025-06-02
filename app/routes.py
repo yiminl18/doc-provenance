@@ -1430,22 +1430,20 @@ def setup_user_study_logging():
 # Initialize the logger
 user_study_logger = setup_user_study_logging()
 
-@main.route('/api/user-study/log-event', methods=['POST'])
+@main.route('/user-study/log-event', methods=['POST', 'OPTIONS'])
 def log_user_study_event():
     """
     Endpoint to receive and log user study events from the frontend
-    
-    Expected JSON format:
-    {
-        "event_type": "string",
-        "user_session_id": "string", 
-        "timestamp": float,
-        "logged_at": float,
-        "iso_timestamp": "string",
-        "user_agent": "string",
-        ... (additional event-specific fields)
-    }
+    Added OPTIONS method for CORS preflight requests
     """
+    # Handle CORS preflight requests
+    if request.method == 'OPTIONS':
+        response = jsonify({'success': True})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        return response
+    
     try:
         # Get the event data from request
         event_data = request.get_json()
@@ -1482,12 +1480,16 @@ def log_user_study_event():
         # Also log to console for development
         print(f"📊 User Study Event: {enhanced_event['event_type']} - {enhanced_event['user_session_id']}")
         
-        return jsonify({
+        response = jsonify({
             'success': True,
             'message': 'Event logged successfully',
             'event_type': enhanced_event['event_type'],
             'server_timestamp': enhanced_event['server_timestamp']
         })
+        
+        # Add CORS headers to response
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
         
     except json.JSONDecodeError:
         return jsonify({
@@ -1501,7 +1503,6 @@ def log_user_study_event():
             'success': False,
             'error': 'Internal server error while logging event'
         }), 500
-
 @main.route('/api/user-study/session-info', methods=['GET'])
 def get_session_info():
     """

@@ -1510,12 +1510,12 @@ def get_session_info():
     This can be used to retrieve algorithm method assignments, etc.
     """
     try:
-        # You can implement session-based algorithm assignment here
+        # can implement session-based algorithm assignment here
         # For now, return basic session info
         
         session_info = {
             'server_time': datetime.now().isoformat(),
-            'algorithm_method': 'default',  # You can implement rotation logic here
+            'algorithm_method': 'default',  # can implement rotation logic here
             'processing_method': 'session-based',
             'max_provenances': 5,
             'session_id': f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"

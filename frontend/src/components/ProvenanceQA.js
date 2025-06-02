@@ -886,14 +886,7 @@ const handleNextProvenance = () => {
                                             </div>
 
                                             <div className="provenance-actions">
-                                                <button
-                                                    className="action-btn highlight-btn"
-                                                    onClick={() => onHighlightInPDF && onHighlightInPDF(selectedProvenance)}
-                                                    disabled={!selectedProvenance.content}
-                                                >
-                                                    <FontAwesomeIcon icon={faHighlighter} />
-                                                    Highlight in PDF
-                                                </button>
+                                         
 
                                                 <button
                                                     className="action-btn feedback-btn"

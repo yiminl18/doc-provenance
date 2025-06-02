@@ -20,7 +20,7 @@ import { SentencePDFMapper } from '../utils/SentencePDFMapper';
 
 const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, onClose, navigationTrigger }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1.2);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pdfDoc, setPdfDoc] = useState(null);
@@ -83,17 +83,17 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
     loadPDFAndSentences();
   }, [pdfUrl]);
 
-   // Initialize the mapper when PDF and sentences are available
+  // Initialize the enhanced sentence mapper
   useEffect(() => {
     const initializeEnhancedMapper = async () => {
       if (!pdfDoc || !sentences.length) return;
-      
+
       console.log('🔄 Initializing enhanced PDF mapper with provenance support...');
-      
+
       try {
         const mapper = new SentencePDFMapper();
         const result = await mapper.initialize(pdfDoc, sentences);
-        
+
         if (result.success) {
           setSentenceMapper(mapper);
           setMapperReady(true);
@@ -106,19 +106,19 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
         console.error('❌ Error initializing enhanced mapper:', error);
       }
     };
-    
+
     initializeEnhancedMapper();
   }, [pdfDoc, sentences]);
 
   // Handle provenance changes with enhanced mapper
   useEffect(() => {
     if (!sentenceMapper || !selectedProvenance || !mapperReady) return;
-    
+
     const registerAndHighlightProvenance = () => {
       const { provenance_id, sentences_ids, content, time } = selectedProvenance;
-      
+
       console.log(`🏷️ Registering provenance ${provenance_id} with enhanced mapper`);
-      
+
       if (sentences_ids && sentences_ids.length > 0) {
         // Register the provenance with the enhanced mapper
         sentenceMapper.registerProvenance(provenance_id, sentences_ids, {
@@ -128,10 +128,10 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
           type: 'answer_provenance',
           questionId: activeQuestionId
         });
-        
+
         // Set as active provenance for highlighting
         sentenceMapper.setActiveProvenance(provenance_id);
-        
+
         // Navigate to the primary page for this provenance
         const primaryPage = sentenceMapper.getPrimaryPageForProvenance(provenance_id);
         if (primaryPage !== currentPage) {
@@ -143,22 +143,22 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
             createEnhancedProvenanceHighlights();
           }, 500);
         }
-        
+
         // Log provenance page distribution
         const pageDistribution = sentenceMapper.getPagesForProvenance(provenance_id);
         console.log(`📊 Provenance ${provenance_id} spans:`, pageDistribution);
       }
     };
-    
+
     registerAndHighlightProvenance();
   }, [selectedProvenance, sentenceMapper, mapperReady]);
 
   // Handle navigation triggers with enhanced mapper
   useEffect(() => {
     if (!navigationTrigger || !sentenceMapper || !mapperReady) return;
-    
+
     const { action, data } = navigationTrigger;
-    
+
     switch (action) {
       case 'highlight_provenance':
         if (data.provenanceId && data.sentenceIds) {
@@ -167,7 +167,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
           setCurrentPage(primaryPage);
         }
         break;
-        
+
       case 'navigate_to_sentence':
         if (data.sentenceId) {
           const page = sentenceMapper.getPageForSentence(data.sentenceId);
@@ -176,12 +176,12 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
           }
         }
         break;
-        
+
       case 'clear_highlights':
         sentenceMapper.clearActiveProvenance();
         clearAllHighlights();
         break;
-        
+
       default:
         console.log('Unknown navigation action:', action);
     }
@@ -215,6 +215,683 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
       }, 800);
     }
   }, [zoomLevel]);
+
+  const loadPDFAndSentences = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log('🔄 Loading PDF and sentence data...');
+
+      const testResponse = await fetch(pdfUrl, { method: 'HEAD' });
+      if (!testResponse.ok) {
+        throw new Error(`PDF not accessible: ${testResponse.status} ${testResponse.statusText}`);
+      }
+
+      const loadingTask = window.pdfjsLib.getDocument({
+        url: pdfUrl,
+        verbosity: 0
+      });
+
+      const pdf = await loadingTask.promise;
+      console.log('✅ PDF loaded successfully:', pdf.numPages, 'pages');
+
+      setPdfDoc(pdf);
+      setTotalPages(pdf.numPages);
+      setCurrentPage(1);
+
+      await loadSentenceMapping();
+
+      setLoading(false);
+
+    } catch (err) {
+      console.error('❌ Error loading PDF:', err);
+      setError(`Failed to load document: ${err.message}`);
+      setLoading(false);
+    }
+  };
+
+  const loadSentenceMapping = async () => {
+    try {
+      console.log('🔄 Loading sentence mapping...');
+
+      const backendFilename = pdfDocument.filename;
+      const sentencesResponse = await fetch(`/api/documents/${backendFilename}/sentences`);
+
+      if (!sentencesResponse.ok) {
+        throw new Error(`Sentences file not found: ${sentencesResponse.status}`);
+      }
+
+      const sentencesData = await sentencesResponse.json();
+
+      let actualSentences = null;
+      if (Array.isArray(sentencesData)) {
+        actualSentences = sentencesData;
+      } else if (sentencesData.sentences && Array.isArray(sentencesData.sentences)) {
+        actualSentences = sentencesData.sentences;
+      } else {
+        throw new Error('Invalid sentences data format');
+      }
+
+      console.log('✅ Loaded sentences:', actualSentences?.length || 0);
+      setSentences(actualSentences || []);
+
+    } catch (error) {
+      console.error('❌ Sentence mapping error:', error);
+      setSentences([]); // Continue without sentences
+    }
+  };
+
+  const renderPageWithEnhancedHighlights = async (pageNum) => {
+    if (!pdfDoc || !canvasRef.current || !containerRef.current) return;
+
+    try {
+      console.log(`🔄 Rendering page ${pageNum} with enhanced highlighting...`);
+
+      const page = await pdfDoc.getPage(pageNum);
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      const container = containerRef.current;
+
+      // Get the container dimensions
+      const containerRect = container.getBoundingClientRect();
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+
+      console.log(`📦 Container dimensions: ${containerWidth}x${containerHeight}`);
+
+      // Get the original page dimensions at scale 1
+      const originalViewport = page.getViewport({ scale: 1.0 });
+      console.log(`📄 Original page dimensions: ${originalViewport.width}x${originalViewport.height}`);
+
+      // Calculate scale to fit the page width in the container
+      // Leave some padding (e.g., 40px total)
+      const availableWidth = containerWidth - 40;
+      const availableHeight = containerHeight - 40;
+
+      // Calculate scale based on width (primary) and height (secondary)
+      const scaleToFitWidth = availableWidth / originalViewport.width;
+      const scaleToFitHeight = availableHeight / originalViewport.height;
+
+      // Use the smaller scale to ensure the entire page fits
+      const autoScale = scaleToFitWidth;
+
+      // Apply user's zoom level on top of the auto-fit scale
+      const finalScale = autoScale * zoomLevel;
+
+      console.log(`📏 Scales - Auto: ${autoScale.toFixed(2)}, User zoom: ${zoomLevel}, Final: ${finalScale.toFixed(2)}`);
+
+
+      // ENHANCEMENT 1: Use device pixel ratio for crisp rendering
+      const devicePixelRatio = window.devicePixelRatio || 1;
+      const scaleFactor = zoomLevel * devicePixelRatio;
+
+      const viewport = page.getViewport({ scale: finalScale });
+
+
+      // Set canvas size
+      canvas.height = viewport.height * devicePixelRatio;
+      canvas.width = viewport.width * devicePixelRatio;
+      canvas.style.width = `${viewport.width}px`;
+      canvas.style.height = `${viewport.height}px`;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      console.log(`Canvas size set to ${canvas.width}x${canvas.height}`);
+
+      // Center the canvas in the container
+      const canvasContainer = canvas.parentElement;
+      if (canvasContainer) {
+        canvasContainer.style.display = 'flex';
+        canvasContainer.style.justifyContent = 'center';
+        canvasContainer.style.alignItems = 'flex-start';
+        canvasContainer.style.padding = '20px';
+        canvasContainer.style.overflow = 'auto';
+        canvasContainer.style.width = '100%';
+        canvasContainer.style.height = '100%';
+      }
+
+      // Scale context for device pixel ratio
+      context.scale(devicePixelRatio, devicePixelRatio);
+
+      // Clear and configure context
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      const renderContext = {
+        canvasContext: context,
+        viewport: viewport
+      };
+
+      // Render PDF page
+      await page.render(renderContext).promise;
+
+      // Render text layer for text matching
+      await renderTextLayerWithProperViewport(page, viewport);
+
+      // Add enhanced provenance highlights if we have an active provenance
+      if (sentenceMapper && selectedProvenance && mapperReady) {
+        setTimeout(() => {
+          createEnhancedProvenanceHighlights();
+        }, 500);
+      }
+
+      console.log(`✅ Page ${pageNum} rendered with enhanced support`);
+
+    } catch (err) {
+      console.error(`❌ Error rendering page ${pageNum}:`, err);
+    }
+  };
+
+  const renderTextLayer = async (page, viewport) => {
+    if (!textLayerRef.current) return;
+
+    try {
+      const textContent = await page.getTextContent();
+      const textLayer = textLayerRef.current;
+
+      textLayer.innerHTML = '';
+      textLayer.style.left = '0px';
+      textLayer.style.top = '0px';
+      textLayer.style.width = viewport.width + 'px';
+      textLayer.style.height = viewport.height + 'px';
+      textLayer.style.setProperty('--scale-factor', viewport.scale);
+
+      if (window.pdfjsLib.renderTextLayer) {
+        await window.pdfjsLib.renderTextLayer({
+          textContentSource: textContent,
+          container: textLayer,
+          viewport: viewport,
+          textDivs: []
+        });
+      }
+
+    } catch (err) {
+      console.error('❌ Error rendering text layer:', err);
+    }
+  };
+
+  // Enhanced text layer rendering with proper viewport matching
+  const renderTextLayerWithProperViewport = async (page, viewport) => {
+    if (!textLayerRef.current) return;
+
+    try {
+      const textContent = await page.getTextContent();
+      const textLayer = textLayerRef.current;
+
+      // Clear and reset text layer to match canvas exactly
+      textLayer.innerHTML = '';
+      textLayer.style.position = 'absolute';
+      textLayer.style.left = '0px';
+      textLayer.style.top = '0px';
+      textLayer.style.width = `${viewport.width}px`;
+      textLayer.style.height = `${viewport.height}px`;
+      textLayer.style.overflow = 'hidden';
+      textLayer.style.pointerEvents = 'none'; // Allow clicks to pass through
+      textLayer.style.setProperty('--scale-factor', viewport.scale);
+
+      // Make sure text layer is positioned relative to the canvas
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const canvasRect = canvas.getBoundingClientRect();
+        const containerRect = textLayer.parentElement.getBoundingClientRect();
+
+        textLayer.style.left = `${canvasRect.left - containerRect.left}px`;
+        textLayer.style.top = `${canvasRect.top - containerRect.top}px`;
+      }
+
+      if (window.pdfjsLib.renderTextLayer) {
+        await window.pdfjsLib.renderTextLayer({
+          textContentSource: textContent,
+          container: textLayer,
+          viewport: viewport,
+          textDivs: []
+        });
+      }
+
+      console.log(`✅ Text layer positioned to match canvas`);
+
+    } catch (err) {
+      console.error('❌ Error rendering text layer:', err);
+    }
+  };
+
+  const createEnhancedProvenanceHighlights = () => {
+    if (!sentenceMapper || !selectedProvenance || !textLayerRef.current || !highlightLayerRef.current) {
+      console.warn('⚠️ Missing requirements for enhanced highlighting');
+      return;
+    }
+
+    console.log('🎨 Creating enhanced provenance highlights...');
+
+    // Clear existing highlights
+    clearAllHighlights();
+
+    // Get sentences on current page with provenance information
+    const pageSentences = sentenceMapper.getSentencesOnPageWithProvenance(currentPage);
+    const activeProvenanceSentences = pageSentences.filter(s => s.isActiveProvenanceSentence);
+
+    console.log(`📄 Page ${currentPage}: ${pageSentences.length} total sentences, ${activeProvenanceSentences.length} active provenance sentences`);
+
+    if (activeProvenanceSentences.length === 0) {
+      console.log(`📄 No active provenance sentences on page ${currentPage}`);
+      return;
+    }
+
+    // Create highlights for each active provenance sentence
+    activeProvenanceSentences.forEach((sentenceData, index) => {
+      const { sentenceId, mappingInfo } = sentenceData;
+
+      // Get sentence text
+      let sentenceText = null;
+      const provenanceSentenceIndex = selectedProvenance.sentences_ids?.indexOf(sentenceId);
+
+      if (provenanceSentenceIndex >= 0 && selectedProvenance.content?.[provenanceSentenceIndex]) {
+        sentenceText = selectedProvenance.content[provenanceSentenceIndex];
+      } else if (sentences[sentenceId]) {
+        sentenceText = sentences[sentenceId];
+      }
+
+      if (sentenceText) {
+        createEnhancedSentenceHighlight(sentenceText, sentenceId, index, mappingInfo);
+      } else {
+        console.warn(`⚠️ No text found for sentence ${sentenceId}`);
+        createFallbackHighlight(sentenceId, index);
+      }
+    });
+  };
+
+  const createEnhancedSentenceHighlight = (sentenceText, sentenceId, index, mappingInfo) => {
+    console.log(`🖍️ Creating enhanced highlight for sentence ${sentenceId} (confidence: ${mappingInfo.confidence?.toFixed(2)})`);
+
+    const textSpans = textLayerRef.current.querySelectorAll('span, div');
+    const cleanSentence = cleanTextForMatching(sentenceText);
+    const words = cleanSentence.split(/\s+/).filter(word => word.length > 2);
+
+    // Strategy 1: Try phrase matching first
+    const phraseMatches = findPhraseMatches(words, textSpans);
+    if (phraseMatches.length > 0) {
+      phraseMatches.forEach((match, matchIndex) => {
+        createHighlightOverlay(match.spans, sentenceId, index, matchIndex, match.confidence);
+      });
+      return;
+    }
+
+    // Strategy 2: Word cluster matching
+    const wordClusters = findWordClusters(words, textSpans);
+    if (wordClusters.length > 0) {
+      wordClusters.forEach((cluster, clusterIndex) => {
+        createHighlightOverlay(cluster.spans, sentenceId, index, clusterIndex, cluster.confidence);
+      });
+      return;
+    }
+
+    // Strategy 3: Fallback to individual important words
+    createIndividualWordHighlights(words.slice(0, 5), textSpans, sentenceId, index);
+  };
+
+
+  const findPhraseMatches = (words, textSpans) => {
+    const matches = [];
+
+    // Try different phrase lengths
+    for (let phraseLength = Math.min(6, words.length); phraseLength >= 3; phraseLength--) {
+      for (let i = 0; i <= words.length - phraseLength; i++) {
+        const phrase = words.slice(i, i + phraseLength).join(' ');
+        const matchingSpans = findConsecutiveSpansForPhrase(phrase, textSpans);
+
+        if (matchingSpans.length > 0) {
+          matches.push({
+            spans: matchingSpans,
+            confidence: phraseLength / words.length,
+            phrase: phrase
+          });
+        }
+      }
+    }
+
+    return matches.sort((a, b) => b.confidence - a.confidence).slice(0, 2);
+  };
+
+  const findConsecutiveSpansForPhrase = (phrase, textSpans) => {
+    const phraseWords = phrase.split(/\s+/);
+
+    for (let startIdx = 0; startIdx < textSpans.length - phraseWords.length + 1; startIdx++) {
+      const candidateSpans = [];
+      let wordIndex = 0;
+
+      for (let spanIdx = startIdx; spanIdx < textSpans.length && wordIndex < phraseWords.length; spanIdx++) {
+        const span = textSpans[spanIdx];
+        const spanText = cleanTextForMatching(span.textContent);
+
+        if (spanText.includes(phraseWords[wordIndex])) {
+          candidateSpans.push(span);
+          wordIndex++;
+
+          if (wordIndex === phraseWords.length) {
+            return candidateSpans;
+          }
+        } else if (candidateSpans.length > 0) {
+          break;
+        }
+      }
+    }
+
+    return [];
+  };
+
+  const findWordClusters = (words, textSpans) => {
+    const spanWordMap = new Map();
+
+    // Map spans to words they contain
+    textSpans.forEach(span => {
+      const spanText = cleanTextForMatching(span.textContent);
+      const matchingWords = words.filter(word => spanText.includes(word));
+
+      if (matchingWords.length > 0) {
+        spanWordMap.set(span, matchingWords);
+      }
+    });
+
+    // Find clusters of nearby spans
+    const clusters = [];
+    const usedSpans = new Set();
+
+    for (const [span, spanWords] of spanWordMap) {
+      if (usedSpans.has(span)) continue;
+
+      const cluster = findNearbySpans(span, spanWordMap, usedSpans);
+      if (cluster.spans.length > 0 && cluster.confidence > 0.3) {
+        clusters.push(cluster);
+      }
+    }
+
+    return clusters.sort((a, b) => b.confidence - a.confidence);
+  };
+
+  const findNearbySpans = (centerSpan, spanWordMap, usedSpans) => {
+    const centerRect = centerSpan.getBoundingClientRect();
+    const containerRect = textLayerRef.current.getBoundingClientRect();
+
+    const nearbySpans = [centerSpan];
+    let totalWords = spanWordMap.get(centerSpan)?.length || 0;
+    usedSpans.add(centerSpan);
+
+    const maxDistance = 100; // pixels
+
+    for (const [span, spanWords] of spanWordMap) {
+      if (usedSpans.has(span)) continue;
+
+      const spanRect = span.getBoundingClientRect();
+      const distance = calculateDistance(centerRect, spanRect, containerRect);
+
+      if (distance <= maxDistance) {
+        nearbySpans.push(span);
+        totalWords += spanWords.length;
+        usedSpans.add(span);
+      }
+    }
+
+    return {
+      spans: nearbySpans,
+      confidence: Math.min(totalWords / 10, 1.0) // Normalize confidence
+    };
+  };
+
+  const calculateDistance = (rect1, rect2, containerRect) => {
+    const center1X = rect1.left + rect1.width / 2 - containerRect.left;
+    const center1Y = rect1.top + rect1.height / 2 - containerRect.top;
+    const center2X = rect2.left + rect2.width / 2 - containerRect.left;
+    const center2Y = rect2.top + rect2.height / 2 - containerRect.top;
+
+    return Math.sqrt(Math.pow(center1X - center2X, 2) + Math.pow(center1Y - center2Y, 2));
+  };
+
+  const createIndividualWordHighlights = (importantWords, textSpans, sentenceId, index) => {
+    importantWords.forEach((word, wordIndex) => {
+      for (const span of textSpans) {
+        const spanText = cleanTextForMatching(span.textContent);
+        if (spanText.includes(word)) {
+          createHighlightOverlay([span], sentenceId, index, wordIndex, 0.4);
+          break; // Only highlight first occurrence
+        }
+      }
+    });
+  };
+
+  const createHighlightOverlay = (spans, sentenceId, index, subIndex = 0, confidence = 1.0) => {
+    if (!spans || spans.length === 0) return;
+
+    const boundingBox = calculateTightBoundingBox(spans);
+    if (!boundingBox) return;
+
+    // Skip highlights that are too small or too large
+    if (boundingBox.width < 10 || boundingBox.height < 10 ||
+      boundingBox.width > 600 || boundingBox.height > 100) {
+      console.log('⚠️ Skipping highlight due to size constraints');
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'provenance-overlay enhanced-highlight';
+    overlay.setAttribute('data-sentence-id', sentenceId);
+    overlay.setAttribute('data-question-id', activeQuestionId || 'unknown');
+    overlay.setAttribute('data-provenance-id', selectedProvenance?.provenance_id || 'unknown');
+    overlay.setAttribute('data-page', currentPage);
+    overlay.setAttribute('data-index', index);
+    overlay.setAttribute('data-confidence', confidence.toFixed(2));
+
+    // Color based on confidence
+    const colors = [
+      { bg: 'rgba(255, 193, 7, 0.4)', border: 'rgba(255, 193, 7, 0.9)' },    // High confidence - Yellow
+      { bg: 'rgba(40, 167, 69, 0.4)', border: 'rgba(40, 167, 69, 0.9)' },    // Medium-high - Green
+      { bg: 'rgba(0, 123, 255, 0.4)', border: 'rgba(0, 123, 255, 0.9)' },    // Medium - Blue
+      { bg: 'rgba(255, 102, 0, 0.4)', border: 'rgba(255, 102, 0, 0.9)' },    // Low-medium - Orange
+      { bg: 'rgba(111, 66, 193, 0.4)', border: 'rgba(111, 66, 193, 0.9)' }   // Low - Purple
+    ];
+
+    const colorIndex = Math.min(Math.floor((1 - confidence) * colors.length), colors.length - 1);
+    const color = colors[colorIndex];
+
+    overlay.style.cssText = `
+      position: absolute;
+      left: ${boundingBox.left}px;
+      top: ${boundingBox.top}px;
+      width: ${boundingBox.width}px;
+      height: ${boundingBox.height}px;
+      background-color: ${color.bg};
+      border: 2px solid ${color.border};
+      border-radius: 3px;
+      z-index: 500;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+    `;
+
+    overlay.title = `Evidence ${index + 1} - Sentence ${sentenceId}\nConfidence: ${(confidence * 100).toFixed(0)}%\nPage: ${currentPage}`;
+
+    // Click handler
+    overlay.addEventListener('click', (e) => {
+      e.stopPropagation();
+      console.log(`📍 Clicked evidence for sentence ${sentenceId}`);
+
+      // Visual feedback
+      overlay.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        overlay.style.transform = 'scale(1)';
+      }, 200);
+    });
+
+    // Hover effects
+    overlay.addEventListener('mouseenter', () => {
+      overlay.style.transform = 'scale(1.02)';
+      overlay.style.zIndex = '600';
+      overlay.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.25)';
+    });
+
+    overlay.addEventListener('mouseleave', () => {
+      overlay.style.transform = 'scale(1)';
+      overlay.style.zIndex = '500';
+      overlay.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+    });
+
+    highlightLayerRef.current.appendChild(overlay);
+
+    // Animate in
+    setTimeout(() => {
+      overlay.style.opacity = '1';
+    }, 50 + (index * 100) + (subIndex * 50));
+
+    console.log(`✅ Enhanced overlay created for sentence ${sentenceId} with confidence ${confidence.toFixed(2)}`);
+  };
+
+  const calculateTightBoundingBox = (spans) => {
+    if (spans.length === 0) return null;
+
+    try {
+      const containerRect = textLayerRef.current.getBoundingClientRect();
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+      spans.forEach(span => {
+        const rect = span.getBoundingClientRect();
+        const left = rect.left - containerRect.left;
+        const top = rect.top - containerRect.top;
+        const right = left + rect.width;
+        const bottom = top + rect.height;
+
+        minX = Math.min(minX, left);
+        minY = Math.min(minY, top);
+        maxX = Math.max(maxX, right);
+        maxY = Math.max(maxY, bottom);
+      });
+
+      const padding = 3;
+      return {
+        left: Math.max(0, minX - padding),
+        top: Math.max(0, minY - padding),
+        width: (maxX - minX) + (padding * 2),
+        height: (maxY - minY) + (padding * 2)
+      };
+    } catch (error) {
+      console.error('❌ Error calculating bounding box:', error);
+      return null;
+    }
+  };
+
+  const createFallbackHighlight = (sentenceId, index) => {
+    console.log(`🆘 Creating fallback highlight for sentence ${sentenceId}`);
+
+    const fallbackBox = {
+      left: 20,
+      top: 20 + (index * 35),
+      width: 250,
+      height: 30
+    };
+
+    const overlay = document.createElement('div');
+    overlay.className = 'provenance-overlay fallback-highlight';
+    overlay.setAttribute('data-sentence-id', sentenceId);
+
+    overlay.style.cssText = `
+      position: absolute;
+      left: ${fallbackBox.left}px;
+      top: ${fallbackBox.top}px;
+      width: ${fallbackBox.width}px;
+      height: ${fallbackBox.height}px;
+      background-color: rgba(255, 69, 0, 0.7);
+      border: 2px solid rgba(255, 69, 0, 1);
+      border-radius: 4px;
+      z-index: 550;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0;
+    `;
+
+    overlay.innerHTML = `📍 Evidence ${index + 1}`;
+    overlay.title = `Fallback highlight for sentence ${sentenceId}`;
+
+    highlightLayerRef.current.appendChild(overlay);
+
+    setTimeout(() => {
+      overlay.style.opacity = '1';
+    }, 100 + (index * 100));
+  };
+
+  const clearAllHighlights = () => {
+    if (!highlightLayerRef.current) return;
+
+    const overlays = highlightLayerRef.current.querySelectorAll('.provenance-overlay');
+    console.log(`🧹 Clearing ${overlays.length} highlights`);
+
+    overlays.forEach(overlay => {
+      overlay.style.opacity = '0';
+      overlay.style.transform = 'scale(0.8)';
+    });
+
+    setTimeout(() => {
+      highlightLayerRef.current.innerHTML = '';
+    }, 300);
+  };
+
+  const cleanTextForMatching = (text) => {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  // Enhanced page navigation
+const goToPage = (pageNum) => {
+  if (pageNum >= 1 && pageNum <= totalPages && pageNum !== currentPage) {
+    console.log(`📖 Navigating to page ${pageNum}`);
+    
+    // Clear highlights first
+    clearAllHighlights();
+    
+    // Update page
+    setCurrentPage(pageNum);
+  }
+};
+
+  // Enhanced zoom handlers that maintain proper viewport
+  const handleZoomIn = () => {
+    const newZoom = Math.min(zoomLevel + 0.25, 3);
+    console.log(`🔍 Zooming in: ${zoomLevel} → ${newZoom}`);
+    setZoomLevel(newZoom);
+  };
+
+  const handleZoomOut = () => {
+    const newZoom = Math.max(zoomLevel - 0.25, 0.5);
+    console.log(`🔍 Zooming out: ${zoomLevel} → ${newZoom}`);
+    setZoomLevel(newZoom);
+  };
+  const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
+
+  // Add window resize handler to re-calculate viewport
+useEffect(() => {
+  const handleResize = () => {
+    console.log('🔄 Window resized, recalculating viewport...');
+    if (pdfDoc && !loading && mapperReady) {
+      setTimeout(() => {
+        renderPageWithEnhancedHighlights(currentPage);
+      }, 150);
+    }
+  };
+
+  window.addEventListener('resize', handleResize);
+  
+  return () => {
+    window.removeEventListener('resize', handleResize);
+  };
+}, [pdfDoc, loading, mapperReady, currentPage]);
+
+
 
   // Enhanced provenance change handler with page checking
   useEffect(() => {
@@ -315,21 +992,21 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
   const createHighlightsForCurrentPage = (pageProvenances) => {
     const questionId = activeQuestionId || 'unknown';
     const provenanceId = selectedProvenance?.provenance_id || selectedProvenance?.id || 'unknown';
-    
+
     console.log(`🎨 Creating highlights for page ${currentPage} - Q:${questionId}, P:${provenanceId}`);
     console.log(`🎨 Highlighting ${pageProvenances.length} sentences on this page`);
-    
+
     // Clear any existing highlights first
     clearHighlights();
-    
+
     setTimeout(() => {
       setisCreatingHighlights(true);
-      
+
       pageProvenances.forEach(({ sentenceText, sentenceId, index }) => {
         console.log(`🖍️ Creating highlight for sentence ${sentenceId} on page ${currentPage}`);
         createSequentialHighlight(sentenceText, sentenceId, index);
       });
-      
+
       setTimeout(() => {
         setisCreatingHighlights(false);
       }, 2000);
@@ -382,135 +1059,69 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
     };
   }, []);
 
-  const loadPDFAndSentences = async () => {
-    setLoading(true);
-    setError(null);
 
-    try {
-      console.log('🔄 Loading PDF and sentence data...');
 
-      const testResponse = await fetch(pdfUrl, { method: 'HEAD' });
-      if (!testResponse.ok) {
-        throw new Error(`PDF not accessible: ${testResponse.status} ${testResponse.statusText}`);
-      }
 
-      const loadingTask = window.pdfjsLib.getDocument({
-        url: pdfUrl,
-        verbosity: 0
-      });
-
-      const pdf = await loadingTask.promise;
-      console.log('✅ PDF loaded successfully:', pdf.numPages, 'pages');
-
-      setPdfDoc(pdf);
-      setTotalPages(pdf.numPages);
-      setCurrentPage(1);
-
-      await loadSentenceMapping();
-
-      setLoading(false);
-
-    } catch (err) {
-      console.error('❌ Error loading PDF:', err);
-      setError(`Failed to load document: ${err.message}`);
-      setLoading(false);
-    }
-  };
-
-  // Add this debugging code to your HybridPDFViewer.js
-  // Place it in the loadSentenceMapping function
-
-  const loadSentenceMapping = async () => {
-    try {
-      console.log('🔄 Loading sentence mapping...');
-
-      const backendFilename = pdfDocument.filename;
-      const sentencesResponse = await fetch(`/api/documents/${backendFilename}/sentences`);
-
-      if (!sentencesResponse.ok) {
-        throw new Error(`Sentences file not found: ${sentencesResponse.status}`);
-      }
-
-      const sentencesData = await sentencesResponse.json();
-      
-      let actualSentences = null;
-      if (Array.isArray(sentencesData)) {
-        actualSentences = sentencesData;
-      } else if (sentencesData.sentences && Array.isArray(sentencesData.sentences)) {
-        actualSentences = sentencesData.sentences;
-      } else {
-        throw new Error('Invalid sentences data format');
-      }
-
-      console.log('✅ Loaded sentences:', actualSentences?.length || 0);
-      setSentences(actualSentences || []);
-
-    } catch (error) {
-      console.error('❌ Sentence mapping error:', error);
-      setSentences([]); // Continue without sentences
-    }
-  };
-
-   // Get sentences with provenance information for current page
+  // Get sentences with provenance information for current page
   const getSentencesForCurrentPage = () => {
     if (!sentenceMapper || !mapperReady) return [];
-    
+
     return sentenceMapper.getSentencesOnPageWithProvenance(currentPage);
   };
 
   // Enhanced navigation with page map lookup
   const getPageForSentence = (sentenceId) => {
     if (!selectedProvenance) return null;
-    
-  
+
+
     // Fallback to sentence mapper
     if (sentenceMapper && sentenceMapper.getPageForSentence) {
       const page = sentenceMapper.getPageForSentence(sentenceId);
       console.log(`🔍 Sentence mapper lookup: Sentence ${sentenceId} -> Page ${page}`);
       return page;
     }
-    
+
     console.warn(`⚠️ Could not find page for sentence ${sentenceId}`);
     return null;
   };
 
-  
 
-  
+
+
 
   // Check sentences on a specific page (fallback method)
   const checkSentencesOnPage = async (pageNum, provenance) => {
     if (!pdfDoc) return [];
-    
+
     try {
       // Render the page to get text content
       const page = await pdfDoc.getPage(pageNum);
       const textContent = await page.getTextContent();
-      
+
       // Extract all text from the page
       const pageText = textContent.items.map(item => item.str).join(' ');
       const cleanPageText = cleanTextForMatching(pageText);
-      
+
       const highlightSentenceIds = provenance.sentences_ids || provenance.provenance_ids || [];
       const sentencesOnPage = [];
-      
+
       highlightSentenceIds.forEach((sentenceId, index) => {
         let sentenceText = null;
-        
+
         if (provenance.content && provenance.content[index]) {
           sentenceText = provenance.content[index];
         } else if (sentences && sentences[sentenceId]) {
           sentenceText = sentences[sentenceId];
         }
-        
+
         if (sentenceText) {
           const cleanSentence = cleanTextForMatching(sentenceText);
           const sentenceWords = cleanSentence.split(/\s+/).filter(word => word.length > 2);
-          
+
           // Check if 60% of sentence words exist on this page
           const wordsFound = sentenceWords.filter(word => cleanPageText.includes(word));
           const matchPercentage = wordsFound.length / sentenceWords.length;
-          
+
           if (matchPercentage >= 0.6) {
             sentencesOnPage.push({
               sentenceId,
@@ -521,81 +1132,15 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
           }
         }
       });
-      
+
       return sentencesOnPage;
-      
+
     } catch (error) {
       console.error(`❌ Error checking sentences on page ${pageNum}:`, error);
       return [];
     }
   };
 
-  const goToPage = (pageNum) => {
-    if (pageNum >= 1 && pageNum <= totalPages) {
-      setCurrentPage(pageNum);
-    }
-  };
-
-  // Enhanced render page with provenance overlay support
-  useEffect(() => {
-    if (pdfDoc && !loading && !isCreatingHighlights) {
-      const checkAndRender = () => {
-        if (canvasRef.current) {
-          console.log('🎯 Canvas ready, rendering page with provenance', currentPage);
-          renderPageWithProvenance(currentPage);
-        } else {
-          setTimeout(checkAndRender, 100);
-        }
-      };
-      checkAndRender();
-    }
-  }, [pdfDoc, loading, currentPage, zoomLevel]);
-
-  useEffect(() => {
-    if (selectedProvenance && textLayerRef.current && highlightLayerRef.current && !isCreatingHighlights) {
-      console.log('🔄 Provenance changed, updating highlights after delay...');
-
-      // Add delay to ensure PDF text layer is ready
-      const highlightTimeout = setTimeout(() => {
-        console.log('✨ Adding provenance highlights...');
-        setisCreatingHighlights(true);
-        addProvenanceOverlays();
-
-        // Reset highlighting flag after completion
-        setTimeout(() => {
-          setisCreatingHighlights(false);
-        }, 2000);
-      }, 1200);
-
-      return () => {
-        clearTimeout(highlightTimeout);
-      };
-    }
-  }, [selectedProvenance, currentPage]); // Only trigger on provenance changes
-
-  // Enhanced highlighting that responds to zoom changes and follows text structure
-  // Add these to your HybridPDFViewer.js
-
-  // Add this useEffect to re-highlight when zoom changes
-  useEffect(() => {
-    if (selectedProvenance && textLayerRef.current && highlightLayerRef.current && !isCreatingHighlights) {
-      console.log('🔍 Zoom changed, re-highlighting at new scale...');
-
-      // Add delay to ensure text layer has re-rendered at new zoom
-      const zoomTimeout = setTimeout(() => {
-        setisCreatingHighlights(true);
-        addProvenanceOverlays();
-
-        setTimeout(() => {
-          setisCreatingHighlights(false);
-        }, 1500);
-      }, 800); // Wait for text layer to settle
-
-      return () => {
-        clearTimeout(zoomTimeout);
-      };
-    }
-  }, [zoomLevel]); // React to zoom level changes
 
   /**
    * Sequential highlighting that finds text in reading order
@@ -818,28 +1363,28 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
     return nonOverlapping;
   };
 
- // Enhanced createZoomResponsiveHighlight with page tracking
+  // Enhanced createZoomResponsiveHighlight with page tracking
   const createZoomResponsiveHighlight = (spans, sentenceId, index, subIndex = 0, confidence = 1.0) => {
     if (!spans || spans.length === 0) return;
-    
+
     const questionId = activeQuestionId || 'unknown';
     const provenanceId = selectedProvenance?.provenance_id || selectedProvenance?.id || index;
-    
+
     console.log(`🎨 Creating highlight for Page: ${currentPage}, Question: ${questionId}, Provenance: ${provenanceId}, Sentence: ${sentenceId}`);
-    
+
     // Calculate bounding box
     const boundingBox = calculateTightBoundingBox(spans);
     if (!boundingBox) {
       console.warn('⚠️ Could not calculate bounding box');
       return;
     }
-    
+
     // Validate size
     if (boundingBox.width < 5 || boundingBox.height < 5) {
       console.log('⚠️ Bounding box too small, skipping');
       return;
     }
-    
+
     if (boundingBox.width > 600 || boundingBox.height > 100) {
       console.log('⚠️ Bounding box too large, trying to split');
       if (spans.length > 2) {
@@ -849,7 +1394,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
         return;
       }
     }
-    
+
     const overlay = document.createElement('div');
     overlay.className = 'provenance-overlay zoom-responsive-overlay page-aware-overlay';
     overlay.setAttribute('data-sentence-id', sentenceId);
@@ -859,7 +1404,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
     overlay.setAttribute('data-index', index);
     overlay.setAttribute('data-sub-index', subIndex);
     overlay.setAttribute('data-confidence', confidence.toFixed(2));
-    
+
     // Choose color based on confidence
     const colors = [
       { bg: 'rgba(255, 193, 7, 0.4)', border: 'rgba(255, 193, 7, 0.9)' },    // High confidence - Yellow
@@ -868,15 +1413,15 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
       { bg: 'rgba(255, 102, 0, 0.4)', border: 'rgba(255, 102, 0, 0.9)' },    // Low-medium - Orange
       { bg: 'rgba(111, 66, 193, 0.4)', border: 'rgba(111, 66, 193, 0.9)' }   // Low - Purple
     ];
-    
+
     const colorIndex = Math.min(Math.floor((1 - confidence) * colors.length), colors.length - 1);
     const color = colors[colorIndex];
-    
+
     // Adjust opacity based on confidence
     const opacity = Math.max(0.3, confidence);
     const adjustedBg = color.bg.replace(/[\d.]+\)$/, `${opacity * 0.4})`);
     const adjustedBorder = color.border.replace(/[\d.]+\)$/, `${opacity})`);
-    
+
     overlay.style.cssText = `
       position: absolute;
       left: ${boundingBox.left}px;
@@ -893,15 +1438,15 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       opacity: 0;
     `;
-    
+
     // Enhanced tooltip with page info
     overlay.title = `Page: ${currentPage}\nQuestion: ${questionId}\nProvenance: ${provenanceId}\nEvidence ${index + 1}${subIndex ? ` (part ${Math.floor(subIndex) + 1})` : ''}\nSentence: ${sentenceId}\nConfidence: ${(confidence * 100).toFixed(0)}%\nClick to focus`;
-    
+
     // Enhanced click handler with page debugging
     overlay.addEventListener('click', (e) => {
       e.stopPropagation();
       console.log(`📍 Clicked overlay - Page: ${currentPage}, Question: ${questionId}, Provenance: ${provenanceId}, Sentence: ${sentenceId}`);
-      
+
       // Visual feedback
       overlay.style.transform = 'scale(1.05)';
       overlay.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
@@ -910,13 +1455,13 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
         overlay.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
       }, 200);
     });
-    
+
     // Enhanced hover effects
     overlay.addEventListener('mouseenter', () => {
       overlay.style.transform = 'scale(1.02)';
       overlay.style.zIndex = '600';
       overlay.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.25)';
-      
+
       // Debug log on hover
       console.log(`🖱️ Hover - Page: ${currentPage}, Q: ${questionId}, P: ${provenanceId}, S: ${sentenceId}`);
     });
@@ -926,15 +1471,15 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
       overlay.style.zIndex = '500';
       overlay.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
     });
-    
+
     // Add to highlight layer
     highlightLayerRef.current.appendChild(overlay);
-    
+
     // Animate in with stagger based on confidence
     const animationDelay = 50 + (index * 100) + (subIndex * 50) + ((1 - confidence) * 200);
     setTimeout(() => {
       overlay.style.opacity = '1';
-      
+
       // Subtle entrance animation
       setTimeout(() => {
         overlay.style.transform = 'scale(1.03)';
@@ -943,7 +1488,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
         }, 150);
       }, 100);
     }, animationDelay);
-    
+
     console.log(`✅ Page-aware overlay created for Page: ${currentPage}, Q: ${questionId}, P: ${provenanceId}, S: ${sentenceId} - ${boundingBox.width}x${boundingBox.height} at (${boundingBox.left}, ${boundingBox.top})`);
   };
 
@@ -966,53 +1511,6 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
     }
   };
 
-   const renderPageWithEnhancedHighlights = async (pageNum) => {
-    if (!pdfDoc || !canvasRef.current || !containerRef.current) return;
-
-    try {
-      console.log(`🔄 Rendering page ${pageNum} with enhanced highlighting...`);
-
-      const page = await pdfDoc.getPage(pageNum);
-
-       // ENHANCEMENT 1: Use device pixel ratio for crisp rendering
-      const devicePixelRatio = window.devicePixelRatio || 1;
-      const scaleFactor = zoomLevel * devicePixelRatio;
-      
-      const viewport = page.getViewport({ scale: scaleFactor });
-      const canvas = canvasRef.current;
-      const context = canvas.getContext('2d');
-
-      // Set canvas size
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      context.clearRect(0, 0, canvas.width, canvas.height);
-
-      console.log(`Canvas size set to ${canvas.width}x${canvas.height}`);
-
-      const renderContext = {
-        canvasContext: context,
-        viewport: viewport
-      };
-
-      // Render PDF page
-      await page.render(renderContext).promise;
-
-      // Render text layer for text matching
-      await renderTextLayer(page, viewport);
-
-      // Add enhanced provenance highlights if we have an active provenance
-      if (sentenceMapper && selectedProvenance && mapperReady) {
-        setTimeout(() => {
-          createEnhancedProvenanceHighlights();
-        }, 500);
-      }
-
-      console.log(`✅ Page ${pageNum} rendered with enhanced support`);
-
-    } catch (err) {
-      console.error(`❌ Error rendering page ${pageNum}:`, err);
-    }
-  };
 
 
 
@@ -1070,33 +1568,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
     }
   };
 
-  const renderTextLayer = async (page, viewport) => {
-    if (!textLayerRef.current) return;
 
-    try {
-      const textContent = await page.getTextContent();
-      const textLayer = textLayerRef.current;
-
-      textLayer.innerHTML = '';
-      textLayer.style.left = '0px';
-      textLayer.style.top = '0px';
-      textLayer.style.width = viewport.width + 'px';
-      textLayer.style.height = viewport.height + 'px';
-      textLayer.style.setProperty('--scale-factor', viewport.scale);
-
-      if (window.pdfjsLib.renderTextLayer) {
-        await window.pdfjsLib.renderTextLayer({
-          textContentSource: textContent,
-          container: textLayer,
-          viewport: viewport,
-          textDivs: []
-        });
-      }
-
-    } catch (err) {
-      console.error('❌ Error rendering text layer:', err);
-    }
-  };
 
   const addProvenanceOverlays = () => {
     console.log('🎯 Starting enhanced overlay creation...');
@@ -1224,355 +1696,10 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
     }
   };
 
-  const createEnhancedProvenanceHighlights = () => {
-    if (!sentenceMapper || !selectedProvenance || !textLayerRef.current || !highlightLayerRef.current) {
-      console.warn('⚠️ Missing requirements for enhanced highlighting');
-      return;
-    }
 
-    console.log('🎨 Creating enhanced provenance highlights...');
 
-    // Clear existing highlights
-    clearAllHighlights();
 
-    // Get sentences on current page with provenance information
-    const pageSentences = sentenceMapper.getSentencesOnPageWithProvenance(currentPage);
-    const activeProvenanceSentences = pageSentences.filter(s => s.isActiveProvenanceSentence);
 
-    console.log(`📄 Page ${currentPage}: ${pageSentences.length} total sentences, ${activeProvenanceSentences.length} active provenance sentences`);
-
-    if (activeProvenanceSentences.length === 0) {
-      console.log(`📄 No active provenance sentences on page ${currentPage}`);
-      return;
-    }
-
-    // Create highlights for each active provenance sentence
-    activeProvenanceSentences.forEach((sentenceData, index) => {
-      const { sentenceId, mappingInfo } = sentenceData;
-      
-      // Get sentence text
-      let sentenceText = null;
-      const provenanceSentenceIndex = selectedProvenance.sentences_ids?.indexOf(sentenceId);
-      
-      if (provenanceSentenceIndex >= 0 && selectedProvenance.content?.[provenanceSentenceIndex]) {
-        sentenceText = selectedProvenance.content[provenanceSentenceIndex];
-      } else if (sentences[sentenceId]) {
-        sentenceText = sentences[sentenceId];
-      }
-
-      if (sentenceText) {
-        createEnhancedSentenceHighlight(sentenceText, sentenceId, index, mappingInfo);
-      } else {
-        console.warn(`⚠️ No text found for sentence ${sentenceId}`);
-        createFallbackHighlight(sentenceId, index);
-      }
-    });
-  };
-
-   const findPhraseMatches = (words, textSpans) => {
-    const matches = [];
-    
-    // Try different phrase lengths
-    for (let phraseLength = Math.min(6, words.length); phraseLength >= 3; phraseLength--) {
-      for (let i = 0; i <= words.length - phraseLength; i++) {
-        const phrase = words.slice(i, i + phraseLength).join(' ');
-        const matchingSpans = findConsecutiveSpansForPhrase(phrase, textSpans);
-        
-        if (matchingSpans.length > 0) {
-          matches.push({
-            spans: matchingSpans,
-            confidence: phraseLength / words.length,
-            phrase: phrase
-          });
-        }
-      }
-    }
-    
-    return matches.sort((a, b) => b.confidence - a.confidence).slice(0, 2);
-  };
-
-  const createEnhancedSentenceHighlight = (sentenceText, sentenceId, index, mappingInfo) => {
-    console.log(`🖍️ Creating enhanced highlight for sentence ${sentenceId} (confidence: ${mappingInfo.confidence?.toFixed(2)})`);
-
-    const textSpans = textLayerRef.current.querySelectorAll('span, div');
-    const cleanSentence = cleanTextForMatching(sentenceText);
-    const words = cleanSentence.split(/\s+/).filter(word => word.length > 2);
-
-    // Strategy 1: Try phrase matching first
-    const phraseMatches = findPhraseMatches(words, textSpans);
-    if (phraseMatches.length > 0) {
-      phraseMatches.forEach((match, matchIndex) => {
-        createHighlightOverlay(match.spans, sentenceId, index, matchIndex, match.confidence);
-      });
-      return;
-    }
-
-    // Strategy 2: Word cluster matching
-    const wordClusters = findWordClusters(words, textSpans);
-    if (wordClusters.length > 0) {
-      wordClusters.forEach((cluster, clusterIndex) => {
-        createHighlightOverlay(cluster.spans, sentenceId, index, clusterIndex, cluster.confidence);
-      });
-      return;
-    }
-
-    // Strategy 3: Fallback to individual important words
-    createIndividualWordHighlights(words.slice(0, 5), textSpans, sentenceId, index);
-  };
-
-  const createEnhancedHighlight = (sentenceText, sentenceId, index) => {
-    console.log(`🎨 Creating enhanced highlight for: "${sentenceText.substring(0, 50)}..."`);
-
-    const textSpans = textLayerRef.current.querySelectorAll('span, div');
-    const cleanSentence = cleanTextForMatching(sentenceText);
-
-    // Strategy 1: Look for exact phrase matches first
-    const phraseMatches = findExactPhraseMatches(cleanSentence, textSpans);
-
-    if (phraseMatches.length > 0) {
-      console.log(`✅ Found ${phraseMatches.length} phrase matches`);
-      phraseMatches.forEach((match, matchIndex) => {
-        createTightHighlightOverlay(match.spans, sentenceId, index, matchIndex);
-      });
-      return;
-    }
-
-    // Strategy 2: Word cluster matching
-    const wordClusters = findWordClusters(cleanSentence, textSpans);
-
-    if (wordClusters.length > 0) {
-      console.log(`✅ Found ${wordClusters.length} word clusters`);
-      wordClusters.forEach((cluster, clusterIndex) => {
-        createTightHighlightOverlay(cluster.spans, sentenceId, index, clusterIndex);
-      });
-      return;
-    }
-
-    // Strategy 3: Fallback to individual word highlights
-    console.log(`⚠️ Using individual word highlights for sentence ${sentenceId}`);
-    createIndividualWordHighlights(cleanSentence, textSpans, sentenceId, index);
-  };
-
-  /**
-   * Find exact phrase matches in the PDF text
-   */
-  const findExactPhraseMatches = (cleanSentence, textSpans) => {
-    const matches = [];
-    const words = cleanSentence.split(/\s+/).filter(word => word.length > 2);
-
-    // Try different phrase lengths
-    for (let phraseLength = Math.min(8, words.length); phraseLength >= 4; phraseLength--) {
-      for (let i = 0; i <= words.length - phraseLength; i++) {
-        const phrase = words.slice(i, i + phraseLength).join(' ');
-        const matchingSpans = findConsecutiveSpansForPhrase(phrase, textSpans);
-
-        if (matchingSpans.length > 0) {
-          matches.push({
-            phrase: phrase,
-            spans: matchingSpans,
-            confidence: phraseLength / words.length
-          });
-        }
-      }
-    }
-
-    // Return best matches (highest confidence)
-    return matches.sort((a, b) => b.confidence - a.confidence).slice(0, 3);
-  };
-
-   const findConsecutiveSpansForPhrase = (phrase, textSpans) => {
-    const phraseWords = phrase.split(/\s+/);
-    
-    for (let startIdx = 0; startIdx < textSpans.length - phraseWords.length + 1; startIdx++) {
-      const candidateSpans = [];
-      let wordIndex = 0;
-      
-      for (let spanIdx = startIdx; spanIdx < textSpans.length && wordIndex < phraseWords.length; spanIdx++) {
-        const span = textSpans[spanIdx];
-        const spanText = cleanTextForMatching(span.textContent);
-        
-        if (spanText.includes(phraseWords[wordIndex])) {
-          candidateSpans.push(span);
-          wordIndex++;
-          
-          if (wordIndex === phraseWords.length) {
-            return candidateSpans;
-          }
-        } else if (candidateSpans.length > 0) {
-          break;
-        }
-      }
-    }
-    
-    return [];
-  };
-
-  const findWordClusters = (words, textSpans) => {
-    const spanWordMap = new Map();
-    
-    // Map spans to words they contain
-    textSpans.forEach(span => {
-      const spanText = cleanTextForMatching(span.textContent);
-      const matchingWords = words.filter(word => spanText.includes(word));
-      
-      if (matchingWords.length > 0) {
-        spanWordMap.set(span, matchingWords);
-      }
-    });
-    
-    // Find clusters of nearby spans
-    const clusters = [];
-    const usedSpans = new Set();
-    
-    for (const [span, spanWords] of spanWordMap) {
-      if (usedSpans.has(span)) continue;
-      
-      const cluster = findNearbySpans(span, spanWordMap, usedSpans);
-      if (cluster.spans.length > 0 && cluster.confidence > 0.3) {
-        clusters.push(cluster);
-      }
-    }
-    
-    return clusters.sort((a, b) => b.confidence - a.confidence);
-  };
-
-  const findNearbySpans = (centerSpan, spanWordMap, usedSpans) => {
-    const centerRect = centerSpan.getBoundingClientRect();
-    const containerRect = textLayerRef.current.getBoundingClientRect();
-    
-    const nearbySpans = [centerSpan];
-    let totalWords = spanWordMap.get(centerSpan)?.length || 0;
-    usedSpans.add(centerSpan);
-    
-    const maxDistance = 100; // pixels
-    
-    for (const [span, spanWords] of spanWordMap) {
-      if (usedSpans.has(span)) continue;
-      
-      const spanRect = span.getBoundingClientRect();
-      const distance = calculateDistance(centerRect, spanRect, containerRect);
-      
-      if (distance <= maxDistance) {
-        nearbySpans.push(span);
-        totalWords += spanWords.length;
-        usedSpans.add(span);
-      }
-    }
-    
-    return {
-      spans: nearbySpans,
-      confidence: Math.min(totalWords / 10, 1.0) // Normalize confidence
-    };
-  };
-
-  const calculateDistance = (rect1, rect2, containerRect) => {
-    const center1X = rect1.left + rect1.width / 2 - containerRect.left;
-    const center1Y = rect1.top + rect1.height / 2 - containerRect.top;
-    const center2X = rect2.left + rect2.width / 2 - containerRect.left;
-    const center2Y = rect2.top + rect2.height / 2 - containerRect.top;
-    
-    return Math.sqrt(Math.pow(center1X - center2X, 2) + Math.pow(center1Y - center2Y, 2));
-  };
-
-  const createIndividualWordHighlights = (importantWords, textSpans, sentenceId, index) => {
-    importantWords.forEach((word, wordIndex) => {
-      for (const span of textSpans) {
-        const spanText = cleanTextForMatching(span.textContent);
-        if (spanText.includes(word)) {
-          createHighlightOverlay([span], sentenceId, index, wordIndex, 0.4);
-          break; // Only highlight first occurrence
-        }
-      }
-    });
-  };
-
-  const createHighlightOverlay = (spans, sentenceId, index, subIndex = 0, confidence = 1.0) => {
-    if (!spans || spans.length === 0) return;
-    
-    const boundingBox = calculateTightBoundingBox(spans);
-    if (!boundingBox) return;
-    
-    // Skip highlights that are too small or too large
-    if (boundingBox.width < 10 || boundingBox.height < 10 || 
-        boundingBox.width > 600 || boundingBox.height > 100) {
-      console.log('⚠️ Skipping highlight due to size constraints');
-      return;
-    }
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'provenance-overlay enhanced-highlight';
-    overlay.setAttribute('data-sentence-id', sentenceId);
-    overlay.setAttribute('data-question-id', activeQuestionId || 'unknown');
-    overlay.setAttribute('data-provenance-id', selectedProvenance?.provenance_id || 'unknown');
-    overlay.setAttribute('data-page', currentPage);
-    overlay.setAttribute('data-index', index);
-    overlay.setAttribute('data-confidence', confidence.toFixed(2));
-    
-    // Color based on confidence
-    const colors = [
-      { bg: 'rgba(255, 193, 7, 0.4)', border: 'rgba(255, 193, 7, 0.9)' },    // High confidence - Yellow
-      { bg: 'rgba(40, 167, 69, 0.4)', border: 'rgba(40, 167, 69, 0.9)' },    // Medium-high - Green
-      { bg: 'rgba(0, 123, 255, 0.4)', border: 'rgba(0, 123, 255, 0.9)' },    // Medium - Blue
-      { bg: 'rgba(255, 102, 0, 0.4)', border: 'rgba(255, 102, 0, 0.9)' },    // Low-medium - Orange
-      { bg: 'rgba(111, 66, 193, 0.4)', border: 'rgba(111, 66, 193, 0.9)' }   // Low - Purple
-    ];
-    
-    const colorIndex = Math.min(Math.floor((1 - confidence) * colors.length), colors.length - 1);
-    const color = colors[colorIndex];
-    
-    overlay.style.cssText = `
-      position: absolute;
-      left: ${boundingBox.left}px;
-      top: ${boundingBox.top}px;
-      width: ${boundingBox.width}px;
-      height: ${boundingBox.height}px;
-      background-color: ${color.bg};
-      border: 2px solid ${color.border};
-      border-radius: 3px;
-      z-index: 500;
-      pointer-events: auto;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-      opacity: 0;
-    `;
-    
-    overlay.title = `Evidence ${index + 1} - Sentence ${sentenceId}\nConfidence: ${(confidence * 100).toFixed(0)}%\nPage: ${currentPage}`;
-    
-    // Click handler
-    overlay.addEventListener('click', (e) => {
-      e.stopPropagation();
-      console.log(`📍 Clicked evidence for sentence ${sentenceId}`);
-      
-      // Visual feedback
-      overlay.style.transform = 'scale(1.05)';
-      setTimeout(() => {
-        overlay.style.transform = 'scale(1)';
-      }, 200);
-    });
-    
-    // Hover effects
-    overlay.addEventListener('mouseenter', () => {
-      overlay.style.transform = 'scale(1.02)';
-      overlay.style.zIndex = '600';
-      overlay.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.25)';
-    });
-    
-    overlay.addEventListener('mouseleave', () => {
-      overlay.style.transform = 'scale(1)';
-      overlay.style.zIndex = '500';
-      overlay.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
-    });
-    
-    highlightLayerRef.current.appendChild(overlay);
-    
-    // Animate in
-    setTimeout(() => {
-      overlay.style.opacity = '1';
-    }, 50 + (index * 100) + (subIndex * 50));
-    
-    console.log(`✅ Enhanced overlay created for sentence ${sentenceId} with confidence ${confidence.toFixed(2)}`);
-  };
 
   /**
    * Create a tight highlight overlay for a group of spans
@@ -1683,152 +1810,12 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
     console.log(`✅ Tight overlay created for sentence ${sentenceId} (${boundingBox.width}x${boundingBox.height})`);
   };
 
-   const calculateTightBoundingBox = (spans) => {
-    if (spans.length === 0) return null;
-    
-    try {
-      const containerRect = textLayerRef.current.getBoundingClientRect();
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      
-      spans.forEach(span => {
-        const rect = span.getBoundingClientRect();
-        const left = rect.left - containerRect.left;
-        const top = rect.top - containerRect.top;
-        const right = left + rect.width;
-        const bottom = top + rect.height;
-        
-        minX = Math.min(minX, left);
-        minY = Math.min(minY, top);
-        maxX = Math.max(maxX, right);
-        maxY = Math.max(maxY, bottom);
-      });
-      
-      const padding = 3;
-      return {
-        left: Math.max(0, minX - padding),
-        top: Math.max(0, minY - padding),
-        width: (maxX - minX) + (padding * 2),
-        height: (maxY - minY) + (padding * 2)
-      };
-    } catch (error) {
-      console.error('❌ Error calculating bounding box:', error);
-      return null;
-    }
-  };
 
-  /**
-   * Group rectangles by line based on Y coordinates
-   */
-  const groupRectsByLine = (rects) => {
-    const lines = [];
-    const lineThreshold = 5; // pixels - rects within this Y distance are on same line
 
-    rects.forEach(rect => {
-      let addedToLine = false;
 
-      for (const line of lines) {
-        const lineY = line[0].top;
-        if (Math.abs(rect.top - lineY) <= lineThreshold) {
-          line.push(rect);
-          addedToLine = true;
-          break;
-        }
-      }
 
-      if (!addedToLine) {
-        lines.push([rect]);
-      }
-    });
 
-    // Sort each line by X coordinate
-    lines.forEach(line => {
-      line.sort((a, b) => a.left - b.left);
-    });
 
-    return lines;
-  };
-
-  /**
-   * Calculate bounding box for rects on the same line
-   */
-  const calculateLineBox = (rects) => {
-    if (rects.length === 0) return null;
-
-    const minLeft = Math.min(...rects.map(r => r.left));
-    const maxRight = Math.max(...rects.map(r => r.right));
-    const minTop = Math.min(...rects.map(r => r.top));
-    const maxBottom = Math.max(...rects.map(r => r.bottom));
-
-    // Add small padding
-    const padding = 2;
-
-    return {
-      left: Math.max(0, minLeft - padding),
-      top: Math.max(0, minTop - padding),
-      width: (maxRight - minLeft) + (padding * 2),
-      height: (maxBottom - minTop) + (padding * 2)
-    };
-  };
-
-  const createFallbackHighlight = (sentenceId, index) => {
-    console.log(`🆘 Creating fallback highlight for sentence ${sentenceId}`);
-    
-    const fallbackBox = {
-      left: 20,
-      top: 20 + (index * 35),
-      width: 250,
-      height: 30
-    };
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'provenance-overlay fallback-highlight';
-    overlay.setAttribute('data-sentence-id', sentenceId);
-    
-    overlay.style.cssText = `
-      position: absolute;
-      left: ${fallbackBox.left}px;
-      top: ${fallbackBox.top}px;
-      width: ${fallbackBox.width}px;
-      height: ${fallbackBox.height}px;
-      background-color: rgba(255, 69, 0, 0.7);
-      border: 2px solid rgba(255, 69, 0, 1);
-      border-radius: 4px;
-      z-index: 550;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 12px;
-      cursor: pointer;
-      opacity: 0;
-    `;
-    
-    overlay.innerHTML = `📍 Evidence ${index + 1}`;
-    overlay.title = `Fallback highlight for sentence ${sentenceId}`;
-    
-    highlightLayerRef.current.appendChild(overlay);
-    
-    setTimeout(() => {
-      overlay.style.opacity = '1';
-    }, 100 + (index * 100));
-  };
-
-  const clearAllHighlights = () => {
-    if (!highlightLayerRef.current) return;
-    
-    const overlays = highlightLayerRef.current.querySelectorAll('.provenance-overlay');
-    console.log(`🧹 Clearing ${overlays.length} highlights`);
-    
-    overlays.forEach(overlay => {
-      overlay.style.opacity = '0';
-      overlay.style.transform = 'scale(0.8)';
-    });
-    
-    setTimeout(() => {
-      highlightLayerRef.current.innerHTML = '';
-    }, 300);
-  };
 
   // Enhanced debugging functions
   if (process.env.NODE_ENV === 'development') {
@@ -1836,7 +1823,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
       console.log(`🔧 Debug: Page ${currentPage} highlights analysis`);
       console.log(`🔧 Active question: ${activeQuestionId}`);
       console.log(`🔧 Selected provenance:`, selectedProvenance);
-      
+
       if (highlightLayerRef.current) {
         const overlays = highlightLayerRef.current.querySelectorAll('.provenance-overlay');
         console.log(`🔧 Found ${overlays.length} overlays on page ${currentPage}:`);
@@ -1849,12 +1836,12 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
         });
       }
     };
-    
+
     window.debugCheckPageForProvenance = () => {
       console.log(`🔧 Debug: Manually checking page ${currentPage} for current provenance`);
       checkProvenanceForCurrentPage();
     };
-    
+
     window.debugSentencePages = (sentenceId) => {
       if (sentenceMapper) {
         const page = sentenceMapper.getPageForSentence(sentenceId);
@@ -2051,16 +2038,16 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
 
   const clearHighlights = () => {
     if (!highlightLayerRef.current) return;
-    
+
     const questionId = activeQuestionId || 'unknown';
     console.log(`🧹 clearHighlights called for question: ${questionId}, page: ${currentPage}`);
-    
+
     const existingOverlays = highlightLayerRef.current.querySelectorAll(
       '.provenance-overlay, .test-overlay, .persistent-test-overlay'
     );
-    
+
     console.log(`🗑️ Clearing ${existingOverlays.length} existing overlays from page ${currentPage}`);
-    
+
     // Log what we're clearing
     existingOverlays.forEach((overlay, index) => {
       const overlayQuestionId = overlay.getAttribute('data-question-id') || 'unknown';
@@ -2069,15 +2056,15 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
       const overlayIndex = overlay.getAttribute('data-index') || 'unknown';
       console.log(`  🗂️ Clearing overlay ${index}: Q:${overlayQuestionId}, P:${overlayProvenanceId}, Page:${overlayPage}, I:${overlayIndex}`);
     });
-    
+
     existingOverlays.forEach(overlay => {
       overlay.style.opacity = '0';
       overlay.style.transform = 'scale(0.8)';
     });
-    
 
-        highlightLayerRef.current.innerHTML = '';
-        console.log(`✅ Highlights cleared for question: ${questionId}, page: ${currentPage}`);
+
+    highlightLayerRef.current.innerHTML = '';
+    console.log(`✅ Highlights cleared for question: ${questionId}, page: ${currentPage}`);
 
   };
 
@@ -2141,17 +2128,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
 
   // ===== HELPER FUNCTIONS =====
 
-  /**
-   * Clean text for more reliable matching
-   */
-  const cleanTextForMatching = (text) => {
-    return text
-      .toLowerCase()
-      .replace(/[^\w\s]/g, ' ')     // Remove punctuation
-      .replace(/\s+/g, ' ')         // Normalize whitespace
-      .replace(/\n+/g, ' ')         // Replace newlines with spaces
-      .trim();
-  };
+
 
   /**
    * Extract key words, filtering out common words
@@ -2382,10 +2359,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
     console.log(`🔗 Provenance overlay clicked: sentence ${sentenceId}`);
   };
 
-  // Control handlers
-  const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.25, 3));
-  const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.25, 0.5));
-  const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
+
 
   // Render states (keeping existing render states...)
   if (!pdfDocument) {
@@ -2485,7 +2459,7 @@ const HybridPDFViewer = ({ pdfDocument, selectedProvenance, activeQuestionId, on
           <FontAwesomeIcon icon={faChevronRight} />
         </button>
 
-         {/* Enhanced sentence info */}
+        {/* Enhanced sentence info */}
         {mapperReady && (
           <div className="mapping-info">
             <span className="sentence-status">

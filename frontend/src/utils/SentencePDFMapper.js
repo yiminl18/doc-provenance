@@ -332,153 +332,243 @@ export class SentencePDFMapper {
     }
   }
 
-  /**
-    * Map sentences to their most likely pages and positions
-    */
-  async mapSentencesToPages(sentences) {
-    console.log('🗺️ Starting sentence-to-page mapping...');
-    console.log(`📋 Input sentences: ${sentences?.length || 0}`);
-    console.log(`📄 Available pages: ${this.pageTextCache.size}`);
+ /**
+ * Map sentences to pages while preserving reading order
+ */
+async mapSentencesToPages(sentences) {
+  console.log('🗺️ Starting reading-order-aware sentence mapping...');
+  
+  if (!sentences || sentences.length === 0) {
+    console.warn('⚠️ No sentences provided for mapping');
+    return;
+  }
 
-    if (!sentences || sentences.length === 0) {
-      console.warn('⚠️ No sentences provided for mapping');
+  // First pass: establish page boundaries based on content flow
+  const pageStartSentences = this.findPageBoundaries(sentences);
+  
+  // Second pass: map sentences with reading order constraints
+  let currentExpectedPage = 1;
+  let sentencesOnCurrentPage = 0;
+  const maxSentencesPerPage = Math.ceil(sentences.length / this.pageTextCache.size) * 1.5;
+
+  sentences.forEach((sentence, sentenceId) => {
+    if (!sentence || typeof sentence !== 'string') {
+      console.warn(`⚠️ Invalid sentence at index ${sentenceId}`);
+      this.sentencePageMap.set(sentenceId, currentExpectedPage);
       return;
     }
 
-    const mappingResults = {
-      highConfidence: 0,
-      mediumConfidence: 0,
-      lowConfidence: 0,
-      unmapped: 0
-    };
+    // Find best match with reading order constraints
+    const mapping = this.findBestPageMatchWithOrder(
+      sentence, 
+      sentenceId, 
+      currentExpectedPage,
+      pageStartSentences
+    );
 
-    sentences.forEach((sentence, sentenceId) => {
-      if (!sentence || typeof sentence !== 'string') {
-        console.warn(`⚠️ Invalid sentence at index ${sentenceId}:`, sentence);
-        mappingResults.unmapped++;
-        return;
-      }
+    // Update expected page based on content density
+    if (sentencesOnCurrentPage > maxSentencesPerPage) {
+      currentExpectedPage = Math.min(currentExpectedPage + 1, this.pageTextCache.size);
+      sentencesOnCurrentPage = 0;
+    }
 
-      const mapping = this.findBestPageMatch(sentence, sentenceId);
-
-      if (mapping.confidence > 0.8) {
-        mappingResults.highConfidence++;
-      } else if (mapping.confidence > 0.5) {
-        mappingResults.mediumConfidence++;
-      } else if (mapping.confidence > 0.2) {
-        mappingResults.lowConfidence++;
-      } else {
-        mappingResults.unmapped++;
-      }
-
-      this.sentencePageMap.set(sentenceId, mapping.pageNum);
-      this.sentencePositionMap.set(sentenceId, mapping);
+    // Don't allow backwards page jumps (preserve reading order)
+    const finalPage = Math.max(mapping.pageNum, currentExpectedPage);
+    
+    this.sentencePageMap.set(sentenceId, finalPage);
+    this.sentencePositionMap.set(sentenceId, {
+      ...mapping,
+      pageNum: finalPage,
+      originalPageNum: mapping.pageNum,
+      orderCorrected: finalPage !== mapping.pageNum
     });
 
-    console.log('📊 Sentence mapping results:', mappingResults);
+    if (finalPage === currentExpectedPage) {
+      sentencesOnCurrentPage++;
+    } else {
+      currentExpectedPage = finalPage;
+      sentencesOnCurrentPage = 1;
+    }
+  });
 
-    // Log some successful mappings for debugging
-    const successfulMappings = Array.from(this.sentencePositionMap.entries())
-      .filter(([_, mapping]) => mapping.confidence > 0.5)
-      .slice(0, 3);
+  //this.logMappingStatistics(sentences.length);
+}
 
-    if (successfulMappings.length > 0) {
-      console.log('✅ Sample successful mappings:');
-      successfulMappings.forEach(([sentenceId, mapping]) => {
-        console.log(`  Sentence ${sentenceId} → Page ${mapping.pageNum} (${mapping.confidence.toFixed(2)} confidence)`);
-      });
+/**
+ * Find page boundaries by detecting content transitions
+ */
+findPageBoundaries(sentences) {
+  const boundaries = new Set([0]); // First sentence always starts a page
+  
+  // Look for sentences that likely start new pages
+  sentences.forEach((sentence, index) => {
+    if (this.isLikelyPageStart(sentence, sentences[index - 1])) {
+      boundaries.add(index);
+    }
+  });
+
+  return boundaries;
+}
+
+/**
+ * Check if a sentence likely starts a new page
+ */
+isLikelyPageStart(sentence, prevSentence) {
+  if (!sentence || !prevSentence) return false;
+  
+  const currentWords = sentence.toLowerCase().split(/\s+/);
+  const prevWords = prevSentence.toLowerCase().split(/\s+/);
+  
+  // Heuristics for page starts:
+  // 1. Very different vocabulary (topic change)
+  const commonWords = currentWords.filter(word => prevWords.includes(word));
+  const vocabularyOverlap = commonWords.length / Math.max(currentWords.length, 1);
+  
+  // 2. Starts with section headers or common page-start patterns
+  const pageStartPatterns = [
+    /^(abstract|introduction|methodology|results|conclusion|references)/i,
+    /^(chapter|section|appendix|\d+\.)/i,
+    /^(table|figure|\[)/i
+  ];
+  
+  const hasPageStartPattern = pageStartPatterns.some(pattern => 
+    pattern.test(sentence.trim())
+  );
+  
+  return vocabularyOverlap < 0.3 || hasPageStartPattern;
+}
+
+/**
+ * Find best page match while respecting reading order
+ */
+findBestPageMatchWithOrder(sentence, sentenceId, expectedPage, pageStartSentences) {
+  const cleanSentence = this.cleanText(sentence);
+  
+  // Search pages in order: expected, expected+1, expected-1, etc.
+  const searchOrder = this.generateSearchOrder(expectedPage, this.pageTextCache.size);
+  
+  let bestMatch = {
+    pageNum: expectedPage,
+    confidence: 0,
+    position: 0,
+    matchType: 'order_fallback'
+  };
+
+  for (const pageNum of searchOrder) {
+    const pageData = this.pageTextCache.get(pageNum);
+    if (!pageData) continue;
+
+    // Try exact match first
+    const exactMatch = this.findExactMatch(cleanSentence, pageData.fullText);
+    if (exactMatch.confidence > 0.8) {
+      return {
+        pageNum,
+        confidence: exactMatch.confidence,
+        position: exactMatch.position,
+        matchType: 'exact',
+        searchRank: searchOrder.indexOf(pageNum)
+      };
+    }
+
+    // Keep track of best match found so far
+    if (exactMatch.confidence > bestMatch.confidence) {
+      bestMatch = {
+        pageNum,
+        confidence: exactMatch.confidence,
+        position: exactMatch.position,
+        matchType: 'partial',
+        searchRank: searchOrder.indexOf(pageNum)
+      };
     }
   }
 
-  /**
-   * Find the best page match for a sentence
-   */
-  findBestPageMatch(sentence, sentenceId) {
-    const cleanSentence = this.cleanText(sentence);
-    let bestMatch = {
-      pageNum: 1,
-      confidence: 0,
-      position: 0,
-      matchType: 'none',
-      matchedText: ''
-    };
-
-    // Strategy 1: Exact substring match
-    for (const [pageNum, pageData] of this.pageTextCache) {
-      const exactMatch = this.findExactMatch(cleanSentence, pageData.fullText);
-      if (exactMatch.confidence > bestMatch.confidence) {
+  // If no good match found, try word overlap on expected page
+  if (bestMatch.confidence < 0.5) {
+    const pageData = this.pageTextCache.get(expectedPage);
+    if (pageData) {
+      const wordMatch = this.findWordOverlapMatch(cleanSentence, pageData.fullText);
+      if (wordMatch.confidence > bestMatch.confidence) {
         bestMatch = {
-          pageNum,
-          confidence: exactMatch.confidence,
-          position: exactMatch.position,
-          matchType: 'exact',
-          matchedText: exactMatch.matchedText
+          pageNum: expectedPage,
+          confidence: wordMatch.confidence,
+          position: wordMatch.position,
+          matchType: 'word_overlap_expected'
         };
       }
     }
-
-    // Strategy 2: Word overlap matching (if exact match not found)
-    if (bestMatch.confidence < 0.7) {
-      for (const [pageNum, pageData] of this.pageTextCache) {
-        const wordMatch = this.findWordOverlapMatch(cleanSentence, pageData.fullText);
-        if (wordMatch.confidence > bestMatch.confidence) {
-          bestMatch = {
-            pageNum,
-            confidence: wordMatch.confidence,
-            position: wordMatch.position,
-            matchType: 'word_overlap',
-            matchedText: wordMatch.matchedText
-          };
-        }
-      }
-    }
-
-    // Strategy 3: Fuzzy matching for difficult cases
-    if (bestMatch.confidence < 0.5) {
-      for (const [pageNum, pageData] of this.pageTextCache) {
-        const fuzzyMatch = this.findFuzzyMatch(cleanSentence, pageData.fullText);
-        if (fuzzyMatch.confidence > bestMatch.confidence) {
-          bestMatch = {
-            pageNum,
-            confidence: fuzzyMatch.confidence,
-            position: fuzzyMatch.position,
-            matchType: 'fuzzy',
-            matchedText: fuzzyMatch.matchedText
-          };
-        }
-      }
-    }
-
-    return bestMatch;
   }
 
-  /**
-   * Find exact substring matches
-   */
-  findExactMatch(sentence, pageText) {
-    // Try different substring lengths for matching
-    const lengths = [
-      Math.min(sentence.length, 100),
-      Math.min(sentence.length, 50),
-      Math.min(sentence.length, 30)
+  return bestMatch;
+}
+
+/**
+ * Generate page search order (expected page first, then nearby pages)
+ */
+generateSearchOrder(expectedPage, totalPages) {
+  const order = [expectedPage];
+  
+  for (let offset = 1; offset <= totalPages; offset++) {
+    // Add pages after expected page
+    if (expectedPage + offset <= totalPages) {
+      order.push(expectedPage + offset);
+    }
+    // Add pages before expected page (but don't go backwards too far)
+    if (expectedPage - offset >= 1 && offset <= 2) {
+      order.push(expectedPage - offset);
+    }
+    
+    if (order.length >= totalPages) break;
+  }
+  
+  return order;
+}
+
+/**
+ * Enhanced method to prevent duplicate mappings to headers
+ */
+findExactMatch(sentence, pageText) {
+  // Skip very short sentences that are likely headers/footers
+  if (sentence.length < 20) {
+    const headerPatterns = [
+      /^(page|\d+|chapter|section|table|figure)/i,
+      /^\d+$/,
+      /^[a-z\s]{1,15}$/i
     ];
-
-    for (const length of lengths) {
-      const substring = sentence.substring(0, length);
-      const index = pageText.indexOf(substring);
-
-      if (index !== -1) {
-        const confidence = length / sentence.length;
-        return {
-          confidence,
-          position: index,
-          matchedText: substring
-        };
-      }
+    
+    if (headerPatterns.some(pattern => pattern.test(sentence.trim()))) {
+      return { 
+        confidence: 0.3, // Lower confidence for likely headers
+        position: 0, 
+        matchedText: sentence.substring(0, 20),
+        isLikelyHeader: true
+      };
     }
-
-    return { confidence: 0, position: 0, matchedText: '' };
   }
+
+  // Regular exact matching logic
+  const lengths = [
+    Math.min(sentence.length, 100),
+    Math.min(sentence.length, 50),
+    Math.min(sentence.length, 30)
+  ];
+
+  for (const length of lengths) {
+    const substring = sentence.substring(0, length);
+    const index = pageText.indexOf(substring);
+
+    if (index !== -1) {
+      const confidence = length / sentence.length;
+      return {
+        confidence,
+        position: index,
+        matchedText: substring,
+        isLikelyHeader: false
+      };
+    }
+  }
+
+  return { confidence: 0, position: 0, matchedText: '', isLikelyHeader: false };
+}
 
   /**
    * Find matches based on word overlap
@@ -506,37 +596,6 @@ export class SentencePDFMapper {
         };
       }
     }
-
-    return bestMatch;
-  }
-
-  /**
-   * Fuzzy matching for difficult cases
-   */
-  findFuzzyMatch(sentence, pageText) {
-    const sentenceWords = this.extractSignificantWords(sentence);
-    const chunks = this.chunkText(pageText, 200); // 200-character chunks
-
-    let bestMatch = { confidence: 0, position: 0, matchedText: '' };
-
-    chunks.forEach((chunk, index) => {
-      const chunkWords = this.extractSignificantWords(chunk.text);
-      const commonWords = sentenceWords.filter(word =>
-        chunkWords.some(chunkWord =>
-          this.calculateSimilarity(word, chunkWord) > 0.8
-        )
-      );
-
-      const confidence = commonWords.length / Math.max(sentenceWords.length, 1);
-
-      if (confidence > bestMatch.confidence) {
-        bestMatch = {
-          confidence,
-          position: chunk.position,
-          matchedText: chunk.text.substring(0, 100)
-        };
-      }
-    });
 
     return bestMatch;
   }

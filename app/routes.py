@@ -884,9 +884,9 @@ def ask_question():
         json.dump(initial_answer, f, indent=2, ensure_ascii=False)
     
     # Initialize empty provenance file
-    provenance_path = get_question_provenance_path(question_backend_id)
-    with open(provenance_path, 'w', encoding='utf-8') as f:
-        json.dump([], f)
+    # provenance_path = get_question_provenance_path(question_backend_id)
+    # with open(provenance_path, 'w', encoding='utf-8') as f:
+    #     json.dump([], f)
     
     # Initialize process logs
     logs_path = os.path.join(os.path.join(RESULT_DIR, question_backend_id), 'process_logs.json')
@@ -1395,3 +1395,328 @@ def parse_provenance_output(output, question_dir):
         provenance_entries.append(current_entry)
     
     return provenance_entries
+
+# =============================================================================
+# user study logging
+# =============================================================================
+
+# Configure logging for user study events
+def setup_user_study_logging():
+    """Setup dedicated logging for user study events"""
+    
+    # Create logs directory if it doesn't exist
+    logs_dir = "logs/user_study"
+    os.makedirs(logs_dir, exist_ok=True)
+    
+    # Create a dedicated logger for user study events
+    user_study_logger = logging.getLogger('user_study')
+    user_study_logger.setLevel(logging.INFO)
+    
+    # Create file handler with daily rotation
+    log_filename = f"{logs_dir}/user_study_{datetime.now().strftime('%Y%m%d')}.jsonl"
+    file_handler = logging.FileHandler(log_filename)
+    file_handler.setLevel(logging.INFO)
+    
+    # Create formatter for JSON logs
+    formatter = logging.Formatter('%(message)s')
+    file_handler.setFormatter(formatter)
+    
+    # Add handler to logger (avoid duplicates)
+    if not user_study_logger.handlers:
+        user_study_logger.addHandler(file_handler)
+    
+    return user_study_logger
+
+# Initialize the logger
+user_study_logger = setup_user_study_logging()
+
+@main.route('/user-study/log-event', methods=['POST', 'OPTIONS'])
+def log_user_study_event():
+    """
+    Endpoint to receive and log user study events from the frontend
+    Added OPTIONS method for CORS preflight requests
+    """
+    # Handle CORS preflight requests
+    if request.method == 'OPTIONS':
+        response = jsonify({'success': True})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        return response
+    
+    try:
+        # Get the event data from request
+        event_data = request.get_json()
+        
+        if not event_data:
+            return jsonify({
+                'success': False,
+                'error': 'No event data provided'
+            }), 400
+        
+        # Validate required fields
+        required_fields = ['event_type', 'user_session_id', 'timestamp']
+        missing_fields = [field for field in required_fields if field not in event_data]
+        
+        if missing_fields:
+            return jsonify({
+                'success': False,
+                'error': f'Missing required fields: {", ".join(missing_fields)}'
+            }), 400
+        
+        # Add server-side metadata
+        enhanced_event = {
+            **event_data,
+            'server_timestamp': datetime.now().timestamp(),
+            'server_iso_timestamp': datetime.now().isoformat(),
+            'ip_address': request.environ.get('REMOTE_ADDR', 'unknown'),
+            'forwarded_for': request.environ.get('HTTP_X_FORWARDED_FOR', None),
+            'user_agent': request.environ.get('HTTP_USER_AGENT', event_data.get('user_agent', 'unknown'))
+        }
+        
+        # Log the event as a JSON line
+        user_study_logger.info(json.dumps(enhanced_event, ensure_ascii=False))
+        
+        # Also log to console for development
+        print(f"📊 User Study Event: {enhanced_event['event_type']} - {enhanced_event['user_session_id']}")
+        
+        response = jsonify({
+            'success': True,
+            'message': 'Event logged successfully',
+            'event_type': enhanced_event['event_type'],
+            'server_timestamp': enhanced_event['server_timestamp']
+        })
+        
+        # Add CORS headers to response
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+        
+    except json.JSONDecodeError:
+        return jsonify({
+            'success': False,
+            'error': 'Invalid JSON data'
+        }), 400
+        
+    except Exception as e:
+        print(f"❌ Error logging user study event: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error while logging event'
+        }), 500
+@main.route('/api/user-study/session-info', methods=['GET'])
+def get_session_info():
+    """
+    Endpoint to get session information for the frontend
+    This can be used to retrieve algorithm method assignments, etc.
+    """
+    try:
+        # can implement session-based algorithm assignment here
+        # For now, return basic session info
+        
+        session_info = {
+            'server_time': datetime.now().isoformat(),
+            'algorithm_method': 'default',  # can implement rotation logic here
+            'processing_method': 'session-based',
+            'max_provenances': 5,
+            'session_id': f"session_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        }
+        
+        return jsonify({
+            'success': True,
+            'session_info': session_info
+        })
+        
+    except Exception as e:
+        print(f"❌ Error getting session info: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to get session info'
+        }), 500
+
+@main.route('/api/user-study/export-logs', methods=['GET'])
+def export_user_study_logs():
+    """
+    Endpoint to export user study logs for analysis
+    Add authentication/authorization as needed for your study
+    """
+    try:
+        # Get date parameter (optional)
+        date_str = request.args.get('date', datetime.now().strftime('%Y%m%d'))
+        
+        # Build log file path
+        log_file = f"logs/user_study/user_study_{date_str}.jsonl"
+        
+        if not os.path.exists(log_file):
+            return jsonify({
+                'success': False,
+                'error': f'No log file found for date {date_str}'
+            }), 404
+        
+        # Read and return log file contents
+        with open(log_file, 'r', encoding='utf-8') as f:
+            log_lines = [json.loads(line.strip()) for line in f if line.strip()]
+        
+        return jsonify({
+            'success': True,
+            'date': date_str,
+            'event_count': len(log_lines),
+            'events': log_lines
+        })
+        
+    except Exception as e:
+        print(f"❌ Error exporting logs: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to export logs'
+        }), 500
+
+@main.route('/api/user-study/stats', methods=['GET'])
+def get_user_study_stats():
+    """
+    Endpoint to get basic statistics about user study events
+    """
+    try:
+        date_str = request.args.get('date', datetime.now().strftime('%Y%m%d'))
+        log_file = f"logs/user_study/user_study_{date_str}.jsonl"
+        
+        if not os.path.exists(log_file):
+            return jsonify({
+                'success': True,
+                'stats': {
+                    'total_events': 0,
+                    'unique_sessions': 0,
+                    'event_types': {}
+                }
+            })
+        
+        # Analyze log file
+        event_types = {}
+        sessions = set()
+        total_events = 0
+        
+        with open(log_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.strip():
+                    try:
+                        event = json.loads(line.strip())
+                        total_events += 1
+                        
+                        # Count event types
+                        event_type = event.get('event_type', 'unknown')
+                        event_types[event_type] = event_types.get(event_type, 0) + 1
+                        
+                        # Track unique sessions
+                        if 'user_session_id' in event:
+                            sessions.add(event['user_session_id'])
+                            
+                    except json.JSONDecodeError:
+                        continue
+        
+        return jsonify({
+            'success': True,
+            'date': date_str,
+            'stats': {
+                'total_events': total_events,
+                'unique_sessions': len(sessions),
+                'event_types': event_types,
+                'most_common_events': sorted(event_types.items(), key=lambda x: x[1], reverse=True)[:10]
+            }
+        })
+        
+    except Exception as e:
+        print(f"❌ Error getting stats: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to get statistics'
+        }), 500
+
+# Utility function to analyze user study data
+def analyze_user_study_session(user_session_id, date_str=None):
+    """
+    Analyze events for a specific user session
+    This can be used for detailed session analysis
+    """
+    if not date_str:
+        date_str = datetime.now().strftime('%Y%m%d')
+    
+    log_file = f"logs/user_study/user_study_{date_str}.jsonl"
+    
+    if not os.path.exists(log_file):
+        return None
+    
+    session_events = []
+    
+    with open(log_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            if line.strip():
+                try:
+                    event = json.loads(line.strip())
+                    if event.get('user_session_id') == user_session_id:
+                        session_events.append(event)
+                except json.JSONDecodeError:
+                    continue
+    
+    # Sort events by timestamp
+    session_events.sort(key=lambda x: x.get('timestamp', 0))
+    
+    # Analyze session
+    analysis = {
+        'session_id': user_session_id,
+        'total_events': len(session_events),
+        'start_time': session_events[0].get('iso_timestamp') if session_events else None,
+        'end_time': session_events[-1].get('iso_timestamp') if session_events else None,
+        'event_types': {},
+        'documents_used': set(),
+        'questions_asked': [],
+        'feedback_submitted': False
+    }
+    
+    for event in session_events:
+        # Count event types
+        event_type = event.get('event_type', 'unknown')
+        analysis['event_types'][event_type] = analysis['event_types'].get(event_type, 0) + 1
+        
+        # Track documents
+        if 'document_id' in event:
+            analysis['documents_used'].add(event['document_id'])
+        
+        # Track questions
+        if event_type == 'question_submitted':
+            analysis['questions_asked'].append({
+                'question_text': event.get('question_text'),
+                'timestamp': event.get('iso_timestamp')
+            })
+        
+        # Track feedback
+        if event_type == 'feedback_submitted':
+            analysis['feedback_submitted'] = True
+    
+    analysis['documents_used'] = list(analysis['documents_used'])
+    
+    return analysis
+
+# Example usage in another endpoint
+@main.route('/api/user-study/analyze-session/<session_id>', methods=['GET'])
+def analyze_session_endpoint(session_id):
+    """Get detailed analysis of a specific user session"""
+    try:
+        date_str = request.args.get('date', datetime.now().strftime('%Y%m%d'))
+        analysis = analyze_user_study_session(session_id, date_str)
+        
+        if analysis is None:
+            return jsonify({
+                'success': False,
+                'error': 'Session not found or no log file for date'
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            'analysis': analysis
+        })
+        
+    except Exception as e:
+        print(f"❌ Error analyzing session: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to analyze session'
+        }), 500

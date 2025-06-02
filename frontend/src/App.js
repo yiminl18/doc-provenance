@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './styles/brutalist-design.css';
 import './styles/layout.css';
-import './styles/history-sidebar.css'
 import HistorySidebar from './components/HistorySidebar';
 import Header from './components/Header';
 import HybridPDFViewer from './components/HybridPDFViewer';

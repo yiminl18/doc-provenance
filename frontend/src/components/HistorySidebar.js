@@ -18,6 +18,7 @@ import {
   faUpload,
   faDatabase
 } from '@fortawesome/free-solid-svg-icons';
+import '../styles/history-sidebar.css';
 
 const HistorySidebar = ({ 
   documents, 

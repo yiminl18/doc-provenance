@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import '../styles/document-selector.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faUpload, 

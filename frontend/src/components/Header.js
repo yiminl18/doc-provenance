@@ -10,7 +10,6 @@ const Header = ({
 }) => {
 
 
-
   return (
     <div className="app-header-compact">
       <div className="header-left">

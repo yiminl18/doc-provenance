@@ -32,10 +32,12 @@ import {
 } from '../services/api';
 
 const ProvenanceQA = forwardRef(({
-    pdfDocument,
-    questionsLibrary,
-    onOpenQuestionLibrary,
-    onAddQuestionToLibrary,
+     pdfDocument,
+    questionsHistory,           // Receive from App
+    activeQuestionId,          // Receive from App  
+    onQuestionUpdate,          // Receive from App
+    onQuestionAdd,             // Receive from App
+    onActiveQuestionChange,    // Receive from App
     onProvenanceSelect,
     onFeedbackRequest,
     onHighlightInPDF,
@@ -47,8 +49,8 @@ const ProvenanceQA = forwardRef(({
     const [submitError, setSubmitError] = useState(null);
 
     // Questions history
-    const [questionsHistory, setQuestionsHistory] = useState(new Map());
-    const [activeQuestionId, setActiveQuestionId] = useState(null);
+    //const [questionsHistory, setQuestionsHistory] = useState(new Map());
+    //const [activeQuestionId, setActiveQuestionId] = useState(null);
 
     // Provenance state
     const [currentProvenanceIndex, setCurrentProvenanceIndex] = useState(0);
@@ -77,15 +79,12 @@ const ProvenanceQA = forwardRef(({
 
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({
-        submitQuestion: (questionText, libraryQuestionId) => {
+        submitQuestion: (questionText, activeQuestionId) => {
             setCurrentQuestion(questionText);
             if (inputRef.current) {
                 inputRef.current.focus();
             }
-            // Auto-submit if from library
-            if (libraryQuestionId) {
-                setTimeout(() => handleSubmit(null, questionText), 100);
-            }
+   
         }
     }));
 
@@ -146,8 +145,7 @@ const ProvenanceQA = forwardRef(({
                 };
 
                 // Add to questions history
-                setQuestionsHistory(prev => new Map(prev).set(questionId, questionData));
-                setActiveQuestionId(questionId);
+                onQuestionAdd(questionData);
 
                 // Start watching for answer with a proper delay
                 setTimeout(() => {
@@ -366,32 +364,15 @@ const ProvenanceQA = forwardRef(({
 
     // Also check the updateQuestion function to make sure it's not accidentally clearing intervals
     const updateQuestion = (questionId, updates) => {
-        console.log(`🔄 updateQuestion called for ${questionId}:`, updates);
-
+        console.log(`🔄 ProvenanceQA: updateQuestion called for ${questionId}:`, updates);
+        
         // Check if we're accidentally clearing intervals
         if (updates.statusInterval === null || updates.answerInterval === null) {
             console.warn(`⚠️ WARNING: Clearing interval in updates for ${questionId}:`, updates);
         }
-
-        setQuestionsHistory(prev => {
-            const newHistory = new Map(prev);
-            const currentQuestion = newHistory.get(questionId);
-
-            if (currentQuestion) {
-                const updatedQuestion = { ...currentQuestion, ...updates };
-
-                // Debug logging
-                if (currentQuestion.statusInterval && !updatedQuestion.statusInterval) {
-                    console.warn(`⚠️ Status interval was removed for question ${questionId}`);
-                }
-
-                newHistory.set(questionId, updatedQuestion);
-            } else {
-                console.error(`❌ Question ${questionId} not found in history!`);
-            }
-
-            return newHistory;
-        });
+        
+        // Call the parent's update function
+        onQuestionUpdate(questionId, updates);
     };
 
     // Updated handleGetNextProvenance to handle your backend format
@@ -612,40 +593,9 @@ const handleNextProvenance = () => {
     }
 };
 
-    // Handle adding question to library from history
-    const handleAddQuestionFromHistory = async (questionText) => {
-        try {
-            const success = await onAddQuestionToLibrary(questionText, 'Custom', `From ${pdfDocument.filename}`);
-            if (success) {
-                console.log('✅ Question added to library from history');
-            }
-        } catch (error) {
-            console.error('❌ Failed to add question to library:', error);
-        }
-    };
 
-    // Handle deleting question from history
-    const handleDeleteQuestion = (questionId) => {
-        if (window.confirm('Are you sure you want to delete this question?')) {
-            setQuestionsHistory(prev => {
-                const newHistory = new Map(prev);
-                newHistory.delete(questionId);
 
-                // If we deleted the active question, select the most recent one
-                if (questionId === activeQuestionId) {
-                    const remaining = Array.from(newHistory.values());
-                    if (remaining.length > 0) {
-                        const mostRecent = remaining.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
-                        setActiveQuestionId(mostRecent.id);
-                    } else {
-                        setActiveQuestionId(null);
-                    }
-                }
 
-                return newHistory;
-            });
-        }
-    };
 
     // Handle retry after error
     const handleRetry = () => {
@@ -752,20 +702,7 @@ const handleNextProvenance = () => {
                 <h4>Ready for Questions</h4>
                 <p>Upload a document to start asking questions and analyzing provenance.</p>
 
-                {/* Show library access even without document */}
-                {questionsLibrary && questionsLibrary.questions?.length > 0 && (
-                    <div className="library-preview">
-                        <h5>📚 Your Question Library</h5>
-                        <p>{questionsLibrary.questions.length} saved questions</p>
-                        <button
-                            className="open-library-btn"
-                            onClick={onOpenQuestionLibrary}
-                        >
-                            <FontAwesomeIcon icon={faBookOpen} />
-                            Browse Library
-                        </button>
-                    </div>
-                )}
+     
             </div>
         );
     }
@@ -781,16 +718,7 @@ const handleNextProvenance = () => {
                 <div className="section-header">
                     <FontAwesomeIcon icon={faTerminal} />
                     <h4>Ask Questions</h4>
-                    {/*<div className="header-actions">
-                        <span className="question-count">{questionsArray.length} questions</span>
-                        <button
-                            className="library-btn"
-                            onClick={onOpenQuestionLibrary}
-                            title="Open Question Library"
-                        >
-                            <FontAwesomeIcon icon={faBookOpen} />
-                        </button>
-                    </div>*/}
+ 
                 </div>
 
                 {/* Error Display */}
@@ -1108,86 +1036,7 @@ const handleNextProvenance = () => {
                 </div>
             )}
 
-            {/* Questions History 
-            {questionsArray.length > 1 && (
-                <div className="questions-history-section">
-                    <div className="section-header">
-                        <FontAwesomeIcon icon={faHistory} />
-                        <h4>Question History</h4>
-                    </div>
-
-                    <div className="questions-history" ref={historyRef}>
-                        {questionsArray.map((question) => {
-                            const status = getQuestionUIStatus(question);
-                            const isActive = question.id === activeQuestionId;
-
-                            return (
-                                <div
-                                    key={question.id}
-                                    className={`question-history-item ${status.className} ${isActive ? 'active' : ''}`}
-                                    onClick={() => {
-                                        setActiveQuestionId(question.id);
-                                        setCurrentProvenanceIndex(0);
-                                    }}
-                                >
-                                    <div className="question-header">
-                                        <div className="question-status">
-                                            <FontAwesomeIcon
-                                                icon={status.icon}
-                                                spin={status.spin}
-                                                style={{ color: status.color }}
-                                            />
-                                            <span>{status.text}</span>
-                                        </div>
-                                        <div className="question-actions">
-                                            <button
-                                                className="action-btn add-to-library"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleAddQuestionFromHistory(question.text);
-                                                }}
-                                                title="Add this question to your library"
-                                            >
-                                                <FontAwesomeIcon icon={faBookmark} />
-                                            </button>
-                                            <button
-                                                className="action-btn delete-question"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteQuestion(question.id);
-                                                }}
-                                                title="Delete this question"
-                                            >
-                                                <FontAwesomeIcon icon={faTrash} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="question-text">{question.text}</div>
-
-                                    {question.answer && (
-                                        <div className="answer-preview">
-                                            {question.answer.length > 100
-                                                ? `${question.answer.substring(0, 100)}...`
-                                                : question.answer}
-                                        </div>
-                                    )}
-
-                                    <div className="question-stats">
-                                        {question.provenanceSources?.length > 0 && (
-                                            <span>📄 {question.provenanceSources.length} evidence sources</span>
-                                        )}
-                                        {question.processingTime && (
-                                            <span>⏱️ {question.processingTime.toFixed(2)}s</span>
-                                        )}
-                                        <span className="timestamp">{formatTimestamp(question.createdAt)}</span>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            )*/}
+           
         </div>
     );
 });

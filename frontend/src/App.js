@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './styles/brutalist-design.css';
 import './styles/layout.css';
-import Sidebar from './components/Sidebar';
+import './styles/history-sidebar.css'
+import HistorySidebar from './components/HistorySidebar';
 import Header from './components/Header';
 import HybridPDFViewer from './components/HybridPDFViewer';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import ProvenanceQA from './components/ProvenanceQA';
-import QuestionLibrary from './components/QuestionLibrary';
 import userStudyLogger from './services/UserStudyLogger';
 
 import {
@@ -17,10 +17,7 @@ import {
   checkAnswer,
   getNextProvenance,
   getQuestionStatus,
-  fetchSentences,
-  getQuestionsLibrary,
-  addQuestionToLibrary,
-  removeQuestionFromLibrary
+  fetchSentences
 } from './services/api';
 
 function App() {
@@ -33,9 +30,9 @@ function App() {
   const [uploadProgress, setUploadProgress] = useState(null);
   const [pollingInterval, setPollingInterval] = useState(null);
 
-  // Question Library state
-  const [questionLibraryOpen, setQuestionLibraryOpen] = useState(false);
-  const [questionsLibrary, setQuestionsLibrary] = useState(null);
+  // Questions history state (for history sidebar)
+  const [questionsHistory, setQuestionsHistory] = useState(new Map());
+  const [activeQuestionId, setActiveQuestionId] = useState(null);
 
   // Modal state
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
@@ -49,21 +46,6 @@ function App() {
   // Get active document
   const activeDocument = activeDocumentId ? documents.get(activeDocumentId) : null;
 
-  // Load questions library on mount
-  useEffect(() => {
-    loadQuestionsLibrary();
-  }, []);
-
-  const loadQuestionsLibrary = async () => {
-    try {
-      const library = await getQuestionsLibrary();
-      if (library.success) {
-        setQuestionsLibrary(library.library);
-      }
-    } catch (error) {
-      console.warn('Failed to load questions library:', error);
-    }
-  };
 
   const createNewDocument = (filename, backendFilename = null) => {
     const docId = `doc_${Date.now()}`;
@@ -85,15 +67,42 @@ function App() {
     return docId;
   };
 
+  // Add this function to update questions from ProvenanceQA
+  const updateQuestion = useCallback((questionId, updates) => {
+    console.log(`🔄 App: updateQuestion called for ${questionId}:`, updates);
+
+    setQuestionsHistory(prev => {
+      const newHistory = new Map(prev);
+      const currentQuestion = newHistory.get(questionId);
+
+      if (currentQuestion) {
+        const updatedQuestion = { ...currentQuestion, ...updates };
+        newHistory.set(questionId, updatedQuestion);
+      } else {
+        console.error(`❌ Question ${questionId} not found in App's history!`);
+      }
+
+      return newHistory;
+    });
+  }, []);
+
+  // Add this function to add new questions
+  const addQuestion = useCallback((questionData) => {
+    console.log(`➕ App: Adding new question:`, questionData.id);
+
+    setQuestionsHistory(prev => new Map(prev).set(questionData.id, questionData));
+    setActiveQuestionId(questionData.id);
+  }, []);
+
   const handleNavigationTrigger = useCallback((navTrigger) => {
     console.log('🎯 App: Received navigation trigger from ProvenanceQA:', navTrigger);
     setNavigationTrigger(navTrigger);
-    
+
     // Clear trigger after a delay to prevent re-triggers
     setTimeout(() => {
-        setNavigationTrigger(null);
+      setNavigationTrigger(null);
     }, 2000);
-}, []); // Empty dependency array - this function never changes
+  }, []); // Empty dependency array - this function never changes
 
   const handleDocumentSelect = async (doc_obj) => {
 
@@ -145,6 +154,41 @@ function App() {
       setLoadingPreloaded(false);
     }
   };
+
+  // History sidebar handlers
+  const handleHistoryDocumentSelect = async (docId) => {
+    await logUserInteraction('document_select', 'history_sidebar', { document_id: docId });
+    setActiveDocumentId(docId);
+  };
+
+  const handleHistoryQuestionSelect = async (questionId) => {
+    await logUserInteraction('question_select', 'history_sidebar', { question_id: questionId });
+    setActiveQuestionId(questionId);
+
+    // Also tell the ProvenanceQA component about this selection
+    if (window.integratedQARef && window.integratedQARef.selectQuestion) {
+      window.integratedQARef.selectQuestion(questionId);
+    }
+  };
+
+  const handleHistoryQuestionDelete = async (questionId) => {
+    if (window.confirm('Are you sure you want to delete this question from history?')) {
+      await logUserInteraction('question_delete', 'history_sidebar', { question_id: questionId });
+
+      setQuestionsHistory(prev => {
+        const newHistory = new Map(prev);
+        newHistory.delete(questionId);
+
+        // If we deleted the active question, clear active state
+        if (questionId === activeQuestionId) {
+          setActiveQuestionId(null);
+        }
+
+        return newHistory;
+      });
+    }
+  };
+
 
 
   // Document upload with persistence
@@ -207,70 +251,12 @@ function App() {
     }
   };
 
-  // Question Library Handlers (simplified)
-  const handleQuestionLibrarySelect = async (questionText, questionId) => {
-    console.log('📚 Selected question from library:', questionText);
 
-    // Log library question selection
-    await userStudyLogger.logQuestionSelectedFromLibrary(questionId, questionText);
-    
-    setQuestionLibraryOpen(false);
-
-    // The IntegratedQAComponent will handle the submission
-    // We just need to pass the question text to it somehow
-    // For now, we'll trigger a custom event or use a ref
-    if (window.integratedQARef && window.integratedQARef.submitQuestion) {
-      window.integratedQARef.submitQuestion(questionText, questionId);
-    }
-  };
-
-  const handleAddQuestionToLibrary = async (questionText, category = 'Custom', description = '') => {
-    try {
-      const response = await addQuestionToLibrary({
-        question_text: questionText,
-        category,
-        description,
-        is_favorite: false
-      });
-
-      if (response.success) {
-        // Reload library
-        await loadQuestionsLibrary();
-        console.log('✅ Question added to library:', questionText);
-        return true;
-      } else {
-        console.error('❌ Failed to add question to library:', response.error);
-        return false;
-      }
-    } catch (error) {
-      console.error('❌ Failed to add question to library:', error);
-      return false;
-    }
-  };
-
-  const handleRemoveQuestionFromLibrary = async (questionId) => {
-    try {
-      const response = await removeQuestionFromLibrary(questionId);
-
-      if (response.success) {
-        // Reload library
-        await loadQuestionsLibrary();
-        console.log('✅ Question removed from library');
-        return true;
-      } else {
-        console.error('❌ Failed to remove question from library:', response.error);
-        return false;
-      }
-    } catch (error) {
-      console.error('❌ Failed to remove question from library:', error);
-      return false;
-    }
-  };
 
   const handleHighlightInPDF = async (provenance) => {
     console.log('🔍 App: Highlighting provenance in PDF:', provenance?.provenance_id);
 
-     // Log PDF highlighting
+    // Log PDF highlighting
     if (provenance && activeDocument) {
       await userStudyLogger.logProvenanceHighlighted(
         provenance.questionId || 'unknown',
@@ -300,54 +286,54 @@ function App() {
     if (!provenance?.sentences_ids || provenance.sentences_ids.length === 0) return;
 
     try {
-        const firstSentenceId = provenance.sentences_ids[0];
+      const firstSentenceId = provenance.sentences_ids[0];
 
-        // Try multiple selectors to find the sentence element
-        const selectors = [
-            `[data-sentence-id="${firstSentenceId}"]`,
-            `.evidence-sentence[data-sentence-id="${firstSentenceId}"]`,
-            `.sentence-text[data-sentence-id="${firstSentenceId}"]`
-        ];
+      // Try multiple selectors to find the sentence element
+      const selectors = [
+        `[data-sentence-id="${firstSentenceId}"]`,
+        `.evidence-sentence[data-sentence-id="${firstSentenceId}"]`,
+        `.sentence-text[data-sentence-id="${firstSentenceId}"]`
+      ];
 
-        let sentenceElement = null;
-        for (const selector of selectors) {
-            sentenceElement = document.querySelector(selector);
-            if (sentenceElement) break;
+      let sentenceElement = null;
+      for (const selector of selectors) {
+        sentenceElement = document.querySelector(selector);
+        if (sentenceElement) break;
+      }
+
+      if (sentenceElement) {
+        console.log('📜 Scrolling to sentence element:', firstSentenceId);
+
+        // Scroll the sentence into view with smooth animation
+        sentenceElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+
+        // Add a longer highlight effect for navigation
+        sentenceElement.classList.add('sentence-highlight-flash');
+        setTimeout(() => {
+          sentenceElement.classList.remove('sentence-highlight-flash');
+        }, 3000); // Longer highlight duration
+
+      } else {
+        console.warn('Could not find sentence element for ID:', firstSentenceId);
+
+        // Fallback: scroll the provenance panel to top
+        const provenancePanel = document.querySelector('.current-provenance, .provenance-content');
+        if (provenancePanel) {
+          provenancePanel.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
         }
-
-        if (sentenceElement) {
-            console.log('📜 Scrolling to sentence element:', firstSentenceId);
-
-            // Scroll the sentence into view with smooth animation
-            sentenceElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'nearest'
-            });
-
-            // Add a longer highlight effect for navigation
-            sentenceElement.classList.add('sentence-highlight-flash');
-            setTimeout(() => {
-                sentenceElement.classList.remove('sentence-highlight-flash');
-            }, 3000); // Longer highlight duration
-
-        } else {
-            console.warn('Could not find sentence element for ID:', firstSentenceId);
-
-            // Fallback: scroll the provenance panel to top
-            const provenancePanel = document.querySelector('.current-provenance, .provenance-content');
-            if (provenancePanel) {
-                provenancePanel.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            }
-        }
+      }
 
     } catch (error) {
-        console.warn('Could not scroll to provenance sentence:', error);
+      console.warn('Could not scroll to provenance sentence:', error);
     }
-};
+  };
 
   // Enhanced provenance selection handler that includes scrolling
   const handleProvenanceSelect = async (provenance) => {
@@ -386,7 +372,7 @@ function App() {
   // Handle feedback
   const handleFeedbackSubmit = async (questionId, feedback) => {
 
-     // The feedback modal already logs the submission, 
+    // The feedback modal already logs the submission, 
     // but we can log the completion here
     await userStudyLogger.logUserInteraction(
       'feedback_completed',
@@ -405,11 +391,7 @@ function App() {
   };
 
   const handleShowDocuments = async () => {
-    // Log library opening
-    await userStudyLogger.logUserInteraction(
-      'open_document_library',
-      'document_selector'
-    );
+
     setLoadingPreloaded(true);
     try {
       const response = await getDocuments();
@@ -429,10 +411,6 @@ function App() {
     }
   };
 
-   const openQuestionLibrary = async () => {
-    await userStudyLogger.logQuestionLibraryOpened();
-    setQuestionLibraryOpen(true);
-  };
 
   // Add user interaction logging for various UI elements
   const logUserInteraction = async (type, element, details = {}) => {
@@ -459,7 +437,7 @@ function App() {
     fileInput.click();
   };
 
-   // Page/document navigation logging
+  // Page/document navigation logging
   useEffect(() => {
     if (activeDocumentId) {
       const activeDoc = documents.get(activeDocumentId);
@@ -467,7 +445,7 @@ function App() {
         userStudyLogger.logUserInteraction(
           'document_activated',
           'document_selector',
-          { 
+          {
             document_id: activeDocumentId,
             filename: activeDoc.filename,
             is_preloaded: activeDoc.isSessionDocument || false
@@ -499,32 +477,31 @@ function App() {
   return (
     <div className="app-improved">
       {/* Header */}
-       <Header
+      <Header
         activeDocument={activeDocument}
         onShowPreloaded={handleShowDocuments}
         onUploadDocument={async () => {
           await logUserInteraction('upload_button_click', 'header');
           handleUploadNewDocument();
         }}
-        onOpenQuestionLibrary={openQuestionLibrary}
-        questionsLibrary={questionsLibrary}
       />
 
       {/* Main Content Grid */}
       <div className="app-content-grid">
         {/* Left Sidebar */}
-          <div className="sidebar-panel">
-          <Sidebar
+        <div className="sidebar-panel">
+          <HistorySidebar
             documents={documents}
             activeDocumentId={activeDocumentId}
-            onDocumentSelect={async (docId) => {
-              await logUserInteraction('document_select', 'sidebar', { document_id: docId });
-              setActiveDocumentId(docId);
-            }}
-            onUploadNewDocument={async () => {
-              await logUserInteraction('upload_button_click', 'sidebar');
-              handleUploadNewDocument();
-            }}
+            onDocumentUpload={handleDocumentUpload}
+            onShowPreloaded={handleShowDocuments}
+            onDocumentSelect={handleHistoryDocumentSelect}
+            questionsHistory={questionsHistory}        // Same state as ProvenanceQA
+            activeQuestionId={activeQuestionId}         // Same state as ProvenanceQA
+            onQuestionSelect={setActiveQuestionId}      // Same setter as ProvenanceQA
+            onQuestionDelete={handleHistoryQuestionDelete}
+            onProvenanceSelect={handleProvenanceSelect}
+            onFeedbackRequest={openFeedbackModal}
           />
         </div>
 
@@ -535,6 +512,7 @@ function App() {
               <HybridPDFViewer
                 pdfDocument={activeDocument}
                 selectedProvenance={selectedProvenance}
+                activeQuestionId={activeQuestionId}
                 navigationTrigger={navigationTrigger}
                 onClose={() => { }}
               />
@@ -560,47 +538,36 @@ function App() {
         <div className="right-panel">
           <ProvenanceQA
             pdfDocument={activeDocument}
-            questionsLibrary={questionsLibrary}
-            onOpenQuestionLibrary={() => setQuestionLibraryOpen(true)}
-            onAddQuestionToLibrary={handleAddQuestionToLibrary}
+            questionsHistory={questionsHistory}  // Pass the history
+            activeQuestionId={activeQuestionId}   // Pass active ID
+            onQuestionUpdate={updateQuestion}     // Pass update function
+            onQuestionAdd={addQuestion}           // Pass add function
+            onActiveQuestionChange={setActiveQuestionId}  // Pass setter
             onProvenanceSelect={handleProvenanceSelect}
             onFeedbackRequest={openFeedbackModal}
             onHighlightInPDF={handleHighlightInPDF}
             onNavigationTrigger={handleNavigationTrigger}
             ref={(ref) => {
-              // Store reference for library integration
               window.integratedQARef = ref;
             }}
           />
         </div>
       </div>
 
-      {/* Question Library Modal */}
-        <QuestionLibrary
-          isOpen={questionLibraryOpen}
-          onClose={async () => {
-            await logUserInteraction('close_question_library', 'question_library');
-            setQuestionLibraryOpen(false);
-          }}
-          onQuestionSelect={handleQuestionLibrarySelect}
-          onQuestionAdd={handleAddQuestionToLibrary}
-          onQuestionRemove={handleRemoveQuestionFromLibrary}
-          questionsLibrary={questionsLibrary}
-          simplified={true}
-        />
 
-        {/* Enhanced Feedback Modal */}
-        {feedbackModalOpen && selectedQuestionForFeedback && (
-          <FeedbackModal
-            pdfDocument={activeDocument}
-            question={selectedQuestionForFeedback}
-            allProvenances={selectedQuestionForFeedback.provenanceSources || []}
-            onSubmit={handleFeedbackSubmit}
-            onClose={async () => {
-              await logUserInteraction('close_feedback_modal', 'feedback_modal');
-              setFeedbackModalOpen(false);
-            }}
-          />
+
+      {/* Enhanced Feedback Modal */}
+      {feedbackModalOpen && selectedQuestionForFeedback && (
+        <FeedbackModal
+          pdfDocument={activeDocument}
+          question={selectedQuestionForFeedback}
+          allProvenances={selectedQuestionForFeedback.provenanceSources || []}
+          onSubmit={handleFeedbackSubmit}
+          onClose={async () => {
+            await logUserInteraction('close_feedback_modal', 'feedback_modal');
+            setFeedbackModalOpen(false);
+          }}
+        />
       )}
 
       {/* Preloaded Documents Modal */}

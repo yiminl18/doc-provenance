@@ -749,12 +749,14 @@ const LayoutBasedPDFViewer = ({
         if (isRendering) return;
         const newZoom = Math.min(zoomLevel + 0.25, 3);
         setZoomLevel(newZoom);
+        setLastRenderedPage(null); // Reset last rendered page to force re-render
     };
 
     const handleZoomOut = () => {
         if (isRendering) return;
         const newZoom = Math.max(zoomLevel - 0.25, 0.5);
         setZoomLevel(newZoom);
+        setLastRenderedPage(null); // Reset last rendered page to force re-render
     };
 
     const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
@@ -820,18 +822,11 @@ const LayoutBasedPDFViewer = ({
                 {/* Layout info */}
                 {layoutData && (
                     <div className="layout-info">
-                        <span className="sentences-status">
-                            📍 {layoutData.metadata.total_sentences} sentences
-                        </span>
-                        {selectedProvenance && (
-                            <span className="provenance-status">
-                                | {selectedProvenance.sentences_ids?.filter(id =>
-                                    enhancedSentences[id]?.page_spans?.includes(currentPage)
-                                ).length || 0} provenance on page
-                            </span>
-                        )}
                         {selectedProvenance && selectedProvenance.input_token_size && selectedProvenance.output_token_size && (
-                            <div className="provenance-status">
+                            <div className="provenance-meta">
+
+                                                <span><strong>Time Elapsed:</strong> {selectedProvenance.time?.toFixed(2) || 'N/A'}s</span>
+                                          
                             | <span className="cost-estimate">
                             
                                 <>

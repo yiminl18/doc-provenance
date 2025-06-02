@@ -811,7 +811,7 @@ const handleNextProvenance = () => {
                         <div className="provenance-section">
                             <div className="provenance-header">
                                 <FontAwesomeIcon icon={faHighlighter} />
-                                <span>Evidence Sources</span>
+                                <span>Provenances</span>
                                 {activeQuestion.provenanceSources.length > 0 && (
                                     <span className="provenance-counter">
                                         {currentProvenanceIndex + 1} of {activeQuestion.provenanceSources.length}
@@ -855,11 +855,7 @@ const handleNextProvenance = () => {
                                     {/* Current Provenance Content */}
                                     {selectedProvenance && (
                                         <div className="current-provenance">
-                                            <div className="provenance-meta">
-                                                <span><strong>ID:</strong> {selectedProvenance.provenance_id || currentProvenanceIndex + 1}</span>
-                                                <span><strong>Sentences:</strong> {selectedProvenance.sentences_ids?.length || 0}</span>
-                                                <span><strong>Time:</strong> {selectedProvenance.time?.toFixed(2) || 'N/A'}s</span>
-                                            </div>
+                                 
 
                                             <div className="provenance-content">
                                                 {selectedProvenance.content && selectedProvenance.content.length > 0 ? (
@@ -880,7 +876,7 @@ const handleNextProvenance = () => {
                                                 ) : (
                                                     <div className="loading-evidence">
                                                         <FontAwesomeIcon icon={faSpinner} spin />
-                                                        <span>Loading evidence content...</span>
+                                                        <span>Searching for provenance...</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -908,7 +904,7 @@ const handleNextProvenance = () => {
                                         activeQuestion.provenanceCount === 0 ? (
                                         <div className="provenance-processing">
                                             <FontAwesomeIcon icon={faSpinner} spin />
-                                            <span>Generating evidence sources...</span>
+                                            <span>Searching for provenance...</span>
                                             <div className="processing-info">
                                                 <small>This may take a moment while we analyze the document</small>
                                             </div>
@@ -920,7 +916,7 @@ const handleNextProvenance = () => {
                                             activeQuestion.provenanceCount > 0 &&
                                             activeQuestion.provenanceSources.length === 0 ? (
                                             <div className="get-provenance-section">
-                                                <p>Evidence sources are ready! ({activeQuestion.provenanceCount} available)</p>
+                                                <p>Provenance found! ({activeQuestion.provenanceCount} available)</p>
                                                 <button
                                                     className="get-provenance-btn"
                                                     onClick={() => {
@@ -933,12 +929,12 @@ const handleNextProvenance = () => {
                                                     {activeQuestion.requestingProvenance ? (
                                                         <>
                                                             <FontAwesomeIcon icon={faSpinner} spin />
-                                                            <span>Loading Evidence...</span>
+                                                            <span>Searching for provenance...</span>
                                                         </>
                                                     ) : (
                                                         <>
                                                             <FontAwesomeIcon icon={faSearchPlus} />
-                                                            <span>Get Evidence Sources</span>
+                                                            <span>Get Provenance</span>
                                                         </>
                                                     )}
                                                 </button>
@@ -947,7 +943,7 @@ const handleNextProvenance = () => {
                                             /* Case 3: Provenances shown, but can get more */
                                             activeQuestion.canRequestMore && activeQuestion.provenanceSources.length > 0 ? (
                                                 <div className="get-provenance-section">
-                                                    <p>More evidence sources available.</p>
+                                                    <p>More provenance available.</p>
                                                     <button
                                                         className="get-provenance-btn"
                                                         onClick={() => {
@@ -959,12 +955,12 @@ const handleNextProvenance = () => {
                                                         {activeQuestion.requestingProvenance ? (
                                                             <>
                                                                 <FontAwesomeIcon icon={faSpinner} spin />
-                                                                <span>Loading Evidence...</span>
+                                                                <span>Loading Provenance...</span>
                                                             </>
                                                         ) : (
                                                             <>
                                                                 <FontAwesomeIcon icon={faSearchPlus} />
-                                                                <span>Get Next Evidence Source</span>
+                                                                <span>Get Next Provenance</span>
                                                             </>
                                                         )}
                                                     </button>
@@ -980,15 +976,15 @@ const handleNextProvenance = () => {
                                                     /* Case 5: Processing complete but no provenances found */
                                                     activeQuestion.processing_complete && activeQuestion.provenanceCount === 0 ? (
                                                         <div className="no-provenance">
-                                                            <span>No evidence sources found for this answer</span>
+                                                            <span>No provenance found for this answer</span>
                                                             <div className="user-message">
-                                                                <small>The answer was generated but no supporting evidence was identified in the document.</small>
+                                                                <small>The answer exists but no provenance was found in the document.</small>
                                                             </div>
                                                         </div>
                                                     ) : (
                                                         /* Case 6: Default - no evidence available */
                                                         <div className="no-provenance">
-                                                            <span>No evidence sources available</span>
+                                                            <span>No provenance available</span>
                                                             {activeQuestion.userMessage && (
                                                                 <div className="user-message">{activeQuestion.userMessage}</div>
                                                             )}
@@ -1013,12 +1009,12 @@ const handleNextProvenance = () => {
                                         ) : (
                                             <>
                                                 <FontAwesomeIcon icon={faArrowRight} />
-                                                <span>Get Next Evidence Source</span>
+                                                <span>Get Next Provenance</span>
                                             </>
                                         )}
                                     </button>
                                     <div className="provenance-info">
-                                        Showing {activeQuestion.userProvenanceCount} of {activeQuestion.maxProvenances} max
+                                        Showing {activeQuestion.userProvenanceCount} of {activeQuestion.maxProvenances} 
                                         {activeQuestion.provenanceCount > activeQuestion.userProvenanceCount &&
                                             ` (${activeQuestion.provenanceCount - activeQuestion.userProvenanceCount} more available)`}
                                     </div>

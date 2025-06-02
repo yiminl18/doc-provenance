@@ -11,6 +11,8 @@ import {
   faChevronDown,
   faChevronRight,
   faSearch,
+  faEye,
+  faArrowRight,
   faTimes,
   faTrash,
   faHighlighter,
@@ -36,6 +38,8 @@ const HistorySidebar = ({
   const [documentsExpanded, setDocumentsExpanded] = useState(true);
   const [questionsExpanded, setQuestionsExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [collapsedQuestions, setCollapsedQuestions] = useState(new Set());
+  const [selectedQuestionModal, setSelectedQuestionModal] = useState(null);
 
   const documentList = Array.from(documents.values()).sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -48,6 +52,30 @@ const HistorySidebar = ({
   const filteredQuestions = questionsArray.filter(q =>
     q.text.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+   // Auto-collapse completed questions by default to keep sidebar clean
+  useEffect(() => {
+    const newCollapsed = new Set();
+    questionsArray.forEach(question => {
+      if ((question.answer || question.provenanceSources?.length > 0) && 
+          question.id !== activeQuestionId) {
+        newCollapsed.add(question.id);
+      }
+    });
+    setCollapsedQuestions(newCollapsed);
+  }, [questionsArray.length, activeQuestionId]);
+
+  const toggleQuestionCollapse = (questionId) => {
+    setCollapsedQuestions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(questionId)) {
+        newSet.delete(questionId);
+      } else {
+        newSet.add(questionId);
+      }
+      return newSet;
+    });
+  };
 
   const formatFileName = (filename) => {
     const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
@@ -126,8 +154,6 @@ const HistorySidebar = ({
 
         {documentsExpanded && (
           <div className="section-content">
-
-
             <div className="history-list">
               {documentList.length === 0 ? (
                 <div className="empty-section">
@@ -196,30 +222,10 @@ const HistorySidebar = ({
 
         {questionsExpanded && (
           <div className="section-content">
-            {/* Search */}
-            {questionsArray.length > 3 && (
-              <div className="search-box">
-                <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Search questions..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="search-input"
-                />
-                {searchTerm && (
-                  <button 
-                    className="clear-search"
-                    onClick={() => setSearchTerm('')}
-                  >
-                    <FontAwesomeIcon icon={faTimes} />
-                  </button>
-                )}
-              </div>
-            )}
+ 
 
-            {/* Questions List */}
-            <div className="history-list">
+           {/* Questions List with Scrolling */}
+            <div className="history-list questions-scrollable">
               {filteredQuestions.length === 0 ? (
                 <div className="empty-section">
                   <FontAwesomeIcon icon={faQuestionCircle} className="empty-icon" />
@@ -234,14 +240,15 @@ const HistorySidebar = ({
                 filteredQuestions.map((question) => {
                   const status = getQuestionStatus(question);
                   const isActive = question.id === activeQuestionId;
+                  const isCollapsed = collapsedQuestions.has(question.id);
+                  const hasDetails = question.answer || question.provenanceSources?.length > 0;
 
                   return (
                     <div
                       key={question.id}
-                      className={`history-item question-item ${status.className} ${isActive ? 'active' : ''}`}
-                      onClick={() => onQuestionSelect(question.id)}
+                      className={`history-item question-item ${status.className} ${isActive ? 'active' : ''} ${isCollapsed ? 'collapsed' : ''}`}
                     >
-                      <div className="item-header">
+                      <div className="item-header" onClick={() => onQuestionSelect(question.id)}>
                         <div className="item-icon">
                           <FontAwesomeIcon
                             icon={status.icon}
@@ -251,22 +258,72 @@ const HistorySidebar = ({
                         </div>
                         <div className="item-content">
                           <div className="item-name question-text">
-                            {question.text.length > 60 
-                              ? `${question.text.substring(0, 57)}...`
+                            {question.text.length > 45 
+                              ? `${question.text.substring(0, 42)}...`
                               : question.text
                             }
                           </div>
-                          <div className="item-meta">
+                          <div className="item-meta compact">
                             <span className="timestamp">
                               {formatTimestamp(new Date(question.createdAt))}
                             </span>
                             <span className="status-text">{status.text}</span>
+                            {question.provenanceSources?.length > 0 && (
+                              <span className="provenance-count">
+                                {question.provenanceSources.length} sources
+                              </span>
+                            )}
                           </div>
+                        </div>
+                        
+                        {/* Action buttons */}
+                        <div className="question-actions-header">
+                          {/* Detail modal button */}
+                          {hasDetails && (
+                            <button
+                              className="action-btn detail-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedQuestionModal(question);
+                              }}
+                              title="View full details"
+                            >
+                              <FontAwesomeIcon icon={faEye} />
+                            </button>
+                          )}
+                          
+                          {/* Collapse toggle button */}
+                          {hasDetails && (
+                            <button
+                              className="action-btn collapse-toggle"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleQuestionCollapse(question.id);
+                              }}
+                              title={isCollapsed ? "Expand details" : "Collapse details"}
+                            >
+                              <FontAwesomeIcon 
+                                icon={isCollapsed ? faChevronRight : faChevronDown} 
+                              />
+                            </button>
+                          )}
+                          
+                          {/* Delete button */}
+                          <button
+                            className="action-btn delete-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onQuestionDelete(question.id);
+                            }}
+                            title="Delete question"
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </button>
                         </div>
                       </div>
 
-                      {/* Question Details - Only show for completed questions */}
-                      {(question.answer || question.provenanceSources?.length > 0) && (
+                      {/* Expandable Question Details */}
+                      {!isCollapsed && hasDetails && (
                         <div className="question-details">
                           {question.answer && (
                             <div className="answer-preview">
@@ -276,19 +333,14 @@ const HistorySidebar = ({
                             </div>
                           )}
 
-                          {/* Provenance Previews */}
+                          {/* Compact Provenance Previews */}
                           {question.provenanceSources?.length > 0 && (
-                            <div className="provenance-previews">
-                              <div className="provenance-header">
-                                <span className="provenance-count">
-                                  {question.provenanceSources.length} provenance sources
-                                </span>
-                              </div>
+                            <div className="provenance-previews compact">
                               <div className="provenance-list">
-                                {question.provenanceSources.slice(0, 3).map((prov, idx) => (
+                                {question.provenanceSources.slice(0, 2).map((prov, idx) => (
                                   <button
                                     key={prov.provenance_id || idx}
-                                    className="provenance-preview-btn"
+                                    className="provenance-preview-btn compact"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       onProvenanceSelect(prov);
@@ -296,7 +348,7 @@ const HistorySidebar = ({
                                     title={`View provenance ${idx + 1}`}
                                   >
                                     <FontAwesomeIcon icon={faHighlighter} />
-                                    <span>Provenance {idx + 1}</span>
+                                    <span>Source {idx + 1}</span>
                                     {prov.sentences_ids && (
                                       <span className="sentence-count">
                                         ({prov.sentences_ids.length})
@@ -304,40 +356,20 @@ const HistorySidebar = ({
                                     )}
                                   </button>
                                 ))}
-                                {question.provenanceSources.length > 3 && (
-                                  <span className="more-indicator">
-                                    +{question.provenanceSources.length - 3} more
-                                  </span>
+                                {question.provenanceSources.length > 2 && (
+                                  <button
+                                    className="more-indicator-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedQuestionModal(question);
+                                    }}
+                                  >
+                                    +{question.provenanceSources.length - 2} more
+                                  </button>
                                 )}
                               </div>
                             </div>
                           )}
-
-                          {/* Question Actions */}
-                          <div className="question-actions">
-                            {question.provenanceSources?.length > 0 && (
-                              <button
-                                className="action-btn feedback-btn"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  onFeedbackRequest(question);
-                                }}
-                                title="Provide feedback"
-                              >
-                                <FontAwesomeIcon icon={faComment} />
-                              </button>
-                            )}
-                            <button
-                              className="action-btn delete-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onQuestionDelete(question.id);
-                              }}
-                              title="Delete question"
-                            >
-                              <FontAwesomeIcon icon={faTrash} />
-                            </button>
-                          </div>
                         </div>
                       )}
                     </div>
@@ -348,6 +380,121 @@ const HistorySidebar = ({
           </div>
         )}
       </div>
+
+      {/* Question Detail Modal */}
+      {selectedQuestionModal && (
+        <div className="modal-overlay" onClick={() => setSelectedQuestionModal(null)}>
+          <div className="question-detail-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h4>Question Details</h4>
+              <button 
+                className="close-btn" 
+                onClick={() => setSelectedQuestionModal(null)}
+              >
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              {/* Question */}
+              <div className="question-full-section">
+                <h5><FontAwesomeIcon icon={faQuestionCircle} /> Question:</h5>
+                <div className="question-full-text">{selectedQuestionModal.text}</div>
+                <div className="question-meta">
+                  <span>Asked: {formatTimestamp(new Date(selectedQuestionModal.createdAt))}</span>
+                  {selectedQuestionModal.processingTime && (
+                    <span>Processing time: {selectedQuestionModal.processingTime.toFixed(1)}s</span>
+                  )}
+                </div>
+              </div>
+              
+              {/* Answer */}
+              {selectedQuestionModal.answer && (
+                <div className="answer-full-section">
+                  <h5><FontAwesomeIcon icon={faCheck} /> Answer:</h5>
+                  <div className="answer-full-text">{selectedQuestionModal.answer}</div>
+                </div>
+              )}
+              
+              {/* Evidence Sources */}
+              {selectedQuestionModal.provenanceSources?.length > 0 && (
+                <div className="provenances-full-section">
+                  <h5>
+                    <FontAwesomeIcon icon={faHighlighter} /> 
+                    Evidence Sources ({selectedQuestionModal.provenanceSources.length})
+                  </h5>
+                  <div className="provenances-full-list">
+                    {selectedQuestionModal.provenanceSources.map((prov, idx) => (
+                      <div key={prov.provenance_id || idx} className="provenance-item">
+                        <div className="provenance-header">
+                          <span className="provenance-label">Source {idx + 1}</span>
+                          <div className="provenance-meta">
+                            {prov.time && <span>Time: {prov.time.toFixed(2)}s</span>}
+                            {prov.sentences_ids && (
+                              <span>Sentences: {prov.sentences_ids.length}</span>
+                            )}
+                          </div>
+                          <button
+                            className="highlight-btn"
+                            onClick={() => {
+                              onProvenanceSelect(prov);
+                              setSelectedQuestionModal(null);
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faHighlighter} />
+                            Highlight
+                          </button>
+                        </div>
+                        <div className="provenance-content">
+                          {prov.content?.map((sentence, sentenceIdx) => (
+                            <p key={sentenceIdx} className="evidence-sentence">
+                              <span className="sentence-number">{sentenceIdx + 1}.</span>
+                              <span className="sentence-text">{sentence}</span>
+                            </p>
+                          )) || <p className="no-content">Content not available</p>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="modal-footer">
+              <button 
+                className="btn-secondary"
+                onClick={() => setSelectedQuestionModal(null)}
+              >
+                Close
+              </button>
+              
+              <button 
+                className="btn-primary"
+                onClick={() => {
+                  onQuestionSelect(selectedQuestionModal.id);
+                  setSelectedQuestionModal(null);
+                }}
+              >
+                <FontAwesomeIcon icon={faArrowRight} />
+                Select Question
+              </button>
+              
+              {selectedQuestionModal.provenanceSources?.length > 0 && (
+                <button 
+                  className="btn-accent"
+                  onClick={() => {
+                    onFeedbackRequest(selectedQuestionModal);
+                    setSelectedQuestionModal(null);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faComment} />
+                  Provide Feedback
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

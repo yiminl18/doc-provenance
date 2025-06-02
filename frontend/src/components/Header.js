@@ -22,16 +22,7 @@ const Header = ({
       <div className="header-right">
         {/* Document Actions */}
         <div className="document-actions">
-          {activeDocument && (
-            <div className="active-document-info">
-              <FontAwesomeIcon icon={faFileAlt} />
-              <span className="doc-name">{activeDocument.filename}</span>
-              {activeDocument.isPreloadedOrigin && (
-                <span className="preloaded-badge">📚</span>
-              )}
 
-            </div>
-          )}
 
           {/* Upload Button */}
           <button

@@ -42,6 +42,7 @@ UPLOAD_DIR = os.path.join(os.getcwd(), 'app/uploads')
 STUDY_LOGS_DIR = os.path.join(os.getcwd(), 'app/study_logs')
 QUESTIONS_DIR = os.path.join(os.getcwd(), 'app/questions')
 SENTENCES_DIR = os.path.join(os.getcwd(), 'app/sentences')
+LAYOUT_DIR = os.path.join(os.getcwd(), 'app/layout')
 
 # =============================================================================
 
@@ -404,6 +405,7 @@ def get_next_provenance(question_id, current_count=0):
 # DOCUMENT MANAGEMENT
 # =============================================================================
 
+
 def get_all_available_pdfs():
     """Scan both upload and preload folders and return all PDFs with unified metadata"""
     all_documents = []
@@ -414,6 +416,64 @@ def get_all_available_pdfs():
         all_documents.extend(scan_folder_for_pdfs(uploads_dir, is_preloaded=False))
     
     return all_documents
+
+def get_all_available_layouts():
+    """Scan the layout folder and return all layouts with unified metadata"""
+    all_documents = []
+    
+    # Check layout folder
+    if os.path.exists(LAYOUT_DIR):
+        all_documents.extend(scan_layout_folder(is_preloaded=False))
+    
+    return all_documents
+
+def scan_layout_folder(is_preloaded = False):
+    """Unified PDF scanning for any folder"""
+    documents = []
+    
+    try:
+        
+        # Get all PDF files
+        layout_files = [f for f in os.listdir(LAYOUT_DIR) if f.lower().endswith('_layout.json')]
+        
+        for layout_file in layout_files:
+            layout_file = os.path.join(LAYOUT_DIR, layout_file)
+            try:
+                with open(layout_file, 'r', encoding='utf-8') as f:
+                            layout_dat = json.load(f)
+                logger.info(f"Processing PDF: {layout_file} (Preloaded: {is_preloaded})")
+                metadata = layout_dat.get('metadata', {})
+                sentences = layout_dat.get('sentences', [])
+                base_name = os.path.basename(layout_file)  # Get just the file name without path
+
+                pdf_file = base_name.replace('_layout.json', '.pdf')
+                metadata = {
+                    'filename': pdf_file,
+
+                    'text_length': len(sentences),
+                    'sentence_count': len(sentences),
+                    'is_preloaded': False,
+                    'source_folder': 'preloaded' if is_preloaded else 'uploads',
+                    'processed_at': time.time(),
+                    'base_name': base_name
+                }
+                
+                # Save metadata
+                #with open(metadata_file, 'w', encoding='utf-8') as f:
+                #    json.dump(metadata, f, indent=2, ensure_ascii=False)
+                
+    
+                documents.append(metadata)
+                
+                
+            except Exception as e:
+                print(f"Error processing {layout_file}: {e}")
+                continue
+    
+    except Exception as e:
+        print(f"Error scanning folder {LAYOUT_DIR}: {e}")
+    
+    return documents
 
 def scan_folder_for_pdfs(folder_path, is_preloaded=False):
     """Unified PDF scanning for any folder"""
@@ -436,8 +496,6 @@ def scan_folder_for_pdfs(folder_path, is_preloaded=False):
                 metadata_file = os.path.join(folder_path, f"{base_name}_metadata.json")
                 sentences_file = get_document_sentences_path(base_name)
                 logger.info(f"Sentences file: {sentences_file}")
-                # Generate consistent document ID
-                file_stat = os.stat(filepath)
     
                 # Check if we already have processed this file
                 if os.path.exists(metadata_file) and os.path.exists(sentences_file):
@@ -459,6 +517,16 @@ def scan_folder_for_pdfs(folder_path, is_preloaded=False):
                 # Process new PDF
                 try:
                     pdf_text = extract_text(filepath)
+
+                     # Check if text extraction succeeded
+                    if not pdf_text or not isinstance(pdf_text, str):
+                        logger.error(f"Text extraction failed for {pdf_file}: extract_text returned {type(pdf_text)}")
+                        continue
+                    
+                    if len(pdf_text.strip()) == 0:
+                        logger.error(f"No text content extracted from {pdf_file}")
+                        continue
+
                     sentences = doc_provenance.base_strategies.extract_sentences_from_pdf(pdf_text)
 
                     sentences_saved = save_document_sentences(pdf_file, sentences)
@@ -498,7 +566,7 @@ def scan_folder_for_pdfs(folder_path, is_preloaded=False):
 def get_available_documents():
     """Get all available documents from upload folder"""
     try:
-        all_documents = get_all_available_pdfs()
+        all_documents = get_all_available_layouts()
         
         # Separate for UI purposes but same underlying logic
         uploaded_docs = [doc for doc in all_documents]

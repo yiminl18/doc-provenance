@@ -374,3 +374,90 @@ export const askMultipleQuestionsFromLibrary = async (filename, questionIds, onP
   
   return { results, errors };
 };
+
+// gdrive APIs
+
+// Add these functions to your existing api.js file
+
+// Drive inventory browsing functions
+export const getDriveCounties = async () => {
+  try {
+    const response = await fetch('/api/drive/counties');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching Drive counties:', error);
+    throw error;
+  }
+};
+
+export const getDriveAgencies = async (county) => {
+  try {
+    const response = await fetch(`/api/drive/agencies/${encodeURIComponent(county)}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching Drive agencies:', error);
+    throw error;
+  }
+};
+
+export const getDriveFiles = async (county, agency) => {
+  try {
+    const response = await fetch(`/api/drive/files/${encodeURIComponent(county)}/${encodeURIComponent(agency)}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching Drive files:', error);
+    throw error;
+  }
+};
+
+// In api.js - Update the function
+export const downloadDriveFile = async (fileId) => {
+  try {
+    console.log('🔄 Downloading file:', fileId);
+    
+    const response = await fetch('/api/drive/download', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ file_id: fileId })
+    });
+    
+    console.log('📡 Response status:', response.status);
+    
+    const responseText = await response.text();
+    console.log('📡 Response text:', responseText.substring(0, 300));
+    
+    const data = JSON.parse(responseText);
+    return data;
+  } catch (error) {
+    console.error('Error downloading Drive file:', error);
+    throw error;
+  }
+};
+
+// In api.js - Add this new function
+export const sampleExtractableDocuments = async (maxDocuments = 5) => {
+  try {
+    console.log('🎲 Sampling extractable documents...');
+    
+    const response = await fetch('/api/drive/sample-documents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        max_documents: maxDocuments,
+        max_attempts: 20 
+      })
+    });
+    
+    const data = await response.json();
+    console.log('📊 Sampling result:', data);
+    
+    return data;
+  } catch (error) {
+    console.error('Error sampling documents:', error);
+    throw error;
+  }
+};

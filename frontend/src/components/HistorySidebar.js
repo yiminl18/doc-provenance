@@ -281,7 +281,7 @@ const HistorySidebar = ({
                           {/* Detail modal button */}
                           {hasDetails && (
                             <button
-                              className="action-btn detail-btn"
+                              className="action-btn detail"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedQuestionModal(question);
@@ -310,7 +310,7 @@ const HistorySidebar = ({
                           
                           {/* Delete button */}
                           <button
-                            className="action-btn delete-btn"
+                            className="action-btn delete"
                             onClick={(e) => {
                               e.stopPropagation();
                               onQuestionDelete(question.id);
@@ -435,7 +435,7 @@ const HistorySidebar = ({
                             )}
                           </div>
                           <button
-                            className="highlight-btn"
+                            className="action-btn highlight"
                             onClick={() => {
                               onProvenanceSelect(prov);
                               setSelectedQuestionModal(null);

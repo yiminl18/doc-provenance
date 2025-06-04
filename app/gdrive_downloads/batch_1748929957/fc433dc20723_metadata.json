@@ -1,0 +1,29 @@
+{
+  "document_id": "fc433dc20723",
+  "filename": "fc433dc20723.pdf",
+  "original_name": "Supplement Incident SO220000538.013 10_30_2022 Berg, Nicholas 1102224.pdf",
+  "title": "Supplement Incident SO220000538.013 10_30_2022 Berg, Nicholas 1102224.pdf",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1748929957",
+  "gdrive_info": {
+    "file_id": "1rvkMyWESCSx52vaqRe6lrUL4vViUhHWj",
+    "gdrive_path": "Sonoma County Sheriff/20250109_Scraped_SonomaCountySheriff/SO220000538",
+    "county": "Sonoma County",
+    "agency": "Sonoma County Sheriff",
+    "page_count": 1
+  },
+  "processing_info": {
+    "text_length": 2040,
+    "sentence_count": 15,
+    "layout_sentence_count": 15,
+    "pages_count": 1,
+    "processed_at": 1748929979.758394
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\fc433dc20723.pdf",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\fc433dc20723_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\fc433dc20723_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

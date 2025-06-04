@@ -1,0 +1,29 @@
+{
+  "document_id": "4ebbe5a7dda5",
+  "filename": "4ebbe5a7dda5.pdf",
+  "original_name": "ICD2018-0002 Int of Witness #4 signed_Redacted.pdf",
+  "title": "ICD2018-0002 Int of Witness #4 signed_Redacted.pdf",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1748929957",
+  "gdrive_info": {
+    "file_id": "1mMPGOKIRG2s-cwc1U5mIelccHzjBqAc4",
+    "gdrive_path": "Santa Ana Police Department/2023 Agency Release: Santa Ana Police Department/2018/In Custody Death 2018/ICD2018-0002/ICD2018-0002 Redacted/Documents/ICD2018-0002 OCDA Documents",
+    "county": "Orange County",
+    "agency": "Santa Ana Police Department",
+    "page_count": 3
+  },
+  "processing_info": {
+    "text_length": 2274,
+    "sentence_count": 15,
+    "layout_sentence_count": 15,
+    "pages_count": 3,
+    "processed_at": 1748930092.8273664
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\4ebbe5a7dda5.pdf",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\4ebbe5a7dda5_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\4ebbe5a7dda5_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

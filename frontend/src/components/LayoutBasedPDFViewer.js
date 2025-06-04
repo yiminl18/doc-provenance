@@ -4,17 +4,13 @@ import {
     faSearchPlus,
     faSearchMinus,
     faExpand,
-    faCompress,
     faFileAlt,
     faSpinner,
     faChevronLeft,
     faChevronRight,
-    faHighlighter,
-    faMapMarkedAlt,
     faTimes,
     faExclamationTriangle,
-    faLayerGroup,
-    faBullseye
+    faLayerGroup
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/pdf-viewer.css';
 import { calculateProvenanceCost, formatCost } from '../utils/ProvenanceOutputsFormatting'
@@ -27,7 +23,6 @@ const LayoutBasedPDFViewer = ({
     navigationTrigger
 }) => {
     // Core PDF state
-    const [isFullscreen, setIsFullscreen] = useState(false);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -66,6 +61,13 @@ const LayoutBasedPDFViewer = ({
     const renderTaskRef = useRef(null);
     const magnifyOverlayRef = useRef(null);
 
+    const debugHighlighting = (step, data = {}) => {
+        console.log(`🐛 HIGHLIGHT DEBUG [${step}]:`, {
+            timestamp: new Date().toLocaleTimeString(),
+            ...data
+        });
+    };
+
     // Initialize PDF.js worker
     useEffect(() => {
         if (window.pdfjsLib && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
@@ -102,7 +104,7 @@ const LayoutBasedPDFViewer = ({
         loadPDFWithLayoutData();
     }, [pdfUrl]);
 
-    // Handle page changes - FIXED: Only render if page actually changed
+    // Handle page changes
     useEffect(() => {
         if (pdfDoc && !loading && !isRendering && layoutData && currentPage !== lastRenderedPage) {
             console.log(`📄 Page changed from ${lastRenderedPage} to ${currentPage} - rendering`);
@@ -291,19 +293,7 @@ const LayoutBasedPDFViewer = ({
     };
 
 
-    const createPreciseHighlightEnhanced = (bbox, sentenceId, index, bboxIndex, provenanceId, sentenceText) => {
-        // First validate the bounding box
-        const pageLayout = layoutData?.pages_layout?.find(p => p.page_num === bbox.page);
-        const validatedBbox = validateAndFilterBoundingBox(bbox, sentenceText, pageLayout);
 
-        if (!validatedBbox) {
-            console.warn(`❌ Skipping invalid bbox for sentence ${sentenceId}`);
-            return null;
-        }
-
-        // Use the existing createPreciseHighlight function with validated bbox
-        return createPreciseHighlight(validatedBbox, sentenceId, index, bboxIndex, provenanceId, sentenceText);
-    };
 
 
     // 8. Add a manual "Fit to Content" button (optional)
@@ -324,28 +314,31 @@ const LayoutBasedPDFViewer = ({
 
 
             // Only recreate highlights if provenance actually changed
-            if (provenanceId !== currentProvenanceId) {
+            if (provenanceId !== currentProvenanceId || !highlightsPersisted) {
                 console.log('🎯 Creating NEW layout-based highlights for provenance:', provenanceId);
                 setCurrentProvenanceId(provenanceId);
                 createLayoutBasedHighlightsEnhanced();
             } else if (!highlightsPersisted) {
-                console.log('🔄 Restoring highlights for current provenance:', provenanceId);
-                createLayoutBasedHighlightsEnhanced();
+                console.log('Highlights already exist for current provenance:', provenanceId);
             }
         }
-    }, [selectedProvenance?.provenance_id, currentPage, currentViewport, layoutData, currentProvenanceId, highlightsPersisted]);
+    }, [selectedProvenance?.provenance_id, currentPage, currentViewport, layoutData, currentProvenanceId, highlightsPersisted, isRendering]);
 
-    // Trigger highlighting when conditions are met
+    // 4. Fix the effect that triggers highlighting to avoid timing issues
     useEffect(() => {
-        if (!isRendering && currentViewport) {
-            // Small delay to ensure rendering is complete
+        if (!isRendering && currentViewport && selectedProvenance) {
+            // Add a longer delay to ensure rendering is completely finished
             const timer = setTimeout(() => {
+                console.log('🕐 Timer triggered - checking if highlights should be created');
                 stableCreateHighlights();
-            }, 100);
+            }, 200); // Increased from 100ms to 200ms
 
-            return () => clearTimeout(timer);
+            return () => {
+                console.log('🕐 Timer cancelled');
+                clearTimeout(timer);
+            };
         }
-    }, [stableCreateHighlights, isRendering, currentViewport]);
+    }, [stableCreateHighlights, isRendering, currentViewport, selectedProvenance]);
 
     // Replace the navigation trigger useEffect with this improved version:
     useEffect(() => {
@@ -834,13 +827,24 @@ const LayoutBasedPDFViewer = ({
             return;
         }
 
+
+
+        const { sentences_ids, provenance_id } = selectedProvenance;
+
         // Clear existing highlights
         clearHighlights();
 
-        const { sentences_ids, provenance_id } = selectedProvenance;
         if (!sentences_ids || sentences_ids.length === 0) {
             console.warn('⚠️ No sentence IDs in provenance');
             return;
+        }
+
+        // Only recreate highlights if provenance actually changed
+        if (provenance_id !== currentProvenanceId) {
+            ;
+            setCurrentProvenanceId(provenance_id);
+        } else if (!highlightsPersisted) {
+            console.log(`RESTORING_HIGHLIGHTS ${provenance_id}`);
         }
 
         console.log(`🎨 Creating PERSISTENT highlights for ${sentences_ids.length} sentences on page ${currentPage}`);
@@ -856,36 +860,98 @@ const LayoutBasedPDFViewer = ({
                 return;
             }
 
-            // Get and validate bounding boxes for current page
-            const pageBoxes = sentenceData.bounding_boxes?.filter(bbox => {
-                if (bbox.page !== currentPage) return false;
+            // Get bounding boxes for current page
+            const basicBoxes = sentenceData.bounding_boxes?.filter(bbox =>
+                bbox.page === currentPage && bbox.confidence > 0.2
+            ) || [];
 
-                // Enhanced filtering with validation
+            // Apply validation to get "good" boxes
+            const validatedBoxes = basicBoxes.filter(bbox => {
                 const pageLayout = layoutData?.pages_layout?.find(p => p.page_num === bbox.page);
-                const validatedBbox = validateAndFilterBoundingBox(bbox, sentenceData.text, pageLayout);
-                return validatedBbox !== null;
-            }) || [];
+                return validateAndFilterBoundingBox(bbox, sentenceData.text, pageLayout) !== null;
+            });
 
-            if (pageBoxes.length === 0) {
+            debugHighlighting('PAGE_BOXES', {
+                sentenceId,
+                currentPage,
+                totalBoxes: sentenceData.bounding_boxes?.length || 0,
+                basicBoxesCount: basicBoxes.length,
+                pageBoxesCount: validatedBoxes.length,
+                pageBoxes: validatedBoxes.map(b => ({
+                    page: b.page,
+                    confidence: b.confidence,
+                    coords: `(${b.x0?.toFixed(1)}, ${b.y0?.toFixed(1)})`
+                })),
+                basicBoxes: basicBoxes.map(b => ({
+                    page: b.page,
+                    confidence: b.confidence,
+                    coords: `(${b.x0?.toFixed(1)}, ${b.y0?.toFixed(1)})`,
+                    dimensions: `${(b.x1 - b.x0).toFixed(1)}×${(b.y1 - b.y0).toFixed(1)}`
+                }))
+            });
+
+            // FALLBACK LOGIC: If validation filtered out all boxes, use basic boxes
+            let boxesToUse = validatedBoxes;
+            let usingFallback = false;
+
+            if (validatedBoxes.length === 0 && basicBoxes.length > 0) {
+                console.warn(`⚠️ Validation filtered out all ${basicBoxes.length} boxes for sentence ${sentenceId} - using fallback`);
+                boxesToUse = basicBoxes;
+                usingFallback = true;
+
+                debugHighlighting('USING_FALLBACK_BOXES', {
+                    sentenceId,
+                    basicBoxCount: basicBoxes.length,
+                    reason: 'validation_too_strict'
+                });
+            }
+
+            if (boxesToUse.length === 0) {
+                debugHighlighting('NO_BOXES_ON_PAGE', {
+                    sentenceId,
+                    currentPage,
+                    availablePages: sentenceData.bounding_boxes?.map(b => b.page) || []
+                });
                 return;
             }
 
-            console.log(`📍 Sentence ${sentenceId} has ${pageBoxes.length} boxes on page ${currentPage}:`);
-            pageBoxes.forEach((bbox, i) => {
-                console.log(`  Box ${i}: confidence=${bbox.confidence.toFixed(2)}, coords=(${bbox.x0.toFixed(1)}, ${bbox.y0.toFixed(1)})`);
-            });
-
             if (highlightMode === 'precise') {
-                // Use precise layout-based highlighting for ALL boxes above threshold
-                pageBoxes.forEach((bbox, bboxIndex) => {
-                    const highlightElement = createPreciseHighlightEnhanced(bbox, sentenceId, index, bboxIndex, provenance_id, sentenceData.text);
+                // Use precise layout-based highlighting
+                boxesToUse.forEach((bbox, bboxIndex) => {
+                    debugHighlighting('CREATING_PRECISE_HIGHLIGHT', {
+                        sentenceId,
+                        bboxIndex,
+                        usingFallback,
+                        bbox: {
+                            page: bbox.page,
+                            confidence: bbox.confidence,
+                            x0: bbox.x0,
+                            y0: bbox.y0,
+                            x1: bbox.x1,
+                            y1: bbox.y1
+                        }
+                    });
+
+                    // If using fallback, create highlight with special styling
+                    const highlightElement = usingFallback
+                        ? createPreciseHighlightWithFallback(bbox, sentenceId, index, bboxIndex, provenance_id, sentenceData.text)
+                        : createPreciseHighlight(bbox, sentenceId, index, bboxIndex, provenance_id, sentenceData.text);
+
                     if (highlightElement) {
                         newHighlights.set(`${sentenceId}_${bboxIndex}`, highlightElement);
                         highlightsCreated++;
+                        debugHighlighting('PRECISE_HIGHLIGHT_CREATED', {
+                            sentenceId,
+                            bboxIndex,
+                            usingFallback,
+                            elementInDOM: document.body.contains(highlightElement)
+                        });
+                    } else {
+                        debugHighlighting('PRECISE_HIGHLIGHT_FAILED', { sentenceId, bboxIndex, usingFallback });
                     }
                 });
             } else {
-                // Fallback highlighting
+                // Fallback highlighting unchanged
                 const highlightElement = createFallbackHighlight(sentenceData.text, sentenceId, index, provenance_id);
                 if (highlightElement) {
                     newHighlights.set(`${sentenceId}_fallback`, highlightElement);
@@ -1053,6 +1119,129 @@ const LayoutBasedPDFViewer = ({
         return overlay;
     };
 
+    // Create a special highlight function for fallback boxes
+    const createPreciseHighlightWithFallback = (bbox, sentenceId, index, bboxIndex, provenanceId, sentenceText) => {
+        // Use the same logic as createPreciseHighlight but with different styling
+        if (!currentViewport || !highlightLayerRef.current) return null;
+
+        console.log(`🆘 Creating FALLBACK precise highlight for sentence ${sentenceId}`);
+
+        // Convert PDF coordinates to viewport coordinates (same as before)
+        const pdfToViewport = (pdfX, pdfY) => {
+            const viewportX = pdfX * currentViewport.scale;
+            const viewportY = (currentViewport.height / currentViewport.scale - pdfY) * currentViewport.scale;
+            return { x: viewportX, y: viewportY };
+        };
+
+        const topLeft = pdfToViewport(bbox.x0, bbox.y1);
+        const bottomRight = pdfToViewport(bbox.x1, bbox.y0);
+        const width = bottomRight.x - topLeft.x;
+        const height = bottomRight.y - topLeft.y;
+
+        // More lenient validation for fallback
+        if (width < 2 || height < 2 || width > 1000 || height > 400) {
+            console.warn(`❌ Even fallback bbox is invalid: ${width}x${height}`);
+            return null;
+        }
+
+        const overlay = document.createElement('div');
+        overlay.className = 'provenance-overlay precise-highlight fallback-validated';
+        overlay.setAttribute('data-sentence-id', sentenceId);
+        overlay.setAttribute('data-bbox-index', bboxIndex);
+        overlay.setAttribute('data-provenance-id', provenanceId);
+        overlay.setAttribute('data-confidence', bbox.confidence.toFixed(2));
+        overlay.setAttribute('data-sentence-text', sentenceText || '');
+        overlay.setAttribute('data-fallback', 'true');
+
+        // SPECIAL STYLING for fallback boxes - more visible
+        const alpha = Math.max(0.4, bbox.confidence * 0.7); // Higher alpha
+        const borderAlpha = Math.max(0.6, bbox.confidence);
+
+        overlay.style.cssText = `
+    position: absolute;
+    left: ${topLeft.x}px;
+    top: ${topLeft.y}px;
+    width: ${width}px;
+    height: ${height}px;
+    background-color: rgba(255, 165, 0, ${alpha}); /* Orange instead of yellow */
+    border: 3px solid rgba(255, 140, 0, ${borderAlpha}); /* Thicker border */
+    border-style: dashed; /* Dashed to indicate fallback */
+    border-radius: 4px;
+    z-index: 500;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    opacity: 1;
+  `;
+
+        overlay.title = `Fallback Evidence ${index + 1}.${bboxIndex + 1}\nSentence: ${sentenceId}\nConfidence: ${(bbox.confidence * 100).toFixed(0)}%\n⚠️ Using unvalidated bounding box`;
+
+        // Add a warning indicator
+        const warningIndicator = document.createElement('div');
+        warningIndicator.style.cssText = `
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 16px;
+    height: 16px;
+    background: red;
+    border-radius: 50%;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    line-height: 1;
+  `;
+        warningIndicator.innerHTML = '!';
+        warningIndicator.title = 'Fallback bounding box - validation bypassed';
+        overlay.appendChild(warningIndicator);
+
+        // Add click handlers (same as regular highlights)
+        overlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log(`📍 Clicked FALLBACK highlight: sentence ${sentenceId}, bbox ${bboxIndex}`);
+
+            // Visual feedback
+            overlay.style.transform = 'scale(1.05)';
+            overlay.style.borderWidth = '4px';
+            setTimeout(() => {
+                overlay.style.transform = 'scale(1)';
+                overlay.style.borderWidth = '3px';
+            }, 200);
+
+            // Trigger magnify mode
+            showMagnifiedText({
+                sentenceId,
+                sentenceText: sentenceText || `Sentence ${sentenceId}`,
+                bbox,
+                overlayElement: overlay,
+                confidence: bbox.confidence,
+                inputTokens: selectedProvenance.input_token_size,
+                outputTokens: selectedProvenance.output_token_size,
+                isFallback: true
+            });
+        });
+
+        overlay.addEventListener('mouseenter', () => {
+            overlay.style.transform = 'scale(1.02)';
+            overlay.style.zIndex = '600';
+            overlay.style.boxShadow = '0 4px 16px rgba(255, 140, 0, 0.4)'; // Orange shadow
+        });
+
+        overlay.addEventListener('mouseleave', () => {
+            overlay.style.transform = 'scale(1)';
+            overlay.style.zIndex = '500';
+            overlay.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+        });
+
+        highlightLayerRef.current.appendChild(overlay);
+        console.log(`✅ Created FALLBACK precise highlight for sentence ${sentenceId} at (${topLeft.x}, ${topLeft.y})`);
+        return overlay;
+    };
+
     const createFallbackHighlight = (sentenceText, sentenceId, index, provenanceId) => {
         console.log(`🆘 Creating fallback highlight for sentence ${sentenceId}`);
 
@@ -1205,6 +1394,43 @@ const LayoutBasedPDFViewer = ({
         );
     };
 
+    // 5. Add debugging to see if sentence data exists for provenance 2
+    const debugSentenceData = (sentenceId) => {
+        const sentenceData = enhancedSentences[sentenceId];
+
+        console.log(`🔍 SENTENCE ${sentenceId} DEBUG:`, {
+            exists: !!sentenceData,
+            text: sentenceData?.text?.substring(0, 100),
+            totalBboxes: sentenceData?.bounding_boxes?.length || 0,
+            bboxesOnPage1: sentenceData?.bounding_boxes?.filter(b => b.page === 1).length || 0,
+            pageSpans: sentenceData?.page_spans,
+            primaryPage: sentenceData?.primary_page,
+            allPages: sentenceData?.bounding_boxes?.map(b => `Page ${b.page} (conf: ${b.confidence.toFixed(2)})`) || []
+        });
+
+        if (sentenceData?.bounding_boxes) {
+            sentenceData.bounding_boxes.forEach((bbox, i) => {
+                if (bbox.page === 1) {
+                    console.log(`  📍 Bbox ${i} on page 1:`, {
+                        confidence: bbox.confidence,
+                        coords: `(${bbox.x0}, ${bbox.y0}) → (${bbox.x1}, ${bbox.y1})`,
+                        dimensions: `${(bbox.x1 - bbox.x0).toFixed(1)}×${(bbox.y1 - bbox.y0).toFixed(1)}`
+                    });
+                }
+            });
+        }
+    };
+
+    // 6. Add sentence debugging when provenance is selected
+    useEffect(() => {
+        if (selectedProvenance?.sentences_ids) {
+            console.log('🔍 DEBUG: Checking sentence data for selected provenance');
+            selectedProvenance.sentences_ids.forEach(sentenceId => {
+                debugSentenceData(sentenceId);
+            });
+        }
+    }, [selectedProvenance]);
+
 
 
 
@@ -1258,7 +1484,7 @@ const LayoutBasedPDFViewer = ({
     }
 
     return (
-        <div className={`hybrid-pdf-viewer layout-based fixed-size ${isFullscreen ? 'fullscreen' : ''}`}>
+        <div className={'hybrid-pdf-viewer layout-based fixed-size'}>
             {/* Header */}
             <div className="pdf-header">
                 <div className="pdf-title">
@@ -1296,7 +1522,7 @@ const LayoutBasedPDFViewer = ({
                 )}
 
                 {/* Add fixed size indicator */}
-                {fixedDimensions && !isFullscreen && (
+                {fixedDimensions && (
                     <div className="viewer-size-info">
                         <span className="size-display">
                             📐 {fixedDimensions.width}×{fixedDimensions.height}px

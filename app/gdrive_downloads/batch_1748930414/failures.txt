@@ -1,0 +1,19 @@
+[2025-06-02 23:00:17] 16-1687(SUPP7) - Copy.PDF: layout_extraction_failed - 'charmap' codec can't encode character '\u2705' in position 22: character maps to <undefined>
+[2025-06-02 23:00:33] February 18, 2014 IA 2014-185_Document_Sgt Riddle Interview_Redacted.pdf: not_text_extractable
+[2025-06-02 23:00:35] FO2243185 - Case - Public.pdf: not_text_extractable
+[2025-06-02 23:02:26] Summary.pdf: layout_extraction_failed - 'charmap' codec can't encode character '\u2705' in position 22: character maps to <undefined>
+[2025-06-02 23:02:26] Set0004 - DSC_1159.pdf: download_failed_attempt_1
+[2025-06-02 23:02:26] Set0004 - DSC_1159.pdf: download_failed_attempt_2
+[2025-06-02 23:02:27] Set0004 - DSC_1159.pdf: download_failed_attempt_3
+[2025-06-02 23:02:31] 35 - Findings After Appeal to City Council.pdf: layout_extraction_failed - 'charmap' codec can't encode character '\u2705' in position 22: character maps to <undefined>
+[2025-06-02 23:02:33] DSC_0511_Redacted.pdf: not_text_extractable
+[2025-06-02 23:02:38] S-RJD-390-14-I_ROMERO_-_DFIT_Report.pdf: not_text_extractable
+[2025-06-02 23:02:40] November 27 2018_IA #2018-027_Documents_Discipline_RedactedBK_Redacted_mb.pdf: not_text_extractable
+[2025-06-02 23:02:45] UOF PP--redacted.pdf: layout_extraction_failed - 'charmap' codec can't encode character '\u2705' in position 22: character maps to <undefined>
+[2025-06-02 23:02:46] AGCRA0006026.pdf: not_text_extractable
+[2025-06-02 23:02:46] Letter20to20A20Conroy20Re20Board20Determination20on20Termination.pdf: not_text_extractable
+[2025-06-02 23:02:50] 122018_23-0009983_47169746633_10_Redacted.pdf: not_text_extractable
+[2025-06-02 23:02:51] PRA_22-07_Response_to_Muckrock.com.pdf: not_text_extractable
+[2025-06-02 23:02:53] IRVINEPD0002583.pdf: not_text_extractable
+[2025-06-02 23:02:55] IA 17-004 TAB 7 OFFICER GUTIERREZ' FIREARM TRAINING RECORDS.pdf: not_text_extractable
+[2025-06-02 23:03:33] 180011767 FSO CFS Redacted_Redacted 2.pdf: layout_extraction_failed - 'charmap' codec can't encode character '\u2705' in position 22: character maps to <undefined>

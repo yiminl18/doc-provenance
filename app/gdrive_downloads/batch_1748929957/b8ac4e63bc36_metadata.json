@@ -1,0 +1,29 @@
+{
+  "document_id": "b8ac4e63bc36",
+  "filename": "b8ac4e63bc36.pdf",
+  "original_name": "Interview 8.pdf",
+  "title": "Interview 8.pdf",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1748929957",
+  "gdrive_info": {
+    "file_id": "1s0dl6gnDq4IvjYES1hvGyuYgaeFJcrNN",
+    "gdrive_path": "Santa Rosa Police Department/20241029_Scraped_SantaRosaPoliceDepartment/#13-0013093/10-08-2019 Additional Documents/Transcribed Interviews",
+    "county": "Sonoma County",
+    "agency": "Santa Rosa Police Department",
+    "page_count": 4
+  },
+  "processing_info": {
+    "text_length": 3849,
+    "sentence_count": 36,
+    "layout_sentence_count": 36,
+    "pages_count": 4,
+    "processed_at": 1748930086.209067
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\b8ac4e63bc36.pdf",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\b8ac4e63bc36_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\b8ac4e63bc36_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

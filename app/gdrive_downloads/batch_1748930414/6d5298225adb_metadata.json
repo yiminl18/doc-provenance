@@ -1,0 +1,29 @@
+{
+  "document_id": "6d5298225adb",
+  "filename": "6d5298225adb.pdf",
+  "original_name": "180011767 FSO CFS Redacted_Redacted 2.pdf",
+  "title": "180011767 FSO CFS Redacted_Redacted 2.pdf",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1748930414",
+  "gdrive_info": {
+    "file_id": "1ZRVL-mbgfvIhC8iFOZy4GEvHUc4rANRv",
+    "gdrive_path": "Fresno County Sheriff/20241002_Scraped_Fresno County Sheriff/18-0011767",
+    "county": "Fresno County",
+    "agency": "Fresno County Sheriff",
+    "page_count": 16
+  },
+  "processing_info": {
+    "text_length": 44426,
+    "sentence_count": 34,
+    "layout_sentence_count": 34,
+    "pages_count": 16,
+    "processed_at": 1748930613.4905996
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748930414\\6d5298225adb.pdf",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748930414\\6d5298225adb_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748930414\\6d5298225adb_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

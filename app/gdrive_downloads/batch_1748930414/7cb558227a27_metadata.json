@@ -1,0 +1,29 @@
+{
+  "document_id": "7cb558227a27",
+  "filename": "7cb558227a27.PDF",
+  "original_name": "16-1687(SUPP7) - Copy.PDF",
+  "title": "16-1687(SUPP7) - Copy.PDF",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1748930414",
+  "gdrive_info": {
+    "file_id": "1QU-kTs3kyYdv0dXjjG3b8L4tVxUYdntO",
+    "gdrive_path": "Stockton Police Department/STOCKTON PARTNER FILES/DUPLICATES/StocktonPoliceDeptRobertAllsup01132016",
+    "county": "San Joaquin County",
+    "agency": "Stockton Police Department",
+    "page_count": 2
+  },
+  "processing_info": {
+    "text_length": 3344,
+    "sentence_count": 22,
+    "layout_sentence_count": 22,
+    "pages_count": 2,
+    "processed_at": 1748930417.4968405
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748930414\\7cb558227a27.PDF",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748930414\\7cb558227a27_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748930414\\7cb558227a27_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

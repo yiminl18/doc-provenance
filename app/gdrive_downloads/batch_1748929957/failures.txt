@@ -1,0 +1,26 @@
+[2025-06-02 22:52:42] SPPD_OIS0002320.pdf: not_text_extractable
+[2025-06-02 22:52:48] Photos 1.pdf: not_text_extractable
+[2025-06-02 22:52:57] JNM_5158_Redacted.pdf: not_text_extractable
+[2025-06-02 22:52:57] 21-1517 CSI Photos_Redacted (215).pdf: download_failed_attempt_1
+[2025-06-02 22:52:57] 21-1517 CSI Photos_Redacted (215).pdf: download_failed_attempt_2
+[2025-06-02 22:52:58] 21-1517 CSI Photos_Redacted (215).pdf: download_failed_attempt_3
+[2025-06-02 22:52:59] Supplement Incident SO220000538.013 10_30_2022 Berg, Nicholas 1102224.pdf: layout_extraction_failed - 'charmap' codec can't encode character '\u2705' in position 22: character maps to <undefined>
+[2025-06-02 22:53:02] Interview Map - Weisser_Redacted.pdf: not_text_extractable
+[2025-06-02 22:53:03] Exhibit 20_Donaldson.pdf: not_text_extractable
+[2025-06-02 22:53:48] APD DR # 2009-37967_Redacted.pdf: layout_extraction_failed - 'charmap' codec can't encode character '\u2705' in position 22: character maps to <undefined>
+[2025-06-02 22:53:49] AG001259.pdf: not_text_extractable
+[2025-06-02 22:53:50] AG002861.pdf: not_text_extractable
+[2025-06-02 22:53:52] N-HDSP-385-18-A_-_Sieberg__J_-_402_403.pdf: not_text_extractable
+[2025-06-02 22:53:57] JNM_5176_Redacted.pdf: not_text_extractable
+[2025-06-02 22:53:58] 18.  edward thomas hayes printouts.pdf: not_text_extractable
+[2025-06-02 22:53:59] DM Log Feb March April 2015.pdf: insufficient_layout_data: sentences=3, pages=1
+[2025-06-02 22:54:32] 21-6027 follow up.pdf: layout_extraction_failed - 'charmap' codec can't encode character '\u2705' in position 22: character maps to <undefined>
+[2025-06-02 22:54:34] McCullough - Board Resolution and Order - ph.9.11.19_Redacted.pdf: not_text_extractable
+[2025-06-02 22:54:43] Copy of 20-8090 jpeg_redacted (34).pdf: not_text_extractable
+[2025-06-02 22:54:46] Interview 8.pdf: layout_extraction_failed - 'charmap' codec can't encode character '\u2705' in position 22: character maps to <undefined>
+[2025-06-02 22:54:47] ATTACH_28_01102020_17-14937 R.pdf: not_text_extractable
+[2025-06-02 22:54:50] 17-045_Redacted.pdf: not_text_extractable
+[2025-06-02 22:54:50] Set0001 - DSC_7860.pdf: download_failed_attempt_1
+[2025-06-02 22:54:50] Set0001 - DSC_7860.pdf: download_failed_attempt_2
+[2025-06-02 22:54:50] Set0001 - DSC_7860.pdf: download_failed_attempt_3
+[2025-06-02 22:54:52] ICD2018-0002 Int of Witness #4 signed_Redacted.pdf: layout_extraction_failed - 'charmap' codec can't encode character '\u2705' in position 22: character maps to <undefined>

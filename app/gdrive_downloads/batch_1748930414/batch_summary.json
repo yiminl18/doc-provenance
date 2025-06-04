@@ -1,0 +1,15 @@
+{
+  "batch_id": "batch_1748930414",
+  "target_documents": 5,
+  "achieved_documents": 5,
+  "total_attempts": 18,
+  "text_extractable_count": 5,
+  "layout_success_count": 5,
+  "download_failures": 1,
+  "total_time_minutes": 3.3382166743278505,
+  "attempts_per_minute": 5.392100560286218,
+  "overall_success_rate": "5/18 (27.78%)",
+  "text_extraction_rate": "5/18 (27.78%)",
+  "layout_success_rate": "5/5 (100.00%)",
+  "batch_directory": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748930414"
+}

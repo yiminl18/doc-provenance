@@ -1,11 +1,12 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserSecret, faDatabase, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faUserSecret, faDatabase, faCloud,faUpload } from '@fortawesome/free-solid-svg-icons';
 
 const Header = ({
   activeDocument, // This will determine if we show the buttons
   onShowPreloaded,
-  onUploadDocument
+  onUploadDocument,
+  onShowDrive
 }) => {
   return (
     <div className="app-header-compact">
@@ -22,7 +23,7 @@ const Header = ({
           <div className="document-actions">
             {/* Upload Button */}
             <button
-              className="upload-btn compact"
+              className="action-btn compact upload"
               onClick={onUploadDocument}
               title="Upload PDF"
             >
@@ -32,12 +33,18 @@ const Header = ({
 
             {/* Browse Documents Button */}
             <button
-              className="browse-btn compact"
+              className="action-btn compact browse"
               onClick={onShowPreloaded}
               title="Browse Documents"
             >
               <FontAwesomeIcon icon={faDatabase} />
               <span>Browse Documents</span>
+            </button>
+
+            {/* Browse Drive Button */}
+            <button className="action-btn compact drive" onClick={onShowDrive}>
+              <FontAwesomeIcon icon={faCloud} />
+              <span>Browse Drive</span>
             </button>
           </div>
         )}

@@ -1,0 +1,29 @@
+{
+  "document_id": "a03ab9090caa",
+  "filename": "a03ab9090caa.pdf",
+  "original_name": "21-6027 follow up.pdf",
+  "title": "21-6027 follow up.pdf",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1748929957",
+  "gdrive_info": {
+    "file_id": "1dUR4iYcmiHbrOXtfutzOdsKlrxQfZR3I",
+    "gdrive_path": "Inglewood Police Department/2024 Agency Request Releases: Inglewood Police Department/20240726_2024Request_InglewoodPoliceDepartment/2021-001/IPD Crime Report & Follow-up Rpts",
+    "county": "Los Angeles County",
+    "agency": "Inglewood Police Department",
+    "page_count": 9
+  },
+  "processing_info": {
+    "text_length": 33807,
+    "sentence_count": 240,
+    "layout_sentence_count": 240,
+    "pages_count": 9,
+    "processed_at": 1748930072.6933522
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\a03ab9090caa.pdf",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\a03ab9090caa_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\a03ab9090caa_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

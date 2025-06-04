@@ -171,79 +171,225 @@ def create_sentence_to_layout_mapping(original_sentences, pages_layout):
 
 def find_best_layout_matches(sentence_text, pages_layout):
     """
-    Find layout blocks that best match the original sentence text
-    Uses multiple strategies for robust matching
+    Enhanced layout matching with better validation and stricter criteria
     """
     
     # Clean sentence for matching
     clean_sentence = clean_text_for_matching(sentence_text)
     sentence_words = clean_sentence.split()
     
+    # Skip very short sentences (likely formatting artifacts)
+    if len(sentence_words) < 3:
+        return []
+    
     matching_blocks = []
     
     for page_data in pages_layout:
         for block in page_data['elements']:
             clean_block_text = clean_text_for_matching(block['text'])
+            block_words = clean_block_text.split()
             
-            # Strategy 1: Direct substring match (best case)
-            if clean_sentence in clean_block_text or clean_block_text in clean_sentence:
-                overlap_ratio = min(len(clean_sentence), len(clean_block_text)) / max(len(clean_sentence), len(clean_block_text))
+            # Skip very short blocks
+            if len(block_words) < 2:
+                continue
+            
+            # Strategy 1: Exact or near-exact substring match (highest priority)
+            if clean_sentence in clean_block_text:
+                matching_blocks.append({
+                    **block,
+                    'match_confidence': 0.95,
+                    'match_type': 'exact_substring'
+                })
+                continue
+            elif clean_block_text in clean_sentence:
+                # Block text is contained within sentence
+                overlap_ratio = len(clean_block_text) / len(clean_sentence)
                 matching_blocks.append({
                     **block,
                     'match_confidence': 0.9 * overlap_ratio,
-                    'match_type': 'substring_match'
+                    'match_type': 'contained_substring'
                 })
                 continue
             
-            # Strategy 2: Word overlap matching
-            block_words = clean_block_text.split()
+            # Strategy 2: High-confidence word overlap with strict validation
             common_words = set(sentence_words) & set(block_words)
+            common_word_count = len(common_words)
             
-            if len(common_words) >= max(2, len(sentence_words) * 0.3):
-                confidence = len(common_words) / len(sentence_words)
+            # More stringent requirements for word overlap
+            min_common_words = max(3, len(sentence_words) * 0.4)  # Increased from 0.3
+            word_overlap_ratio = common_word_count / len(sentence_words)
+            block_coverage_ratio = common_word_count / len(block_words)
+            
+            # Only accept if we have good coverage AND the block isn't too large
+            if (common_word_count >= min_common_words and 
+                word_overlap_ratio >= 0.4 and
+                block_coverage_ratio >= 0.3):  # Block should also be mostly covered
+                
+                # Additional validation: check for key phrase matches
+                key_phrases_match = check_key_phrases_match(sentence_text, block['text'])
+                
+                # Penalize very large blocks (likely false positives)
+                size_penalty = min(1.0, 500.0 / len(clean_block_text))  # Penalize blocks > 500 chars
+                
+                confidence = (word_overlap_ratio * 0.6 + block_coverage_ratio * 0.4) * size_penalty
+                
+                if key_phrases_match:
+                    confidence *= 1.2  # Boost confidence for key phrase matches
+                
                 matching_blocks.append({
                     **block,
-                    'match_confidence': confidence * 0.8,  # Lower than exact match
-                    'match_type': 'word_overlap',
-                    'common_words_count': len(common_words)
+                    'match_confidence': min(0.85, confidence),  # Cap at 0.85 for word overlap
+                    'match_type': 'validated_word_overlap',
+                    'common_words_count': common_word_count,
+                    'word_overlap_ratio': word_overlap_ratio,
+                    'block_coverage_ratio': block_coverage_ratio,
+                    'key_phrases_match': key_phrases_match
                 })
                 continue
             
-            # Strategy 3: Sequence matching for partial overlaps
-            if len(clean_block_text) > 10:
+            # Strategy 3: Sequence matching for partial overlaps (more conservative)
+            if len(clean_block_text) > 20 and len(clean_sentence) > 20:
                 similarity = SequenceMatcher(None, clean_sentence, clean_block_text).ratio()
-                if similarity > 0.4:
+                if similarity > 0.6:  # Increased threshold from 0.4
                     matching_blocks.append({
                         **block,
-                        'match_confidence': similarity * 0.6,  # Lower confidence
+                        'match_confidence': similarity * 0.7,  # Reduced multiplier
                         'match_type': 'sequence_match',
                         'similarity_ratio': similarity
                     })
     
-    # Sort by confidence and take best matches
+    # Enhanced selection logic
+    return select_best_matches_enhanced(matching_blocks, sentence_text, sentence_words)
+
+def check_key_phrases_match(sentence_text, block_text):
+    """
+    Check if key phrases from the sentence appear in the block
+    This helps validate that the match is semantically correct
+    """
+    sentence_clean = clean_text_for_matching(sentence_text)
+    block_clean = clean_text_for_matching(block_text)
+    
+    # Extract potential key phrases (sequences of 2-4 words)
+    sentence_words = sentence_clean.split()
+    key_phrases = []
+    
+    # Generate 2-4 word phrases
+    for length in [4, 3, 2]:
+        for i in range(len(sentence_words) - length + 1):
+            phrase = ' '.join(sentence_words[i:i+length])
+            if len(phrase) > 6:  # Only meaningful phrases
+                key_phrases.append(phrase)
+    
+    # Check if any key phrases appear in the block
+    matches = 0
+    for phrase in key_phrases[:10]:  # Check top 10 phrases
+        if phrase in block_clean:
+            matches += 1
+    
+    # Return True if we find multiple phrase matches
+    return matches >= 2
+
+def select_best_matches_enhanced(matching_blocks, sentence_text, sentence_words):
+    """
+    Enhanced selection of the best matching blocks with better validation
+    """
+    if not matching_blocks:
+        return []
+    
+    # Sort by confidence
     matching_blocks.sort(key=lambda x: x['match_confidence'], reverse=True)
     
-    # Select the best matches that together cover the sentence well
+    # If we have exact/substring matches, prefer those
+    exact_matches = [b for b in matching_blocks if b['match_type'] in ['exact_substring', 'contained_substring']]
+    if exact_matches:
+        return exact_matches[:2]  # Return top 2 exact matches
+    
+    # For other matches, apply more stringent selection
     selected_blocks = []
     covered_content = set()
+    total_sentence_words = set(sentence_words)
     
-    for block in matching_blocks[:10]:  # Consider top 10 matches
-        if block['match_confidence'] < 0.3:  # Minimum confidence threshold
+    for block in matching_blocks:
+        # Skip low confidence matches
+        if block['match_confidence'] < 0.5:  # Increased threshold
             break
-            
-        block_words = set(clean_text_for_matching(block['text']).split())
-        new_coverage = block_words - covered_content
         
-        # Add block if it contributes new content or has very high confidence
-        if new_coverage or block['match_confidence'] > 0.8:
-            selected_blocks.append(block)
-            covered_content.update(block_words)
+        block_words = set(clean_text_for_matching(block['text']).split())
+        new_coverage = block_words & total_sentence_words
+        
+        # Calculate how much new content this block adds
+        truly_new_coverage = new_coverage - covered_content
+        
+        # Add block if it contributes significant new content or has very high confidence
+        coverage_contribution = len(truly_new_coverage) / len(total_sentence_words)
+        
+        if (coverage_contribution > 0.2 or  # Contributes 20%+ new coverage
+            block['match_confidence'] > 0.8 or  # Very high confidence
+            (len(selected_blocks) == 0 and block['match_confidence'] > 0.6)):  # First block with decent confidence
             
-            # Stop if we have good coverage
-            if len(covered_content) >= len(sentence_words) * 0.7:
+            selected_blocks.append(block)
+            covered_content.update(new_coverage)
+            
+            # Stop if we have good coverage or enough blocks
+            coverage_ratio = len(covered_content) / len(total_sentence_words)
+            if coverage_ratio >= 0.8 or len(selected_blocks) >= 3:
                 break
     
-    return selected_blocks[:5]  # Limit to 5 blocks per sentence to avoid over-segmentation
+    return selected_blocks
+
+def validate_sentence_layout_mapping(sentence_data, debug=False):
+    """
+    Validate that sentence layout mappings make sense
+    Returns validated sentences with quality scores
+    """
+    validated_sentences = []
+    
+    for sentence in sentence_data:
+        sentence_id = sentence['sentence_id']
+        sentence_text = sentence['text']
+        bounding_boxes = sentence['bounding_boxes']
+        
+        if debug:
+            print(f"\n🔍 Validating sentence {sentence_id}: {sentence_text[:50]}...")
+        
+        # Calculate quality metrics
+        total_confidence = sum(box['confidence'] for box in bounding_boxes)
+        avg_confidence = total_confidence / len(bounding_boxes) if bounding_boxes else 0
+        
+        # Check for reasonable box sizes
+        reasonable_boxes = []
+        for box in bounding_boxes:
+            width = box['x1'] - box['x0']
+            height = box['y1'] - box['y0']
+            area = width * height
+            
+            # Filter out unreasonably large boxes (likely false positives)
+            if area < 50000 and height < 200 and width < 600:  # Reasonable size limits
+                reasonable_boxes.append(box)
+            elif box['confidence'] > 0.8:  # Keep high-confidence boxes even if large
+                reasonable_boxes.append(box)
+            elif debug:
+                print(f"   ⚠️ Filtering large box: {width:.1f}×{height:.1f} (area: {area:.1f})")
+        
+        # Update sentence with validated boxes
+        validated_sentence = {
+            **sentence,
+            'bounding_boxes': reasonable_boxes,
+            'quality_metrics': {
+                'original_box_count': len(bounding_boxes),
+                'validated_box_count': len(reasonable_boxes),
+                'avg_confidence': avg_confidence,
+                'has_high_confidence_match': any(box['confidence'] > 0.8 for box in reasonable_boxes),
+                'mapping_quality': 'high' if avg_confidence > 0.7 else 'medium' if avg_confidence > 0.4 else 'low'
+            }
+        }
+        
+        validated_sentences.append(validated_sentence)
+        
+        if debug and len(reasonable_boxes) != len(bounding_boxes):
+            print(f"   ✅ Kept {len(reasonable_boxes)}/{len(bounding_boxes)} boxes (avg conf: {avg_confidence:.2f})")
+    
+    return validated_sentences
 
 def clean_text_for_matching(text):
     """Clean text for robust matching"""
@@ -403,50 +549,54 @@ def verify_sentence_compatibility(original_sentences, new_sentences):
     else:
         print(f"❌ COMPATIBILITY ISSUE: {mismatches} sentences don't match")
         return False
-
-# Example usage for testing compatibility
-if __name__ == "__main__":
     
-    current_file_directory = os.path.dirname(os.path.abspath(__file__))
-
-    output_directory = os.path.join(current_file_directory, "layout")
-    if not os.path.exists(output_directory):
-        os.makedirs(output_directory)
-    pdf_directory = os.path.join(current_file_directory, "uploads")
-
-    for pdf_file in os.listdir(pdf_directory):
-        if pdf_file.endswith('.pdf'):
-            pdf_path = os.path.join(pdf_directory, pdf_file)
-
-            filename = os.path.splitext(pdf_file)[0]
-
-            print(f"🧪 TESTING SENTENCE INDEX COMPATIBILITY FOR {filename}")
-            print("=" * 60)
-
-            # Test original method
-            print("1️⃣ Extracting with original method...")
-            original_text, original_sentences = extract_sentences_from_pdf_original(pdf_path)
-
-            # Test compatible method
-            print("2️⃣ Extracting with compatible method...")
-            new_sentences, enhanced_sentences, pages_layout = extract_sentences_with_compatible_layout(pdf_path)
-
-            # Verify compatibility
-            print("3️⃣ Verifying compatibility...")
-            is_compatible = verify_sentence_compatibility(original_sentences, new_sentences)
-
-            if is_compatible:
-                print("\n🎉 SUCCESS: Sentence indices will be preserved!")
-                print("Your existing provenance data will work perfectly.")
-
-                # Save files
-                sentences_file, layout_file, stats = save_compatible_sentence_data(pdf_path, output_directory)
-                print(f"\n📁 Files saved:")
-                print(f"   Sentences: {sentences_file}")
-                print(f"   Layout: {layout_file}")
-
-            else:
-                print("\n❌ FAILURE: Sentence extraction differs from original")
-                print("This method would break compatibility with existing provenance data.")
-
+# After your current sentence extraction, add validation
+def fix_existing_layout_mapping(layout_file_path):
+    """Fix existing layout mapping with enhanced validation"""
     
+    with open(layout_file_path, 'r', encoding='utf-8') as f:
+        layout_data = json.load(f)
+    
+    # Validate and fix sentence mappings
+    validated_sentences = validate_sentence_layout_mapping(
+        layout_data['sentences'], 
+        debug=True
+    )
+    
+    # Update the data
+    layout_data['sentences'] = validated_sentences
+    layout_data['metadata']['validation_applied'] = True
+    layout_data['metadata']['validation_timestamp'] = time.time()
+    
+    # Save updated file
+    with open(layout_file_path, 'w', encoding='utf-8') as f:
+        json.dump(layout_data, f, indent=2, ensure_ascii=False)
+    
+    print(f"✅ Enhanced validation applied to {len(validated_sentences)} sentences")
+
+def full_pdf_preprocess(pdf_directory, pdf_file, output_directory):
+    
+    pdf_path = os.path.join(pdf_directory, pdf_file)
+    filename = os.path.splitext(pdf_file)[0]
+    print(f"🧪 TESTING SENTENCE INDEX COMPATIBILITY FOR {filename}")
+    print("=" * 60)
+    # Test original method
+    print("1️⃣ Extracting with original method...")
+    original_text, original_sentences = extract_sentences_from_pdf_original(pdf_path)
+    # Test compatible method
+    print("2️⃣ Extracting with compatible method...")
+    new_sentences, enhanced_sentences, pages_layout = extract_sentences_with_compatible_layout(pdf_path)
+    # Verify compatibility
+    print("3️⃣ Verifying compatibility...")
+    is_compatible = verify_sentence_compatibility(original_sentences, new_sentences)
+    if is_compatible:
+        print("\n🎉 SUCCESS: Sentence indices will be preserved!")
+        print("Your existing provenance data will work perfectly.")
+        # Save files
+        sentences_file, layout_file, stats = save_compatible_sentence_data(pdf_path, output_directory)
+        print(f"\n📁 Files saved:")
+        print(f"   Sentences: {sentences_file}")
+        print(f"   Layout: {layout_file}")
+    else:
+        print("\n❌ FAILURE: Sentence extraction differs from original")
+        print("This method would break compatibility with existing provenance data.")

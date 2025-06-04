@@ -8,6 +8,7 @@ import DocumentSelector from './components/DocumentSelector';
 import ProvenanceQA from './components/ProvenanceQA';
 import userStudyLogger from './services/UserStudyLogger';
 import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
+import DriveFileBrowser from './components/DriveFileBrowser';
 import {
   uploadFile,
   getDocuments,
@@ -38,6 +39,7 @@ function App() {
   const [showPreloadedModal, setShowPreloadedModal] = useState(false);
   const [preloadedDocuments, setPreloadedDocuments] = useState([]);
   const [loadingPreloaded, setLoadingPreloaded] = useState(false);
+  const [showDriveModal, setShowDriveModal] = useState(false);
 
   const [navigationTrigger, setNavigationTrigger] = useState(null);
 
@@ -350,6 +352,46 @@ const handleHighlightInPDF = async (provenance) => {
     }
   };
 
+  // handle gdrive modal
+  const handleShowDrive = async () => {
+  await logUserInteraction('browse_drive_click', 'document_selector');
+  setShowDriveModal(true);
+};
+
+// Add Drive file selection handler
+const handleDriveFileSelect = async (fileData) => {
+  try {
+    // Create document using your existing logic
+    const docId = createNewDocument(fileData.filename, fileData.filename);
+    
+    // Update with Drive-specific metadata
+    setDocuments(prev => {
+      const newDocs = new Map(prev);
+      const doc = newDocs.get(docId);
+      if (doc) {
+        doc.isDriveDocument = true;
+        doc.driveFileId = fileData.drive_file_id;
+        doc.source = 'google_drive';
+        // ... other metadata
+        newDocs.set(docId, doc);
+      }
+      return newDocs;
+    });
+
+    // Log the Drive document selection
+    await userStudyLogger.logDocumentSelected(
+      docId,
+      fileData.filename,
+      false, // isPreloaded = false for Drive docs
+      'google_drive'
+    );
+
+  } catch (error) {
+    console.error('Error selecting Drive file:', error);
+  }
+};
+
+
   // Handle feedback
   const handleFeedbackSubmit = async (questionId, feedback) => {
 
@@ -469,6 +511,7 @@ const handleHighlightInPDF = async (provenance) => {
           await logUserInteraction('upload_button_click', 'header');
           handleUploadNewDocument();
         }}
+        onShowDrive={handleShowDrive}
       />
         {/* Left Sidebar */}
         <div className="sidebar-panel">
@@ -510,6 +553,7 @@ const handleHighlightInPDF = async (provenance) => {
                   <DocumentSelector
                     onDocumentUpload={handleDocumentUpload}
                     onShowPreloaded={handleShowDocuments}
+                    onShowDrive={handleShowDrive}
                     uploadProgress={uploadProgress}
                     compactMode={false}
                   />
@@ -538,7 +582,11 @@ const handleHighlightInPDF = async (provenance) => {
           />
         </div>
       </div>
-
+      <DriveFileBrowser
+  isOpen={showDriveModal}
+  onClose={() => setShowDriveModal(false)}
+  onFileSelect={handleDriveFileSelect}
+/>
 
 
       {/* Enhanced Feedback Modal */}

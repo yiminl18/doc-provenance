@@ -13,17 +13,7 @@
   overflow: hidden;
 }
 
-.hybrid-pdf-viewer.fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
-  background-color: var(--bg-paper);
-  border: var(--border-thick) solid var(--win95-border-dark);
-  box-shadow: var(--shadow-raised);
-}
+
 
 /* ===== PDF HEADER ===== */
 .hybrid-pdf-viewer .pdf-header {
@@ -1028,11 +1018,7 @@
   /* Remove height: 100% - let it be determined by content */
 }
 
-.hybrid-pdf-viewer.fixed-size.fullscreen {
-  /* Fullscreen mode still uses full viewport */
-  height: 100vh;
-  width: 100vw;
-}
+
 
 /* Fixed content area */
 .hybrid-content.fixed-content {
@@ -1206,12 +1192,47 @@
   background-color: var(--bg-primary);
 }
 
-/* Special handling for fullscreen mode */
-.hybrid-pdf-viewer.fixed-size.fullscreen .pdf-main-view.fixed-viewer {
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 100% !important;
-  min-height: 100% !important;
-  margin: 0 !important;
+/* Add these styles to your pdf-viewer.css for fallback highlights */
+
+/* Fallback validated highlights */
+.provenance-overlay.fallback-validated {
+  /* Already styled in JS, but add any additional CSS here */
+  animation: fallbackPulse 3s ease-in-out infinite;
 }
 
+@keyframes fallbackPulse {
+  0%, 100% { 
+    opacity: 1;
+    border-color: rgba(255, 140, 0, 0.8);
+  }
+  50% { 
+    opacity: 0.8;
+    border-color: rgba(255, 165, 0, 1);
+  }
+}
+
+.provenance-overlay.fallback-validated:hover {
+  animation: none; /* Stop pulsing on hover */
+  border-color: rgba(255, 69, 0, 1) !important;
+  background-color: rgba(255, 69, 0, 0.6) !important;
+}
+
+/* Warning indicator styling */
+.provenance-overlay.fallback-validated::before {
+  /* This will be overridden by the JS-created warning indicator */
+}
+
+/* Enhanced magnify modal for fallback */
+.magnify-content.fallback {
+  border-color: orange;
+}
+
+.magnify-header.fallback {
+  background-color: rgba(255, 165, 0, 0.1);
+  border-bottom-color: orange;
+}
+
+.magnify-header.fallback h3::after {
+  content: " ⚠️";
+  color: orange;
+}

@@ -1,0 +1,3 @@
+[2025-06-02 22:52:37] Starting batch sampling - Target: 5, Max attempts: 500
+[2025-06-02 22:52:38] Found 206840 candidate files
+[2025-06-02 22:52:38] Processing batch: 50 files (Success so far: 0/5)

@@ -13,6 +13,7 @@ import {
 const DocumentSelector = ({ 
   onDocumentUpload, 
   onShowPreloaded, 
+  onShowDrive,
   uploadProgress,
   compactMode = false,
   disabled = false
@@ -48,6 +49,11 @@ const DocumentSelector = ({
     onShowPreloaded();
   };
 
+  const handleDriveClick = () => {
+    if (disabled) return;
+    onShowDrive();
+  };
+
   if (compactMode) {
     return (
       <div className="document-selector compact">
@@ -65,7 +71,7 @@ const DocumentSelector = ({
         <div className="document-controls compact">
           {/* Upload Button */}
           <button 
-            className={`upload-btn compact ${disabled ? 'disabled' : ''}`}
+            className={`action-btn compact upload ${disabled ? 'disabled' : ''}`}
             onClick={handleUploadClick}
             disabled={disabled}
             title={disabled ? 'Session not ready' : 'Upload PDF Document'}
@@ -85,13 +91,22 @@ const DocumentSelector = ({
           
           {/* Browse Button - Updated */}
           <button 
-            className={`browse-btn compact ${disabled ? 'disabled' : ''}`}
+            className={`action-btn compact browse ${disabled ? 'disabled' : ''}`}
             onClick={handleBrowseClick}
             disabled={disabled}
-            title={disabled ? 'Session not ready' : 'Browse Session Documents'}
           >
             <FontAwesomeIcon icon={disabled ? faSpinner : faDatabase} spin={disabled} />
             <span>Browse Documents</span>
+          </button>
+
+           {/* drive Button - Updated */}
+          <button 
+            className={`action-btn compact drive ${disabled ? 'disabled' : ''}`}
+            onClick={handleDriveClick}
+            disabled={disabled}
+          >
+            <FontAwesomeIcon icon={disabled ? faSpinner : faDatabase} spin={disabled} />
+            <span>Connect to GDrive</span>
           </button>
         </div>
       </div>
@@ -145,7 +160,7 @@ const DocumentSelector = ({
         <div className="document-selector-section">
           {/* Upload Button */}
           <button 
-            className={`upload-btn ${disabled ? 'disabled' : ''}`}
+            className={`action-btn upload ${disabled ? 'disabled' : ''}`}
             onClick={handleUploadClick}
             disabled={disabled}
             title={disabled ? 'Session initializing, please wait...' : 'Upload PDF'}
@@ -171,7 +186,7 @@ const DocumentSelector = ({
           
           {/* Browse Button - Updated */}
           <button 
-            className={`browse-btn ${disabled ? 'disabled' : ''}`}
+            className={`action-btn upload ${disabled ? 'disabled' : ''}`}
             onClick={handleBrowseClick}
             disabled={disabled}
             title={disabled ? 'Session initializing, please wait...' : 'Browse documents'}
@@ -183,6 +198,23 @@ const DocumentSelector = ({
             />
             <div className="btn-content">
               <span className="btn-title">Browse Documents</span>
+           
+            </div>
+          </button>
+
+          {/* drive Button - Updated */}
+          <button 
+            className={`action-btn drive ${disabled ? 'disabled' : ''}`}
+            onClick={handleDriveClick}
+            disabled={disabled}
+          >
+            <FontAwesomeIcon 
+              icon={disabled ? faSpinner : faDatabase} 
+              spin={disabled}
+              size="lg" 
+            />
+            <div className="btn-content">
+              <span className="btn-title">Browse GDrive</span>
            
             </div>
           </button>

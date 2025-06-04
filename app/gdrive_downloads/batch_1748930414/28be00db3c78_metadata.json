@@ -1,0 +1,29 @@
+{
+  "document_id": "28be00db3c78",
+  "filename": "28be00db3c78.pdf",
+  "original_name": "UOF PP--redacted.pdf",
+  "title": "UOF PP--redacted.pdf",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1748930414",
+  "gdrive_info": {
+    "file_id": "1ohz7wWSSUSwWQZPJud_F-VlfWuOsU_um",
+    "gdrive_path": "Pasadena Police Department/2023 Agency Release - Pasadena Police Department/20240729_2023Request_PasadenaPoliceDepartment/SB1421 Releases/SB1421 - McDade File 2012-0053/Documents/Criminal Inv & UofF Powerpoint",
+    "county": "Los Angeles County",
+    "agency": "Pasadena Police Department",
+    "page_count": 19
+  },
+  "processing_info": {
+    "text_length": 7247,
+    "sentence_count": 57,
+    "layout_sentence_count": 57,
+    "pages_count": 19,
+    "processed_at": 1748930565.0495493
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748930414\\28be00db3c78.pdf",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748930414\\28be00db3c78_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748930414\\28be00db3c78_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

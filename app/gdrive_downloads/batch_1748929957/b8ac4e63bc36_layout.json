@@ -1,0 +1,6616 @@
+{
+  "sentences": [
+    {
+      "sentence_id": 0,
+      "text": ". Hi, I'm Detective Albini of the Santa Rosa Police.",
+      "layout_matches": [
+        {
+          "text": ".  Hi, I'm Detective Albini of the Santa Rosa Police.  Um, we're",
+          "page": 1,
+          "x0": 243.77,
+          "y0": 545.548,
+          "x1": 550.66,
+          "y1": 557.548,
+          "width": 306.89,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": ".  Hi, I'm Detective Albini of the Santa Rosa Police.  Um, we're",
+          "page": 1,
+          "x0": 243.77,
+          "y0": 545.548,
+          "x1": 550.66,
+          "y1": 557.548,
+          "width": 306.89,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 243.77,
+          "y0": 545.548,
+          "x1": 550.66,
+          "y1": 557.548,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 1,
+          "x0": 243.77,
+          "y0": 545.548,
+          "x1": 550.66,
+          "y1": 557.548,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 1,
+      "text": "Um, we're \n\n \n\n. I'm \n\nYou were at school then?",
+      "layout_matches": [
+        {
+          "text": "You were at school then?",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 462.718,
+          "x1": 304.97,
+          "y1": 474.718,
+          "width": 124.95000000000002,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.575,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "You were at school then?",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 462.718,
+          "x1": 304.97,
+          "y1": 474.718,
+          "width": 124.95000000000002,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.575,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 462.718,
+          "x1": 304.97,
+          "y1": 474.718,
+          "confidence": 0.575,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 462.718,
+          "x1": 304.97,
+          "y1": 474.718,
+          "confidence": 0.575,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 2,
+      "text": "Hi there, how you doin'? Hi. Uh, not really, I was at school.",
+      "layout_matches": [
+        {
+          "text": "Uh, not really, I was at school.",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 490.31800000000004,
+          "x1": 330.05,
+          "y1": 502.31800000000004,
+          "width": 150.03,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.48214285714285715,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Uh, not really, I was at school.",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 490.31800000000004,
+          "x1": 330.05,
+          "y1": 502.31800000000004,
+          "width": 150.03,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.48214285714285715,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 490.31800000000004,
+          "x1": 330.05,
+          "y1": 502.31800000000004,
+          "confidence": 0.48214285714285715,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 490.31800000000004,
+          "x1": 330.05,
+          "y1": 502.31800000000004,
+          "confidence": 0.48214285714285715,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 3,
+      "text": "I heard, uh, like, somebody got shot, and I don't know.",
+      "layout_matches": [
+        {
+          "text": "I heard, uh, like, somebody got shot, and I don't know.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 435.118,
+          "x1": 408.79,
+          "y1": 447.118,
+          "width": 264.77,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "I heard, uh, like, somebody got shot, and I don't know.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 435.118,
+          "x1": 408.79,
+          "y1": 447.118,
+          "width": 264.77,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 144.02,
+          "y0": 435.118,
+          "x1": 408.79,
+          "y1": 447.118,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 1,
+          "x0": 144.02,
+          "y0": 435.118,
+          "x1": 408.79,
+          "y1": 447.118,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 4,
+      "text": "SRPD Case#: 13-13093 \nLocation:  Santa Rosa Police Department \n \n \nINTERVIEW \nLegend: \n****:    Unintelligible \n \n \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \nhere investigating a crime that happened down the street.",
+      "layout_matches": [
+        {
+          "text": "SRPD Case#: 13-13093 \nLocation:  Santa Rosa Police Department",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 728.448,
+          "x1": 286.73,
+          "y1": 754.248,
+          "width": 214.70600000000002,
+          "height": 25.800000000000068,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.25846153846153846,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Location:  Santa Rosa Police Department",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 728.448,
+          "x1": 286.73,
+          "y1": 740.448,
+          "width": 214.70600000000002,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.17076923076923076,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 72.024,
+          "y0": 728.448,
+          "x1": 286.73,
+          "y1": 754.248,
+          "confidence": 0.25846153846153846,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 72.024,
+          "y0": 728.448,
+          "x1": 286.73,
+          "y1": 740.448,
+          "confidence": 0.17076923076923076,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 5,
+      "text": "Are you aware what happened down \nthere?",
+      "layout_matches": [
+        {
+          "text": "NTERVIEW \nLegend: \n****:    Unintelligible \n \n \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \nhere investigating a crime that happened down the street.  Are you aware what happened down \nthere? \n \nOther Speaker: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \nsay I talked to you. \n \nSpeaker 2: \n \nDetective Albini:  What's your first name? \n \nSpeaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 76.272,
+          "x1": 530.11,
+          "y1": 697.2280000000001,
+          "width": 458.086,
+          "height": 620.956,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 72.024,
+          "y0": 76.272,
+          "x1": 530.11,
+          "y1": 697.2280000000001,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 6,
+      "text": "Other Speaker: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \nsay I talked to you.",
+      "layout_matches": [
+        {
+          "text": "NTERVIEW \nLegend: \n****:    Unintelligible \n \n \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \nhere investigating a crime that happened down the street.  Are you aware what happened down \nthere? \n \nOther Speaker: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \nsay I talked to you. \n \nSpeaker 2: \n \nDetective Albini:  What's your first name? \n \nSpeaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 76.272,
+          "x1": 530.11,
+          "y1": 697.2280000000001,
+          "width": 458.086,
+          "height": 620.956,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "say I talked to you.",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 172.868,
+          "x1": 166.7,
+          "y1": 184.868,
+          "width": 94.67599999999999,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.0967741935483871,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 72.024,
+          "y0": 76.272,
+          "x1": 530.11,
+          "y1": 697.2280000000001,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 1,
+          "x0": 72.024,
+          "y0": 172.868,
+          "x1": 166.7,
+          "y1": 184.868,
+          "confidence": 0.0967741935483871,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 7,
+      "text": "Speaker 2: \n \nDetective Albini:  What's your first name?",
+      "layout_matches": [
+        {
+          "text": "NTERVIEW \nLegend: \n****:    Unintelligible \n \n \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \nhere investigating a crime that happened down the street.  Are you aware what happened down \nthere? \n \nOther Speaker: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \nsay I talked to you. \n \nSpeaker 2: \n \nDetective Albini:  What's your first name? \n \nSpeaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 76.272,
+          "x1": 530.11,
+          "y1": 697.2280000000001,
+          "width": 458.086,
+          "height": 620.956,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "Detective Albini:  What's your first name?",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 117.668,
+          "x1": 297.53,
+          "y1": 129.668,
+          "width": 225.50599999999997,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.7125,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 72.024,
+          "y0": 76.272,
+          "x1": 530.11,
+          "y1": 697.2280000000001,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 1,
+          "x0": 72.024,
+          "y0": 117.668,
+          "x1": 297.53,
+          "y1": 129.668,
+          "confidence": 0.7125,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 8,
+      "text": "Speaker 2: \n \n\nOkay, you guys had came home after all the – \n\nOkay.",
+      "layout_matches": [
+        {
+          "text": "Okay, you guys had came home after all the –",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 352.298,
+          "x1": 403.75,
+          "y1": 364.298,
+          "width": 223.73,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.6362068965517241,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Okay, you guys had came home after all the –",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 352.298,
+          "x1": 403.75,
+          "y1": 364.298,
+          "width": 223.73,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.6362068965517241,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 352.298,
+          "x1": 403.75,
+          "y1": 364.298,
+          "confidence": 0.6362068965517241,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 352.298,
+          "x1": 403.75,
+          "y1": 364.298,
+          "confidence": 0.6362068965517241,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 9,
+      "text": "Um, so no one heard or saw anything?",
+      "layout_matches": [
+        {
+          "text": "Okay.  Um, so no one heard or saw anything?",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 241.898,
+          "x1": 402.67,
+          "y1": 253.898,
+          "width": 222.65,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "Okay.  Um, so no one heard or saw anything?",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 241.898,
+          "x1": 402.67,
+          "y1": 253.898,
+          "width": 222.65,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 241.898,
+          "x1": 402.67,
+          "y1": 253.898,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 241.898,
+          "x1": 402.67,
+          "y1": 253.898,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 10,
+      "text": "– the street were blocked off and stuff. Okay.",
+      "layout_matches": [
+        {
+          "text": "– the street were blocked off and stuff.",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 297.098,
+          "x1": 368.35,
+          "y1": 309.098,
+          "width": 188.33,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.7772727272727273,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "– the street were blocked off and stuff.",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 297.098,
+          "x1": 368.35,
+          "y1": 309.098,
+          "width": 188.33,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.7772727272727273,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 297.098,
+          "x1": 368.35,
+          "y1": 309.098,
+          "confidence": 0.7772727272727273,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 297.098,
+          "x1": 368.35,
+          "y1": 309.098,
+          "confidence": 0.7772727272727273,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 11,
+      "text": "Were you home when – \n\nNo, I wasn't home, but ****.",
+      "layout_matches": [
+        {
+          "text": "No, I wasn't home, but ****.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 379.918,
+          "x1": 285.89,
+          "y1": 391.918,
+          "width": 141.86999999999998,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.4609756097560976,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "No, I wasn't home, but ****.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 379.918,
+          "x1": 285.89,
+          "y1": 391.918,
+          "width": 141.86999999999998,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.4609756097560976,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 144.02,
+          "y0": 379.918,
+          "x1": 285.89,
+          "y1": 391.918,
+          "confidence": 0.4609756097560976,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 144.02,
+          "y0": 379.918,
+          "x1": 285.89,
+          "y1": 391.918,
+          "confidence": 0.4609756097560976,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 12,
+      "text": "No, no, nothing like that. Yeah. Yeah. Yeah. . Okay.",
+      "layout_matches": [
+        {
+          "text": "No, no, nothing like that.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 214.29799999999997,
+          "x1": 267.41,
+          "y1": 226.29799999999997,
+          "width": 123.39000000000001,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.432,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "No, no, nothing like that.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 214.29799999999997,
+          "x1": 267.41,
+          "y1": 226.29799999999997,
+          "width": 123.39000000000001,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.432,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 144.02,
+          "y0": 214.29799999999997,
+          "x1": 267.41,
+          "y1": 226.29799999999997,
+          "confidence": 0.432,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 144.02,
+          "y0": 214.29799999999997,
+          "x1": 267.41,
+          "y1": 226.29799999999997,
+          "confidence": 0.432,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 13,
+      "text": "Um, can I get your guy's information?",
+      "layout_matches": [
+        {
+          "text": "Okay.  Um, can I get your guy's information?  Let's get your name so I can",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 186.69799999999998,
+          "x1": 541.64,
+          "y1": 198.69799999999998,
+          "width": 361.62,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "Okay.  Um, can I get your guy's information?  Let's get your name so I can",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 186.69799999999998,
+          "x1": 541.64,
+          "y1": 198.69799999999998,
+          "width": 361.62,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 186.69799999999998,
+          "x1": 541.64,
+          "y1": 198.69799999999998,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 1,
+          "x0": 180.02,
+          "y0": 186.69799999999998,
+          "x1": 541.64,
+          "y1": 198.69799999999998,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 14,
+      "text": "Let's get your name so I can \n\n1 \n2 \n3 \n4 \n5 \n6 \n7 \n8 \n9 \n10 \n11 \n12 \n13 \n14 \n15 \n16 \n17 \n18 \n19 \n20 \n21 \n22 \n23 \n24 \n25 \n26 \n27 \n28 \n29 \n30 \n31 \n32 \n33 \n34 \n35 \n36 \n37 \n38 \n39 \n40 \n41 \n42 \n43 \n44 \n45 \n\n\fAnd do you have a home telephone or a cell phone number?",
+      "layout_matches": [
+        {
+          "text": "1 \n2 \n3 \n4 \n5 \n6 \n7 \n8 \n9 \n10 \n11 \n12 \n13 \n14 \n15 \n16 \n17 \n18 \n19 \n20 \n21 \n22 \n23 \n24 \n25 \n26 \n27 \n28 \n29 \n30 \n31 \n32 \n33 \n34 \n35 \n36 \n37 \n38 \n39 \n40 \n41 \n42 \n43 \n44 \n45",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 76.272,
+          "x1": 57.0,
+          "y1": 697.2280000000001,
+          "width": 15.0,
+          "height": 620.956,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.5382775119617225,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "And do you have a home telephone or a cell phone number?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 448.19800000000004,
+          "x1": 472.06,
+          "y1": 460.19800000000004,
+          "width": 292.03999999999996,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.23684210526315788,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1,
+        2
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 42.0,
+          "y0": 76.272,
+          "x1": 57.0,
+          "y1": 697.2280000000001,
+          "confidence": 0.5382775119617225,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 2,
+          "x0": 180.02,
+          "y0": 448.19800000000004,
+          "x1": 472.06,
+          "y1": 460.19800000000004,
+          "confidence": 0.23684210526315788,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 15,
+      "text": ". ? 46 \n47 \n48 \n49 \n50 \n51 \n52 \n53 \n54 \n55 \n56 \n57 \n58 \n59 \n60 \n61 \n62 \n63 \n64 \n65 \n66 \n67 \n68 \n69 \n70 \n71 \n72 \n73 \n74 \n75 \n76 \n77 \n78 \n79 \n80 \n81 \n82 \n83 \n84 \n85 \n86 \n87 \n88 \n89 \n90 \n91 \n92 \n93 \n\nYes. Yes. .",
+      "layout_matches": [
+        {
+          "text": "46 \n47 \n48 \n49 \n50 \n51 \n52 \n53 \n54 \n55 \n56 \n57 \n58 \n59 \n60 \n61 \n62 \n63 \n64 \n65 \n66 \n67 \n68 \n69 \n70 \n71 \n72 \n73 \n74 \n75 \n76 \n77 \n78 \n79 \n80 \n81 \n82 \n83 \n84 \n85 \n86 \n87 \n88 \n89 \n90 \n91 \n92 \n93",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 75.552,
+          "x1": 57.0,
+          "y1": 736.248,
+          "width": 15.0,
+          "height": 660.696,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.8145569620253165,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        2
+      ],
+      "primary_page": 2,
+      "bounding_boxes": [
+        {
+          "page": 2,
+          "x0": 42.0,
+          "y0": 75.552,
+          "x1": 57.0,
+          "y1": 736.248,
+          "confidence": 0.8145569620253165,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 16,
+      "text": "Detective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \n\n \n\nAnd do you have a middle name?",
+      "layout_matches": [
+        {
+          "text": "Detective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 75.552,
+          "x1": 158.06,
+          "y1": 736.248,
+          "width": 86.036,
+          "height": 660.696,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.8276139410187667,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "And do you have a middle name?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 669.028,
+          "x1": 344.35,
+          "y1": 681.028,
+          "width": 164.33,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.06997319034852546,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        2
+      ],
+      "primary_page": 2,
+      "bounding_boxes": [
+        {
+          "page": 2,
+          "x0": 72.024,
+          "y0": 75.552,
+          "x1": 158.06,
+          "y1": 736.248,
+          "confidence": 0.8276139410187667,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 2,
+          "x0": 180.02,
+          "y0": 669.028,
+          "x1": 344.35,
+          "y1": 681.028,
+          "confidence": 0.06997319034852546,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 17,
+      "text": "Uh, no, last name is \n\n. , as in \n\n?",
+      "layout_matches": [
+        {
+          "text": "Uh, no, last name is",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 641.428,
+          "x1": 242.264,
+          "y1": 653.428,
+          "width": 98.244,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.6,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Uh, no, last name is",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 641.428,
+          "x1": 242.264,
+          "y1": 653.428,
+          "width": 98.244,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.6,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        2
+      ],
+      "primary_page": 2,
+      "bounding_boxes": [
+        {
+          "page": 2,
+          "x0": 144.02,
+          "y0": 641.428,
+          "x1": 242.264,
+          "y1": 653.428,
+          "confidence": 0.6,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 2,
+          "x0": 144.02,
+          "y0": 641.428,
+          "x1": 242.264,
+          "y1": 653.428,
+          "confidence": 0.6,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 18,
+      "text": "Okay, \n\n \n\nAnd your birthdate?",
+      "layout_matches": [
+        {
+          "text": "And your birthdate?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 503.398,
+          "x1": 279.65,
+          "y1": 515.398,
+          "width": 99.62999999999997,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.7043478260869566,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "And your birthdate?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 503.398,
+          "x1": 279.65,
+          "y1": 515.398,
+          "width": 99.62999999999997,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.7043478260869566,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        2
+      ],
+      "primary_page": 2,
+      "bounding_boxes": [
+        {
+          "page": 2,
+          "x0": 180.02,
+          "y0": 503.398,
+          "x1": 279.65,
+          "y1": 515.398,
+          "confidence": 0.7043478260869566,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 2,
+          "x0": 180.02,
+          "y0": 503.398,
+          "x1": 279.65,
+          "y1": 515.398,
+          "confidence": 0.7043478260869566,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 19,
+      "text": "Uh, \n\n. Uh, home phone number, \n\n.",
+      "layout_matches": [
+        {
+          "text": "Uh, home phone number,",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 420.598,
+          "x1": 269.288,
+          "y1": 432.598,
+          "width": 125.268,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.6666666666666666,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Uh, home phone number,",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 420.598,
+          "x1": 269.288,
+          "y1": 432.598,
+          "width": 125.268,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.6666666666666666,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        2
+      ],
+      "primary_page": 2,
+      "bounding_boxes": [
+        {
+          "page": 2,
+          "x0": 144.02,
+          "y0": 420.598,
+          "x1": 269.288,
+          "y1": 432.598,
+          "confidence": 0.6666666666666666,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 2,
+          "x0": 144.02,
+          "y0": 420.598,
+          "x1": 269.288,
+          "y1": 432.598,
+          "confidence": 0.6666666666666666,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 20,
+      "text": "And your cell phone? Uh, \n\n \n\nAnd your name, sir?",
+      "layout_matches": [
+        {
+          "text": "And your cell phone?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 392.998,
+          "x1": 286.73,
+          "y1": 404.998,
+          "width": 106.71000000000001,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.4275,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "And your cell phone?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 392.998,
+          "x1": 286.73,
+          "y1": 404.998,
+          "width": 106.71000000000001,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.4275,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        2
+      ],
+      "primary_page": 2,
+      "bounding_boxes": [
+        {
+          "page": 2,
+          "x0": 180.02,
+          "y0": 392.998,
+          "x1": 286.73,
+          "y1": 404.998,
+          "confidence": 0.4275,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 2,
+          "x0": 180.02,
+          "y0": 392.998,
+          "x1": 286.73,
+          "y1": 404.998,
+          "confidence": 0.4275,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 21,
+      "text": ". ? Yeah. Yeah. No. Do you have a middle name, \n\n? No. Your last name? -2- \n\n\f.",
+      "layout_matches": [
+        {
+          "text": "Do you have a middle name,",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 172.148,
+          "x1": 320.98400000000004,
+          "y1": 184.148,
+          "width": 140.96400000000003,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.32142857142857145,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Do you have a middle name,",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 172.148,
+          "x1": 320.98400000000004,
+          "y1": 184.148,
+          "width": 140.96400000000003,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.32142857142857145,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        2
+      ],
+      "primary_page": 2,
+      "bounding_boxes": [
+        {
+          "page": 2,
+          "x0": 180.02,
+          "y0": 172.148,
+          "x1": 320.98400000000004,
+          "y1": 184.148,
+          "confidence": 0.32142857142857145,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 2,
+          "x0": 180.02,
+          "y0": 172.148,
+          "x1": 320.98400000000004,
+          "y1": 184.148,
+          "confidence": 0.32142857142857145,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 22,
+      "text": "And you, you have the same home, home phone number?",
+      "layout_matches": [
+        {
+          "text": ".  And you, you have the same home, home phone number?",
+          "page": 3,
+          "x0": 204.02,
+          "y0": 586.2280000000001,
+          "x1": 492.34,
+          "y1": 598.2280000000001,
+          "width": 288.31999999999994,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": ".  And you, you have the same home, home phone number?",
+          "page": 3,
+          "x0": 204.02,
+          "y0": 586.2280000000001,
+          "x1": 492.34,
+          "y1": 598.2280000000001,
+          "width": 288.31999999999994,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 204.02,
+          "y0": 586.2280000000001,
+          "x1": 492.34,
+          "y1": 598.2280000000001,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 3,
+          "x0": 204.02,
+          "y0": 586.2280000000001,
+          "x1": 492.34,
+          "y1": 598.2280000000001,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 23,
+      "text": "Okay. And your birthdate? Uh, \n\n, uh, \n\n.",
+      "layout_matches": [
+        {
+          "text": "Okay.  And your birthdate?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 724.248,
+          "x1": 314.69,
+          "y1": 736.248,
+          "width": 134.67,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.6545454545454545,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Okay.  And your birthdate?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 724.248,
+          "x1": 314.69,
+          "y1": 736.248,
+          "width": 134.67,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.6545454545454545,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 724.248,
+          "x1": 314.69,
+          "y1": 736.248,
+          "confidence": 0.6545454545454545,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 724.248,
+          "x1": 314.69,
+          "y1": 736.248,
+          "confidence": 0.6545454545454545,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 24,
+      "text": "Of – \n\n what? . Yeah. Uh, no. No cell?",
+      "layout_matches": [
+        {
+          "text": "No cell?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 475.798,
+          "x1": 223.37,
+          "y1": 487.798,
+          "width": 43.349999999999994,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.2032258064516129,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "No cell?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 475.798,
+          "x1": 223.37,
+          "y1": 487.798,
+          "width": 43.349999999999994,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.2032258064516129,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 475.798,
+          "x1": 223.37,
+          "y1": 487.798,
+          "confidence": 0.2032258064516129,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 475.798,
+          "x1": 223.37,
+          "y1": 487.798,
+          "confidence": 0.2032258064516129,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 25,
+      "text": "Do you have a cell phone number?",
+      "layout_matches": [
+        {
+          "text": "Do you have a cell phone number?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 531.028,
+          "x1": 350.35,
+          "y1": 543.028,
+          "width": 170.33,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "Do you have a cell phone number?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 531.028,
+          "x1": 350.35,
+          "y1": 543.028,
+          "width": 170.33,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 531.028,
+          "x1": 350.35,
+          "y1": 543.028,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 531.028,
+          "x1": 350.35,
+          "y1": 543.028,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 26,
+      "text": "Is the road still blocked or is it open now?",
+      "layout_matches": [
+        {
+          "text": "Is the road still blocked or is it open now?",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 448.19800000000004,
+          "x1": 348.79,
+          "y1": 460.19800000000004,
+          "width": 204.77,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "Is the road still blocked or is it open now?",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 448.19800000000004,
+          "x1": 348.79,
+          "y1": 460.19800000000004,
+          "width": 204.77,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 144.02,
+          "y0": 448.19800000000004,
+          "x1": 348.79,
+          "y1": 460.19800000000004,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 3,
+          "x0": 144.02,
+          "y0": 448.19800000000004,
+          "x1": 348.79,
+          "y1": 460.19800000000004,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 27,
+      "text": "No, it'll be blocked for a little bit.",
+      "layout_matches": [
+        {
+          "text": "No, it'll be blocked for a little bit.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 420.598,
+          "x1": 343.51,
+          "y1": 432.598,
+          "width": 163.48999999999998,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "No, it'll be blocked for a little bit.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 420.598,
+          "x1": 343.51,
+          "y1": 432.598,
+          "width": 163.48999999999998,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 420.598,
+          "x1": 343.51,
+          "y1": 432.598,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 420.598,
+          "x1": 343.51,
+          "y1": 432.598,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 28,
+      "text": "From school too. Oh, from school, okay.",
+      "layout_matches": [
+        {
+          "text": "Oh, from school, okay.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 296.37800000000004,
+          "x1": 293.69,
+          "y1": 308.37800000000004,
+          "width": 113.66999999999999,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.4864864864864865,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Oh, from school, okay.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 296.37800000000004,
+          "x1": 293.69,
+          "y1": 308.37800000000004,
+          "width": 113.66999999999999,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.4864864864864865,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 296.37800000000004,
+          "x1": 293.69,
+          "y1": 308.37800000000004,
+          "confidence": 0.4864864864864865,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 296.37800000000004,
+          "x1": 293.69,
+          "y1": 308.37800000000004,
+          "confidence": 0.4864864864864865,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 29,
+      "text": "94 \n95 \n96 \n97 \n98 \n99 \n100 \n101 \n102 \n103 \n104 \n105 \n106 \n107 \n108 \n109 \n110 \n111 \n112 \n113 \n114 \n115 \n116 \n117 \n118 \n119 \n120 \n121 \n122 \n123 \n124 \n125 \n126 \n127 \n128 \n129 \n130 \n131 \n132 \n133 \n134 \n135 \n136 \n137 \n138 \n139 \n140 \n141 \n\nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nSpeaker 2: \n \nOther Speaker: \n \nSpeaker 2: \n \nDetective Albini: \nwork, or?",
+      "layout_matches": [
+        {
+          "text": "94 \n95 \n96 \n97 \n98 \n99 \n100 \n101 \n102 \n103 \n104 \n105 \n106 \n107 \n108 \n109 \n110 \n111 \n112 \n113 \n114 \n115 \n116 \n117 \n118 \n119 \n120 \n121 \n122 \n123 \n124 \n125 \n126 \n127 \n128 \n129 \n130 \n131 \n132 \n133 \n134 \n135 \n136 \n137 \n138 \n139 \n140 \n141",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 75.552,
+          "x1": 57.0,
+          "y1": 736.248,
+          "width": 21.0,
+          "height": 660.696,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.41729323308270677,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 600.748,
+          "x1": 158.06,
+          "y1": 612.748,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.03609022556390978,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1,
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 36.0,
+          "y0": 75.552,
+          "x1": 57.0,
+          "y1": 736.248,
+          "confidence": 0.41729323308270677,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 72.024,
+          "y0": 600.748,
+          "x1": 158.06,
+          "y1": 612.748,
+          "confidence": 0.03609022556390978,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 30,
+      "text": "Speaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nOther Speaker: \n \nSpeaker 2: \n \nOther Speaker: \n\n \n\nOh.",
+      "layout_matches": [
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 600.748,
+          "x1": 158.06,
+          "y1": 612.748,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.1090909090909091,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 545.548,
+          "x1": 158.06,
+          "y1": 557.548,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.1090909090909091,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 72.024,
+          "y0": 600.748,
+          "x1": 158.06,
+          "y1": 612.748,
+          "confidence": 0.1090909090909091,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 72.024,
+          "y0": 545.548,
+          "x1": 158.06,
+          "y1": 557.548,
+          "confidence": 0.1090909090909091,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 31,
+      "text": "Yeah. No. No. Okay, so, again, didn't see or, or hear anything?",
+      "layout_matches": [
+        {
+          "text": "Okay, so, again, didn't see or, or hear anything?  Okay.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 241.178,
+          "x1": 446.83,
+          "y1": 253.178,
+          "width": 266.80999999999995,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.85,
+          "match_type": "validated_word_overlap",
+          "common_words_count": 8,
+          "word_overlap_ratio": 0.6666666666666666,
+          "block_coverage_ratio": 0.8,
+          "key_phrases_match": true
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 241.178,
+          "x1": 446.83,
+          "y1": 253.178,
+          "confidence": 0.85,
+          "match_type": "validated_word_overlap"
+        }
+      ]
+    },
+    {
+      "sentence_id": 32,
+      "text": "Okay. Anyone else home that may have – \n\nNo.",
+      "layout_matches": [
+        {
+          "text": "Anyone else home that may have –",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 185.97799999999998,
+          "x1": 351.67,
+          "y1": 197.97799999999998,
+          "width": 171.65,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.6585365853658537,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Anyone else home that may have –",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 185.97799999999998,
+          "x1": 351.67,
+          "y1": 197.97799999999998,
+          "width": 171.65,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.6585365853658537,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 185.97799999999998,
+          "x1": 351.67,
+          "y1": 197.97799999999998,
+          "confidence": 0.6585365853658537,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 185.97799999999998,
+          "x1": 351.67,
+          "y1": 197.97799999999998,
+          "confidence": 0.6585365853658537,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 33,
+      "text": "Yeah there was nobody home. Okay, thank you guys.",
+      "layout_matches": [
+        {
+          "text": "Yeah there was nobody home.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 103.148,
+          "x1": 292.61,
+          "y1": 115.148,
+          "width": 148.59,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.50625,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Yeah there was nobody home.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 103.148,
+          "x1": 292.61,
+          "y1": 115.148,
+          "width": 148.59,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.50625,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 144.02,
+          "y0": 103.148,
+          "x1": 292.61,
+          "y1": 115.148,
+          "confidence": 0.50625,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 3,
+          "x0": 144.02,
+          "y0": 103.148,
+          "x1": 292.61,
+          "y1": 115.148,
+          "confidence": 0.50625,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 34,
+      "text": "-3- \n\nSo, you were at school, and then you just, you were coming home from \n\n\fThank you very much. Bye.",
+      "layout_matches": [
+        {
+          "text": "So, you were at school, and then you just, you were coming home from",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 365.398,
+          "x1": 525.452,
+          "y1": 377.398,
+          "width": 345.432,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.6157894736842106,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "So, you were at school, and then you just, you were coming home from",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 365.398,
+          "x1": 525.452,
+          "y1": 377.398,
+          "width": 345.432,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.6157894736842106,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        3
+      ],
+      "primary_page": 3,
+      "bounding_boxes": [
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 365.398,
+          "x1": 525.452,
+          "y1": 377.398,
+          "confidence": 0.6157894736842106,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 3,
+          "x0": 180.02,
+          "y0": 365.398,
+          "x1": 525.452,
+          "y1": 377.398,
+          "confidence": 0.6157894736842106,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 35,
+      "text": "142 \n143 \n144 \n145 \n146 \n147 \n148 \n149 \n150 \n151 \n152 \n153 \n154 \n155 \n156 \n157 \n158 \n159 \n160 \n161 \n162 \n163 \n164 \n\nOk. \n\n \nDetective Albini: \n \nSpeaker 2: \n \nOther Speaker: \n \nEND OF AUDIO \n \n \n[Company Name] \n[Date] \n \n \n \n \n \nSpeakWrite \nwww.speakwrite.com \nJob Number: 19146-015 \nCustom Filename: Interview 15 \nDate: 05/26/2019 \nBilled Words: 503 \n\n \n\n-4-",
+      "layout_matches": [
+        {
+          "text": "Detective Albini: \n \nSpeaker 2: \n \nOther Speaker: \n \nEND OF AUDIO \n \n \n[Company Name] \n[Date] \n \n \n \n \n \nSpeakWrite \nwww.speakwrite.com \nJob Number: 19146-015 \nCustom Filename: Interview 15 \nDate: 05/26/2019 \nBilled Words: 503",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 487.702,
+          "x1": 180.01999999999998,
+          "y1": 736.248,
+          "width": 107.99599999999998,
+          "height": 248.54600000000005,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.5808510638297872,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "142 \n143 \n144 \n145 \n146 \n147 \n148 \n149 \n150 \n151 \n152 \n153 \n154 \n155 \n156 \n157 \n158 \n159 \n160 \n161 \n162 \n163 \n164",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 486.238,
+          "x1": 57.0,
+          "y1": 736.248,
+          "width": 21.0,
+          "height": 250.01000000000005,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.2904255319148936,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        4
+      ],
+      "primary_page": 4,
+      "bounding_boxes": [
+        {
+          "page": 4,
+          "x0": 72.024,
+          "y0": 487.702,
+          "x1": 180.01999999999998,
+          "y1": 736.248,
+          "confidence": 0.5808510638297872,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 4,
+          "x0": 36.0,
+          "y0": 486.238,
+          "x1": 57.0,
+          "y1": 736.248,
+          "confidence": 0.2904255319148936,
+          "match_type": "contained_substring"
+        }
+      ]
+    }
+  ],
+  "pages_layout": [
+    {
+      "page_num": 1,
+      "elements": [
+        {
+          "text": "SRPD Case#: 13-13093 \nLocation:  Santa Rosa Police Department",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 728.448,
+          "x1": 286.73,
+          "y1": 754.248,
+          "width": 214.70600000000002,
+          "height": 25.800000000000068,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "SRPD Case#: 13-13093",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 742.248,
+          "x1": 192.98,
+          "y1": 754.248,
+          "width": 120.95599999999999,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Location:  Santa Rosa Police Department",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 728.448,
+          "x1": 286.73,
+          "y1": 740.448,
+          "width": 214.70600000000002,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "1 \n2 \n3 \n4 \n5 \n6 \n7 \n8 \n9 \n10 \n11 \n12 \n13 \n14 \n15 \n16 \n17 \n18 \n19 \n20 \n21 \n22 \n23 \n24 \n25 \n26 \n27 \n28 \n29 \n30 \n31 \n32 \n33 \n34 \n35 \n36 \n37 \n38 \n39 \n40 \n41 \n42 \n43 \n44 \n45",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 76.272,
+          "x1": 57.0,
+          "y1": 697.2280000000001,
+          "width": 15.0,
+          "height": 620.956,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "NTERVIEW \nLegend: \n****:    Unintelligible \n \n \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \nhere investigating a crime that happened down the street.  Are you aware what happened down \nthere? \n \nOther Speaker: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \nsay I talked to you. \n \nSpeaker 2: \n \nDetective Albini:  What's your first name? \n \nSpeaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 76.272,
+          "x1": 530.11,
+          "y1": 697.2280000000001,
+          "width": 458.086,
+          "height": 620.956,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "NTERVIEW",
+          "page": 1,
+          "x0": 76.704,
+          "y0": 685.2280000000001,
+          "x1": 146.42,
+          "y1": 697.2280000000001,
+          "width": 69.716,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Legend:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 671.428,
+          "x1": 114.38,
+          "y1": 683.428,
+          "width": 42.355999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "****:    Unintelligible",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 657.628,
+          "x1": 186.74,
+          "y1": 669.628,
+          "width": 114.71600000000001,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 600.748,
+          "x1": 158.06,
+          "y1": 612.748,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Hi there, how you doin'?  Hi.",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 600.748,
+          "x1": 322.49,
+          "y1": 612.748,
+          "width": 142.47,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Hi there, how you doin'?  Hi.",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 600.748,
+          "x1": 322.49,
+          "y1": 612.748,
+          "width": 142.47,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 573.148,
+          "x1": 147.38,
+          "y1": 585.148,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "I'm",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 573.148,
+          "x1": 198.35600000000002,
+          "y1": 585.148,
+          "width": 18.336000000000013,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "I'm",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 573.148,
+          "x1": 198.35600000000002,
+          "y1": 585.148,
+          "width": 18.336000000000013,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "10",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 559.3480000000001,
+          "x1": 57.0,
+          "y1": 571.3480000000001,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "11",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 545.548,
+          "x1": 57.0,
+          "y1": 557.548,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 545.548,
+          "x1": 158.06,
+          "y1": 557.548,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": ".  Hi, I'm Detective Albini of the Santa Rosa Police.  Um, we're",
+          "page": 1,
+          "x0": 243.77,
+          "y0": 545.548,
+          "x1": 550.66,
+          "y1": 557.548,
+          "width": 306.89,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": ".  Hi, I'm Detective Albini of the Santa Rosa Police.  Um, we're",
+          "page": 1,
+          "x0": 243.77,
+          "y0": 545.548,
+          "x1": 550.66,
+          "y1": 557.548,
+          "width": 306.89,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "12",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 531.748,
+          "x1": 57.0,
+          "y1": 543.748,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "here investigating a crime that happened down the street.  Are you aware what happened down",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 531.748,
+          "x1": 530.11,
+          "y1": 543.748,
+          "width": 458.086,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "13",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 517.918,
+          "x1": 57.0,
+          "y1": 529.918,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "there?",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 517.918,
+          "x1": 104.3,
+          "y1": 529.918,
+          "width": 32.275999999999996,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "14",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 504.118,
+          "x1": 57.0,
+          "y1": 516.1179999999999,
+          "width": 15.0,
+          "height": 11.999999999999943,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "15",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 490.31800000000004,
+          "x1": 57.0,
+          "y1": 502.31800000000004,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 490.31800000000004,
+          "x1": 147.38,
+          "y1": 502.31800000000004,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Uh, not really, I was at school.",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 490.31800000000004,
+          "x1": 330.05,
+          "y1": 502.31800000000004,
+          "width": 150.03,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Uh, not really, I was at school.",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 490.31800000000004,
+          "x1": 330.05,
+          "y1": 502.31800000000004,
+          "width": 150.03,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "16",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 476.51800000000003,
+          "x1": 57.0,
+          "y1": 488.51800000000003,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "17",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 462.718,
+          "x1": 57.0,
+          "y1": 474.718,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 462.718,
+          "x1": 158.06,
+          "y1": 474.718,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "You were at school then?",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 462.718,
+          "x1": 304.97,
+          "y1": 474.718,
+          "width": 124.95000000000002,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "You were at school then?",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 462.718,
+          "x1": 304.97,
+          "y1": 474.718,
+          "width": 124.95000000000002,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "18",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 448.918,
+          "x1": 57.0,
+          "y1": 460.918,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "19",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 435.118,
+          "x1": 57.0,
+          "y1": 447.118,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 435.118,
+          "x1": 126.02,
+          "y1": 447.118,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "I heard, uh, like, somebody got shot, and I don't know.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 435.118,
+          "x1": 408.79,
+          "y1": 447.118,
+          "width": 264.77,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "I heard, uh, like, somebody got shot, and I don't know.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 435.118,
+          "x1": 408.79,
+          "y1": 447.118,
+          "width": 264.77,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "20",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 421.31800000000004,
+          "x1": 57.0,
+          "y1": 433.31800000000004,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "21",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 407.51800000000003,
+          "x1": 57.0,
+          "y1": 419.51800000000003,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 407.51800000000003,
+          "x1": 158.06,
+          "y1": 419.51800000000003,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Okay.  Were you home when –",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 407.51800000000003,
+          "x1": 332.69,
+          "y1": 419.51800000000003,
+          "width": 152.67,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Okay.  Were you home when –",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 407.51800000000003,
+          "x1": 332.69,
+          "y1": 419.51800000000003,
+          "width": 152.67,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "22",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 393.718,
+          "x1": 57.0,
+          "y1": 405.718,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "23",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 379.918,
+          "x1": 57.0,
+          "y1": 391.918,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 379.918,
+          "x1": 126.02,
+          "y1": 391.918,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "No, I wasn't home, but ****.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 379.918,
+          "x1": 285.89,
+          "y1": 391.918,
+          "width": 141.86999999999998,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "No, I wasn't home, but ****.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 379.918,
+          "x1": 285.89,
+          "y1": 391.918,
+          "width": 141.86999999999998,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "24",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 366.118,
+          "x1": 57.0,
+          "y1": 378.118,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "25",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 352.298,
+          "x1": 57.0,
+          "y1": 364.298,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 352.298,
+          "x1": 158.06,
+          "y1": 364.298,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Okay, you guys had came home after all the –",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 352.298,
+          "x1": 403.75,
+          "y1": 364.298,
+          "width": 223.73,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Okay, you guys had came home after all the –",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 352.298,
+          "x1": 403.75,
+          "y1": 364.298,
+          "width": 223.73,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "26",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 338.498,
+          "x1": 57.0,
+          "y1": 350.498,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "27",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 324.69800000000004,
+          "x1": 57.0,
+          "y1": 336.69800000000004,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 324.69800000000004,
+          "x1": 126.02,
+          "y1": 336.69800000000004,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Yeah.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 324.69800000000004,
+          "x1": 175.34,
+          "y1": 336.69800000000004,
+          "width": 31.319999999999993,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Yeah.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 324.69800000000004,
+          "x1": 175.34,
+          "y1": 336.69800000000004,
+          "width": 31.319999999999993,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "28",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 310.898,
+          "x1": 57.0,
+          "y1": 322.898,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "29",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 297.098,
+          "x1": 57.0,
+          "y1": 309.098,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 297.098,
+          "x1": 158.06,
+          "y1": 309.098,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "– the street were blocked off and stuff.",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 297.098,
+          "x1": 368.35,
+          "y1": 309.098,
+          "width": 188.33,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "– the street were blocked off and stuff.",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 297.098,
+          "x1": 368.35,
+          "y1": 309.098,
+          "width": 188.33,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "30",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 283.298,
+          "x1": 57.0,
+          "y1": 295.298,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "31",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 269.498,
+          "x1": 57.0,
+          "y1": 281.498,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 269.498,
+          "x1": 126.02,
+          "y1": 281.498,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Yeah.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 269.498,
+          "x1": 175.34,
+          "y1": 281.498,
+          "width": 31.319999999999993,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Yeah.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 269.498,
+          "x1": 175.34,
+          "y1": 281.498,
+          "width": 31.319999999999993,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "32",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 255.698,
+          "x1": 57.0,
+          "y1": 267.69800000000004,
+          "width": 15.0,
+          "height": 12.000000000000028,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "33",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 241.898,
+          "x1": 57.0,
+          "y1": 253.898,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 241.898,
+          "x1": 158.06,
+          "y1": 253.898,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Okay.  Um, so no one heard or saw anything?",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 241.898,
+          "x1": 402.67,
+          "y1": 253.898,
+          "width": 222.65,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Okay.  Um, so no one heard or saw anything?",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 241.898,
+          "x1": 402.67,
+          "y1": 253.898,
+          "width": 222.65,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "34",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 228.09799999999998,
+          "x1": 57.0,
+          "y1": 240.09799999999998,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "35",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 214.29799999999997,
+          "x1": 57.0,
+          "y1": 226.29799999999997,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 214.29799999999997,
+          "x1": 126.02,
+          "y1": 226.29799999999997,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "No, no, nothing like that.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 214.29799999999997,
+          "x1": 267.41,
+          "y1": 226.29799999999997,
+          "width": 123.39000000000001,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "No, no, nothing like that.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 214.29799999999997,
+          "x1": 267.41,
+          "y1": 226.29799999999997,
+          "width": 123.39000000000001,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "36",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 200.498,
+          "x1": 57.0,
+          "y1": 212.498,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "37",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 186.69799999999998,
+          "x1": 57.0,
+          "y1": 198.69799999999998,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 186.69799999999998,
+          "x1": 158.06,
+          "y1": 198.69799999999998,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Okay.  Um, can I get your guy's information?  Let's get your name so I can",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 186.69799999999998,
+          "x1": 541.64,
+          "y1": 198.69799999999998,
+          "width": 361.62,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Okay.  Um, can I get your guy's information?  Let's get your name so I can",
+          "page": 1,
+          "x0": 180.02,
+          "y0": 186.69799999999998,
+          "x1": 541.64,
+          "y1": 198.69799999999998,
+          "width": 361.62,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "38",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 172.868,
+          "x1": 57.0,
+          "y1": 184.868,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "say I talked to you.",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 172.868,
+          "x1": 166.7,
+          "y1": 184.868,
+          "width": 94.67599999999999,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "39",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 159.06799999999998,
+          "x1": 57.0,
+          "y1": 171.06799999999998,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "40",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 145.268,
+          "x1": 57.0,
+          "y1": 157.268,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 145.268,
+          "x1": 126.02,
+          "y1": 157.268,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Yeah.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 145.268,
+          "x1": 175.34,
+          "y1": 157.268,
+          "width": 31.319999999999993,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Yeah.",
+          "page": 1,
+          "x0": 144.02,
+          "y0": 145.268,
+          "x1": 175.34,
+          "y1": 157.268,
+          "width": 31.319999999999993,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "41",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 131.468,
+          "x1": 57.0,
+          "y1": 143.468,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "42",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 117.668,
+          "x1": 57.0,
+          "y1": 129.668,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:  What's your first name?",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 117.668,
+          "x1": 297.53,
+          "y1": 129.668,
+          "width": 225.50599999999997,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "43",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 103.868,
+          "x1": 57.0,
+          "y1": 115.868,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "44",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 90.072,
+          "x1": 57.0,
+          "y1": 102.072,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 1,
+          "x0": 72.024,
+          "y0": 90.072,
+          "x1": 126.02,
+          "y1": 102.072,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "45",
+          "page": 1,
+          "x0": 42.0,
+          "y0": 76.272,
+          "x1": 57.0,
+          "y1": 88.272,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        }
+      ]
+    },
+    {
+      "page_num": 2,
+      "elements": [
+        {
+          "text": "46 \n47 \n48 \n49 \n50 \n51 \n52 \n53 \n54 \n55 \n56 \n57 \n58 \n59 \n60 \n61 \n62 \n63 \n64 \n65 \n66 \n67 \n68 \n69 \n70 \n71 \n72 \n73 \n74 \n75 \n76 \n77 \n78 \n79 \n80 \n81 \n82 \n83 \n84 \n85 \n86 \n87 \n88 \n89 \n90 \n91 \n92 \n93",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 75.552,
+          "x1": 57.0,
+          "y1": 736.248,
+          "width": 15.0,
+          "height": 660.696,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "46",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 724.248,
+          "x1": 57.0,
+          "y1": 736.248,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 75.552,
+          "x1": 158.06,
+          "y1": 736.248,
+          "width": 86.036,
+          "height": 660.696,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 724.248,
+          "x1": 158.06,
+          "y1": 736.248,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "47",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 710.448,
+          "x1": 57.0,
+          "y1": 722.448,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "48",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 696.628,
+          "x1": 57.0,
+          "y1": 708.628,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 696.628,
+          "x1": 126.02,
+          "y1": 708.628,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Yes.",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 696.628,
+          "x1": 168.74,
+          "y1": 708.628,
+          "width": 24.72,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Yes.",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 696.628,
+          "x1": 168.74,
+          "y1": 708.628,
+          "width": 24.72,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "49",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 682.828,
+          "x1": 57.0,
+          "y1": 694.828,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "50",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 669.028,
+          "x1": 57.0,
+          "y1": 681.028,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 669.028,
+          "x1": 158.06,
+          "y1": 681.028,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "And do you have a middle name?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 669.028,
+          "x1": 344.35,
+          "y1": 681.028,
+          "width": 164.33,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "And do you have a middle name?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 669.028,
+          "x1": 344.35,
+          "y1": 681.028,
+          "width": 164.33,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "51",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 655.2280000000001,
+          "x1": 57.0,
+          "y1": 667.2280000000001,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "52",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 641.428,
+          "x1": 57.0,
+          "y1": 653.428,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 641.428,
+          "x1": 126.02,
+          "y1": 653.428,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Uh, no, last name is",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 641.428,
+          "x1": 242.264,
+          "y1": 653.428,
+          "width": 98.244,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Uh, no, last name is",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 641.428,
+          "x1": 242.264,
+          "y1": 653.428,
+          "width": 98.244,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "53",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 627.628,
+          "x1": 57.0,
+          "y1": 639.628,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "54",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 613.828,
+          "x1": 57.0,
+          "y1": 625.828,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 613.828,
+          "x1": 158.06,
+          "y1": 625.828,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": ", as in",
+          "page": 2,
+          "x0": 209.918,
+          "y0": 613.828,
+          "x1": 241.214,
+          "y1": 625.828,
+          "width": 31.295999999999992,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": ", as in",
+          "page": 2,
+          "x0": 209.918,
+          "y0": 613.828,
+          "x1": 241.214,
+          "y1": 625.828,
+          "width": 31.295999999999992,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "55",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 600.028,
+          "x1": 57.0,
+          "y1": 612.028,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "56",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 586.2280000000001,
+          "x1": 57.0,
+          "y1": 598.2280000000001,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 586.2280000000001,
+          "x1": 126.02,
+          "y1": 598.2280000000001,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Yes.",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 586.2280000000001,
+          "x1": 168.74,
+          "y1": 598.2280000000001,
+          "width": 24.72,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Yes.",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 586.2280000000001,
+          "x1": 168.74,
+          "y1": 598.2280000000001,
+          "width": 24.72,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "57",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 572.428,
+          "x1": 57.0,
+          "y1": 584.428,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "58",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 558.628,
+          "x1": 57.0,
+          "y1": 570.628,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 558.628,
+          "x1": 158.06,
+          "y1": 570.628,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Okay,",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 558.628,
+          "x1": 211.928,
+          "y1": 570.628,
+          "width": 31.907999999999987,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Okay,",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 558.628,
+          "x1": 211.928,
+          "y1": 570.628,
+          "width": 31.907999999999987,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "59",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 544.828,
+          "x1": 57.0,
+          "y1": 556.828,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "60",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 531.028,
+          "x1": 57.0,
+          "y1": 543.028,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 531.028,
+          "x1": 126.02,
+          "y1": 543.028,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "61",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 517.198,
+          "x1": 57.0,
+          "y1": 529.198,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "62",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 503.398,
+          "x1": 57.0,
+          "y1": 515.398,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 503.398,
+          "x1": 158.06,
+          "y1": 515.398,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "And your birthdate?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 503.398,
+          "x1": 279.65,
+          "y1": 515.398,
+          "width": 99.62999999999997,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "And your birthdate?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 503.398,
+          "x1": 279.65,
+          "y1": 515.398,
+          "width": 99.62999999999997,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "63",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 489.598,
+          "x1": 57.0,
+          "y1": 501.598,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "64",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 475.798,
+          "x1": 57.0,
+          "y1": 487.798,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 475.798,
+          "x1": 126.02,
+          "y1": 487.798,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Uh,",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 475.798,
+          "x1": 164.68400000000003,
+          "y1": 487.798,
+          "width": 20.664000000000016,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Uh,",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 475.798,
+          "x1": 164.68400000000003,
+          "y1": 487.798,
+          "width": 20.664000000000016,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "65",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 461.998,
+          "x1": 57.0,
+          "y1": 473.998,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "66",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 448.19800000000004,
+          "x1": 57.0,
+          "y1": 460.19800000000004,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 448.19800000000004,
+          "x1": 158.06,
+          "y1": 460.19800000000004,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "And do you have a home telephone or a cell phone number?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 448.19800000000004,
+          "x1": 472.06,
+          "y1": 460.19800000000004,
+          "width": 292.03999999999996,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "And do you have a home telephone or a cell phone number?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 448.19800000000004,
+          "x1": 472.06,
+          "y1": 460.19800000000004,
+          "width": 292.03999999999996,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "67",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 434.398,
+          "x1": 57.0,
+          "y1": 446.398,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "68",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 420.598,
+          "x1": 57.0,
+          "y1": 432.598,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 420.598,
+          "x1": 126.02,
+          "y1": 432.598,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Uh, home phone number,",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 420.598,
+          "x1": 269.288,
+          "y1": 432.598,
+          "width": 125.268,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Uh, home phone number,",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 420.598,
+          "x1": 269.288,
+          "y1": 432.598,
+          "width": 125.268,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "69",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 406.798,
+          "x1": 57.0,
+          "y1": 418.798,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "70",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 392.998,
+          "x1": 57.0,
+          "y1": 404.998,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 392.998,
+          "x1": 158.06,
+          "y1": 404.998,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "And your cell phone?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 392.998,
+          "x1": 286.73,
+          "y1": 404.998,
+          "width": 106.71000000000001,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "And your cell phone?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 392.998,
+          "x1": 286.73,
+          "y1": 404.998,
+          "width": 106.71000000000001,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "71",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 379.19800000000004,
+          "x1": 57.0,
+          "y1": 391.19800000000004,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "72",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 365.398,
+          "x1": 57.0,
+          "y1": 377.398,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 365.398,
+          "x1": 126.02,
+          "y1": 377.398,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Uh,",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 365.398,
+          "x1": 164.68400000000003,
+          "y1": 377.398,
+          "width": 20.664000000000016,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Uh,",
+          "page": 2,
+          "x0": 144.02,
+          "y0": 365.398,
+          "x1": 164.68400000000003,
+          "y1": 377.398,
+          "width": 20.664000000000016,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "73",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 351.57800000000003,
+          "x1": 57.0,
+          "y1": 363.57800000000003,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "74",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 337.778,
+          "x1": 57.0,
+          "y1": 349.778,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 337.778,
+          "x1": 158.06,
+          "y1": 349.778,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "And your name, sir?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 337.778,
+          "x1": 281.09,
+          "y1": 349.778,
+          "width": 101.06999999999996,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "And your name, sir?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 337.778,
+          "x1": 281.09,
+          "y1": 349.778,
+          "width": 101.06999999999996,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "75",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 323.978,
+          "x1": 57.0,
+          "y1": 335.978,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "76",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 310.178,
+          "x1": 57.0,
+          "y1": 322.178,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 310.178,
+          "x1": 147.38,
+          "y1": 322.178,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "77",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 296.37800000000004,
+          "x1": 57.0,
+          "y1": 308.37800000000004,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "78",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 282.57800000000003,
+          "x1": 57.0,
+          "y1": 294.57800000000003,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 282.57800000000003,
+          "x1": 158.06,
+          "y1": 294.57800000000003,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "79",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 268.778,
+          "x1": 57.0,
+          "y1": 280.778,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "80",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 254.97799999999998,
+          "x1": 57.0,
+          "y1": 266.978,
+          "width": 15.0,
+          "height": 12.000000000000028,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 254.97799999999998,
+          "x1": 147.38,
+          "y1": 266.978,
+          "width": 75.356,
+          "height": 12.000000000000028,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Yeah.",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 254.97799999999998,
+          "x1": 211.37,
+          "y1": 266.978,
+          "width": 31.349999999999994,
+          "height": 12.000000000000028,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Yeah.",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 254.97799999999998,
+          "x1": 211.37,
+          "y1": 266.978,
+          "width": 31.349999999999994,
+          "height": 12.000000000000028,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "81",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 241.178,
+          "x1": 57.0,
+          "y1": 253.178,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "82",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 227.378,
+          "x1": 57.0,
+          "y1": 239.378,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 227.378,
+          "x1": 158.06,
+          "y1": 239.378,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "83",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 213.57799999999997,
+          "x1": 57.0,
+          "y1": 225.57799999999997,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "84",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 199.778,
+          "x1": 57.0,
+          "y1": 211.778,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 199.778,
+          "x1": 147.38,
+          "y1": 211.778,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Yeah.",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 199.778,
+          "x1": 211.37,
+          "y1": 211.778,
+          "width": 31.349999999999994,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Yeah.",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 199.778,
+          "x1": 211.37,
+          "y1": 211.778,
+          "width": 31.349999999999994,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "85",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 185.97799999999998,
+          "x1": 57.0,
+          "y1": 197.97799999999998,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "86",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 172.148,
+          "x1": 57.0,
+          "y1": 184.148,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 172.148,
+          "x1": 158.06,
+          "y1": 184.148,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Do you have a middle name,",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 172.148,
+          "x1": 320.98400000000004,
+          "y1": 184.148,
+          "width": 140.96400000000003,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Do you have a middle name,",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 172.148,
+          "x1": 320.98400000000004,
+          "y1": 184.148,
+          "width": 140.96400000000003,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "87",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 158.34799999999998,
+          "x1": 57.0,
+          "y1": 170.34799999999998,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "88",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 144.54799999999997,
+          "x1": 57.0,
+          "y1": 156.54799999999997,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 144.54799999999997,
+          "x1": 147.38,
+          "y1": 156.54799999999997,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "No.",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 144.54799999999997,
+          "x1": 200.66,
+          "y1": 156.54799999999997,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "No.",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 144.54799999999997,
+          "x1": 200.66,
+          "y1": 156.54799999999997,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "89",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 130.748,
+          "x1": 57.0,
+          "y1": 142.748,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "90",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 116.94800000000001,
+          "x1": 57.0,
+          "y1": 128.948,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 116.94800000000001,
+          "x1": 158.06,
+          "y1": 128.948,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "No.  Your last name?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 116.94800000000001,
+          "x1": 285.41,
+          "y1": 128.948,
+          "width": 105.39000000000001,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "No.  Your last name?",
+          "page": 2,
+          "x0": 180.02,
+          "y0": 116.94800000000001,
+          "x1": 285.41,
+          "y1": 128.948,
+          "width": 105.39000000000001,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "91",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 103.148,
+          "x1": 57.0,
+          "y1": 115.148,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "92",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 89.352,
+          "x1": 57.0,
+          "y1": 101.352,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 2,
+          "x0": 72.024,
+          "y0": 89.352,
+          "x1": 147.38,
+          "y1": 101.352,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "93",
+          "page": 2,
+          "x0": 42.0,
+          "y0": 75.552,
+          "x1": 57.0,
+          "y1": 87.552,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "-2-",
+          "page": 2,
+          "x0": 316.97,
+          "y0": 22.152,
+          "x1": 334.01,
+          "y1": 34.152,
+          "width": 17.039999999999964,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "-2-",
+          "page": 2,
+          "x0": 316.97,
+          "y0": 22.152,
+          "x1": 334.01,
+          "y1": 34.152,
+          "width": 17.039999999999964,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        }
+      ]
+    },
+    {
+      "page_num": 3,
+      "elements": [
+        {
+          "text": "94 \n95 \n96 \n97 \n98 \n99 \n100 \n101 \n102 \n103 \n104 \n105 \n106 \n107 \n108 \n109 \n110 \n111 \n112 \n113 \n114 \n115 \n116 \n117 \n118 \n119 \n120 \n121 \n122 \n123 \n124 \n125 \n126 \n127 \n128 \n129 \n130 \n131 \n132 \n133 \n134 \n135 \n136 \n137 \n138 \n139 \n140 \n141",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 75.552,
+          "x1": 57.0,
+          "y1": 736.248,
+          "width": 21.0,
+          "height": 660.696,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "94",
+          "page": 3,
+          "x0": 42.0,
+          "y0": 724.248,
+          "x1": 57.0,
+          "y1": 736.248,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nOther Speaker: \n \nDetective Albini: \n \nSpeaker 2: \n \nOther Speaker: \n \nSpeaker 2: \n \nDetective Albini: \nwork, or? \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nDetective Albini: \n \nSpeaker 2: \n \nOther Speaker: \n \nSpeaker 2: \n \nOther Speaker:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 75.552,
+          "x1": 158.06,
+          "y1": 736.248,
+          "width": 86.036,
+          "height": 660.696,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 724.248,
+          "x1": 158.06,
+          "y1": 736.248,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Okay.  And your birthdate?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 724.248,
+          "x1": 314.69,
+          "y1": 736.248,
+          "width": 134.67,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Okay.  And your birthdate?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 724.248,
+          "x1": 314.69,
+          "y1": 736.248,
+          "width": 134.67,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "95",
+          "page": 3,
+          "x0": 42.0,
+          "y0": 710.448,
+          "x1": 57.0,
+          "y1": 722.448,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "96",
+          "page": 3,
+          "x0": 42.0,
+          "y0": 696.628,
+          "x1": 57.0,
+          "y1": 708.628,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 696.628,
+          "x1": 147.38,
+          "y1": 708.628,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Uh,",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 696.628,
+          "x1": 200.68400000000003,
+          "y1": 708.628,
+          "width": 20.664000000000016,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Uh,",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 696.628,
+          "x1": 200.68400000000003,
+          "y1": 708.628,
+          "width": 20.664000000000016,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": ", uh,",
+          "page": 3,
+          "x0": 222.728,
+          "y0": 696.628,
+          "x1": 246.728,
+          "y1": 708.628,
+          "width": 24.0,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": ", uh,",
+          "page": 3,
+          "x0": 222.728,
+          "y0": 696.628,
+          "x1": 246.728,
+          "y1": 708.628,
+          "width": 24.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "97",
+          "page": 3,
+          "x0": 42.0,
+          "y0": 682.828,
+          "x1": 57.0,
+          "y1": 694.828,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "98",
+          "page": 3,
+          "x0": 42.0,
+          "y0": 669.028,
+          "x1": 57.0,
+          "y1": 681.028,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 669.028,
+          "x1": 158.06,
+          "y1": 681.028,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Of –",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 669.028,
+          "x1": 204.77,
+          "y1": 681.028,
+          "width": 24.75,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Of –",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 669.028,
+          "x1": 204.77,
+          "y1": 681.028,
+          "width": 24.75,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "99",
+          "page": 3,
+          "x0": 42.0,
+          "y0": 655.2280000000001,
+          "x1": 57.0,
+          "y1": 667.2280000000001,
+          "width": 15.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "100",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 641.428,
+          "x1": 57.0,
+          "y1": 653.428,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 641.428,
+          "x1": 147.38,
+          "y1": 653.428,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "what?",
+          "page": 3,
+          "x0": 204.02,
+          "y0": 641.428,
+          "x1": 238.73,
+          "y1": 653.428,
+          "width": 34.70999999999998,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "what?",
+          "page": 3,
+          "x0": 204.02,
+          "y0": 641.428,
+          "x1": 238.73,
+          "y1": 653.428,
+          "width": 34.70999999999998,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "101",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 627.628,
+          "x1": 57.0,
+          "y1": 639.628,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "102",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 613.828,
+          "x1": 57.0,
+          "y1": 625.828,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 613.828,
+          "x1": 147.38,
+          "y1": 625.828,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "103",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 600.028,
+          "x1": 57.0,
+          "y1": 612.028,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "104",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 586.2280000000001,
+          "x1": 57.0,
+          "y1": 598.2280000000001,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 586.2280000000001,
+          "x1": 158.06,
+          "y1": 598.2280000000001,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": ".  And you, you have the same home, home phone number?",
+          "page": 3,
+          "x0": 204.02,
+          "y0": 586.2280000000001,
+          "x1": 492.34,
+          "y1": 598.2280000000001,
+          "width": 288.31999999999994,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": ".  And you, you have the same home, home phone number?",
+          "page": 3,
+          "x0": 204.02,
+          "y0": 586.2280000000001,
+          "x1": 492.34,
+          "y1": 598.2280000000001,
+          "width": 288.31999999999994,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "105",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 572.428,
+          "x1": 57.0,
+          "y1": 584.428,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "106",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 558.628,
+          "x1": 57.0,
+          "y1": 570.628,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 558.628,
+          "x1": 147.38,
+          "y1": 570.628,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Yeah.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 558.628,
+          "x1": 211.37,
+          "y1": 570.628,
+          "width": 31.349999999999994,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Yeah.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 558.628,
+          "x1": 211.37,
+          "y1": 570.628,
+          "width": 31.349999999999994,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "107",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 544.828,
+          "x1": 57.0,
+          "y1": 556.828,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "108",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 531.028,
+          "x1": 57.0,
+          "y1": 543.028,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 531.028,
+          "x1": 158.06,
+          "y1": 543.028,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Do you have a cell phone number?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 531.028,
+          "x1": 350.35,
+          "y1": 543.028,
+          "width": 170.33,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Do you have a cell phone number?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 531.028,
+          "x1": 350.35,
+          "y1": 543.028,
+          "width": 170.33,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "109",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 517.198,
+          "x1": 57.0,
+          "y1": 529.198,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "110",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 503.398,
+          "x1": 57.0,
+          "y1": 515.398,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 503.398,
+          "x1": 147.38,
+          "y1": 515.398,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Uh, no.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 503.398,
+          "x1": 218.69,
+          "y1": 515.398,
+          "width": 38.66999999999999,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Uh, no.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 503.398,
+          "x1": 218.69,
+          "y1": 515.398,
+          "width": 38.66999999999999,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "111",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 489.598,
+          "x1": 57.0,
+          "y1": 501.598,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "112",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 475.798,
+          "x1": 57.0,
+          "y1": 487.798,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 475.798,
+          "x1": 158.06,
+          "y1": 487.798,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "No cell?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 475.798,
+          "x1": 223.37,
+          "y1": 487.798,
+          "width": 43.349999999999994,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "No cell?",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 475.798,
+          "x1": 223.37,
+          "y1": 487.798,
+          "width": 43.349999999999994,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "113",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 461.998,
+          "x1": 57.0,
+          "y1": 473.998,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "114",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 448.19800000000004,
+          "x1": 57.0,
+          "y1": 460.19800000000004,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 448.19800000000004,
+          "x1": 126.02,
+          "y1": 460.19800000000004,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Is the road still blocked or is it open now?",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 448.19800000000004,
+          "x1": 348.79,
+          "y1": 460.19800000000004,
+          "width": 204.77,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Is the road still blocked or is it open now?",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 448.19800000000004,
+          "x1": 348.79,
+          "y1": 460.19800000000004,
+          "width": 204.77,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "115",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 434.398,
+          "x1": 57.0,
+          "y1": 446.398,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "116",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 420.598,
+          "x1": 57.0,
+          "y1": 432.598,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 420.598,
+          "x1": 147.38,
+          "y1": 432.598,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "No, it'll be blocked for a little bit.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 420.598,
+          "x1": 343.51,
+          "y1": 432.598,
+          "width": 163.48999999999998,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "No, it'll be blocked for a little bit.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 420.598,
+          "x1": 343.51,
+          "y1": 432.598,
+          "width": 163.48999999999998,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "117",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 406.798,
+          "x1": 57.0,
+          "y1": 418.798,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "118",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 392.998,
+          "x1": 57.0,
+          "y1": 404.998,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 392.998,
+          "x1": 126.02,
+          "y1": 404.998,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Oh.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 392.998,
+          "x1": 164.66,
+          "y1": 404.998,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Oh.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 392.998,
+          "x1": 164.66,
+          "y1": 404.998,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "119",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 379.19800000000004,
+          "x1": 57.0,
+          "y1": 391.19800000000004,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "120",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 365.398,
+          "x1": 57.0,
+          "y1": 377.398,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 365.398,
+          "x1": 158.06,
+          "y1": 377.398,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "So, you were at school, and then you just, you were coming home from",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 365.398,
+          "x1": 525.452,
+          "y1": 377.398,
+          "width": 345.432,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "So, you were at school, and then you just, you were coming home from",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 365.398,
+          "x1": 525.452,
+          "y1": 377.398,
+          "width": 345.432,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "121",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 351.57800000000003,
+          "x1": 57.0,
+          "y1": 363.57800000000003,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "work, or?",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 351.57800000000003,
+          "x1": 120.98,
+          "y1": 363.57800000000003,
+          "width": 48.956,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "122",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 337.778,
+          "x1": 57.0,
+          "y1": 349.778,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "123",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 323.978,
+          "x1": 57.0,
+          "y1": 335.978,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 323.978,
+          "x1": 126.02,
+          "y1": 335.978,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "From school too.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 323.978,
+          "x1": 228.77,
+          "y1": 335.978,
+          "width": 84.75,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "From school too.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 323.978,
+          "x1": 228.77,
+          "y1": 335.978,
+          "width": 84.75,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "124",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 310.178,
+          "x1": 57.0,
+          "y1": 322.178,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "125",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 296.37800000000004,
+          "x1": 57.0,
+          "y1": 308.37800000000004,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 296.37800000000004,
+          "x1": 158.06,
+          "y1": 308.37800000000004,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Oh, from school, okay.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 296.37800000000004,
+          "x1": 293.69,
+          "y1": 308.37800000000004,
+          "width": 113.66999999999999,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Oh, from school, okay.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 296.37800000000004,
+          "x1": 293.69,
+          "y1": 308.37800000000004,
+          "width": 113.66999999999999,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "126",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 282.57800000000003,
+          "x1": 57.0,
+          "y1": 294.57800000000003,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "127",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 268.778,
+          "x1": 57.0,
+          "y1": 280.778,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 268.778,
+          "x1": 126.02,
+          "y1": 280.778,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Yeah.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 268.778,
+          "x1": 175.34,
+          "y1": 280.778,
+          "width": 31.319999999999993,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Yeah.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 268.778,
+          "x1": 175.34,
+          "y1": 280.778,
+          "width": 31.319999999999993,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "128",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 254.97799999999998,
+          "x1": 57.0,
+          "y1": 266.978,
+          "width": 21.0,
+          "height": 12.000000000000028,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "129",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 241.178,
+          "x1": 57.0,
+          "y1": 253.178,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 241.178,
+          "x1": 158.06,
+          "y1": 253.178,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Okay, so, again, didn't see or, or hear anything?  Okay.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 241.178,
+          "x1": 446.83,
+          "y1": 253.178,
+          "width": 266.80999999999995,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Okay, so, again, didn't see or, or hear anything?  Okay.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 241.178,
+          "x1": 446.83,
+          "y1": 253.178,
+          "width": 266.80999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "130",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 227.378,
+          "x1": 57.0,
+          "y1": 239.378,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "131",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 213.57799999999997,
+          "x1": 57.0,
+          "y1": 225.57799999999997,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 213.57799999999997,
+          "x1": 126.02,
+          "y1": 225.57799999999997,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "No.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 213.57799999999997,
+          "x1": 164.66,
+          "y1": 225.57799999999997,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "No.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 213.57799999999997,
+          "x1": 164.66,
+          "y1": 225.57799999999997,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "132",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 199.778,
+          "x1": 57.0,
+          "y1": 211.778,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "133",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 185.97799999999998,
+          "x1": 57.0,
+          "y1": 197.97799999999998,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 185.97799999999998,
+          "x1": 158.06,
+          "y1": 197.97799999999998,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Anyone else home that may have –",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 185.97799999999998,
+          "x1": 351.67,
+          "y1": 197.97799999999998,
+          "width": 171.65,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Anyone else home that may have –",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 185.97799999999998,
+          "x1": 351.67,
+          "y1": 197.97799999999998,
+          "width": 171.65,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "134",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 172.148,
+          "x1": 57.0,
+          "y1": 184.148,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "135",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 158.34799999999998,
+          "x1": 57.0,
+          "y1": 170.34799999999998,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 158.34799999999998,
+          "x1": 126.02,
+          "y1": 170.34799999999998,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "No.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 158.34799999999998,
+          "x1": 164.66,
+          "y1": 170.34799999999998,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "No.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 158.34799999999998,
+          "x1": 164.66,
+          "y1": 170.34799999999998,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "136",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 144.54799999999997,
+          "x1": 57.0,
+          "y1": 156.54799999999997,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "137",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 130.748,
+          "x1": 57.0,
+          "y1": 142.748,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 130.748,
+          "x1": 147.38,
+          "y1": 142.748,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "No.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 130.748,
+          "x1": 200.66,
+          "y1": 142.748,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "No.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 130.748,
+          "x1": 200.66,
+          "y1": 142.748,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "138",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 116.94800000000001,
+          "x1": 57.0,
+          "y1": 128.948,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "139",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 103.148,
+          "x1": 57.0,
+          "y1": 115.148,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 103.148,
+          "x1": 126.02,
+          "y1": 115.148,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Yeah there was nobody home.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 103.148,
+          "x1": 292.61,
+          "y1": 115.148,
+          "width": 148.59,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Yeah there was nobody home.",
+          "page": 3,
+          "x0": 144.02,
+          "y0": 103.148,
+          "x1": 292.61,
+          "y1": 115.148,
+          "width": 148.59,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "140",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 89.352,
+          "x1": 57.0,
+          "y1": 101.352,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "141",
+          "page": 3,
+          "x0": 36.0,
+          "y0": 75.552,
+          "x1": 57.0,
+          "y1": 87.552,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 3,
+          "x0": 72.024,
+          "y0": 75.552,
+          "x1": 147.38,
+          "y1": 87.552,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Okay, thank you guys.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 75.552,
+          "x1": 291.41,
+          "y1": 87.552,
+          "width": 111.39000000000001,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Okay, thank you guys.",
+          "page": 3,
+          "x0": 180.02,
+          "y0": 75.552,
+          "x1": 291.41,
+          "y1": 87.552,
+          "width": 111.39000000000001,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "-3-",
+          "page": 3,
+          "x0": 316.97,
+          "y0": 22.152,
+          "x1": 334.01,
+          "y1": 34.152,
+          "width": 17.039999999999964,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "-3-",
+          "page": 3,
+          "x0": 316.97,
+          "y0": 22.152,
+          "x1": 334.01,
+          "y1": 34.152,
+          "width": 17.039999999999964,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        }
+      ]
+    },
+    {
+      "page_num": 4,
+      "elements": [
+        {
+          "text": "142 \n143 \n144 \n145 \n146 \n147 \n148 \n149 \n150 \n151 \n152 \n153 \n154 \n155 \n156 \n157 \n158 \n159 \n160 \n161 \n162 \n163 \n164",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 486.238,
+          "x1": 57.0,
+          "y1": 736.248,
+          "width": 21.0,
+          "height": 250.01000000000005,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "142",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 724.248,
+          "x1": 57.0,
+          "y1": 736.248,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini: \n \nSpeaker 2: \n \nOther Speaker: \n \nEND OF AUDIO \n \n \n[Company Name] \n[Date] \n \n \n \n \n \nSpeakWrite \nwww.speakwrite.com \nJob Number: 19146-015 \nCustom Filename: Interview 15 \nDate: 05/26/2019 \nBilled Words: 503",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 487.702,
+          "x1": 180.01999999999998,
+          "y1": 736.248,
+          "width": 107.99599999999998,
+          "height": 248.54600000000005,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "143",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 710.448,
+          "x1": 57.0,
+          "y1": 722.448,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Detective Albini:",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 710.448,
+          "x1": 158.06,
+          "y1": 722.448,
+          "width": 86.036,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Thank you very much.",
+          "page": 4,
+          "x0": 180.02,
+          "y0": 710.448,
+          "x1": 291.65,
+          "y1": 722.448,
+          "width": 111.62999999999997,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Thank you very much.",
+          "page": 4,
+          "x0": 180.02,
+          "y0": 710.448,
+          "x1": 291.65,
+          "y1": 722.448,
+          "width": 111.62999999999997,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "144",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 696.628,
+          "x1": 57.0,
+          "y1": 708.628,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "145",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 682.828,
+          "x1": 57.0,
+          "y1": 694.828,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Speaker 2:",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 682.828,
+          "x1": 126.02,
+          "y1": 694.828,
+          "width": 53.995999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Ok.",
+          "page": 4,
+          "x0": 144.02,
+          "y0": 682.828,
+          "x1": 164.66,
+          "y1": 694.828,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Ok.",
+          "page": 4,
+          "x0": 144.02,
+          "y0": 682.828,
+          "x1": 164.66,
+          "y1": 694.828,
+          "width": 20.639999999999986,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "146",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 669.028,
+          "x1": 57.0,
+          "y1": 681.028,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "147",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 655.2280000000001,
+          "x1": 57.0,
+          "y1": 667.2280000000001,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Other Speaker:",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 655.2280000000001,
+          "x1": 147.38,
+          "y1": 667.2280000000001,
+          "width": 75.356,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Bye.",
+          "page": 4,
+          "x0": 180.02,
+          "y0": 655.2280000000001,
+          "x1": 205.37,
+          "y1": 667.2280000000001,
+          "width": 25.349999999999994,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Bye.",
+          "page": 4,
+          "x0": 180.02,
+          "y0": 655.2280000000001,
+          "x1": 205.37,
+          "y1": 667.2280000000001,
+          "width": 25.349999999999994,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "148",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 641.428,
+          "x1": 57.0,
+          "y1": 653.428,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "149",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 627.628,
+          "x1": 57.0,
+          "y1": 639.628,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "END OF AUDIO",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 627.628,
+          "x1": 159.74,
+          "y1": 639.628,
+          "width": 87.71600000000001,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "150",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 613.828,
+          "x1": 57.0,
+          "y1": 625.828,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "151",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 600.028,
+          "x1": 57.0,
+          "y1": 612.028,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "152",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 586.2280000000001,
+          "x1": 57.0,
+          "y1": 598.2280000000001,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "[Company Name]",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 586.2280000000001,
+          "x1": 161.3,
+          "y1": 598.2280000000001,
+          "width": 89.27600000000001,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "153",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 572.428,
+          "x1": 57.0,
+          "y1": 584.428,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "[Date]",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 572.428,
+          "x1": 105.62,
+          "y1": 584.428,
+          "width": 33.596000000000004,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "154",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 561.388,
+          "x1": 57.0,
+          "y1": 573.388,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "155",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 548.308,
+          "x1": 57.0,
+          "y1": 560.308,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "156",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 540.628,
+          "x1": 57.0,
+          "y1": 552.628,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "157",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 533.908,
+          "x1": 57.0,
+          "y1": 545.908,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "158",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 527.038,
+          "x1": 57.0,
+          "y1": 539.038,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "159",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 520.198,
+          "x1": 57.0,
+          "y1": 532.198,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "SpeakWrite",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 521.536,
+          "x1": 111.61999999999999,
+          "y1": 527.6619999999999,
+          "width": 39.59599999999999,
+          "height": 6.125999999999976,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "160",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 513.4780000000001,
+          "x1": 57.0,
+          "y1": 525.4780000000001,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "www.speakwrite.com",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 514.942,
+          "x1": 140.42,
+          "y1": 520.942,
+          "width": 68.39599999999999,
+          "height": 6.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "161",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 506.63800000000003,
+          "x1": 57.0,
+          "y1": 518.638,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Job Number: 19146-015",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 508.10200000000003,
+          "x1": 151.22,
+          "y1": 514.102,
+          "width": 79.196,
+          "height": 5.999999999999943,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "162",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 499.798,
+          "x1": 57.0,
+          "y1": 511.798,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Custom Filename: Interview 15",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 501.262,
+          "x1": 180.01999999999998,
+          "y1": 507.262,
+          "width": 107.99599999999998,
+          "height": 6.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "163",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 493.07800000000003,
+          "x1": 57.0,
+          "y1": 505.07800000000003,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Date: 05/26/2019",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 494.54200000000003,
+          "x1": 133.22,
+          "y1": 500.54200000000003,
+          "width": 61.196,
+          "height": 6.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "164",
+          "page": 4,
+          "x0": 36.0,
+          "y0": 486.238,
+          "x1": 57.0,
+          "y1": 498.238,
+          "width": 21.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Billed Words: 503",
+          "page": 4,
+          "x0": 72.024,
+          "y0": 487.702,
+          "x1": 136.82,
+          "y1": 493.702,
+          "width": 64.79599999999999,
+          "height": 6.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "-4-",
+          "page": 4,
+          "x0": 316.97,
+          "y0": 22.152,
+          "x1": 334.01,
+          "y1": 34.152,
+          "width": 17.039999999999964,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "-4-",
+          "page": 4,
+          "x0": 316.97,
+          "y0": 22.152,
+          "x1": 334.01,
+          "y1": 34.152,
+          "width": 17.039999999999964,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "total_sentences": 36,
+    "total_pages": 4,
+    "processed_at": 1748930086.1930685,
+    "pdf_path": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1748929957\\b8ac4e63bc36.pdf",
+    "pdf_filename": "b8ac4e63bc36.pdf",
+    "method": "batch_compatible_layout_extraction",
+    "batch_id": "batch_1748929957",
+    "gdrive_info": {
+      "file_id": "1s0dl6gnDq4IvjYES1hvGyuYgaeFJcrNN",
+      "original_name": "Interview 8.pdf",
+      "gdrive_path": "Santa Rosa Police Department/20241029_Scraped_SantaRosaPoliceDepartment/#13-0013093/10-08-2019 Additional Documents/Transcribed Interviews",
+      "page_count": 4,
+      "county": "Sonoma County",
+      "agency": "Santa Rosa Police Department"
+    }
+  }
+}

@@ -10,21 +10,12 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = 'app/uploads'
     app.config['ALLOWED_EXTENSIONS'] = {'pdf'}
     app.config['PRELOAD_FOLDER'] = 'app/preloaded'
-    
+    app.config['LAYOUT_DIR'] = 'app/layouts'
+    app.config['SENTENCES_DIR'] = 'app/sentences'
+    app.config['DOWNLOAD_DIR'] = 'app/gdrive_downloads'
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB limit for file uploads
+    app.config['PROPAGATE_EXCEPTIONS'] = True  # Propagate exceptions to the WSGI server
     from app.routes import main
     app.register_blueprint(main, url_prefix='/api')
 
-    # Add this debug route to check your configuration
-    @app.route('/debug/config')
-    def debug_config():
-        return jsonify({
-            'current_working_dir': os.getcwd(),
-            'upload_folder': app.config.get('UPLOAD_FOLDER'),
-            'preload_folder': app.config.get('PRELOAD_FOLDER'),
-            'upload_folder_exists': os.path.exists(app.config.get('UPLOAD_FOLDER', '')),
-            'preload_folder_exists': os.path.exists(app.config.get('PRELOAD_FOLDER', '')),
-            'upload_folder_contents': os.listdir(app.config['UPLOAD_FOLDER']) if os.path.exists(app.config.get('UPLOAD_FOLDER', '')) else [],
-            'preload_folder_contents': os.listdir(app.config['PRELOAD_FOLDER']) if os.path.exists(app.config.get('PRELOAD_FOLDER', '')) else []
-        })
-    
     return app 

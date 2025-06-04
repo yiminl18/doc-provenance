@@ -272,11 +272,6 @@
   color: white;
 }
 
-.provenance-preview-btn:active {
-  box-shadow: var(--shadow-pressed);
-  transform: translate(1px, 1px);
-}
-
 .history-item.active .provenance-preview-btn {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.3);
@@ -314,7 +309,7 @@
   justify-content: flex-end;
 }
 
-.action-btn {
+.action-btn.question {
   background-color: var(--bg-secondary);
   border: var(--border-thin) solid var(--win95-border);
   color: var(--win95-text);
@@ -330,22 +325,9 @@
   height: 24px;
 }
 
-.action-btn.feedback-btn:hover {
-  background-color: var(--success-green);
-  border-color: var(--success-green);
-  color: white;
-}
 
-.action-btn.delete-btn:hover {
-  background-color: var(--danger-red);
-  border-color: var(--danger-red);
-  color: white;
-}
 
-.action-btn:active {
-  box-shadow: var(--shadow-pressed);
-  transform: translate(1px, 1px);
-}
+
 
 .history-item.active .action-btn {
   background-color: rgba(255, 255, 255, 0.1);
@@ -545,12 +527,7 @@
   border-color: var(--primary-blue);
 }
 
-.action-btn:active {
-  box-shadow: var(--shadow-pressed);
-  transform: translate(1px, 1px);
-}
-
-.action-btn.detail-btn {
+.action-btn.detail {
   color: var(--primary-blue);
 }
 
@@ -558,14 +535,6 @@
   color: var(--win95-text-muted);
 }
 
-.action-btn.delete-btn {
-  color: var(--danger-red);
-}
-
-.action-btn.delete-btn:hover {
-  background-color: var(--danger-red-light);
-  border-color: var(--danger-red);
-}
 
 /* Compact provenance previews */
 .provenance-previews.compact {
@@ -804,11 +773,6 @@
 .highlight-btn:hover {
   background-color: var(--warning-orange-hover);
   border-color: var(--warning-orange-hover);
-}
-
-.highlight-btn:active {
-  box-shadow: var(--shadow-pressed);
-  transform: translate(1px, 1px);
 }
 
 .provenance-content {

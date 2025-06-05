@@ -1,0 +1,19 @@
+[2025-06-04 15:48:56] 20-8090 K9 Bite Rpt_Redacted.pdf: not_text_extractable
+[2025-06-04 15:48:57] AG002573.pdf: not_text_extractable
+[2025-06-04 15:49:05] Redacted Photo (10).pdf: not_text_extractable
+[2025-06-04 15:49:06] 08.14.18_OISReviewLtr_McGuigan & Samano_P16175264 & PC162670002 (DOI 09.22.16).pdf: not_text_extractable
+[2025-06-04 15:49:16] N-PBSP-137-18 pics Part 4.pdf: not_text_extractable
+[2025-06-04 15:49:18] 27 - Incorporation of CAL-Fire Dispatch Incident Reports_Logs & 911_Radio Recordings for Incedent #JV180670133.pdf: not_text_extractable
+[2025-06-04 15:49:26] Redacted Photo (63).pdf: not_text_extractable
+[2025-06-04 15:49:35] ATTACH_21_11202018_KCSO 18K02.pdf: insufficient_layout_data: sentences=9, pages=17
+[2025-06-04 15:49:36] R - Citizen Complaint (-----) 9-19-22.pdf: not_text_extractable
+[2025-06-04 15:49:37] Cybulski Wit Signed.pdf: insufficient_layout_data: sentences=7, pages=1
+[2025-06-04 15:49:42] Photograph (171).pdf: not_text_extractable
+[2025-06-04 15:51:28] SPPD_OIS0001675(Redaction).pdf: not_text_extractable
+[2025-06-04 15:51:29] AG002242.pdf: not_text_extractable
+[2025-06-04 15:51:31] Suspect Firearm return_Redacted.pdf: insufficient_layout_data: sentences=3, pages=1
+[2025-06-04 15:51:34] CRIME_SCENE_DIAGRAMS,_SUSPECT_WENCESLAO.pdf.pdf: not_text_extractable
+[2025-06-04 15:53:27] Initial Response by Hester_Redacted.pdf: insufficient_layout_data: sentences=5, pages=1
+[2025-06-04 15:53:29] Car_info_EPD_Redacted.pdf: not_text_extractable
+[2025-06-04 15:53:32] 59344_19-0006951_5090413059_6.pdf: not_text_extractable
+[2025-06-04 15:53:34] Redacted 16-47.pdf: not_text_extractable

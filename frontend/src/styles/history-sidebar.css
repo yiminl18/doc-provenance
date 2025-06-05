@@ -115,12 +115,15 @@
   box-shadow: var(--shadow-pressed);
 }
 
-.history-item.active .item-name,
+.history-item.active,
 .history-item.active .item-meta,
 .history-item.active .timestamp,
 .history-item.active .status-text {
   color: white;
 }
+
+
+
 
 .history-item.active .item-icon {
   color: white;
@@ -128,6 +131,7 @@
 
 .item-header {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-3);
@@ -148,7 +152,7 @@
 .item-name {
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  color: var(--win95-text);
+  color: var(--win95-dark);
   line-height: var(--leading-tight);
   margin-bottom: var(--space-1);
   word-wrap: break-word;
@@ -158,6 +162,7 @@
 .question-text {
   line-height: var(--leading-snug);
   margin-bottom: var(--space-2);
+  color: var(--win95-text)
 }
 
 .item-meta {
@@ -506,7 +511,7 @@
   margin-left: var(--space-2);
 }
 
-.action-btn {
+.action-btn.question {
   padding: var(--space-1);
   border: var(--border-thin) solid var(--win95-border);
   background-color: var(--win95-lighter);
@@ -522,16 +527,16 @@
   box-shadow: var(--shadow-raised);
 }
 
-.action-btn:hover {
+.action-btn.question:hover {
   background-color: var(--win95-lightest);
   border-color: var(--primary-blue);
 }
 
-.action-btn.detail {
+.action-btn.question.detail {
   color: var(--primary-blue);
 }
 
-.action-btn.collapse-toggle {
+.action-btn.question.collapse-toggle {
   color: var(--win95-text-muted);
 }
 

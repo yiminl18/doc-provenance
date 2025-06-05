@@ -1,0 +1,29 @@
+{
+  "document_id": "312c2bc4bbd1",
+  "filename": "Email.pdf",
+  "original_name": "Email.pdf",
+  "title": "Email.pdf",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1749077333",
+  "gdrive_info": {
+    "file_id": "1stkgjVkJXZA61NybbMP7zYqs5l8rdndT",
+    "gdrive_path": "Orange County Sheriff/20241211_FromStantonPD_OrangeCountySheriffsDepartment/UOF.16-253663/Documents",
+    "county": "Orange County",
+    "agency": "Orange County Sheriff",
+    "page_count": 1
+  },
+  "processing_info": {
+    "text_length": 1320,
+    "sentence_count": 15,
+    "layout_sentence_count": 15,
+    "pages_count": 1,
+    "processed_at": 1749077378.6746523
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\Email.pdf",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\Email_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\Email_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

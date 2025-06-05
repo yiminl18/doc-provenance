@@ -1,0 +1,1195 @@
+{
+  "sentences": [
+    {
+      "sentence_id": 0,
+      "text": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.",
+      "layout_matches": [
+        {
+          "text": "CRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM",
+          "page": 1,
+          "x0": 156.0,
+          "y0": 677.8575,
+          "x1": 363.0225,
+          "y1": 727.3575,
+          "width": 207.02249999999998,
+          "height": 49.5,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.5852216748768473,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "UOF: 16-253663 has been Submitted for the Captain\"s Review",
+          "page": 1,
+          "x0": 156.0,
+          "y0": 688.3575,
+          "x1": 363.0225,
+          "y1": 695.8575,
+          "width": 207.02249999999998,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.2482758620689655,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 156.0,
+          "y0": 677.8575,
+          "x1": 363.0225,
+          "y1": 727.3575,
+          "confidence": 0.5852216748768473,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 156.0,
+          "y0": 688.3575,
+          "x1": 363.0225,
+          "y1": 695.8575,
+          "confidence": 0.2482758620689655,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 1,
+      "text": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+      "layout_matches": [
+        {
+          "text": "Initial Call: Uncooperative Inmate",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 431.316,
+          "x1": 242.97600000000008,
+          "y1": 443.316,
+          "width": 164.97600000000008,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.16054054054054057,
+          "match_type": "contained_substring"
+        },
+        {
+          "text": "Initial Call: Uncooperative Inmate",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 431.316,
+          "x1": 242.97600000000008,
+          "y1": 443.316,
+          "width": 164.97600000000008,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.16054054054054057,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 431.316,
+          "x1": 242.97600000000008,
+          "y1": 443.316,
+          "confidence": 0.16054054054054057,
+          "match_type": "contained_substring"
+        },
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 431.316,
+          "x1": 242.97600000000008,
+          "y1": 443.316,
+          "confidence": 0.16054054054054057,
+          "match_type": "contained_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 2,
+      "text": "J. Dorn was talking to an inmate who was standing in\nModule B's vestibule.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 3,
+      "text": "The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 4,
+      "text": "Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 5,
+      "text": "B. Tucker and Dep. C. Palomares-Velasco.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "deputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 339.816,
+          "x1": 523.9199999999997,
+          "y1": 351.816,
+          "width": 445.91999999999973,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 339.816,
+          "x1": 523.9199999999997,
+          "y1": 351.816,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 6,
+      "text": "Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 7,
+      "text": "Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 8,
+      "text": "Muniga refused and said, \"No.\" Dep.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "shoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 312.816,
+          "x1": 532.692,
+          "y1": 324.816,
+          "width": 454.692,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 312.816,
+          "x1": 532.692,
+          "y1": 324.816,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 9,
+      "text": "Dorn grabbed Muniga\nby his shoulder.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 10,
+      "text": "Muniga tried to turn away to break Dep. Dorn's grasp. Dep.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "by his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 299.316,
+          "x1": 513.7439999999999,
+          "y1": 311.316,
+          "width": 435.7439999999999,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 299.316,
+          "x1": 513.7439999999999,
+          "y1": 311.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 11,
+      "text": "Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 12,
+      "text": "Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 13,
+      "text": "Five additional deputies\nresponded to help gain control of Muniga.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        }
+      ]
+    },
+    {
+      "sentence_id": 14,
+      "text": "Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+      "layout_matches": [
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0,
+          "match_confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "text": "be treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 200.976,
+          "y1": 257.316,
+          "width": 122.976,
+          "height": 11.999999999999972,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1,
+          "match_confidence": 0.32727272727272727,
+          "match_type": "contained_substring"
+        }
+      ],
+      "page_spans": [
+        1
+      ],
+      "primary_page": 1,
+      "bounding_boxes": [
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "confidence": 0.95,
+          "match_type": "exact_substring"
+        },
+        {
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 200.976,
+          "y1": 257.316,
+          "confidence": 0.32727272727272727,
+          "match_type": "contained_substring"
+        }
+      ]
+    }
+  ],
+  "pages_layout": [
+    {
+      "page_num": 1,
+      "elements": [
+        {
+          "text": "From:\nTo:\nCc:\nSubject:\nDate:",
+          "page": 1,
+          "x0": 79.5,
+          "y0": 677.8575,
+          "x1": 110.75999999999999,
+          "y1": 727.3575,
+          "width": 31.25999999999999,
+          "height": 49.5,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "From:",
+          "page": 1,
+          "x0": 79.5,
+          "y0": 719.8575,
+          "x1": 101.61749999999999,
+          "y1": 727.3575,
+          "width": 22.117499999999993,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "CRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM",
+          "page": 1,
+          "x0": 156.0,
+          "y0": 677.8575,
+          "x1": 363.0225,
+          "y1": 727.3575,
+          "width": 207.02249999999998,
+          "height": 49.5,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "CRMAdmin",
+          "page": 1,
+          "x0": 156.0,
+          "y0": 719.8575,
+          "x1": 191.7975,
+          "y1": 727.3575,
+          "width": 35.797500000000014,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "To:",
+          "page": 1,
+          "x0": 79.5,
+          "y0": 709.3575,
+          "x1": 91.44,
+          "y1": 716.8575,
+          "width": 11.939999999999998,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Baker, William J",
+          "page": 1,
+          "x0": 156.0,
+          "y0": 709.3575,
+          "x1": 208.7025,
+          "y1": 716.8575,
+          "width": 52.702499999999986,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Cc:",
+          "page": 1,
+          "x0": 79.5,
+          "y0": 698.8575,
+          "x1": 91.1775,
+          "y1": 706.3575,
+          "width": 11.677499999999995,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Carlsen, Jerry J",
+          "page": 1,
+          "x0": 156.0,
+          "y0": 698.8575,
+          "x1": 206.64,
+          "y1": 706.3575,
+          "width": 50.639999999999986,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Subject:",
+          "page": 1,
+          "x0": 79.5,
+          "y0": 688.3575,
+          "x1": 110.75999999999999,
+          "y1": 695.8575,
+          "width": 31.25999999999999,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "UOF: 16-253663 has been Submitted for the Captain\"s Review",
+          "page": 1,
+          "x0": 156.0,
+          "y0": 688.3575,
+          "x1": 363.0225,
+          "y1": 695.8575,
+          "width": 207.02249999999998,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Date:",
+          "page": 1,
+          "x0": 79.5,
+          "y0": 677.8575,
+          "x1": 99.9675,
+          "y1": 685.3575,
+          "width": 20.4675,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Wednesday, October 19, 2016 8:14:29 PM",
+          "page": 1,
+          "x0": 156.0,
+          "y0": 677.8575,
+          "x1": 296.8425,
+          "y1": 685.3575,
+          "width": 140.84249999999997,
+          "height": 7.5,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Jerry Carlsen  submitted a UOF for your review.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 609.816,
+          "x1": 313.95599999999996,
+          "y1": 635.316,
+          "width": 235.95599999999996,
+          "height": 25.5,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Jerry Carlsen  submitted a UOF for your review.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 609.816,
+          "x1": 313.95599999999996,
+          "y1": 621.816,
+          "width": 235.95599999999996,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "UOF Link",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 584.316,
+          "x1": 130.668,
+          "y1": 596.316,
+          "width": 52.668000000000006,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "UOF Link",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 584.316,
+          "x1": 130.668,
+          "y1": 596.316,
+          "width": 52.668000000000006,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Summary:",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 558.816,
+          "x1": 128.00400000000002,
+          "y1": 570.816,
+          "width": 50.00400000000002,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Summary:",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 558.816,
+          "x1": 128.00400000000002,
+          "y1": 570.816,
+          "width": 50.00400000000002,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "DR: 16-253663",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 533.316,
+          "x1": 153.0,
+          "y1": 545.316,
+          "width": 75.0,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "DR: 16-253663",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 533.316,
+          "x1": 153.0,
+          "y1": 545.316,
+          "width": 75.0,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Date: 9/28/2016 7:58 AM",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 507.816,
+          "x1": 202.332,
+          "y1": 519.816,
+          "width": 124.332,
+          "height": 12.000000000000057,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Date: 9/28/2016 7:58 AM",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 507.816,
+          "x1": 202.332,
+          "y1": 519.816,
+          "width": 124.332,
+          "height": 12.000000000000057,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Location: 550 Flower",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 482.316,
+          "x1": 181.99200000000002,
+          "y1": 494.316,
+          "width": 103.99200000000002,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Location: 550 Flower",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 482.316,
+          "x1": 181.99200000000002,
+          "y1": 494.316,
+          "width": 103.99200000000002,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "# of Deputies using Force: 8",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 456.816,
+          "x1": 214.32000000000005,
+          "y1": 468.816,
+          "width": 136.32000000000005,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "# of Deputies using Force: 8",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 456.816,
+          "x1": 214.32000000000005,
+          "y1": 468.816,
+          "width": 136.32000000000005,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Initial Call: Uncooperative Inmate",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 431.316,
+          "x1": 242.97600000000008,
+          "y1": 443.316,
+          "width": 164.97600000000008,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Initial Call: Uncooperative Inmate",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 431.316,
+          "x1": 242.97600000000008,
+          "y1": 443.316,
+          "width": 164.97600000000008,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Notification Summary:",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 405.816,
+          "x1": 189.00000000000003,
+          "y1": 417.816,
+          "width": 111.00000000000003,
+          "height": 12.0,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "Notification Summary:",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 405.816,
+          "x1": 189.00000000000003,
+          "y1": 417.816,
+          "width": 111.00000000000003,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in\nModule B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance\nand was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga\nby his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.\nPalomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies\nresponded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 533.9519999999999,
+          "y1": 392.316,
+          "width": 455.9519999999999,
+          "height": 146.99999999999997,
+          "element_type": "LTTextBoxHorizontal",
+          "depth": 0
+        },
+        {
+          "text": "On 9/28/16 at about 0758 hours, Dep. J. Dorn was talking to an inmate who was standing in",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 380.316,
+          "x1": 519.3,
+          "y1": 392.316,
+          "width": 441.29999999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Module B's vestibule. The inmate, Raymond Muniga (bk# 2955064) appeared agitated and",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 366.816,
+          "x1": 514.4399999999999,
+          "y1": 378.816,
+          "width": 436.43999999999994,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "uncooperative. Dep. Dorn entered the vestibule through the hallway door with two additional",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 353.316,
+          "x1": 525.2639999999999,
+          "y1": 365.316,
+          "width": 447.2639999999999,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "deputies, Dep. B. Tucker and Dep. C. Palomares-Velasco. Muniga assumed a fighting stance",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 339.816,
+          "x1": 523.9199999999997,
+          "y1": 351.816,
+          "width": 445.91999999999973,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "and was holding one of his shoes in his hand. Dep. Dorn ordered Muniga two times to drop the",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 326.316,
+          "x1": 533.9519999999999,
+          "y1": 338.316,
+          "width": 455.9519999999999,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "shoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 312.816,
+          "x1": 532.692,
+          "y1": 324.816,
+          "width": 454.692,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "by his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker,",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 299.316,
+          "x1": 513.7439999999999,
+          "y1": 311.316,
+          "width": 435.7439999999999,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "and Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 285.816,
+          "x1": 508.60799999999995,
+          "y1": 297.816,
+          "width": 430.60799999999995,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "Palomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 272.316,
+          "x1": 509.96399999999994,
+          "y1": 284.316,
+          "width": 431.96399999999994,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "responded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 258.816,
+          "x1": 531.9479999999999,
+          "y1": 270.816,
+          "width": 453.94799999999987,
+          "height": 12.0,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        },
+        {
+          "text": "be treated for his injuries.",
+          "page": 1,
+          "x0": 78.0,
+          "y0": 245.316,
+          "x1": 200.976,
+          "y1": 257.316,
+          "width": 122.976,
+          "height": 11.999999999999972,
+          "element_type": "LTTextLineHorizontal",
+          "depth": 1
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "total_sentences": 15,
+    "total_pages": 1,
+    "processed_at": 1749077378.6716554,
+    "pdf_path": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\Email.pdf",
+    "pdf_filename": "Email.pdf",
+    "method": "batch_compatible_layout_extraction",
+    "batch_id": "batch_1749077333",
+    "gdrive_info": {
+      "file_id": "1stkgjVkJXZA61NybbMP7zYqs5l8rdndT",
+      "original_name": "Email.pdf",
+      "gdrive_path": "Orange County Sheriff/20241211_FromStantonPD_OrangeCountySheriffsDepartment/UOF.16-253663/Documents",
+      "page_count": 1,
+      "county": "Orange County",
+      "agency": "Orange County Sheriff"
+    }
+  }
+}

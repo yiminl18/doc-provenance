@@ -1,0 +1,29 @@
+{
+  "document_id": "8c049705c104",
+  "filename": "Attachment_16_Redacted_sk_done_Redacted.pdf",
+  "original_name": "Attachment 16_Redacted_sk_done_Redacted.pdf",
+  "title": "Attachment 16_Redacted_sk_done_Redacted.pdf",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1749077333",
+  "gdrive_info": {
+    "file_id": "1_a_vC39Mmnq7mgFklwKSL5MKu_PB7sD1",
+    "gdrive_path": "California Department of Consumer Affairs/2024 Agency Request Releases: California Department of Consumer Affairs/20240830_2024Request_CaliforniaDepartmentofConsumerAffairs",
+    "county": "State agencies",
+    "agency": "California Department of Consumer Affairs",
+    "page_count": 47
+  },
+  "processing_info": {
+    "text_length": 14560,
+    "sentence_count": 65,
+    "layout_sentence_count": 65,
+    "pages_count": 47,
+    "processed_at": 1749077605.752119
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\Attachment_16_Redacted_sk_done_Redacted.pdf",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\Attachment_16_Redacted_sk_done_Redacted_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\Attachment_16_Redacted_sk_done_Redacted_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

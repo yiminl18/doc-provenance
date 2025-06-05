@@ -264,9 +264,7 @@ const HistorySidebar = ({
                             }
                           </div>
                           <div className="item-meta compact">
-                            <span className="timestamp">
-                              {formatTimestamp(new Date(question.createdAt))}
-                            </span>
+                           
                             <span className="status-text">{status.text}</span>
                             {question.provenanceSources?.length > 0 && (
                               <span className="provenance-count">
@@ -281,7 +279,7 @@ const HistorySidebar = ({
                           {/* Detail modal button */}
                           {hasDetails && (
                             <button
-                              className="action-btn detail"
+                              className="action-btn question detail"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedQuestionModal(question);
@@ -295,7 +293,7 @@ const HistorySidebar = ({
                           {/* Collapse toggle button */}
                           {hasDetails && (
                             <button
-                              className="action-btn collapse-toggle"
+                              className="action-btn question collapse-toggle"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleQuestionCollapse(question.id);
@@ -310,7 +308,7 @@ const HistorySidebar = ({
                           
                           {/* Delete button */}
                           <button
-                            className="action-btn delete"
+                            className="action-btn question delete"
                             onClick={(e) => {
                               e.stopPropagation();
                               onQuestionDelete(question.id);

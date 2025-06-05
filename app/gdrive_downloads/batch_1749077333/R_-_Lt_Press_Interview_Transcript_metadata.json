@@ -1,0 +1,29 @@
+{
+  "document_id": "808f08eb893f",
+  "filename": "R_-_Lt_Press_Interview_Transcript.pdf",
+  "original_name": "R - Lt Press Interview Transcript.pdf",
+  "title": "R - Lt Press Interview Transcript.pdf",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1749077333",
+  "gdrive_info": {
+    "file_id": "1hdjNOz-8HCYC0Dy9Mak9svZBirz98lPz",
+    "gdrive_path": "Elk Grove Police Department/20241122_2024Request_ElkGrovePoliceDepartment/CASE 19-004020 AND IA19-024/Interviews",
+    "county": "Sacramento County",
+    "agency": "Elk Grove Police Department",
+    "page_count": 18
+  },
+  "processing_info": {
+    "text_length": 41054,
+    "sentence_count": 207,
+    "layout_sentence_count": 207,
+    "pages_count": 18,
+    "processed_at": 1749077485.3723538
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\R_-_Lt_Press_Interview_Transcript.pdf",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\R_-_Lt_Press_Interview_Transcript_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\R_-_Lt_Press_Interview_Transcript_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

@@ -1,0 +1,7 @@
+[2025-06-04 15:48:53] Starting batch sampling - Target: 5, Max attempts: 500
+[2025-06-04 15:48:54] Found 206840 candidate files
+[2025-06-04 15:48:54] Processing batch: 50 files (Success so far: 0/5)
+[2025-06-04 15:49:38] ✅ SUCCESS #1: Email.pdf (15 sentences, 1 pages)
+[2025-06-04 15:51:25] ✅ SUCCESS #2: R - Lt Press Interview Transcript.pdf (207 sentences, 18 pages)
+[2025-06-04 15:53:02] ✅ SUCCESS #3: Internal Affairs Investigation #1426_Redacted.pdf (299 sentences, 17 pages)
+[2025-06-04 15:53:25] ✅ SUCCESS #4: Attachment 16_Redacted_sk_done_Redacted.pdf (65 sentences, 47 pages)

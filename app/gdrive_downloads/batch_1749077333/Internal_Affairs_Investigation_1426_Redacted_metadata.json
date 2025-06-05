@@ -1,0 +1,29 @@
+{
+  "document_id": "4e133c6bc2a6",
+  "filename": "Internal_Affairs_Investigation_1426_Redacted.pdf",
+  "original_name": "Internal Affairs Investigation #1426_Redacted.pdf",
+  "title": "Internal Affairs Investigation #1426_Redacted.pdf",
+  "source": "google_drive_batch_sampling",
+  "batch_id": "batch_1749077333",
+  "gdrive_info": {
+    "file_id": "1i3e9mlTjU-AB_w3VJh7msAqhqXTds_N7",
+    "gdrive_path": "Menlo Park Police Department/MenloParkPoliceDeptJaimeRomero11112014",
+    "county": "San Mateo County",
+    "agency": "Menlo Park Police Department",
+    "page_count": 17
+  },
+  "processing_info": {
+    "text_length": 42422,
+    "sentence_count": 299,
+    "layout_sentence_count": 299,
+    "pages_count": 17,
+    "processed_at": 1749077582.74737
+  },
+  "files": {
+    "pdf": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\Internal_Affairs_Investigation_1426_Redacted.pdf",
+    "sentences": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\Internal_Affairs_Investigation_1426_Redacted_sentences.json",
+    "layout": "C:\\Users\\hannah\\git\\doc-provenance\\app/gdrive_downloads\\batch_1749077333\\Internal_Affairs_Investigation_1426_Redacted_layout.json"
+  },
+  "ready_for_qa": true,
+  "ready_for_layout_qa": true
+}

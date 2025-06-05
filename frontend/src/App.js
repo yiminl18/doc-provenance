@@ -9,6 +9,7 @@ import ProvenanceQA from './components/ProvenanceQA';
 import userStudyLogger from './services/UserStudyLogger';
 import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
 import DriveFileBrowser from './components/DriveFileBrowser';
+//import LayoutBasedPDFViewer  from './components/SimplifiedLayoutBasedPDFViewer'
 import {
   uploadFile,
   getDocuments,
@@ -125,6 +126,12 @@ function App() {
         sentence_count: doc_obj.sentence_count || 0
       });
 
+      console.log('🧹 Clearing questions before loading new document');
+      setQuestionsHistory(new Map());
+      setActiveQuestionId(null);
+      setSelectedProvenance(null);
+      setNavigationTrigger(null);
+
       setDocuments(prev => {
         const newDocs = new Map(prev);
         const doc = newDocs.get(docId);
@@ -155,6 +162,46 @@ function App() {
       setLoadingPreloaded(false);
     }
   };
+
+  useEffect(() => {
+  if (activeDocumentId) {
+    const activeDoc = documents.get(activeDocumentId);
+    
+    // Check if this is actually a new document (not just a re-selection)
+    const previousDocumentId = localStorage.getItem('lastActiveDocumentId');
+    
+    if (activeDoc && activeDocumentId !== previousDocumentId) {
+      console.log('📄 New document activated, clearing questions history');
+      
+      // Clear all questions and reset active question
+      setQuestionsHistory(new Map());
+      setActiveQuestionId(null);
+      
+      // Clear any selected provenance
+      setSelectedProvenance(null);
+      
+      // Clear navigation and highlight triggers
+      setNavigationTrigger(null);
+
+      
+      // Log the document change
+      userStudyLogger.logUserInteraction(
+        'document_switched',
+        'document_selector',
+        {
+          from_document: previousDocumentId,
+          to_document: activeDocumentId,
+          filename: activeDoc.filename
+        }
+      );
+      
+      // Store the current document ID for future comparisons
+      localStorage.setItem('lastActiveDocumentId', activeDocumentId);
+      
+      console.log('✅ Questions cleared for new document:', activeDoc.filename);
+    }
+  }
+}, [activeDocumentId, documents]);
 
   // History sidebar handlers
   const handleHistoryDocumentSelect = async (docId) => {
@@ -539,6 +586,7 @@ const handleDriveFileSelect = async (fileData) => {
                 selectedProvenance={selectedProvenance}
                 activeQuestionId={activeQuestionId}
                 navigationTrigger={navigationTrigger}
+                onFeedbackRequest={openFeedbackModal}
                 onClose={() => { }}
                 />
              

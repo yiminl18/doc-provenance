@@ -76,25 +76,25 @@ const FeedbackModal = ({
 
   const steps = [
     {
-      title: 'PROVENANCE_QUALITY',
+      title: 'PROVENANCE QUALITY',
       question: 'How would you rate the quality of the evidence shown?',
       icon: faCheckCircle,
       category: 'quality'
     },
     {
-      title: 'TIMING_PERCEPTION',
+      title: 'TIMING',
       question: 'How did the processing time feel to you?',
       icon: faClock,
       category: 'timing'
     },
     {
-      title: 'OVERALL_EXPERIENCE',
+      title: 'EXPERIENCE',
       question: 'How was your overall experience?',
       icon: faGraduationCap,
       category: 'experience'
     },
     {
-      title: 'ADDITIONAL_FEEDBACK',
+      title: 'ADDITIONAL FEEDBACK',
       question: 'Please provide additional feedback',
       icon: faComment,
       category: 'comments'
@@ -110,19 +110,19 @@ const FeedbackModal = ({
       options: [
         { 
           value: 'correct_answer', 
-          label: 'CORRECT_&_APPROPRIATE', 
+          label: 'CORRECT & APPROPRIATE', 
           color: 'green', 
           description: 'Evidence directly answers the question correctly' 
         },
         { 
           value: 'correct_but_wrong_context', 
-          label: 'CORRECT_BUT_WRONG_CONTEXT', 
+          label: 'CORRECT BUT WRONG CONTEXT', 
           color: 'yellow', 
           description: 'Technically correct but answers a different question' 
         },
         { 
           value: 'partially_correct', 
-          label: 'PARTIALLY_CORRECT', 
+          label: 'PARTIALLY CORRECT', 
           color: 'yellow', 
           description: 'Some parts correct but incomplete or mixed' 
         },
@@ -139,10 +139,10 @@ const FeedbackModal = ({
       label: 'Question Relevance',
       question: 'How relevant was the evidence to your specific question?',
       options: [
-        { value: 'highly_relevant', label: 'HIGHLY_RELEVANT', color: 'green', description: 'Directly addresses your question' },
-        { value: 'somewhat_relevant', label: 'SOMEWHAT_RELEVANT', color: 'yellow', description: 'Related but not perfectly on-topic' },
-        { value: 'barely_relevant', label: 'BARELY_RELEVANT', color: 'yellow', description: 'Tangentially related' },
-        { value: 'not_relevant', label: 'NOT_RELEVANT', color: 'red', description: 'Does not address your question' }
+        { value: 'highly_relevant', label: 'HIGHLY RELEVANT', color: 'green', description: 'Directly addresses your question' },
+        { value: 'somewhat_relevant', label: 'SOMEWHAT RELEVANT', color: 'yellow', description: 'Related but not perfectly on-topic' },
+        { value: 'barely_relevant', label: 'BARELY RELEVANT', color: 'yellow', description: 'Tangentially related' },
+        { value: 'not_relevant', label: 'NOT RELEVANT', color: 'red', description: 'Does not address your question' }
       ]
     },
     {
@@ -151,9 +151,9 @@ const FeedbackModal = ({
       question: 'How complete was the evidence provided?',
       options: [
         { value: 'complete', label: 'COMPLETE', color: 'green', description: 'All necessary information provided' },
-        { value: 'mostly_complete', label: 'MOSTLY_COMPLETE', color: 'green', description: 'Most information with minor gaps' },
+        { value: 'mostly_complete', label: 'MOSTLY COMPLETE', color: 'green', description: 'Most information with minor gaps' },
         { value: 'incomplete', label: 'INCOMPLETE', color: 'yellow', description: 'Missing important information' },
-        { value: 'missing_key_info', label: 'MISSING_KEY_INFO', color: 'red', description: 'Critical information absent' }
+        { value: 'missing_key_info', label: 'MISSING KEY INFO', color: 'red', description: 'Critical information absent' }
       ]
     },
     {
@@ -161,25 +161,25 @@ const FeedbackModal = ({
       label: 'Contextual Appropriateness',
       question: 'Was the evidence contextually appropriate for your question?',
       options: [
-        { value: 'perfectly_appropriate', label: 'PERFECTLY_APPROPRIATE', color: 'green', description: 'Evidence fits the question context perfectly' },
-        { value: 'mostly_appropriate', label: 'MOSTLY_APPROPRIATE', color: 'green', description: 'Generally appropriate with minor context issues' },
-        { value: 'somewhat_off', label: 'SOMEWHAT_OFF_CONTEXT', color: 'yellow', description: 'Evidence is related but context is somewhat off' },
-        { value: 'wrong_context', label: 'WRONG_CONTEXT', color: 'red', description: 'Evidence from wrong context (e.g., citations vs. main paper)' }
+        { value: 'perfectly_appropriate', label: 'PERFECTLY APPROPRIATE', color: 'green', description: 'Evidence fits the question context perfectly' },
+        { value: 'mostly_appropriate', label: 'MOSTLY APPROPRIATE', color: 'green', description: 'Generally appropriate with minor context issues' },
+        { value: 'somewhat_off', label: 'SOMEWHAT OFF CONTEXT', color: 'yellow', description: 'Evidence is related but context is somewhat off' },
+        { value: 'wrong_context', label: 'WRONG CONTEXT', color: 'red', description: 'Evidence from wrong context (e.g., citations vs. main paper)' }
       ]
     }
   ];
 
   // Timing Questions (Step 2)
-  const timingQuestions = [
+  /*const timingQuestions = [
     {
       key: 'waitTime',
       label: 'Processing Time Expectation',
       question: 'How did the actual processing time compare to your expectations?',
       options: [
-        { value: 'faster_than_expected', label: 'FASTER_THAN_EXPECTED', color: 'green', description: 'Pleasantly surprised by speed' },
-        { value: 'as_expected', label: 'AS_EXPECTED', color: 'green', description: 'Met my expectations' },
-        { value: 'slower_than_desired', label: 'SLOWER_THAN_DESIRED', color: 'yellow', description: 'Took longer than I hoped' },
-        { value: 'too_slow', label: 'TOO_SLOW', color: 'red', description: 'Unacceptably slow' }
+        { value: 'faster_than_expected', label: 'FASTER THAN EXPECTED', color: 'green', description: 'Pleasantly surprised by speed' },
+        { value: 'as_expected', label: 'AS EXPECTED', color: 'green', description: 'Met my expectations' },
+        { value: 'slower_than_desired', label: 'SLOWER THAN DESIRED', color: 'yellow', description: 'Took longer than I hoped' },
+        { value: 'too_slow', label: 'TOO SLOW', color: 'red', description: 'Unacceptably slow' }
       ]
     },
     {
@@ -187,14 +187,14 @@ const FeedbackModal = ({
       label: 'Subjective Processing Speed',
       question: 'How did the processing time feel to you personally?',
       options: [
-        { value: 'very_quick', label: 'VERY_QUICK', color: 'green', description: 'Felt very fast' },
+        { value: 'very_quick', label: 'VERY QUICK', color: 'green', description: 'Felt very fast' },
         { value: 'quick', label: 'QUICK', color: 'green', description: 'Felt reasonably fast' },
         { value: 'reasonable', label: 'REASONABLE', color: 'yellow', description: 'Acceptable waiting time' },
         { value: 'slow', label: 'SLOW', color: 'yellow', description: 'Felt slow' },
-        { value: 'very_slow', label: 'VERY_SLOW', color: 'red', description: 'Felt very slow' }
+        { value: 'very_slow', label: 'VERY SLOW', color: 'red', description: 'Felt very slow' }
       ]
     }
-  ];
+  ];*/
 
   // Experience Questions (Step 3)
   const experienceQuestions = [
@@ -203,11 +203,11 @@ const FeedbackModal = ({
       label: 'Overall Satisfaction',
       question: 'How satisfied are you with the system\'s performance?',
       options: [
-        { value: 'very_satisfied', label: 'VERY_SATISFIED', color: 'green', description: 'Exceeded expectations' },
+        { value: 'very_satisfied', label: 'VERY SATISFIED', color: 'green', description: 'Exceeded expectations' },
         { value: 'satisfied', label: 'SATISFIED', color: 'green', description: 'Met expectations' },
         { value: 'neutral', label: 'NEUTRAL', color: 'yellow', description: 'Adequate performance' },
         { value: 'dissatisfied', label: 'DISSATISFIED', color: 'red', description: 'Below expectations' },
-        { value: 'very_dissatisfied', label: 'VERY_DISSATISFIED', color: 'red', description: 'Far below expectations' }
+        { value: 'very_dissatisfied', label: 'VERY DISSATISFIED', color: 'red', description: 'Far below expectations' }
       ]
     },
     {
@@ -215,10 +215,10 @@ const FeedbackModal = ({
       label: 'Task Completion',
       question: 'How well did the system help you answer your question?',
       options: [
-        { value: 'fully_completed', label: 'FULLY_COMPLETED', color: 'green', description: 'Completely answered my question' },
-        { value: 'mostly_completed', label: 'MOSTLY_COMPLETED', color: 'green', description: 'Answered most of my question' },
-        { value: 'partially_completed', label: 'PARTIALLY_COMPLETED', color: 'yellow', description: 'Provided some useful information' },
-        { value: 'not_completed', label: 'NOT_COMPLETED', color: 'red', description: 'Did not help answer my question' }
+        { value: 'fully_completed', label: 'FULLY COMPLETED', color: 'green', description: 'Completely answered my question' },
+        { value: 'mostly_completed', label: 'MOSTLY COMPLETED', color: 'green', description: 'Answered most of my question' },
+        { value: 'partially_completed', label: 'PARTIALLY COMPLETED', color: 'yellow', description: 'Provided some useful information' },
+        { value: 'not_completed', label: 'NOT COMPLETED', color: 'red', description: 'Did not help answer my question' }
       ]
     },
     {
@@ -226,10 +226,10 @@ const FeedbackModal = ({
       label: 'System Trustworthiness',
       question: 'How much do you trust this system\'s analysis?',
       options: [
-        { value: 'completely_trust', label: 'COMPLETELY_TRUST', color: 'green', description: 'Would rely on it completely' },
-        { value: 'mostly_trust', label: 'MOSTLY_TRUST', color: 'green', description: 'Generally trustworthy' },
-        { value: 'somewhat_trust', label: 'SOMEWHAT_TRUST', color: 'yellow', description: 'Would verify with other sources' },
-        { value: 'dont_trust', label: 'DON\'T_TRUST', color: 'red', description: 'Would not rely on this analysis' }
+        { value: 'completely_trust', label: 'COMPLETELY TRUST', color: 'green', description: 'Would rely on it completely' },
+        { value: 'mostly_trust', label: 'MOSTLY TRUST', color: 'green', description: 'Generally trustworthy' },
+        { value: 'somewhat_trust', label: 'SOMEWHAT TRUST', color: 'yellow', description: 'Would verify with other sources' },
+        { value: 'dont_trust', label: 'DON\'T TRUST', color: 'red', description: 'Would not rely on this analysis' }
       ]
     },
     {
@@ -240,8 +240,8 @@ const FeedbackModal = ({
         { value: 'definitely', label: 'DEFINITELY', color: 'green', description: 'Would actively seek to use it' },
         { value: 'probably', label: 'PROBABLY', color: 'green', description: 'Likely to use if available' },
         { value: 'maybe', label: 'MAYBE', color: 'yellow', description: 'Depends on alternatives' },
-        { value: 'probably_not', label: 'PROBABLY_NOT', color: 'red', description: 'Would prefer other options' },
-        { value: 'definitely_not', label: 'DEFINITELY_NOT', color: 'red', description: 'Would not use again' }
+        { value: 'probably_not', label: 'PROBABLY NOT', color: 'red', description: 'Would prefer other options' },
+        { value: 'definitely_not', label: 'DEFINITELY NOT', color: 'red', description: 'Would not use again' }
       ]
     }
   ];
@@ -378,8 +378,8 @@ const FeedbackModal = ({
   const getCurrentQuestions = () => {
     switch (steps[currentStep]?.category) {
       case 'quality': return qualityQuestions;
-      case 'timing': return timingQuestions;
-      case 'experience': return experienceQuestions;
+      //case 'timing': return timingQuestions;
+      //case 'experience': return experienceQuestions;
       default: return [];
     }
   };
@@ -391,25 +391,25 @@ const FeedbackModal = ({
     const category = steps[currentStep]?.category;
     if (category === 'quality') {
       return qualityQuestions.every(q => feedback.provenanceQuality[q.key] !== null);
-    } else if (category === 'timing') {
-      return timingQuestions.every(q => feedback.overallExperience[q.key] !== null);
-    } else if (category === 'experience') {
-      return experienceQuestions.every(q => 
-        feedback.overallExperience[q.key] !== null || feedback[q.key] !== null
-      );
+    //} else if (category === 'timing') {
+     // return timingQuestions.every(q => feedback.overallExperience[q.key] !== null);
+    //} else if (category === 'experience') {
+    //  return experienceQuestions.every(q => 
+     //   feedback.overallExperience[q.key] !== null || feedback[q.key] !== null
+     // );
     }
     return true;
   };
 
   const getCompletionPercentage = () => {
-    const allQuestions = [...qualityQuestions, ...timingQuestions, ...experienceQuestions];
+    const allQuestions = [...qualityQuestions, ...experienceQuestions];
     const completedQuestions = allQuestions.filter(q => {
       if (qualityQuestions.includes(q)) {
         return feedback.provenanceQuality[q.key] !== null;
-      } else if (timingQuestions.includes(q)) {
-        return feedback.overallExperience[q.key] !== null;
-      } else if (experienceQuestions.includes(q)) {
-        return feedback.overallExperience[q.key] !== null || feedback[q.key] !== null;
+      //} else if (timingQuestions.includes(q)) {
+      //  return feedback.overallExperience[q.key] !== null;
+      //} else if (experienceQuestions.includes(q)) {
+      //  return feedback.overallExperience[q.key] !== null || feedback[q.key] !== null;
       }
       return false;
     }).length;
@@ -437,7 +437,7 @@ const FeedbackModal = ({
       <div className="feedback-modal user-study-modal enhanced">
         <div className="modal-header">
           <div className="header-content">
-            <h3>USER_STUDY_EVALUATION</h3>
+            <h3>PROVENANCE EVALUATION</h3>
             <div className="evaluation-context">
               <div className="context-item">
                 <span className="context-label">Question:</span>
@@ -482,7 +482,7 @@ const FeedbackModal = ({
             </div>
             <div className="step-info">
               <span className="step-indicator">
-                STEP_{currentStep + 1}_OF_{steps.length}
+                STEP {currentStep + 1} OF {steps.length}
               </span>
               <span className="completion-status">
                 COMPLETION: {getCompletionPercentage()}%

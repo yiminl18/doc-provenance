@@ -70,12 +70,13 @@ const ProvenanceQA = forwardRef(({
 
     useEffect(() => {
         // Reset provenance display when active question changes
-        if (activeQuestionId) {
+        if (activeQuestionId || pdfDocument) {
             setShowProvenance(false);
             setCurrentProvenanceIndex(0);
             setSelectedProvenance(null);
         }
     }, [activeQuestionId]);
+
 
     // Expose methods to parent component
     useImperativeHandle(ref, () => ({

@@ -1,0 +1,469 @@
+/* ========================================
+   CHARACTER-LEVEL HIGHLIGHTING STYLES
+   Precise text highlighting for PDF provenance
+   ======================================== */
+
+/* ===== CHARACTER HIGHLIGHT LAYER ===== */
+.character-highlight-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Layer itself doesn't capture events */
+  z-index: 20;
+  overflow: hidden;
+  
+  /* Ensure crisp rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== BASE CHARACTER HIGHLIGHT STYLES ===== */
+.character-level-highlight {
+  position: absolute;
+  pointer-events: auto; /* Individual highlights capture events */
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 2px;
+  z-index: 25;
+  
+  /* Default appearance - yellow highlighter */
+  background-color: rgba(255, 193, 7, 0.4);
+  border: 2px solid rgba(255, 193, 7, 0.8);
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  
+  /* Subtle glow effect */
+  filter: drop-shadow(0 0 1px rgba(255, 193, 7, 0.3));
+  
+  /* Prevent text selection within highlights */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* ===== HOVER STATES ===== */
+.character-level-highlight:hover {
+  transform: scale(1.02);
+  z-index: 30;
+  border-width: 3px;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  filter: drop-shadow(0 0 3px rgba(255, 193, 7, 0.5));
+}
+
+.character-level-highlight:active {
+  transform: scale(0.98);
+  transition-duration: 0.1s;
+}
+
+/* ===== FOCUS STATES FOR ACCESSIBILITY ===== */
+.character-level-highlight:focus {
+  outline: none;
+  box-shadow: 
+    0 0 0 3px rgba(33, 150, 243, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  z-index: 35;
+}
+
+/* ===== COLOR VARIANTS FOR MULTIPLE PROVENANCES ===== */
+
+/* Primary yellow (default) */
+.character-level-highlight.highlight-yellow {
+  background-color: rgba(255, 193, 7, 0.4);
+  border-color: rgba(255, 193, 7, 0.8);
+  filter: drop-shadow(0 0 1px rgba(255, 193, 7, 0.3));
+}
+
+.character-level-highlight.highlight-yellow:hover {
+  background-color: rgba(255, 193, 7, 0.6);
+  border-color: rgba(255, 193, 7, 1.0);
+  filter: drop-shadow(0 0 3px rgba(255, 193, 7, 0.5));
+}
+
+/* Green variant */
+.character-level-highlight.highlight-green {
+  background-color: rgba(76, 175, 80, 0.4);
+  border-color: rgba(76, 175, 80, 0.8);
+  filter: drop-shadow(0 0 1px rgba(76, 175, 80, 0.3));
+}
+
+.character-level-highlight.highlight-green:hover {
+  background-color: rgba(76, 175, 80, 0.6);
+  border-color: rgba(76, 175, 80, 1.0);
+  filter: drop-shadow(0 0 3px rgba(76, 175, 80, 0.5));
+}
+
+/* Blue variant */
+.character-level-highlight.highlight-blue {
+  background-color: rgba(33, 150, 243, 0.4);
+  border-color: rgba(33, 150, 243, 0.8);
+  filter: drop-shadow(0 0 1px rgba(33, 150, 243, 0.3));
+}
+
+.character-level-highlight.highlight-blue:hover {
+  background-color: rgba(33, 150, 243, 0.6);
+  border-color: rgba(33, 150, 243, 1.0);
+  filter: drop-shadow(0 0 3px rgba(33, 150, 243, 0.5));
+}
+
+/* Purple variant */
+.character-level-highlight.highlight-purple {
+  background-color: rgba(156, 39, 176, 0.4);
+  border-color: rgba(156, 39, 176, 0.8);
+  filter: drop-shadow(0 0 1px rgba(156, 39, 176, 0.3));
+}
+
+.character-level-highlight.highlight-purple:hover {
+  background-color: rgba(156, 39, 176, 0.6);
+  border-color: rgba(156, 39, 176, 1.0);
+  filter: drop-shadow(0 0 3px rgba(156, 39, 176, 0.5));
+}
+
+/* Orange variant */
+.character-level-highlight.highlight-orange {
+  background-color: rgba(255, 152, 0, 0.4);
+  border-color: rgba(255, 152, 0, 0.8);
+  filter: drop-shadow(0 0 1px rgba(255, 152, 0, 0.3));
+}
+
+.character-level-highlight.highlight-orange:hover {
+  background-color: rgba(255, 152, 0, 0.6);
+  border-color: rgba(255, 152, 0, 1.0);
+  filter: drop-shadow(0 0 3px rgba(255, 152, 0, 0.5));
+}
+
+/* ===== SPECIAL HIGHLIGHT STATES ===== */
+
+/* High confidence highlight */
+.character-level-highlight.high-confidence {
+  border-width: 3px;
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Low confidence highlight (more subtle) */
+.character-level-highlight.low-confidence {
+  opacity: 0.7;
+  border-style: dashed;
+  border-width: 1px;
+}
+
+/* Selected highlight (when clicked/active) */
+.character-level-highlight.selected {
+  background-color: rgba(255, 193, 7, 0.7) !important;
+  border-color: rgba(255, 193, 7, 1.0) !important;
+  border-width: 4px !important;
+  z-index: 40 !important;
+  transform: scale(1.03);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 0 0 2px rgba(255, 255, 255, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  filter: drop-shadow(0 0 4px rgba(255, 193, 7, 0.6));
+}
+
+/* Fuzzy match highlight (slightly different style) */
+.character-level-highlight.fuzzy-match {
+  border-style: dotted;
+  opacity: 0.8;
+}
+
+.character-level-highlight.fuzzy-match::after {
+  content: '~';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background: rgba(255, 193, 7, 0.9);
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--win95-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== ANIMATION CLASSES ===== */
+
+/* Fade in animation for new highlights */
+.character-level-highlight.animate-in {
+  animation: characterHighlightFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes characterHighlightFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Fade out animation for removed highlights */
+.character-level-highlight.animate-out {
+  animation: characterHighlightFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes characterHighlightFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+    filter: blur(1px);
+  }
+}
+
+/* Pulse animation for drawing attention */
+.character-level-highlight.pulse {
+  animation: characterHighlightPulse 2s ease-in-out infinite;
+}
+
+@keyframes characterHighlightPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.02);
+  }
+}
+
+/* Flash animation for feedback */
+.character-level-highlight.flash {
+  animation: characterHighlightFlash 0.6s ease-out;
+}
+
+@keyframes characterHighlightFlash {
+  0% { background-color: rgba(255, 255, 255, 0.8); }
+  25% { background-color: rgba(255, 193, 7, 0.9); }
+  100% { background-color: rgba(255, 193, 7, 0.4); }
+}
+
+/* ===== HIGHLIGHTING CONTROLS UI ===== */
+.highlighting-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--bg-secondary);
+  border: var(--border-thin) solid var(--win95-border);
+  border-radius: 4px;
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-3);
+}
+
+.highlighting-controls label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-weight: var(--font-medium);
+  color: var(--win95-text);
+}
+
+.highlighting-controls input[type="checkbox"] {
+  accent-color: var(--primary-blue);
+}
+
+/* Status indicators in controls */
+.highlighting-controls .status-ready {
+  color: var(--success-green);
+  font-weight: var(--font-semibold);
+}
+
+.highlighting-controls .status-loading {
+  color: var(--warning-orange);
+  font-weight: var(--font-semibold);
+}
+
+.highlighting-controls .status-error {
+  color: var(--danger-red);
+  font-weight: var(--font-semibold);
+}
+
+/* ===== HIGHLIGHT STATISTICS DISPLAY ===== */
+.highlight-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--primary-blue-light);
+  border: var(--border-thin) solid var(--primary-blue);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--primary-blue);
+  margin-top: var(--space-2);
+}
+
+.highlight-stats .stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.highlight-stats .stat-value {
+  font-weight: var(--font-bold);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  /* Larger touch targets on mobile */
+  .character-level-highlight {
+    min-width: 20px;
+    min-height: 20px;
+  }
+  
+  /* Simpler hover effects on touch devices */
+  @media (hover: none) {
+    .character-level-highlight:hover {
+      transform: none;
+      border-width: 2px;
+    }
+  }
+  
+  /* Stack highlighting controls on small screens */
+  .highlighting-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  
+  .highlight-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .character-level-highlight {
+    background-color: #ffeb3b !important;
+    border: 2px solid #000 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  
+  .character-highlight-layer {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  .highlighting-controls,
+  .highlight-stats {
+    display: none !important;
+  }
+}
+
+/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .character-level-highlight {
+    border-width: 3px;
+    background-color: rgba(255, 193, 7, 0.6);
+    border-color: rgba(255, 193, 7, 1.0);
+  }
+  
+  .character-level-highlight.selected {
+    background-color: rgba(255, 193, 7, 0.8) !important;
+    border-width: 4px !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .character-level-highlight {
+    transition: none;
+    animation: none !important;
+  }
+  
+  .character-level-highlight:hover {
+    transform: none;
+  }
+  
+  .character-level-highlight.selected {
+    transform: none;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+.character-level-highlight:focus-visible {
+  outline: 3px solid var(--primary-blue);
+  outline-offset: 2px;
+}
+
+/* ===== LAYER INTEGRATION ===== */
+
+/* Ensure character highlights work well with existing PDF layers */
+.pdf-page-container .character-highlight-layer {
+  /* Position relative to the page container */
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Stack order with existing elements */
+.pdf-text-layer {
+  z-index: 2;
+}
+
+.pdf-highlight-layer {
+  z-index: 10; /* Your existing layout-based highlights */
+}
+
+.character-highlight-layer {
+  z-index: 20; /* Character highlights above layout highlights */
+}
+
+/* When both highlighting methods are active */
+.character-highlight-layer.priority {
+  z-index: 25; /* Boost character highlights when preferred */
+}
+
+.pdf-highlight-layer.fallback {
+  z-index: 15; /* Lower layout highlights when character is available */
+  opacity: 0.5; /* Make layout highlights more subtle */
+}
+
+/* ===== DEBUG STYLES (for development) ===== */
+.character-level-highlight.debug {
+  border: 2px dashed red !important;
+  background-color: rgba(255, 0, 0, 0.1) !important;
+}
+
+.character-level-highlight.debug::before {
+  content: attr(data-highlight-id);
+  position: absolute;
+  top: -20px;
+  left: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+}

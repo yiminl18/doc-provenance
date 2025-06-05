@@ -270,6 +270,21 @@ export const getQuestionStatus = async (questionId) => {
   }
 };
 
+export const getProvenanceHighlightingBoxes = async (filename, sentenceIds, provenanceId = null, provenanceText = null) => {
+  try {
+    const response = await axios.post(`${API_URL}/documents/${filename}/provenance-boxes`, {
+      sentence_ids: sentenceIds,
+      provenance_id: provenanceId,
+      provenance_text: provenanceText // NEW: include actual text
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('❌ Error getting provenance highlighting boxes:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
 // =============================================================================
 // Legacy/Compatibility APIs
 // =============================================================================

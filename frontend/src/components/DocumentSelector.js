@@ -9,6 +9,7 @@ import {
   faExclamationTriangle,
   faDatabase
 } from '@fortawesome/free-solid-svg-icons';
+import { faGoogleDrive } from '@fortawesome/free-brands-svg-icons';
 
 const DocumentSelector = ({ 
   onDocumentUpload, 
@@ -186,7 +187,7 @@ const DocumentSelector = ({
           
           {/* Browse Button - Updated */}
           <button 
-            className={`action-btn upload ${disabled ? 'disabled' : ''}`}
+            className={`action-btn browse ${disabled ? 'disabled' : ''}`}
             onClick={handleBrowseClick}
             disabled={disabled}
             title={disabled ? 'Session initializing, please wait...' : 'Browse documents'}
@@ -209,9 +210,9 @@ const DocumentSelector = ({
             disabled={disabled}
           >
             <FontAwesomeIcon 
-              icon={disabled ? faSpinner : faDatabase} 
+              icon= {disabled ? faSpinner : faGoogleDrive}
               spin={disabled}
-              size="lg" 
+              size="lg"
             />
             <div className="btn-content">
               <span className="btn-title">Browse GDrive</span>

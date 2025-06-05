@@ -1,0 +1,4 @@
+[2025-06-04 15:46:56] Starting batch sampling - Target: 5, Max attempts: 500
+[2025-06-04 15:46:57] Found 206840 candidate files
+[2025-06-04 15:46:57] Processing batch: 50 files (Success so far: 0/5)
+[2025-06-04 15:47:38] ✅ SUCCESS #1: 12000010_3 NCSO_Redacted-jw+.pdf (46 sentences, 16 pages)

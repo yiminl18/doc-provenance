@@ -23,7 +23,7 @@ const Header = ({
           <div className="document-actions">
             {/* Upload Button */}
             <button
-              className="action-btn compact upload"
+              className="win95-btn compact upload"
               onClick={onUploadDocument}
               title="Upload PDF"
             >
@@ -33,7 +33,7 @@ const Header = ({
 
             {/* Browse Documents Button */}
             <button
-              className="action-btn compact browse"
+              className="win95-btn compact browse"
               onClick={onShowPreloaded}
               title="Browse Documents"
             >
@@ -42,7 +42,7 @@ const Header = ({
             </button>
 
             {/* Browse Drive Button */}
-            <button className="action-btn compact drive" onClick={onShowDrive}>
+            <button className="win95-btn compact drive" onClick={onShowDrive}>
               <FontAwesomeIcon icon={faCloud} />
               <span>Browse Drive</span>
             </button>

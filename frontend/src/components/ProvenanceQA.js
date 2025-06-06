@@ -10,6 +10,7 @@ import {
     faClock,
     faCheck,
     faSpinner,
+    faQuestionCircle,
     faExclamationTriangle,
     faRefresh,
     faBookOpen,
@@ -19,7 +20,10 @@ import {
     faHighlighter,
     faChevronLeft,
     faChevronRight,
-    faTrash
+    faTrash,
+    faTimes,
+    faStopCircle,
+    faExclamationCircle
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/provenance-qa.css';
 // Import the enhanced API functions
@@ -30,9 +34,10 @@ import {
     getQuestionStatus,
     fetchSentences
 } from '../services/api';
+import QuestionSuggestionsModal from './QuestionSuggestionsModal';
 
 const ProvenanceQA = forwardRef(({
-     pdfDocument,
+    pdfDocument,
     questionsHistory,           // Receive from App
     activeQuestionId,          // Receive from App  
     onQuestionUpdate,          // Receive from App
@@ -47,10 +52,8 @@ const ProvenanceQA = forwardRef(({
     const [currentQuestion, setCurrentQuestion] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
+    const [showQuestionSuggestions, setShowQuestionSuggestions] = useState(false);
 
-    // Questions history
-    //const [questionsHistory, setQuestionsHistory] = useState(new Map());
-    //const [activeQuestionId, setActiveQuestionId] = useState(null);
 
     // Provenance state
     const [currentProvenanceIndex, setCurrentProvenanceIndex] = useState(0);
@@ -60,12 +63,115 @@ const ProvenanceQA = forwardRef(({
     const historyRef = useRef(null);
 
 
+
+
     // Get active question
     const activeQuestion = activeQuestionId ? questionsHistory.get(activeQuestionId) : null;
     const availableProvenances = activeQuestion?.provenanceSources || [];
 
     // Check if currently processing any questions
     const isProcessing = Array.from(questionsHistory.values()).some(q => q.isProcessing);
+
+    // Add cancel-related state
+    const [cancelTokens, setCancelTokens] = useState(new Map()); // Track cancel tokens by question ID
+    const [cancellationReasons, setCancellationReasons] = useState(new Map()); // Track why questions were cancelled
+
+    // Create AbortController for cancelling requests
+    const createCancelToken = (questionId) => {
+        const abortController = new AbortController();
+        setCancelTokens(prev => new Map(prev).set(questionId, abortController));
+        return abortController;
+    };
+
+    // Cancel a specific question's processing
+    const cancelQuestionProcessing = async (questionId, reason = 'user_cancelled') => {
+        console.log(`🛑 Cancelling question processing: ${questionId}, reason: ${reason}`);
+
+        const activeQuestionData = questionsHistory.get(questionId);
+        if (!activeQuestionData) {
+            console.warn(`Question ${questionId} not found for cancellation`);
+            return;
+        }
+
+        // Cancel any ongoing HTTP requests
+        const cancelToken = cancelTokens.get(questionId);
+        if (cancelToken) {
+            cancelToken.abort();
+            setCancelTokens(prev => {
+                const newTokens = new Map(prev);
+                newTokens.delete(questionId);
+                return newTokens;
+            });
+        }
+
+        // Clear any intervals
+        if (activeQuestionData.answerInterval) {
+            clearInterval(activeQuestionData.answerInterval);
+        }
+        if (activeQuestionData.statusInterval) {
+            clearInterval(activeQuestionData.statusInterval);
+        }
+
+        // Update question state
+        updateQuestion(questionId, {
+            isProcessing: false,
+            processingStatus: 'cancelled',
+            userMessage: getCancellationMessage(reason),
+            answerInterval: null,
+            statusInterval: null,
+            requestingProvenance: false,
+            canRequestMore: false,
+            cancelledAt: Date.now(),
+            cancellationReason: reason
+        });
+
+        // Store cancellation reason
+        setCancellationReasons(prev => new Map(prev).set(questionId, reason));
+
+        // Log the cancellation
+        if (window.userStudyLogger) {
+            await window.userStudyLogger.logUserInteraction(
+                'question_cancelled',
+                'provenance_qa',
+                {
+                    question_id: questionId,
+                    reason: reason,
+                    processing_time: Date.now() - (activeQuestionData.submitTime || Date.now())
+                }
+            );
+        }
+
+        console.log(`✅ Question ${questionId} processing cancelled`);
+    };
+
+    const getCancellationMessage = (reason) => {
+        switch (reason) {
+            case 'user_cancelled':
+                return 'Processing cancelled by user. You can submit a new question.';
+            case 'new_question_submitted':
+                return 'Processing cancelled due to new question submission.';
+            case 'timeout':
+                return 'Processing cancelled due to timeout.';
+            case 'error':
+                return 'Processing cancelled due to an error.';
+            default:
+                return 'Processing was cancelled.';
+        }
+    };
+
+    // Cancel all processing questions
+    const cancelAllProcessing = async (reason = 'user_cancelled') => {
+        const processingQuestions = Array.from(questionsHistory.values())
+            .filter(q => q.isProcessing)
+            .map(q => q.id);
+
+        console.log(`🛑 Cancelling ${processingQuestions.length} processing questions`);
+
+        for (const questionId of processingQuestions) {
+            await cancelQuestionProcessing(questionId, reason);
+        }
+    };
+
 
 
     useEffect(() => {
@@ -85,38 +191,49 @@ const ProvenanceQA = forwardRef(({
             if (inputRef.current) {
                 inputRef.current.focus();
             }
-   
+
         }
     }));
 
+    const handleSuggestedQuestionSelect = (questionText) => {
+        setCurrentQuestion(questionText);
+        handleSubmit(null, questionText);
+    };
 
 
-    // Enhanced question submission with better error handling and timing
+
+     // Enhanced question submission with cancellation support
     const handleSubmit = async (e, questionTextOverride = null) => {
         if (e) e.preventDefault();
 
         const questionText = (questionTextOverride || currentQuestion).trim();
         if (!questionText || isSubmitting || !pdfDocument) return;
 
-        // Don't allow new submissions while processing
+        // Cancel any currently processing questions before submitting new one
         if (isProcessing) {
-            console.log('⏸️ Cannot submit - another question is still processing');
-            setSubmitError('Please wait for the current question to complete processing.');
-            return;
+            console.log('🛑 Cancelling existing processing before new submission');
+            await cancelAllProcessing('new_question_submitted');
         }
 
         setCurrentQuestion('');
         setIsSubmitting(true);
         setSubmitError(null);
 
+        // Create question ID and cancel token
+        const questionId = `q_${Date.now()}`;
+        const cancelToken = createCancelToken(questionId);
+
         try {
             console.log('🔄 Submitting question:', questionText);
 
-            // Submit question to backend
-            const response = await askQuestion(questionText, pdfDocument.filename, null);
+            // Submit question to backend with abort signal
+            const response = await askQuestion(
+                questionText, 
+                pdfDocument.filename, 
+                { signal: cancelToken.signal } // Pass abort signal
+            );
 
             if (response.success && response.question_id) {
-                const questionId = `q_${Date.now()}`;
                 const backendQuestionId = response.question_id;
 
                 console.log('✅ Question submitted successfully:', {
@@ -124,7 +241,7 @@ const ProvenanceQA = forwardRef(({
                     backendId: backendQuestionId
                 });
 
-                // Create question object with better initial state
+                // Create question object
                 const questionData = {
                     id: questionId,
                     backendQuestionId: backendQuestionId,
@@ -142,16 +259,17 @@ const ProvenanceQA = forwardRef(({
                     processingStatus: 'processing',
                     userMessage: null,
                     processingTime: null,
-                    submitTime: Date.now()
+                    submitTime: Date.now(),
+                    cancellable: true // Mark as cancellable
                 };
 
                 // Add to questions history
                 onQuestionAdd(questionData);
 
-                // Start watching for answer with a proper delay
+                // Start watching for answer
                 setTimeout(() => {
-                    startAnswerWatcher(questionId, backendQuestionId);
-                }, 1000); // Give backend time to set up files
+                    startAnswerWatcher(questionId, backendQuestionId, cancelToken);
+                }, 1000);
 
                 console.log('✅ Question processing initialized');
 
@@ -160,9 +278,15 @@ const ProvenanceQA = forwardRef(({
             }
 
         } catch (error) {
+            // Check if error was due to cancellation
+            if (error.name === 'AbortError') {
+                console.log('🛑 Question submission was cancelled');
+                setCurrentQuestion(questionText); // Restore question text
+                return;
+            }
+
             console.error('❌ Error submitting question:', error);
 
-            // Provide more specific error messages
             let errorMessage = 'Failed to submit question';
             if (error.message.includes('Network Error') || error.message.includes('ERR_NETWORK')) {
                 errorMessage = 'Network error - please check your connection and try again';
@@ -175,9 +299,15 @@ const ProvenanceQA = forwardRef(({
             }
 
             setSubmitError(errorMessage);
-            setCurrentQuestion(questionText); // Restore question text
+            setCurrentQuestion(questionText);
 
-            // Auto-clear error after 10 seconds
+            // Clean up cancel token
+            setCancelTokens(prev => {
+                const newTokens = new Map(prev);
+                newTokens.delete(questionId);
+                return newTokens;
+            });
+
             setTimeout(() => {
                 setSubmitError(null);
             }, 10000);
@@ -187,45 +317,47 @@ const ProvenanceQA = forwardRef(({
         }
     };
 
-    // Watch for answer readiness with improved error handling and delays
-    const startAnswerWatcher = (questionId, backendQuestionId) => {
+    // Enhanced answer watcher with cancellation support
+    const startAnswerWatcher = (questionId, backendQuestionId, cancelToken) => {
         let answerCheckCount = 0;
-        const maxAnswerChecks = 120; // 2 minutes max
+        const maxAnswerChecks = 120;
         let consecutiveErrors = 0;
         const maxConsecutiveErrors = 5;
 
-        // Add initial delay to let backend initialize
         setTimeout(() => {
             const answerInterval = setInterval(async () => {
+                // Check if cancelled
+                if (cancelToken.signal.aborted) {
+                    console.log(`🛑 Answer watcher cancelled for question ${questionId}`);
+                    clearInterval(answerInterval);
+                    return;
+                }
+
                 answerCheckCount++;
 
                 try {
-                    // Check if answer is ready
-                    const answerStatus = await checkAnswer(backendQuestionId);
+                    const answerStatus = await checkAnswer(backendQuestionId, {
+                        signal: cancelToken.signal
+                    });
 
-                    // Reset error counter on successful call
                     consecutiveErrors = 0;
 
                     if (answerStatus.success && answerStatus.ready) {
                         console.log('✅ Answer ready for question:', questionId);
 
-                        // Update question with answer
                         updateQuestion(questionId, {
                             answer: answerStatus.answer,
                             answerReady: true,
                             answerTimestamp: answerStatus.timestamp
                         });
 
-                        // Stop watching for answer
                         clearInterval(answerInterval);
 
-                        // Start status monitoring for provenance with a small delay
                         setTimeout(() => {
-                            startStatusMonitoring(questionId, backendQuestionId);
+                            startStatusMonitoring(questionId, backendQuestionId, cancelToken);
                         }, 500);
 
                     } else if (answerCheckCount >= maxAnswerChecks) {
-                        // Timeout
                         console.log('⏰ Answer check timeout for question:', questionId);
                         clearInterval(answerInterval);
                         updateQuestion(questionId, {
@@ -236,10 +368,15 @@ const ProvenanceQA = forwardRef(({
                     }
 
                 } catch (error) {
+                    if (error.name === 'AbortError') {
+                        console.log(`🛑 Answer check cancelled for question ${questionId}`);
+                        clearInterval(answerInterval);
+                        return;
+                    }
+
                     consecutiveErrors++;
                     console.warn(`⚠️ Error checking answer (attempt ${consecutiveErrors}/${maxConsecutiveErrors}):`, error);
 
-                    // If we hit too many consecutive errors, stop trying
                     if (consecutiveErrors >= maxConsecutiveErrors) {
                         console.error('❌ Too many consecutive errors, stopping answer watcher');
                         clearInterval(answerInterval);
@@ -251,49 +388,45 @@ const ProvenanceQA = forwardRef(({
                         return;
                     }
 
-                    // Increase check interval on errors to reduce load
                     if (consecutiveErrors > 2) {
-                        answerCheckCount += 2; // Skip some checks to slow down
+                        answerCheckCount += 2;
                     }
                 }
-            }, 1500); // Slightly slower interval - 1.5 seconds
+            }, 1500);
 
-            // Store interval for cleanup
             updateQuestion(questionId, { answerInterval });
 
-        }, 2000); // Initial 2-second delay before starting checks
+        }, 2000);
     };
 
-    // Enhanced status monitoring with interval tracking
-    const startStatusMonitoring = (questionId, backendQuestionId) => {
+    // Enhanced status monitoring with cancellation support
+    const startStatusMonitoring = (questionId, backendQuestionId, cancelToken) => {
         let statusCheckCount = 0;
-        const maxStatusChecks = 150; // 5 minutes max
+        const maxStatusChecks = 150;
         let consecutiveErrors = 0;
         const maxConsecutiveErrors = 5;
 
-        console.log(`🎬 Starting status monitoring for question ${questionId} (backend: ${backendQuestionId})`);
+        console.log(`🎬 Starting status monitoring for question ${questionId}`);
 
         const statusInterval = setInterval(async () => {
+            // Check if cancelled
+            if (cancelToken.signal.aborted) {
+                console.log(`🛑 Status monitoring cancelled for question ${questionId}`);
+                clearInterval(statusInterval);
+                return;
+            }
+
             statusCheckCount++;
-            console.log(`🔄 Status check #${statusCheckCount} for question ${questionId} - interval still running`);
 
             try {
-                const statusResponse = await getQuestionStatus(backendQuestionId);
-                console.log(`📊 Status response #${statusCheckCount}:`, statusResponse);
+                const statusResponse = await getQuestionStatus(backendQuestionId, {
+                    signal: cancelToken.signal
+                });
 
                 consecutiveErrors = 0;
 
                 if (statusResponse.success) {
                     const status = statusResponse.status;
-
-                    // Log detailed status
-                    console.log(`📈 Status details for check #${statusCheckCount}:`, {
-                        provenance_count: status.provenance_count,
-                        user_provenance_count: status.user_provenance_count,
-                        processing_complete: status.processing_complete,
-                        can_request_more: status.can_request_more,
-                        answer_ready: status.answer_ready
-                    });
 
                     updateQuestion(questionId, {
                         provenanceCount: status.provenance_count || 0,
@@ -301,32 +434,31 @@ const ProvenanceQA = forwardRef(({
                         canRequestMore: status.can_request_more || false,
                         isProcessing: !status.processing_complete,
                         processingStatus: status.processing_complete ? 'completed' : 'processing',
-                        processingComplete: status.processing_complete // Add this field
+                        processingComplete: status.processing_complete
                     });
 
-                    console.log(`📝 Updated question state for ${questionId}`);
-
-                    // Check if we should stop monitoring
                     if (status.processing_complete) {
-                        console.log(`✅ Processing completed for question ${questionId} - stopping monitoring`);
+                        console.log(`✅ Processing completed for question ${questionId}`);
                         clearInterval(statusInterval);
 
                         updateQuestion(questionId, {
                             processingTime: status.processing_time,
-                            finalProvenanceCount: status.provenance_count
+                            finalProvenanceCount: status.provenance_count,
+                            cancellable: false // No longer cancellable when complete
                         });
 
-                        console.log(`🏁 Status monitoring stopped for ${questionId} after ${statusCheckCount} checks`);
+                        // Clean up cancel token
+                        setCancelTokens(prev => {
+                            const newTokens = new Map(prev);
+                            newTokens.delete(questionId);
+                            return newTokens;
+                        });
                         return;
-                    } else {
-                        console.log(`⏳ Processing still ongoing for ${questionId} - continuing monitoring`);
                     }
-                } else {
-                    console.warn(`⚠️ Status check #${statusCheckCount} returned unsuccessful response:`, statusResponse);
                 }
 
                 if (statusCheckCount >= maxStatusChecks) {
-                    console.log(`⏰ Status monitoring timeout for question ${questionId} after ${statusCheckCount} checks`);
+                    console.log(`⏰ Status monitoring timeout for question ${questionId}`);
                     clearInterval(statusInterval);
                     updateQuestion(questionId, {
                         isProcessing: false,
@@ -337,11 +469,17 @@ const ProvenanceQA = forwardRef(({
                 }
 
             } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log(`🛑 Status monitoring cancelled for question ${questionId}`);
+                    clearInterval(statusInterval);
+                    return;
+                }
+
                 consecutiveErrors++;
-                console.error(`❌ Error in status check #${statusCheckCount} (consecutive errors: ${consecutiveErrors}):`, error);
+                console.error(`❌ Error in status check (consecutive errors: ${consecutiveErrors}):`, error);
 
                 if (consecutiveErrors >= maxConsecutiveErrors) {
-                    console.error(`💥 Too many consecutive errors (${consecutiveErrors}), stopping status monitoring for ${questionId}`);
+                    console.error(`💥 Too many consecutive errors, stopping status monitoring for ${questionId}`);
                     clearInterval(statusInterval);
                     updateQuestion(questionId, {
                         isProcessing: false,
@@ -351,27 +489,31 @@ const ProvenanceQA = forwardRef(({
                     return;
                 }
             }
-        }, 2000); // Check every 2 seconds
+        }, 2000);
 
-        // Store interval for cleanup and debugging
         updateQuestion(questionId, { statusInterval });
-        console.log(`⏰ Status monitoring interval created for question ${questionId} - interval ID:`, statusInterval);
-
-        // Debug: Log that the interval was created successfully
-        setTimeout(() => {
-            console.log(`🔍 Debug: Checking if interval is still active for ${questionId} after 3 seconds`);
-        }, 3000);
     };
+
+    const CancelButton = ({ questionId, className = "" }) => (
+        <button
+            className={`win95-btn cancel ${className}`}
+            onClick={() => cancelQuestionProcessing(questionId, 'user_cancelled')}
+            title="Cancel processing"
+        >
+            <FontAwesomeIcon icon={faStopCircle} />
+            Cancel
+        </button>
+    );
 
     // Also check the updateQuestion function to make sure it's not accidentally clearing intervals
     const updateQuestion = (questionId, updates) => {
         console.log(`🔄 ProvenanceQA: updateQuestion called for ${questionId}:`, updates);
-        
+
         // Check if we're accidentally clearing intervals
         if (updates.statusInterval === null || updates.answerInterval === null) {
             console.warn(`⚠️ WARNING: Clearing interval in updates for ${questionId}:`, updates);
         }
-        
+
         // Call the parent's update function
         onQuestionUpdate(questionId, updates);
     };
@@ -524,75 +666,75 @@ const ProvenanceQA = forwardRef(({
         }
     };
 
-  
- const handleDotNavigation = (index) => {
-    setCurrentProvenanceIndex(index);
-    const provenance = activeQuestion.provenanceSources[index];
-    setSelectedProvenance(provenance);
-    
-    // Send navigation trigger directly (no state)
-    if (provenance.sentences_ids && provenance.sentences_ids.length > 0 && onNavigationTrigger) {
-        const firstSentenceId = provenance.sentences_ids[0];
-        console.log('🎯 ProvenanceQA: Dot nav - Sending navigation trigger for sentence:', firstSentenceId);
-        
-        onNavigationTrigger({
-            sentenceId: firstSentenceId,
-            timestamp: Date.now(),
-            provenanceId: provenance.provenance_id
-        });
-    }
-    
-    if (onProvenanceSelect) onProvenanceSelect(provenance);
-    if (onHighlightInPDF) onHighlightInPDF(provenance);
-};
 
-const handlePreviousProvenance = () => {
-    if (currentProvenanceIndex > 0) {
-        const newIndex = currentProvenanceIndex - 1;
-        setCurrentProvenanceIndex(newIndex);
-        const provenance = availableProvenances[newIndex];
+    const handleDotNavigation = (index) => {
+        setCurrentProvenanceIndex(index);
+        const provenance = activeQuestion.provenanceSources[index];
         setSelectedProvenance(provenance);
-        
-        // Send navigation trigger directly
+
+        // Send navigation trigger directly (no state)
         if (provenance.sentences_ids && provenance.sentences_ids.length > 0 && onNavigationTrigger) {
             const firstSentenceId = provenance.sentences_ids[0];
-            console.log('🎯 ProvenanceQA: Previous - Sending navigation trigger for sentence:', firstSentenceId);
-            
+            console.log('🎯 ProvenanceQA: Dot nav - Sending navigation trigger for sentence:', firstSentenceId);
+
             onNavigationTrigger({
                 sentenceId: firstSentenceId,
                 timestamp: Date.now(),
                 provenanceId: provenance.provenance_id
             });
         }
-        
-        if (onProvenanceSelect) onProvenanceSelect(provenance);
-        if (onHighlightInPDF) onHighlightInPDF(provenance);
-    }
-};
 
-const handleNextProvenance = () => {
-    if (currentProvenanceIndex < availableProvenances.length - 1) {
-        const newIndex = currentProvenanceIndex + 1;
-        setCurrentProvenanceIndex(newIndex);
-        const provenance = availableProvenances[newIndex];
-        setSelectedProvenance(provenance);
-        
-        // Send navigation trigger directly
-        if (provenance.sentences_ids && provenance.sentences_ids.length > 0 && onNavigationTrigger) {
-            const firstSentenceId = provenance.sentences_ids[0];
-            console.log('🎯 ProvenanceQA: Next - Sending navigation trigger for sentence:', firstSentenceId);
-            
-            onNavigationTrigger({
-                sentenceId: firstSentenceId,
-                timestamp: Date.now(),
-                provenanceId: provenance.provenance_id
-            });
-        }
-        
         if (onProvenanceSelect) onProvenanceSelect(provenance);
         if (onHighlightInPDF) onHighlightInPDF(provenance);
-    }
-};
+    };
+
+    const handlePreviousProvenance = () => {
+        if (currentProvenanceIndex > 0) {
+            const newIndex = currentProvenanceIndex - 1;
+            setCurrentProvenanceIndex(newIndex);
+            const provenance = availableProvenances[newIndex];
+            setSelectedProvenance(provenance);
+
+            // Send navigation trigger directly
+            if (provenance.sentences_ids && provenance.sentences_ids.length > 0 && onNavigationTrigger) {
+                const firstSentenceId = provenance.sentences_ids[0];
+                console.log('🎯 ProvenanceQA: Previous - Sending navigation trigger for sentence:', firstSentenceId);
+
+                onNavigationTrigger({
+                    sentenceId: firstSentenceId,
+                    timestamp: Date.now(),
+                    provenanceId: provenance.provenance_id
+                });
+            }
+
+            if (onProvenanceSelect) onProvenanceSelect(provenance);
+            if (onHighlightInPDF) onHighlightInPDF(provenance);
+        }
+    };
+
+    const handleNextProvenance = () => {
+        if (currentProvenanceIndex < availableProvenances.length - 1) {
+            const newIndex = currentProvenanceIndex + 1;
+            setCurrentProvenanceIndex(newIndex);
+            const provenance = availableProvenances[newIndex];
+            setSelectedProvenance(provenance);
+
+            // Send navigation trigger directly
+            if (provenance.sentences_ids && provenance.sentences_ids.length > 0 && onNavigationTrigger) {
+                const firstSentenceId = provenance.sentences_ids[0];
+                console.log('🎯 ProvenanceQA: Next - Sending navigation trigger for sentence:', firstSentenceId);
+
+                onNavigationTrigger({
+                    sentenceId: firstSentenceId,
+                    timestamp: Date.now(),
+                    provenanceId: provenance.provenance_id
+                });
+            }
+
+            if (onProvenanceSelect) onProvenanceSelect(provenance);
+            if (onHighlightInPDF) onHighlightInPDF(provenance);
+        }
+    };
 
 
 
@@ -660,7 +802,7 @@ const handleNextProvenance = () => {
         });
     };
 
-    const getQuestionUIStatus = (question) => {
+    const getQuestionStatusUI = (question) => {
         if (question.processingStatus === 'error') {
             return {
                 icon: faExclamationTriangle,
@@ -669,7 +811,17 @@ const handleNextProvenance = () => {
                 text: 'Error',
                 className: 'error'
             };
-        } else if (question.isProcessing) {
+        }
+        else if (question.processingStatus === 'cancelled') {
+            return {
+                icon: faExclamationCircle,
+                color: '#ffa500',
+                spin: false,
+                text: 'Cancelled',
+                className: 'cancelled'
+            };
+        }
+        else if (question.isProcessing) {
             return {
                 icon: faSpinner,
                 color: '#ff9500',
@@ -700,8 +852,8 @@ const handleNextProvenance = () => {
         return (
             <div className="provenance-qa-empty">
                 <div className="empty-icon"></div>
-    
-     
+
+
             </div>
         );
     }
@@ -716,16 +868,42 @@ const handleNextProvenance = () => {
             <div className="qa-input-section">
                 <div className="section-header">
                     <FontAwesomeIcon icon={faTerminal} />
-                    <h4>Ask Questions</h4>
- 
+                    <h4>Ask</h4>
+                    <button
+                        className="win95-btn"
+                        onClick={() => setShowQuestionSuggestions(true)}
+                        disabled={!pdfDocument}
+                        title="View suggested questions for this document"
+                    >
+                        <FontAwesomeIcon icon={faQuestionCircle} />
+                        Question Suggestions
+                    </button>
                 </div>
+
+                {/* Add global cancel button if any questions are processing */}
+                {isProcessing && (
+                    <div className="processing-controls">
+                        <div className="processing-indicator">
+                            <FontAwesomeIcon icon={faSpinner} spin />
+                            <span>Processing questions...</span>
+                        </div>
+                        <button
+                            className="win95-btn cancel"
+                            onClick={() => cancelAllProcessing('user_cancelled')}
+                            title="Cancel all processing questions"
+                        >
+                            <FontAwesomeIcon icon={faStopCircle} />
+                            Cancel All
+                        </button>
+                    </div>
+                )}
 
                 {/* Error Display */}
                 {submitError && (
                     <div className="submit-error">
                         <FontAwesomeIcon icon={faExclamationTriangle} />
                         <span className="error-message">{submitError}</span>
-                        <button className="retry-btn" onClick={handleRetry}>
+                        <button className="win95-btn retry" onClick={handleRetry}>
                             <FontAwesomeIcon icon={faRefresh} />
                             Retry
                         </button>
@@ -753,7 +931,7 @@ const handleNextProvenance = () => {
 
                     <button
                         type="submit"
-                        className={`submit-btn ${submitError ? 'error' : ''}`}
+                        className={`win95-btn submit ${submitError ? 'error' : ''}`}
                         disabled={!currentQuestion.trim() || isSubmitting || isProcessing}
                     >
                         {isSubmitting ? (
@@ -776,7 +954,7 @@ const handleNextProvenance = () => {
                         <h4>Current Question</h4>
                         <div className="question-status">
                             {(() => {
-                                const status = getQuestionUIStatus(activeQuestion);
+                                const status = getQuestionStatusUI(activeQuestion);
                                 return (
                                     <span className={`status-indicator ${status.className}`}>
                                         <FontAwesomeIcon icon={status.icon} spin={status.spin} />
@@ -785,10 +963,36 @@ const handleNextProvenance = () => {
                                 );
                             })()}
                         </div>
+                        {/* Individual question cancel button */}
+                        {activeQuestion.isProcessing && activeQuestion.cancellable && (
+                            <CancelButton 
+                                questionId={activeQuestion.id} 
+                                className="win95-btn cancel"
+                            />
+                        )}
                     </div>
 
                     <div className="question-display">
                         <div className="question-text">{activeQuestion.text}</div>
+
+                        {/* Show cancellation message if cancelled */}
+                        {activeQuestion.processingStatus === 'cancelled' && (
+                            <div className="cancellation-notice">
+                                <FontAwesomeIcon icon={faExclamationCircle} />
+                                <span>{activeQuestion.userMessage}</span>
+                                <button 
+                                    className="win95-btn retry"
+                                    onClick={() => {
+                                        setCurrentQuestion(activeQuestion.text);
+                                        if (inputRef.current) {
+                                            inputRef.current.focus();
+                                        }
+                                    }}
+                                >
+                                    Ask Again
+                                </button>
+                            </div>
+                        )}
 
                         {/* Answer Section */}
                         {activeQuestion.answerReady && activeQuestion.answer ? (
@@ -823,7 +1027,7 @@ const handleNextProvenance = () => {
                                     {/* Provenance Navigation */}
                                     <div className="provenance-navigation">
                                         <button
-                                            className="nav-btn prev"
+                                            className="win95-btn nav prev"
                                             onClick={handlePreviousProvenance}
                                             disabled={currentProvenanceIndex === 0}
                                         >
@@ -842,7 +1046,7 @@ const handleNextProvenance = () => {
                                         </div>
 
                                         <button
-                                            className="nav-btn next"
+                                            className="win95-btn nav next"
                                             onClick={handleNextProvenance}
                                             disabled={currentProvenanceIndex === activeQuestion.provenanceSources.length - 1}
                                         >
@@ -854,7 +1058,7 @@ const handleNextProvenance = () => {
                                     {/* Current Provenance Content */}
                                     {selectedProvenance && (
                                         <div className="current-provenance">
-                                 
+
 
                                             <div className="provenance-content">
                                                 {selectedProvenance.content && selectedProvenance.content.length > 0 ? (
@@ -881,10 +1085,10 @@ const handleNextProvenance = () => {
                                             </div>
 
                                             <div className="provenance-actions">
-                                         
+
 
                                                 <button
-                                                    className="action-btn feedback-btn"
+                                                    className="win95-btn feedback"
                                                     onClick={() => onFeedbackRequest && onFeedbackRequest(activeQuestion)}
                                                 >
                                                     <FontAwesomeIcon icon={faComment} />
@@ -917,7 +1121,7 @@ const handleNextProvenance = () => {
                                             <div className="get-provenance-section">
                                                 <p>Provenance found! ({activeQuestion.provenanceCount} available)</p>
                                                 <button
-                                                    className="get-provenance-btn"
+                                                    className="win95-btn get-provenance"
                                                     onClick={() => {
                                                         console.log('🎬 Initial provenance button clicked');
                                                         setShowProvenance(true);
@@ -944,7 +1148,7 @@ const handleNextProvenance = () => {
                                                 <div className="get-provenance-section">
                                                     <p>More provenance available.</p>
                                                     <button
-                                                        className="get-provenance-btn"
+                                                        className="win95-btn get-provenance"
                                                         onClick={() => {
                                                             console.log('🔄 Requesting additional provenance');
                                                             handleGetNextProvenance();
@@ -996,7 +1200,7 @@ const handleNextProvenance = () => {
                             {activeQuestion.canRequestMore && activeQuestion.provenanceSources.length > 0 && (
                                 <div className="get-more-section">
                                     <button
-                                        className="get-more-btn"
+                                        className="win95-btn get-more"
                                         onClick={handleGetNextProvenance}
                                         disabled={activeQuestion.requestingProvenance}
                                     >
@@ -1013,7 +1217,7 @@ const handleNextProvenance = () => {
                                         )}
                                     </button>
                                     <div className="provenance-info">
-                                        Showing {activeQuestion.userProvenanceCount} of {activeQuestion.maxProvenances} 
+                                        Showing {activeQuestion.userProvenanceCount} of {activeQuestion.maxProvenances}
                                         {activeQuestion.provenanceCount > activeQuestion.userProvenanceCount &&
                                             ` (${activeQuestion.provenanceCount - activeQuestion.userProvenanceCount} more available)`}
                                     </div>
@@ -1024,7 +1228,12 @@ const handleNextProvenance = () => {
                 </div>
             )}
 
-           
+            <QuestionSuggestionsModal
+                isOpen={showQuestionSuggestions}
+                onClose={() => setShowQuestionSuggestions(false)}
+                filename={pdfDocument?.filename}
+                onQuestionSelect={handleSuggestedQuestionSelect}
+            />
         </div>
     );
 });

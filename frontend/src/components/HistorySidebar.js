@@ -279,7 +279,7 @@ const HistorySidebar = ({
                           {/* Detail modal button */}
                           {hasDetails && (
                             <button
-                              className="action-btn question detail"
+                              className="win95-btn question detail"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedQuestionModal(question);
@@ -293,7 +293,7 @@ const HistorySidebar = ({
                           {/* Collapse toggle button */}
                           {hasDetails && (
                             <button
-                              className="action-btn question collapse-toggle"
+                              className="win95-btn question collapse-toggle"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleQuestionCollapse(question.id);
@@ -308,7 +308,7 @@ const HistorySidebar = ({
                           
                           {/* Delete button */}
                           <button
-                            className="action-btn question delete"
+                            className="win95-btn question delete"
                             onClick={(e) => {
                               e.stopPropagation();
                               onQuestionDelete(question.id);
@@ -386,7 +386,7 @@ const HistorySidebar = ({
             <div className="modal-header">
               <h4>Question Details</h4>
               <button 
-                className="close-btn" 
+                className="win95-btn close" 
                 onClick={() => setSelectedQuestionModal(null)}
               >
                 <FontAwesomeIcon icon={faTimes} />
@@ -433,7 +433,7 @@ const HistorySidebar = ({
                             )}
                           </div>
                           <button
-                            className="action-btn highlight"
+                            className="win95-btn highlight"
                             onClick={() => {
                               onProvenanceSelect(prov);
                               setSelectedQuestionModal(null);
@@ -460,14 +460,14 @@ const HistorySidebar = ({
             
             <div className="modal-footer">
               <button 
-                className="btn-secondary"
+                className="win95-btn econdary"
                 onClick={() => setSelectedQuestionModal(null)}
               >
                 Close
               </button>
               
               <button 
-                className="btn-primary"
+                className="win95-btn primary"
                 onClick={() => {
                   onQuestionSelect(selectedQuestionModal.id);
                   setSelectedQuestionModal(null);
@@ -479,7 +479,7 @@ const HistorySidebar = ({
               
               {selectedQuestionModal.provenanceSources?.length > 0 && (
                 <button 
-                  className="btn-accent"
+                  className="win95-btn accent"
                   onClick={() => {
                     onFeedbackRequest(selectedQuestionModal);
                     setSelectedQuestionModal(null);

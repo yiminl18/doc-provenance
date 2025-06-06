@@ -314,27 +314,12 @@
   justify-content: flex-end;
 }
 
-.action-btn.question {
-  background-color: var(--bg-secondary);
-  border: var(--border-thin) solid var(--win95-border);
-  color: var(--win95-text);
-  padding: var(--space-1);
-  font-size: var(--text-xs);
-  cursor: pointer;
-  transition: var(--transition-fast);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-raised);
-  width: 24px;
-  height: 24px;
-}
 
 
 
 
 
-.history-item.active .action-btn {
+.history-item.active .win95-btn {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.3);
   color: white;
@@ -511,34 +496,6 @@
   margin-left: var(--space-2);
 }
 
-.action-btn.question {
-  padding: var(--space-1);
-  border: var(--border-thin) solid var(--win95-border);
-  background-color: var(--win95-lighter);
-  color: var(--win95-text);
-  cursor: pointer;
-  font-size: var(--text-xs);
-  min-width: 24px;
-  min-height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition-fast);
-  box-shadow: var(--shadow-raised);
-}
-
-.action-btn.question:hover {
-  background-color: var(--win95-lightest);
-  border-color: var(--primary-blue);
-}
-
-.action-btn.question.detail {
-  color: var(--primary-blue);
-}
-
-.action-btn.question.collapse-toggle {
-  color: var(--win95-text-muted);
-}
 
 
 /* Compact provenance previews */
@@ -595,69 +552,6 @@
 .more-indicator-btn:hover {
   background-color: var(--primary-blue);
   color: white;
-}
-
-/* ========================================
-   QUESTION DETAIL MODAL
-   ======================================== */
-
-.question-detail-modal {
-  background-color: var(--bg-panel);
-  border: var(--border-thick) solid var(--win95-border-dark);
-  box-shadow: var(--shadow-raised);
-  width: 100%;
-  max-width: 700px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  animation: slideIn 0.3s ease-out;
-}
-
-.question-detail-modal .modal-header {
-  background-color: var(--bg-secondary);
-  border-bottom: var(--border-medium) solid var(--win95-border);
-  padding: var(--space-4) var(--space-6);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-}
-
-.question-detail-modal .modal-header h4 {
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  color: var(--win95-text);
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.question-detail-modal .close-btn {
-  background-color: var(--danger-red);
-  border: var(--border-medium) solid var(--win95-border-dark);
-  color: white;
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: var(--transition-fast);
-  box-shadow: var(--shadow-raised);
-}
-
-.question-detail-modal .close-btn:hover {
-  background-color: var(--danger-red-hover);
-  transform: translate(1px, 1px);
-  box-shadow: var(--shadow-pressed);
-}
-
-.question-detail-modal .modal-body {
-  padding: var(--space-6);
-  overflow-y: auto;
-  flex: 1;
 }
 
 /* Modal sections */
@@ -758,27 +652,7 @@
   font-family: var(--font-mono);
 }
 
-.highlight-btn {
-  padding: var(--space-2) var(--space-3);
-  background-color: var(--warning-orange);
-  border: var(--border-medium) solid var(--warning-orange);
-  color: white;
-  cursor: pointer;
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  transition: var(--transition-fast);
-  box-shadow: var(--shadow-raised);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
 
-.highlight-btn:hover {
-  background-color: var(--warning-orange-hover);
-  border-color: var(--warning-orange-hover);
-}
 
 .provenance-content {
   padding: var(--space-4);
@@ -822,73 +696,7 @@
   padding: var(--space-4);
 }
 
-/* Modal footer */
-.question-detail-modal .modal-footer {
-  padding: var(--space-4) var(--space-6);
-  background-color: var(--bg-secondary);
-  border-top: var(--border-medium) solid var(--win95-border);
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  flex-shrink: 0;
-}
 
-.question-detail-modal .btn-secondary,
-.question-detail-modal .btn-primary,
-.question-detail-modal .btn-accent {
-  padding: var(--space-3) var(--space-6);
-  border: var(--border-medium) solid var(--win95-border-dark);
-  cursor: pointer;
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  transition: var(--transition-fast);
-  box-shadow: var(--shadow-raised);
-}
-
-.question-detail-modal .btn-secondary {
-  background-color: var(--win95-lighter);
-  color: var(--win95-text);
-}
-
-.question-detail-modal .btn-secondary:hover {
-  background-color: var(--win95-lightest);
-  border-color: var(--primary-blue);
-}
-
-.question-detail-modal .btn-primary {
-  background-color: var(--primary-blue);
-  border-color: var(--primary-blue);
-  color: white;
-}
-
-.question-detail-modal .btn-primary:hover {
-  background-color: var(--primary-blue-hover);
-  border-color: var(--primary-blue-hover);
-}
-
-.question-detail-modal .btn-accent {
-  background-color: var(--success-green);
-  border-color: var(--success-green);
-  color: white;
-}
-
-.question-detail-modal .btn-accent:hover {
-  background-color: var(--success-green-hover);
-  border-color: var(--success-green-hover);
-}
-
-.question-detail-modal .btn-secondary:active,
-.question-detail-modal .btn-primary:active,
-.question-detail-modal .btn-accent:active {
-  box-shadow: var(--shadow-pressed);
-  transform: translate(1px, 1px);
-}
 
 /* ========================================
    SCROLLBAR STYLING
@@ -938,9 +746,9 @@
     gap: var(--space-2);
   }
   
-  .question-detail-modal .btn-secondary,
-  .question-detail-modal .btn-primary,
-  .question-detail-modal .btn-accent {
+  .question-detail-modal .win95-btn.secondary,
+  .question-detail-modal .win95-btn.primary,
+  .question-detail-modal .win95-btn.accent {
     width: 100%;
     justify-content: center;
   }
@@ -967,7 +775,7 @@
     gap: var(--space-1);
   }
   
-  .action-btn {
+  .win95-btn {
     min-width: 20px;
     min-height: 20px;
     font-size: 10px;

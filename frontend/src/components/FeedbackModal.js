@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/feedback-modal.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faTimes, 
@@ -571,7 +570,7 @@ const FeedbackModal = ({
                   <label htmlFor="contextualIssues">If evidence was technically correct but contextually wrong, please explain:</label>
                   <textarea
                     id="contextualIssues"
-                    className="comments-textarea"
+                    className="input-win95"
                     placeholder="E.g., 'I asked about when the paper was published, but the system returned publication years from cited papers instead of the main paper.'"
                     value={feedback.contextualIssues}
                     onChange={(e) => setFeedback(prev => ({ ...prev, contextualIssues: e.target.value }))}
@@ -583,7 +582,7 @@ const FeedbackModal = ({
                   <label htmlFor="comments">Additional comments about your experience:</label>
                   <textarea
                     id="comments"
-                    className="comments-textarea"
+                    className="input-win95"
                     placeholder="Please share any additional thoughts about the system's performance, evidence quality, or your overall experience..."
                     value={feedback.comments}
                     onChange={(e) => setFeedback(prev => ({ ...prev, comments: e.target.value }))}
@@ -595,7 +594,7 @@ const FeedbackModal = ({
                   <label htmlFor="improvements">What could be improved?</label>
                   <textarea
                     id="improvements"
-                    className="comments-textarea"
+                    className="input-win95"
                     placeholder="What changes would make this system more useful for your research or analysis tasks?"
                     value={feedback.improvements}
                     onChange={(e) => setFeedback(prev => ({ ...prev, improvements: e.target.value }))}
@@ -618,7 +617,7 @@ const FeedbackModal = ({
           
           {isCommentsStep ? (
             <button 
-              className="primary-btn submit-btn" 
+              className="win95-btn primary submit" 
               onClick={handleSubmit}
               disabled={isSubmitting}
             >
@@ -636,7 +635,7 @@ const FeedbackModal = ({
             </button>
           ) : (
             <button 
-              className="primary-btn" 
+              className="win95-btn primary" 
               onClick={handleNext}
               disabled={!isStepComplete() || isSubmitting}
             >

@@ -72,7 +72,7 @@ const DocumentSelector = ({
         <div className="document-controls compact">
           {/* Upload Button */}
           <button 
-            className={`action-btn compact upload ${disabled ? 'disabled' : ''}`}
+            className={`win95-btn compact upload ${disabled ? 'disabled' : ''}`}
             onClick={handleUploadClick}
             disabled={disabled}
             title={disabled ? 'Session not ready' : 'Upload PDF Document'}
@@ -92,7 +92,7 @@ const DocumentSelector = ({
           
           {/* Browse Button - Updated */}
           <button 
-            className={`action-btn compact browse ${disabled ? 'disabled' : ''}`}
+            className={`win95-btn compact browse ${disabled ? 'disabled' : ''}`}
             onClick={handleBrowseClick}
             disabled={disabled}
           >
@@ -102,7 +102,7 @@ const DocumentSelector = ({
 
            {/* drive Button - Updated */}
           <button 
-            className={`action-btn compact drive ${disabled ? 'disabled' : ''}`}
+            className={`win95-btn compact drive ${disabled ? 'disabled' : ''}`}
             onClick={handleDriveClick}
             disabled={disabled}
           >
@@ -161,7 +161,7 @@ const DocumentSelector = ({
         <div className="document-selector-section">
           {/* Upload Button */}
           <button 
-            className={`action-btn upload ${disabled ? 'disabled' : ''}`}
+            className={`win95-btn upload ${disabled ? 'disabled' : ''}`}
             onClick={handleUploadClick}
             disabled={disabled}
             title={disabled ? 'Session initializing, please wait...' : 'Upload PDF'}
@@ -187,7 +187,7 @@ const DocumentSelector = ({
           
           {/* Browse Button - Updated */}
           <button 
-            className={`action-btn browse ${disabled ? 'disabled' : ''}`}
+            className={`win95-btn browse ${disabled ? 'disabled' : ''}`}
             onClick={handleBrowseClick}
             disabled={disabled}
             title={disabled ? 'Session initializing, please wait...' : 'Browse documents'}
@@ -205,7 +205,7 @@ const DocumentSelector = ({
 
           {/* drive Button - Updated */}
           <button 
-            className={`action-btn drive ${disabled ? 'disabled' : ''}`}
+            className={`win95-btn drive ${disabled ? 'disabled' : ''}`}
             onClick={handleDriveClick}
             disabled={disabled}
           >

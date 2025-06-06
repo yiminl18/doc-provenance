@@ -445,6 +445,8 @@ const createLayoutBasedHighlights = async () => {
 
     // Get the actual provenance text to search for
     const provenanceText = provenance || (content && content.join(' ')) || '';
+
+    console.log('Provenance text being sent: ', provenanceText);
     
     console.log(`🎯 Creating SENTENCE-CONSTRAINED highlights:`, {
         sentenceIds: sentences_ids,
@@ -782,7 +784,7 @@ const handleResetZoom = () => {
                 <div className="error-content">
                     <h3>PDF Loading Error</h3>
                     <p>{error}</p>
-                    <button onClick={loadPDFWithDocumentData} className="retry-btn">
+                    <button onClick={loadPDFWithDocumentData} className="win95-btn retry">
                         Retry
                     </button>
                 </div>
@@ -836,7 +838,7 @@ const handleResetZoom = () => {
                 <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage <= 1 || isRendering}
-                    className="nav-btn"
+                    className="win95-btn nav"
                 >
                     <FontAwesomeIcon icon={faChevronLeft} />
                     Previous
@@ -849,26 +851,26 @@ const handleResetZoom = () => {
                 <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage >= totalPages || isRendering}
-                    className="nav-btn"
+                    className="win95-btn nav"
                 >
                     Next
                     <FontAwesomeIcon icon={faChevronRight} />
                 </button>
 
                 <div className="pdf-controls">
-                    <button onClick={handleZoomOut} className="control-btn" disabled={isRendering}>
+                    <button onClick={handleZoomOut} className="win95-btn control" disabled={isRendering}>
                         <FontAwesomeIcon icon={faSearchMinus} />
                     </button>
 
                     <span className="zoom-display">{Math.round(zoomLevel * 100)}%</span>
 
-                    <button onClick={handleZoomIn} className="control-btn" disabled={isRendering}>
+                    <button onClick={handleZoomIn} className="win95-btn control" disabled={isRendering}>
                         <FontAwesomeIcon icon={faSearchPlus} />
                     </button>
 
                     <button
                         onClick={handleResetZoom}
-                        className="control-btn reset-zoom-btn"
+                        className="win95-btn control reset-zoom-btn"
                         disabled={isRendering}
                         title="Reset to fit page width"
                     >
@@ -882,7 +884,7 @@ const handleResetZoom = () => {
                 <div className="render-error">
                     <FontAwesomeIcon icon={faExclamationTriangle} />
                     <span>Render Error: {renderError}</span>
-                    <button onClick={() => renderPageSafely(currentPage)} className="retry-btn-small">
+                    <button onClick={() => renderPageSafely(currentPage)} className="win95-btn retry">
                         Retry
                     </button>
                 </div>
@@ -946,7 +948,7 @@ const handleResetZoom = () => {
                             </div>
                             <div className="provenance-actions">
                                 <button
-                                    className="action-btn feedback-btn"
+                                    className="win95-btn feedback"
                                     onClick={() => onFeedbackRequest && onFeedbackRequest(activeQuestionId)}
                                 >
                                     <FontAwesomeIcon icon={faComment} />

@@ -208,6 +208,12 @@
   max-width: 500px;
 }
 
+.pdf-empty-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
 .qa-flow-section {
   flex: 1;
   display: flex;
@@ -562,6 +568,12 @@
   .win95-btn {
     width: 100%;
   }
+
+    .win95-btn.nav {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+    min-width: 60px;
+  }
   
   .document-selector.compact .document-controls.compact {
     gap: var(--space-2);
@@ -582,103 +594,454 @@
   }
 }
 
+/* Responsive Design */
+@media (max-width: 768px) {
 
-/* ===== MODAL INTEGRATION ===== */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: var(--space-4);
-  animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.preloaded-modal {
-  background-color: var(--bg-panel);
-  border: var(--border-thick) solid var(--win95-border-dark);
-  box-shadow: var(--shadow-raised);
-  width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from { 
-    transform: translate(0, -20px);
-    opacity: 0;
+    .win95-btn.nav {
+    width: 100%;
   }
-  to { 
-    transform: translate(0, 0);
-    opacity: 1;
+
+  .modal-container-overlay {
+    padding: var(--space-2);
+  }
+  
+  .modal-container {
+    max-width: 100%;
+    max-height: 95vh;
+  }
+  
+  .modal-container .modal-header {
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .modal-container .modal-body {
+    padding: var(--space-4);
+  }
+  
+  .modal-container .options-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-container .issues-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-container .modal-footer {
+    padding: var(--space-3) var(--space-4);
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  
+  .modal-container .secondary-btn,
+  .modal-container .primary-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
-.modal-header {
-  background-color: var(--bg-secondary);
-  border-bottom: var(--border-medium) solid var(--win95-border);
-  padding: var(--space-4) var(--space-6);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 1200px) {
+  .item-name {
+    font-size: var(--text-xs);
+  }
+  
+  .question-text {
+    line-height: var(--leading-tight);
+  }
+  
+  .provenance-preview-btn {
+    padding: var(--space-1);
+    font-size: 10px;
+  }
 }
 
-.modal-header h3 {
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  color: var(--win95-text);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: 0;
+@media (max-width: 900px) {
+  .history-sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: var(--space-2);
+  }
+  
+  .history-section {
+    min-width: 200px;
+    border-bottom: none;
+    border-right: var(--border-medium) solid var(--win95-border);
+    margin-right: var(--space-2);
+  }
+  
+  .history-section:last-child {
+    border-right: none;
+    margin-right: 0;
+  }
+  
+  .section-content {
+    max-height: 150px;
+  }
+  
+  .history-list {
+    padding: var(--space-2);
+  }
+  
+  .question-details {
+    display: none; /* Hide details on mobile for space */
+  }
 }
 
-.modal-header .close-btn {
-  background-color: var(--danger-red);
-  border: var(--border-medium) solid var(--win95-border-dark);
-  color: white;
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: var(--transition-fast);
-  box-shadow: var(--shadow-raised);
-  font-family: var(--font-display);
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 900px) {
+  .question-detail-modal {
+    max-width: 95vw;
+    max-height: 90vh;
+  }
+  
+  .question-detail-modal .modal-body {
+    padding: var(--space-4);
+  }
+  
+  .question-detail-modal .modal-footer {
+    padding: var(--space-3) var(--space-4);
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  
+  .question-detail-modal .win95-btn.secondary,
+  .question-detail-modal .win95-btn.primary,
+  .question-detail-modal .win95-btn.accent {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .provenance-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  
+  .provenance-meta {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  
+  .questions-scrollable {
+    max-height: 300px;
+  }
 }
 
-.modal-header .close-btn:hover {
-  background-color: var(--danger-red-hover);
-  transform: translate(1px, 1px);
-  box-shadow: var(--shadow-pressed);
+@media (max-width: 640px) {
+  .question-actions-header {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  
+  .win95-btn {
+    min-width: 20px;
+    min-height: 20px;
+    font-size: 10px;
+  }
+  
+  .question-detail-modal .modal-header {
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .question-detail-modal .modal-header h4 {
+    font-size: var(--text-lg);
+  }
 }
 
-.modal-body {
-  padding: var(--space-6);
-  overflow-y: auto;
-  flex: 1;
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 1200px) {
+  .hybrid-pdf-viewer .pdf-main-view.with-detail-panel {
+    flex: 0 0 65%;
+  }
+  
+  .hybrid-pdf-viewer .detail-panel {
+    flex: 0 0 35%;
+  }
 }
 
-.modal-body p {
-  color: var(--win95-text);
-  margin-bottom: var(--space-4);
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
+@media (max-width: 900px) {
+  .hybrid-pdf-viewer .hybrid-content {
+    flex-direction: column;
+  }
+  
+  .hybrid-pdf-viewer .pdf-main-view {
+    flex: 0 0 60%;
+    border-right: none;
+    border-bottom: var(--border-medium) solid var(--win95-border-dark);
+  }
+  
+  .hybrid-pdf-viewer .detail-panel {
+    flex: 0 0 40%;
+    border-left: none;
+    border-top: var(--border-medium) solid var(--win95-border-dark);
+  }
+  
+  .hybrid-pdf-viewer .pdf-header {
+    padding: var(--space-2) var(--space-3);
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  
+  .hybrid-pdf-viewer .pdf-controls {
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+  
+  .hybrid-pdf-viewer .win95-btn.control {
+    min-width: 28px;
+    min-height: 28px;
+    padding: var(--space-1) var(--space-2);
+  }
+  
+  .hybrid-pdf-viewer .page-navigation {
+    padding: var(--space-2) var(--space-3);
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+  
+  .hybrid-pdf-viewer .win95-btn.nav {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+  }
+  
+  .hybrid-pdf-viewer .provenance-summary {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+}
+
+@media (max-width: 640px) {
+  .hybrid-pdf-viewer .pdf-content {
+    padding: var(--space-2);
+  }
+  
+  .hybrid-pdf-viewer .pdf-header {
+    padding: var(--space-2);
+  }
+  
+  .hybrid-pdf-viewer .page-navigation {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+  
+  .hybrid-pdf-viewer .provenance-info {
+    padding: var(--space-3);
+  }
+  
+  .hybrid-pdf-viewer .provenance-badge {
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-xs);
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .hybrid-pdf-viewer {
+    background-color: white;
+  }
+  
+  .hybrid-pdf-viewer .pdf-header,
+  .hybrid-pdf-viewer .page-navigation,
+  .hybrid-pdf-viewer .detail-panel {
+    display: none;
+  }
+  
+  .hybrid-pdf-viewer .pdf-main-view {
+    flex: 1;
+  }
+  
+  .hybrid-pdf-viewer .pdf-content {
+    padding: 0;
+  }
+  
+  .hybrid-pdf-viewer .pdf-light-highlight {
+    background-color: #ffeb3b !important;
+    border: var(--border-medium) solid #000 !important;
+    animation: none !important;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  .hybrid-pdf-viewer * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .provenance-overlay {
+    transition: none;
+  }
+  
+  .provenance-overlay.animate-in,
+  .provenance-overlay.animate-out {
+    animation: none;
+  }
+}
+
+
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+  .provenance-overlay {
+    min-height: 30px; /* Ensure overlays are touchable on mobile */
+    min-width: 30px;
+  }
+  
+  .fallback-overlay {
+    font-size: 10px;
+    padding: 5px;
+  }
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .provenance-warnings {
+    padding: var(--space-2) var(--space-3);
+  }
+  
+  .warning {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  
+  .fix-zoom-btn {
+    align-self: flex-end;
+  }
+  
+  .reset-zoom-btn .btn-text {
+    display: none;
+  }
+}
+
+
+/* Responsive behavior for very small screens */
+@media (max-width: 768px) {
+  .pdf-main-view.fixed-viewer {
+    /* On mobile, still use fixed size but allow some flexibility */
+    min-width: 90vw;
+    max-width: none;
+  }
+  
+  .size-display {
+    font-size: 10px;
+  }
+}
+
+/* Handle very small screens gracefully */
+@media (max-width: 480px) {
+  .pdf-main-view.fixed-viewer {
+    /* On very small screens, use most of viewport but keep scrolling */
+    min-width: 95vw;
+    margin: 0;
+  }
+  
+  .pdf-content.fixed-content-area {
+    /* Thinner scrollbars on mobile */
+  }
+  
+  .pdf-content.fixed-content-area::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+
+/* ===== RESPONSIVE DESIGN - TWO SECTION LAYOUT ===== */
+@media (max-width: 1200px) {
+  .integrated-qa-component {
+    padding: 0;
+  }
+  
+  .qa-input-section,
+  .current-question-section {
+    margin: var(--space-3);
+  }
+  
+  .provenance-bottom-section {
+    height: 350px; /* Slightly smaller on medium screens */
+  }
+  
+  .provenance-navigation {
+    padding: var(--space-3);
+    gap: var(--space-3);
+  }
+  
+}
+
+@media (max-width: 768px) {
+  .integrated-qa-component {
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .qa-top-section {
+    flex: 1;
+    min-height: 60vh;
+  }
+  
+  .provenance-bottom-section {
+    height: 40vh; /* Smaller on mobile */
+    flex-shrink: 0;
+  }
+  
+  .qa-input-section,
+  .current-question-section,
+  .questions-history-section {
+    margin: var(--space-2);
+  }
+  
+  .section-header {
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: flex-start;
+  }
+  
+  .section-header .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .provenance-navigation {
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-2);
+  }
+  
+
+  
+  .provenance-meta {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  
+  .provenance-actions {
+    flex-direction: column;
+  }
+  
+  .question-history-item .question-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  
+  .question-history-item .question-actions {
+    margin-top: var(--space-2);
+  }
+  
+  
+  .get-provenance-state {
+    margin: var(--space-2);
+    padding: var(--space-4);
+  }
 }

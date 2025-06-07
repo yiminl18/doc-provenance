@@ -57,6 +57,16 @@ export const getDocumentSentences = async (filename) => {
   }
 };
 
+export const getDocumentLayout = async (filename) => {
+  try {
+    const response = await axios.get(`${API_URL}/documents/${filename}/layout`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching document layout:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+}
+
 
 // =============================================================================
 // Question Processing APIs
@@ -150,6 +160,191 @@ export const checkStatus = async (questionId) => {
   }
 };
 
+// Add these functions to your existing api.js file
+
+// =============================================================================
+// PDF Mappings APIs
+// =============================================================================
+
+// Add these functions to your existing api.js file
+
+// =============================================================================
+// PDF Mappings APIs
+// =============================================================================
+
+// Add these functions to your existing api.js file
+
+// =============================================================================
+// PDF Mappings APIs
+// =============================================================================
+
+/**
+ * Get pre-computed PDF mappings for a document
+ */
+export const getDocumentMappings = async (documentId) => {
+  try {
+    const response = await axios.get(`${API_URL}/documents/${documentId}/mappings`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching document mappings:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Get index of all available document mappings
+ */
+export const getMappingsIndex = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/mappings/index`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching mappings index:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
+/**
+ * Get highlighting data for specific sentences using pre-computed mappings
+ * This replaces the current getProvenanceHighlightingBoxes for documents with mappings
+ */
+export const getHighlightingFromMappings = async (filename, sentenceIds, currentPage) => {
+  try {
+    // Extract document ID from filename (remove .pdf extension)
+    const documentId = filename.replace('.pdf', '');
+    
+    console.log(`🗺️ Getting highlights from mappings for ${documentId}, sentences:`, sentenceIds);
+    
+    // Get the pre-computed mappings
+    const mappings = await getDocumentMappings(documentId);
+    
+    if (!mappings || typeof mappings !== 'object') {
+      throw new Error('Invalid mappings format received');
+    }
+    
+    // Extract highlights for the requested sentences on the current page
+    const pageKey = currentPage.toString();
+    const pageHighlights = {};
+    
+    if (mappings[pageKey]) {
+      sentenceIds.forEach(sentenceId => {
+        const sentenceKey = sentenceId.toString();
+        if (mappings[pageKey][sentenceKey]) {
+          const sentenceMapping = mappings[pageKey][sentenceKey];
+          
+          // Convert to the format expected by your existing highlighting code
+          // CRITICAL: Transform PDFMiner coordinates to PDF.js coordinates
+          if (sentenceMapping.highlight_regions && sentenceMapping.highlight_regions.length > 0) {
+            // Filter highlights to only include those on the current page
+            const currentPageHighlights = sentenceMapping.highlight_regions.filter(region => 
+              region.page === currentPage
+            );
+            
+            if (currentPageHighlights.length > 0) {
+              pageHighlights[sentenceId] = currentPageHighlights.map(region => {
+                return {
+                  page: region.page,
+                  left: region.left,
+                  top: region.top,
+                  width: region.width,
+                  height: region.height,
+                  confidence: region.confidence || sentenceMapping.match_confidence || 0.8,
+                  source: 'pre_computed_mapping',
+                  match_type: region.match_type || 'mapping',
+                  coordinate_system: 'pdfminer' // Mark the coordinate system
+                };
+              });
+            } else {
+              // No highlights on current page - this sentence spans other pages
+              console.log(`📄 Sentence ${sentenceId} has no highlights on page ${currentPage} (spans other pages)`);
+            }
+          }
+        }
+      });
+    }
+    
+    console.log(`✅ Found highlights for ${Object.keys(pageHighlights).length} sentences on page ${currentPage}`);
+    
+    return {
+      success: true,
+      bounding_boxes: pageHighlights,
+      statistics: {
+        total_boxes: Object.values(pageHighlights).reduce((sum, boxes) => sum + boxes.length, 0),
+        pages_with_matches: Object.keys(pageHighlights).length > 0 ? 1 : 0,
+        avg_confidence: Object.values(pageHighlights).length > 0 
+          ? Object.values(pageHighlights).flat().reduce((sum, box) => sum + box.confidence, 0) / Object.values(pageHighlights).flat().length 
+          : 0,
+        coordinate_system: 'pre_computed_mapping',
+        data_source: 'pre_computed_mapping'
+      },
+      data_source: 'pre_computed_mapping'
+    };
+    
+  } catch (error) {
+    console.error('❌ Error getting highlights from mappings:', error);
+    throw error;
+  }
+};
+
+/**
+ * Enhanced provenance highlighting that tries mappings first, then falls back to API
+ */
+export const getProvenanceHighlightingBoxesEnhanced = async (filename, sentenceIds, provenanceId = null, provenanceText = null, currentPage = 1) => {
+  try {
+    console.log(`🎯 Enhanced highlighting for ${filename} on page ${currentPage}`);
+    
+    // First, try to get highlights from pre-computed mappings
+    try {
+      const mappingsResult = await getHighlightingFromMappings(filename, sentenceIds, currentPage);
+      
+      if (mappingsResult.success && Object.keys(mappingsResult.bounding_boxes).length > 0) {
+        console.log(`✅ Using pre-computed mappings for ${filename}`);
+        return mappingsResult;
+      }
+    } catch (mappingsError) {
+      console.log(`⚠️ Mappings not available for ${filename}, falling back to API`);
+    }
+    
+    // Fallback to existing API-based highlighting
+    console.log(`🔄 Falling back to API-based highlighting for ${filename}`);
+    return await getProvenanceHighlightingBoxes(filename, sentenceIds, provenanceId, provenanceText);
+    
+  } catch (error) {
+    console.error('❌ Error in enhanced highlighting:', error);
+    throw error;
+  }
+};
+
+
+/**
+ * Enhanced provenance highlighting that tries mappings first, then falls back to API
+ */
+export const getProvenanceHighlightingBoxes = async (filename, sentenceIds, provenanceId = null, provenanceText = null) => {
+  try {
+    console.log(`🎯 Enhanced highlighting for ${filename}`);
+    
+    // First, try to get highlights from pre-computed mappings
+    try {
+      const currentPage = 1; // You'll need to pass this from your component
+      const mappingsResult = await getHighlightingFromMappings(filename, sentenceIds, currentPage);
+      
+      if (mappingsResult.success && Object.keys(mappingsResult.bounding_boxes).length > 0) {
+        console.log(`✅ Using pre-computed mappings for ${filename}`);
+        return mappingsResult;
+      }
+    } catch (mappingsError) {
+      console.log(`⚠️ Mappings not available for ${filename}, falling back to API`);
+    }
+    
+    // Fallback to existing API-based highlighting
+    console.log(`🔄 Falling back to API-based highlighting for ${filename}`);
+    return await getProvenanceHighlightingBoxes(filename, sentenceIds, provenanceId, provenanceText);
+    
+  } catch (error) {
+    console.error('❌ Error in enhanced highlighting:', error);
+    throw error;
+  }
+};
 
 // =============================================================================
 // Enhanced Question Processing with Decoupled Answer/Provenance
@@ -171,21 +366,6 @@ export const getNextProvenance = async (questionId, currentCount = 0) => {
 };
 
 
-
-export const getProvenanceHighlightingBoxes = async (filename, sentenceIds, provenanceId = null, provenanceText = null) => {
-  try {
-    const response = await axios.post(`${API_URL}/documents/${filename}/provenance-boxes`, {
-      sentence_ids: sentenceIds,
-      provenance_id: provenanceId,
-      provenance_text: provenanceText // NEW: include actual text
-    });
-    
-    return response.data;
-  } catch (error) {
-    console.error('❌ Error getting provenance highlighting boxes:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-};
 
 // =============================================================================
 // Legacy/Compatibility APIs

@@ -411,53 +411,7 @@
   background-color: var(--primary-blue);
 }
 
-/* ===== RESPONSIVE ADJUSTMENTS ===== */
-@media (max-width: 1200px) {
-  .item-name {
-    font-size: var(--text-xs);
-  }
-  
-  .question-text {
-    line-height: var(--leading-tight);
-  }
-  
-  .provenance-preview-btn {
-    padding: var(--space-1);
-    font-size: 10px;
-  }
-}
 
-@media (max-width: 900px) {
-  .history-sidebar {
-    flex-direction: row;
-    overflow-x: auto;
-    padding: var(--space-2);
-  }
-  
-  .history-section {
-    min-width: 200px;
-    border-bottom: none;
-    border-right: var(--border-medium) solid var(--win95-border);
-    margin-right: var(--space-2);
-  }
-  
-  .history-section:last-child {
-    border-right: none;
-    margin-right: 0;
-  }
-  
-  .section-content {
-    max-height: 150px;
-  }
-  
-  .history-list {
-    padding: var(--space-2);
-  }
-  
-  .question-details {
-    display: none; /* Hide details on mobile for space */
-  }
-}
 
 /* ========================================
    ENHANCED HISTORY SIDEBAR STYLES
@@ -724,68 +678,4 @@
 .question-detail-modal .modal-body::-webkit-scrollbar-thumb:hover {
   background-color: var(--win95-lightest);
   border-color: var(--primary-blue);
-}
-
-/* ========================================
-   RESPONSIVE DESIGN
-   ======================================== */
-
-@media (max-width: 900px) {
-  .question-detail-modal {
-    max-width: 95vw;
-    max-height: 90vh;
-  }
-  
-  .question-detail-modal .modal-body {
-    padding: var(--space-4);
-  }
-  
-  .question-detail-modal .modal-footer {
-    padding: var(--space-3) var(--space-4);
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-  
-  .question-detail-modal .win95-btn.secondary,
-  .question-detail-modal .win95-btn.primary,
-  .question-detail-modal .win95-btn.accent {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .provenance-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-2);
-  }
-  
-  .provenance-meta {
-    flex-direction: column;
-    gap: var(--space-1);
-  }
-  
-  .questions-scrollable {
-    max-height: 300px;
-  }
-}
-
-@media (max-width: 640px) {
-  .question-actions-header {
-    flex-direction: column;
-    gap: var(--space-1);
-  }
-  
-  .win95-btn {
-    min-width: 20px;
-    min-height: 20px;
-    font-size: 10px;
-  }
-  
-  .question-detail-modal .modal-header {
-    padding: var(--space-3) var(--space-4);
-  }
-  
-  .question-detail-modal .modal-header h4 {
-    font-size: var(--text-lg);
-  }
 }

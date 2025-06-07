@@ -382,127 +382,6 @@
 }
 
 
-/* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 1200px) {
-  .hybrid-pdf-viewer .pdf-main-view.with-detail-panel {
-    flex: 0 0 65%;
-  }
-  
-  .hybrid-pdf-viewer .detail-panel {
-    flex: 0 0 35%;
-  }
-}
-
-@media (max-width: 900px) {
-  .hybrid-pdf-viewer .hybrid-content {
-    flex-direction: column;
-  }
-  
-  .hybrid-pdf-viewer .pdf-main-view {
-    flex: 0 0 60%;
-    border-right: none;
-    border-bottom: var(--border-medium) solid var(--win95-border-dark);
-  }
-  
-  .hybrid-pdf-viewer .detail-panel {
-    flex: 0 0 40%;
-    border-left: none;
-    border-top: var(--border-medium) solid var(--win95-border-dark);
-  }
-  
-  .hybrid-pdf-viewer .pdf-header {
-    padding: var(--space-2) var(--space-3);
-    flex-wrap: wrap;
-    gap: var(--space-2);
-  }
-  
-  .hybrid-pdf-viewer .pdf-controls {
-    flex-wrap: wrap;
-    gap: var(--space-1);
-  }
-  
-  .hybrid-pdf-viewer .win95-btn.control {
-    min-width: 28px;
-    min-height: 28px;
-    padding: var(--space-1) var(--space-2);
-  }
-  
-  .hybrid-pdf-viewer .page-navigation {
-    padding: var(--space-2) var(--space-3);
-    gap: var(--space-3);
-    flex-wrap: wrap;
-  }
-  
-  .hybrid-pdf-viewer .win95-btn.nav {
-    padding: var(--space-2) var(--space-3);
-    font-size: var(--text-xs);
-  }
-  
-  .hybrid-pdf-viewer .provenance-summary {
-    grid-template-columns: 1fr;
-    gap: var(--space-2);
-  }
-}
-
-@media (max-width: 640px) {
-  .hybrid-pdf-viewer .pdf-content {
-    padding: var(--space-2);
-  }
-  
-  .hybrid-pdf-viewer .pdf-header {
-    padding: var(--space-2);
-  }
-  
-  .hybrid-pdf-viewer .page-navigation {
-    padding: var(--space-2);
-    gap: var(--space-2);
-  }
-  
-  .hybrid-pdf-viewer .provenance-info {
-    padding: var(--space-3);
-  }
-  
-  .hybrid-pdf-viewer .provenance-badge {
-    padding: var(--space-1) var(--space-2);
-    font-size: var(--text-xs);
-  }
-}
-
-/* ===== PRINT STYLES ===== */
-@media print {
-  .hybrid-pdf-viewer {
-    background-color: white;
-  }
-  
-  .hybrid-pdf-viewer .pdf-header,
-  .hybrid-pdf-viewer .page-navigation,
-  .hybrid-pdf-viewer .detail-panel {
-    display: none;
-  }
-  
-  .hybrid-pdf-viewer .pdf-main-view {
-    flex: 1;
-  }
-  
-  .hybrid-pdf-viewer .pdf-content {
-    padding: 0;
-  }
-  
-  .hybrid-pdf-viewer .pdf-light-highlight {
-    background-color: #ffeb3b !important;
-    border: var(--border-medium) solid #000 !important;
-    animation: none !important;
-  }
-}
-
-/* ===== ACCESSIBILITY ===== */
-@media (prefers-reduced-motion: reduce) {
-  .hybrid-pdf-viewer * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
 
 .hybrid-pdf-viewer .win95-btn.control:focus,
 .hybrid-pdf-viewer .win95-btn.nav:focus {
@@ -681,18 +560,6 @@
   background-color: rgba(255, 0, 0, 0.1) !important;
 }
 
-/* ===== RESPONSIVE ADJUSTMENTS ===== */
-@media (max-width: 768px) {
-  .provenance-overlay {
-    min-height: 30px; /* Ensure overlays are touchable on mobile */
-    min-width: 30px;
-  }
-  
-  .fallback-overlay {
-    font-size: 10px;
-    padding: 5px;
-  }
-}
 
 /* ===== ACCESSIBILITY ===== */
 .provenance-overlay:focus {
@@ -700,16 +567,6 @@
   outline-offset: 2px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .provenance-overlay {
-    transition: none;
-  }
-  
-  .provenance-overlay.animate-in,
-  .provenance-overlay.animate-out {
-    animation: none;
-  }
-}
 
 /* Magnify Overlay Styles */
 .magnify-overlay {
@@ -923,26 +780,6 @@
   text-transform: uppercase;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .provenance-warnings {
-    padding: var(--space-2) var(--space-3);
-  }
-  
-  .warning {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-2);
-  }
-  
-  .fix-zoom-btn {
-    align-self: flex-end;
-  }
-  
-  .reset-zoom-btn .btn-text {
-    display: none;
-  }
-}
 
 /* Animation for warnings appearing */
 .warning {
@@ -1082,36 +919,6 @@
   pointer-events: none;
 }
 
-/* Responsive behavior for very small screens */
-@media (max-width: 768px) {
-  .pdf-main-view.fixed-viewer {
-    /* On mobile, still use fixed size but allow some flexibility */
-    min-width: 90vw;
-    max-width: none;
-  }
-  
-  .size-display {
-    font-size: 10px;
-  }
-}
-
-/* Handle very small screens gracefully */
-@media (max-width: 480px) {
-  .pdf-main-view.fixed-viewer {
-    /* On very small screens, use most of viewport but keep scrolling */
-    min-width: 95vw;
-    margin: 0;
-  }
-  
-  .pdf-content.fixed-content-area {
-    /* Thinner scrollbars on mobile */
-  }
-  
-  .pdf-content.fixed-content-area::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-}
 
 /* Layout integration - make sure the app accommodates fixed size */
 .main-content {

@@ -859,7 +859,7 @@ p {
    ======================================== */
 
 /* Modal Overlay */
-.feedback-modal-overlay {
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -869,12 +869,12 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 999999;
   padding: var(--space-4);
 }
 
 /* Main Modal Container */
-.feedback-modal {
+.modal-container {
   background-color: var(--bg-panel);
   border: var(--border-medium) solid var(--win95-border-dark);
   box-shadow: var(--shadow-raised);
@@ -886,12 +886,56 @@ p {
   font-family: var(--font-display);
 }
 
-.feedback-modal.user-study-modal.enhanced {
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+
+@keyframes slideIn {
+  from { 
+    transform: translate(0, -20px);
+    opacity: 0;
+  }
+  to { 
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+
+/* Main Modal Container */
+.modal-container.documents {
+  background-color: var(--bg-panel);
+  border: var(--border-medium) solid var(--win95-border-dark);
+  box-shadow: var(--shadow-raised);
+  max-width: 800px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display);
+}
+
+.modal-container.question-suggetions {
+  background-color: var(--bg-panel);
+  border: var(--border-thick) solid var(--win95-border-dark);
+  box-shadow: var(--shadow-raised);
+  width: 100%;
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.3s ease-out;
+}
+
+
+.modal-container.user-study-modal.enhanced {
   max-width: 900px;
 }
 
 /* Modal Header */
-.feedback-modal .modal-header {
+.modal-container .modal-header {
   background-color: var(--bg-secondary);
   border-bottom: var(--border-medium) solid var(--win95-border-dark);
   padding: var(--space-4) var(--space-6);
@@ -901,11 +945,11 @@ p {
   flex-shrink: 0;
 }
 
-.feedback-modal .header-content {
+.modal-container .header-content {
   flex: 1;
 }
 
-.feedback-modal .modal-header h3 {
+.modal-container .modal-header h3 {
   font-family: var(--font-display);
   font-size: var(--text-xl);
   font-weight: var(--font-bold);
@@ -915,20 +959,29 @@ p {
   letter-spacing: 0.05em;
 }
 
-.feedback-modal .evaluation-context {
+.modal-container .modal-header h4 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--win95-text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modal-container .evaluation-context {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
-.feedback-modal .context-item {
+.modal-container .context-item {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
   font-size: var(--text-sm);
 }
 
-.feedback-modal .context-label {
+.modal-container .context-label {
   font-family: var(--font-mono);
   font-weight: var(--font-semibold);
   color: var(--win95-text-muted);
@@ -937,7 +990,7 @@ p {
   font-size: var(--text-xs);
 }
 
-.feedback-modal .context-value {
+.modal-container .context-value {
   font-family: var(--font-display);
   color: var(--win95-text);
   flex: 1;
@@ -946,7 +999,7 @@ p {
 
 
 /* Modal Body */
-.feedback-modal .modal-body {
+.modal-container .modal-body {
   flex: 1;
   padding: var(--space-6);
   overflow-y: auto;
@@ -954,7 +1007,7 @@ p {
 }
 
 /* Progress System */
-.feedback-modal .progress-system {
+.modal-container .progress-system {
   margin-bottom: var(--space-6);
   padding: var(--space-4);
   background-color: var(--bg-input);
@@ -962,7 +1015,7 @@ p {
   box-shadow: var(--shadow-soft);
 }
 
-.feedback-modal .progress-bar {
+.modal-container .progress-bar {
   height: 8px;
   background-color: var(--bg-secondary);
   border: var(--border-thin) solid var(--win95-border);
@@ -971,13 +1024,13 @@ p {
   overflow: hidden;
 }
 
-.feedback-modal .progress-fill {
+.modal-container .progress-fill {
   height: 100%;
   background-color: var(--primary-blue);
   transition: width var(--transition-medium);
 }
 
-.feedback-modal .step-info {
+.modal-container .step-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -988,23 +1041,23 @@ p {
   letter-spacing: 0.05em;
 }
 
-.feedback-modal .step-indicator {
+.modal-container .step-indicator {
   color: var(--primary-blue);
 }
 
-.feedback-modal .completion-status {
+.modal-container .completion-status {
   color: var(--success-green);
 }
 
 /* Feedback Step */
-.feedback-modal .feedback-step {
+.modal-container .feedback-step {
   background-color: var(--bg-paper);
   border: var(--border-medium) solid var(--win95-border);
   box-shadow: var(--shadow-raised);
   padding: var(--space-6);
 }
 
-.feedback-modal .step-header {
+.modal-container .step-header {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -1013,12 +1066,12 @@ p {
   border-bottom: var(--border-thin) solid var(--win95-border);
 }
 
-.feedback-modal .step-header svg {
+.modal-container .step-header svg {
   font-size: var(--text-xl);
   color: var(--primary-blue);
 }
 
-.feedback-modal .step-header h4 {
+.modal-container .step-header h4 {
   font-family: var(--font-display);
   font-size: var(--text-lg);
   font-weight: var(--font-bold);
@@ -1028,7 +1081,7 @@ p {
   margin: 0;
 }
 
-.feedback-modal .step-question {
+.modal-container .step-question {
   font-size: var(--text-base);
   font-weight: var(--font-medium);
   color: var(--win95-text);
@@ -1037,20 +1090,20 @@ p {
 }
 
 /* Questions Container */
-.feedback-modal .questions-container {
+.modal-container .questions-container {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
 }
 
-.feedback-modal .question-block {
+.modal-container .question-block {
   background-color: var(--bg-input);
   border: var(--border-thin) solid var(--win95-border);
   padding: var(--space-4);
   box-shadow: var(--shadow-soft);
 }
 
-.feedback-modal .question-label {
+.modal-container .question-label {
   font-family: var(--font-display);
   font-size: var(--text-base);
   font-weight: var(--font-semibold);
@@ -1061,13 +1114,13 @@ p {
 }
 
 /* Options Grid */
-.feedback-modal .options-grid {
+.modal-container .options-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--space-3);
 }
 
-.feedback-modal .option-btn {
+.modal-container .win95-btn.option {
   background-color: var(--bg-paper);
   border: var(--border-medium) solid var(--win95-border);
   padding: var(--space-3);
@@ -1084,11 +1137,11 @@ p {
 
 
 
-.feedback-modal .option-header {
+.modal-container .option-header {
   margin-bottom: var(--space-2);
 }
 
-.feedback-modal .option-label {
+.modal-container .option-label {
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   color: var(--win95-text);
@@ -1097,18 +1150,18 @@ p {
   line-height: var(--leading-tight);
 }
 
-.feedback-modal .option-description {
+.modal-container .option-description {
   font-size: var(--text-xs);
   color: var(--win95-text-muted);
   line-height: var(--leading-normal);
 }
 
 /* Issues Section */
-.feedback-modal .issues-section {
+.modal-container .issues-section {
   margin-bottom: var(--space-6);
 }
 
-.feedback-modal .issues-section h5 {
+.modal-container .issues-section h5 {
   font-family: var(--font-display);
   font-size: var(--text-base);
   font-weight: var(--font-semibold);
@@ -1118,13 +1171,13 @@ p {
   letter-spacing: 0.02em;
 }
 
-.feedback-modal .issues-grid {
+.modal-container .issues-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--space-3);
 }
 
-.feedback-modal .issue-checkbox {
+.modal-container .issue-checkbox {
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
@@ -1136,16 +1189,16 @@ p {
   box-shadow: var(--shadow-soft);
 }
 
-.feedback-modal .issue-checkbox:hover {
+.modal-container .issue-checkbox:hover {
   background-color: var(--bg-secondary);
   border-color: var(--primary-blue);
 }
 
-.feedback-modal .issue-checkbox input[type="checkbox"] {
+.modal-container .issue-checkbox input[type="checkbox"] {
   display: none;
 }
 
-.feedback-modal .checkmark {
+.modal-container .checkmark {
   width: 16px;
   height: 16px;
   border: var(--border-medium) solid var(--win95-border);
@@ -1156,12 +1209,12 @@ p {
   margin-top: 2px;
 }
 
-.feedback-modal .issue-checkbox input:checked + .checkmark {
+.modal-container .issue-checkbox input:checked + .checkmark {
   background-color: var(--primary-blue);
   border-color: var(--primary-blue);
 }
 
-.feedback-modal .issue-checkbox input:checked + .checkmark::after {
+.modal-container .issue-checkbox input:checked + .checkmark::after {
   content: '✓';
   position: absolute;
   top: -2px;
@@ -1171,7 +1224,7 @@ p {
   font-size: var(--text-sm);
 }
 
-.feedback-modal .issue-label {
+.modal-container .issue-label {
   font-family: var(--font-display);
   font-size: var(--text-sm);
   color: var(--win95-text);
@@ -1179,19 +1232,19 @@ p {
 }
 
 /* Text Feedback Section */
-.feedback-modal .text-feedback-section {
+.modal-container .text-feedback-section {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-.feedback-modal .textarea-group {
+.modal-container .textarea-group {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
-.feedback-modal .textarea-group label {
+.modal-container .textarea-group label {
   font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
@@ -1200,7 +1253,7 @@ p {
   letter-spacing: 0.02em;
 }
 
-.feedback-modal .comments-textarea {
+.modal-container .comments-textarea {
   width: 100%;
   padding: var(--space-3);
   font-family: var(--font-display);
@@ -1215,19 +1268,19 @@ p {
   transition: var(--transition-fast);
 }
 
-.feedback-modal .comments-textarea:focus {
+.modal-container .comments-textarea:focus {
   outline: none;
   border-color: var(--primary-blue);
   box-shadow: var(--shadow-pressed), var(--focus-ring);
 }
 
-.feedback-modal .comments-textarea::placeholder {
+.modal-container .comments-textarea::placeholder {
   color: var(--win95-text-muted);
   font-style: italic;
 }
 
 /* Modal Footer */
-.feedback-modal .modal-footer {
+.modal-container .modal-footer {
   background-color: var(--bg-secondary);
   border-top: var(--border-medium) solid var(--win95-border-dark);
   padding: var(--space-4) var(--space-6);
@@ -1236,261 +1289,4 @@ p {
   align-items: center;
   gap: var(--space-4);
   flex-shrink: 0;
-}
-
-.feedback-modal .secondary-btn,
-.feedback-modal .primary-btn {
-  padding: var(--space-3) var(--space-6);
-  font-family: var(--font-display);
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: var(--transition-fast);
-  border: var(--border-medium) solid;
-  box-shadow: var(--shadow-raised);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 44px;
-}
-
-.feedback-modal .secondary-btn {
-  background-color: var(--bg-input);
-  border-color: var(--win95-border);
-  color: var(--win95-text);
-}
-
-.feedback-modal .secondary-btn:hover {
-  background-color: var(--bg-secondary);
-  border-color: var(--win95-text-muted);
-}
-
-.feedback-modal .primary-btn {
-  background-color: var(--primary-blue);
-  border-color: var(--primary-blue);
-  color: white;
-}
-
-.feedback-modal .primary-btn:hover:not(:disabled) {
-  background-color: var(--primary-blue-hover);
-  border-color: var(--primary-blue-hover);
-}
-
-.feedback-modal .primary-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background-color: var(--win95-text-muted);
-  border-color: var(--win95-text-muted);
-}
-
-.feedback-modal .submit-btn {
-  background-color: var(--success-green);
-  border-color: var(--success-green);
-}
-
-.feedback-modal .submit-btn:hover {
-  background-color: var(--success-green-hover);
-  border-color: var(--success-green-hover);
-}
-
-.feedback-modal .secondary-btn:active,
-.feedback-modal .primary-btn:active:not(:disabled) {
-  box-shadow: var(--shadow-pressed);
-  transform: translate(1px, 1px);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .feedback-modal-overlay {
-    padding: var(--space-2);
-  }
-  
-  .feedback-modal {
-    max-width: 100%;
-    max-height: 95vh;
-  }
-  
-  .feedback-modal .modal-header {
-    padding: var(--space-3) var(--space-4);
-  }
-  
-  .feedback-modal .modal-body {
-    padding: var(--space-4);
-  }
-  
-  .feedback-modal .options-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .feedback-modal .issues-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .feedback-modal .modal-footer {
-    padding: var(--space-3) var(--space-4);
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-  
-  .feedback-modal .secondary-btn,
-  .feedback-modal .primary-btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-/* Modal footer */
-
-/* ========================================
-   QUESTION DETAIL MODAL
-   ======================================== */
-
-.question-detail-modal {
-  background-color: var(--bg-panel);
-  border: var(--border-thick) solid var(--win95-border-dark);
-  box-shadow: var(--shadow-raised);
-  width: 100%;
-  max-width: 700px;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  animation: slideIn 0.3s ease-out;
-}
-
-.question-detail-modal .modal-header {
-  background-color: var(--bg-secondary);
-  border-bottom: var(--border-medium) solid var(--win95-border);
-  padding: var(--space-4) var(--space-6);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-}
-
-.question-detail-modal .modal-header h4 {
-  font-size: var(--text-xl);
-  font-weight: var(--font-semibold);
-  color: var(--win95-text);
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.question-detail-modal .close-btn {
-  background-color: var(--danger-red);
-  border: var(--border-medium) solid var(--win95-border-dark);
-  color: white;
-  font-size: var(--text-lg);
-  font-weight: var(--font-bold);
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: var(--transition-fast);
-  box-shadow: var(--shadow-raised);
-}
-
-.question-detail-modal .close-btn:hover {
-  background-color: var(--danger-red-hover);
-  transform: translate(1px, 1px);
-  box-shadow: var(--shadow-pressed);
-}
-
-.question-detail-modal .modal-body {
-  padding: var(--space-6);
-  overflow-y: auto;
-  flex: 1;
-}
-
-
-.question-detail-modal .modal-footer {
-  padding: var(--space-4) var(--space-6);
-  background-color: var(--bg-secondary);
-  border-top: var(--border-medium) solid var(--win95-border);
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  flex-shrink: 0;
-}
-
-.question-detail-modal .btn-secondary,
-.question-detail-modal .btn-primary,
-.question-detail-modal .btn-accent {
-  padding: var(--space-3) var(--space-6);
-  border: var(--border-medium) solid var(--win95-border-dark);
-  cursor: pointer;
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  transition: var(--transition-fast);
-  box-shadow: var(--shadow-raised);
-}
-
-.question-detail-modal .btn-secondary {
-  background-color: var(--win95-lighter);
-  color: var(--win95-text);
-}
-
-.question-detail-modal .btn-secondary:hover {
-  background-color: var(--win95-lightest);
-  border-color: var(--primary-blue);
-}
-
-.question-detail-modal .btn-primary {
-  background-color: var(--primary-blue);
-  border-color: var(--primary-blue);
-  color: white;
-}
-
-.question-detail-modal .btn-primary:hover {
-  background-color: var(--primary-blue-hover);
-  border-color: var(--primary-blue-hover);
-}
-
-.question-detail-modal .btn-accent {
-  background-color: var(--success-green);
-  border-color: var(--success-green);
-  color: white;
-}
-
-.question-detail-modal .btn-accent:hover {
-  background-color: var(--success-green-hover);
-  border-color: var(--success-green-hover);
-}
-
-.question-detail-modal .btn-secondary:active,
-.question-detail-modal .btn-primary:active,
-.question-detail-modal .btn-accent:active {
-  box-shadow: var(--shadow-pressed);
-  transform: translate(1px, 1px);
-}
-
-
-/* ===== RESPONSIVE DESIGN - TWO SECTION LAYOUT ===== */
-@media (max-width: 1200px) {
-  
-  
-  .win95-btn.nav {
-    padding: var(--space-2) var(--space-3);
-    font-size: var(--text-xs);
-    min-width: 60px;
-  }
-}
-
-@media (max-width: 768px) {
- 
-  
-  .win95-btn.nav {
-    width: 100%;
-  }
-  
 }

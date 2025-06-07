@@ -432,8 +432,8 @@ const FeedbackModal = ({
   const sessionContext = getSessionContext();
 
   return (
-    <div className="feedback-modal-overlay">
-      <div className="feedback-modal user-study-modal enhanced">
+    <div className="modal-overlay">
+      <div className="modal-container user-study-modal enhanced">
         <div className="modal-header">
           <div className="header-content">
             <h3>PROVENANCE EVALUATION</h3>
@@ -465,7 +465,7 @@ const FeedbackModal = ({
               </div>
             </div>
           </div>
-          <button className="close-btn" onClick={handleClose}>
+          <button className="win95-btn close" onClick={handleClose}>
             <FontAwesomeIcon icon={faTimes} />
           </button>
         </div>
@@ -521,7 +521,7 @@ const FeedbackModal = ({
                         return (
                           <button
                             key={option.value}
-                            className={`option-btn ${isSelected ? 'selected' : ''}`}
+                            className={`win95-btn option ${isSelected ? 'selected' : ''}`}
                             onClick={() => handleOptionSelect(category, question.key, option.value)}
                             data-color={option.color}
                           >
@@ -608,7 +608,7 @@ const FeedbackModal = ({
 
         <div className="modal-footer">
           <button 
-            className="secondary-btn" 
+            className="win95-btn secondary" 
             onClick={currentStep === 0 ? handleClose : handlePrevious}
             disabled={isSubmitting}
           >

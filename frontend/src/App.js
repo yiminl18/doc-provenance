@@ -9,7 +9,6 @@ import ProvenanceQA from './components/ProvenanceQA';
 import userStudyLogger from './services/UserStudyLogger';
 import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
 import DriveFileBrowser from './components/DriveFileBrowser';
-//import LayoutBasedPDFViewer  from './components/SimplifiedLayoutBasedPDFViewer'
 import {
   uploadFile,
   getDocuments,
@@ -113,11 +112,11 @@ function App() {
       console.log('🔄 Loading document:', doc_obj);
 
       // Log document selection
-      await userStudyLogger.logDocumentSelected(
-        doc_obj.document_id,
-        doc_obj.filename,
-        true // isPreloaded = true for session documents
-      );
+      //await userStudyLogger.logDocumentSelected(
+      //  doc_obj.document_id,
+      //  doc_obj.filename,
+      //  true // isPreloaded = true for session documents
+      //);
 
       // Create the frontend document object
       const docId = createNewDocument(doc_obj.filename || false, {
@@ -185,15 +184,15 @@ function App() {
 
       
       // Log the document change
-      userStudyLogger.logUserInteraction(
-        'document_switched',
-        'document_selector',
-        {
-          from_document: previousDocumentId,
-          to_document: activeDocumentId,
-          filename: activeDoc.filename
-        }
-      );
+      //userStudyLogger.logUserInteraction(
+      //  'document_switched',
+      //  'document_selector',
+      //  {
+      //    from_document: previousDocumentId,
+      //    to_document: activeDocumentId,
+      //    filename: activeDoc.filename
+      //  }
+      //);
       
       // Store the current document ID for future comparisons
       localStorage.setItem('lastActiveDocumentId', activeDocumentId);
@@ -205,12 +204,12 @@ function App() {
 
   // History sidebar handlers
   const handleHistoryDocumentSelect = async (docId) => {
-    await logUserInteraction('document_select', 'history_sidebar', { document_id: docId });
+    //await logUserInteraction('document_select', 'history_sidebar', { document_id: docId });
     setActiveDocumentId(docId);
   };
 
   const handleHistoryQuestionSelect = async (questionId) => {
-    await logUserInteraction('question_select', 'history_sidebar', { question_id: questionId });
+    //await logUserInteraction('question_select', 'history_sidebar', { question_id: questionId });
     setActiveQuestionId(questionId);
 
     // Also tell the ProvenanceQA component about this selection
@@ -221,7 +220,7 @@ function App() {
 
   const handleHistoryQuestionDelete = async (questionId) => {
     if (window.confirm('Are you sure you want to delete this question from history?')) {
-      await logUserInteraction('question_delete', 'history_sidebar', { question_id: questionId });
+      //await logUserInteraction('question_delete', 'history_sidebar', { question_id: questionId });
 
       setQuestionsHistory(prev => {
         const newHistory = new Map(prev);
@@ -256,12 +255,12 @@ function App() {
         const docId = createNewDocument(fileName, response.filename);
 
         // Log document upload
-        await userStudyLogger.logDocumentUploaded(
-          docId,
-          fileName,
-          response.metadata?.text_length || 0,
-          response.metadata?.sentence_count || 0
-        );
+        //await userStudyLogger.logDocumentUploaded(
+        //  docId,
+        //  fileName,
+        //  response.metadata?.text_length || 0,
+        //  response.metadata?.sentence_count || 0
+        //);
 
 
         // Update document with metadata from upload
@@ -371,11 +370,11 @@ const handleHighlightInPDF = async (provenance) => {
 
     // Log provenance viewing
     if (provenance && activeDocument) {
-      await userStudyLogger.logProvenanceViewed(
-        provenance.questionId || 'unknown',
-        provenance.provenance_id || provenance.id,
-        provenance.index || 0
-      );
+      //await userStudyLogger.logProvenanceViewed(
+      //  provenance.questionId || 'unknown',
+      //  provenance.provenance_id || provenance.id,
+      //  provenance.index || 0
+      //);
     }
 
     // Always update the selected provenance
@@ -401,7 +400,7 @@ const handleHighlightInPDF = async (provenance) => {
 
   // handle gdrive modal
   const handleShowDrive = async () => {
-  await logUserInteraction('browse_drive_click', 'document_selector');
+  //await logUserInteraction('browse_drive_click', 'document_selector');
   setShowDriveModal(true);
 };
 
@@ -426,12 +425,12 @@ const handleDriveFileSelect = async (fileData) => {
     });
 
     // Log the Drive document selection
-    await userStudyLogger.logDocumentSelected(
-      docId,
-      fileData.filename,
-      false, // isPreloaded = false for Drive docs
-      'google_drive'
-    );
+    //await userStudyLogger.logDocumentSelected(
+    //  docId,
+    //  fileData.filename,
+    //  false, // isPreloaded = false for Drive docs
+    //  'google_drive'
+    //);
 
   } catch (error) {
     console.error('Error selecting Drive file:', error);
@@ -444,11 +443,11 @@ const handleDriveFileSelect = async (fileData) => {
 
     // The feedback modal already logs the submission, 
     // but we can log the completion here
-    await userStudyLogger.logUserInteraction(
-      'feedback_completed',
-      'feedback_modal',
-      { question_id: questionId }
-    );
+    //await userStudyLogger.logUserInteraction(
+    //  'feedback_completed',
+    //  'feedback_modal',
+    //  { question_id: questionId }
+    //);
 
     // Since we're using the IntegratedQAComponent, we'll need to pass this through
     setFeedbackModalOpen(false);
@@ -483,9 +482,9 @@ const handleDriveFileSelect = async (fileData) => {
 
 
   // Add user interaction logging for various UI elements
-  const logUserInteraction = async (type, element, details = {}) => {
-    await userStudyLogger.logUserInteraction(type, element, details);
-  };
+  //const logUserInteraction = async (type, element, details = {}) => {
+  //  await userStudyLogger.logUserInteraction(type, element, details);
+  //};
 
   // Handle file upload button
   const handleUploadNewDocument = () => {
@@ -512,15 +511,15 @@ const handleDriveFileSelect = async (fileData) => {
     if (activeDocumentId) {
       const activeDoc = documents.get(activeDocumentId);
       if (activeDoc) {
-        userStudyLogger.logUserInteraction(
-          'document_activated',
-          'document_selector',
-          {
-            document_id: activeDocumentId,
-            filename: activeDoc.filename,
-            is_preloaded: activeDoc.isSessionDocument || false
-          }
-        );
+        //userStudyLogger.logUserInteraction(
+        //  'document_activated',
+        //  'document_selector',
+        //  {
+        //    document_id: activeDocumentId,
+        //    filename: activeDoc.filename,
+        //    is_preloaded: activeDoc.isSessionDocument || false
+        //  }
+        //);
       }
     }
   }, [activeDocumentId, documents]);
@@ -530,14 +529,14 @@ const handleDriveFileSelect = async (fileData) => {
     // Log performance metrics periodically
     const performanceInterval = setInterval(() => {
       if (performance && performance.memory) {
-        userStudyLogger.logPerformanceMetric(
-          'memory_usage',
-          performance.memory.usedJSHeapSize,
-          {
-            total_heap: performance.memory.totalJSHeapSize,
-            heap_limit: performance.memory.jsHeapSizeLimit
-          }
-        );
+        //userStudyLogger.logPerformanceMetric(
+        //  'memory_usage',
+        //  performance.memory.usedJSHeapSize,
+        //  {
+        //    total_heap: performance.memory.totalJSHeapSize,
+        //    heap_limit: performance.memory.jsHeapSizeLimit
+        //  }
+        //);
       }
     }, 30000); // Every 30 seconds
 
@@ -555,7 +554,7 @@ const handleDriveFileSelect = async (fileData) => {
         activeDocument={activeDocument}
         onShowPreloaded={handleShowDocuments}
         onUploadDocument={async () => {
-          await logUserInteraction('upload_button_click', 'header');
+          //await logUserInteraction('upload_button_click', 'header');
           handleUploadNewDocument();
         }}
         onShowDrive={handleShowDrive}
@@ -645,7 +644,7 @@ const handleDriveFileSelect = async (fileData) => {
           allProvenances={selectedQuestionForFeedback.provenanceSources || []}
           onSubmit={handleFeedbackSubmit}
           onClose={async () => {
-            await logUserInteraction('close_feedback_modal', 'feedback_modal');
+            //await logUserInteraction('close_feedback_modal', 'feedback_modal');
             setFeedbackModalOpen(false);
           }}
         />
@@ -654,7 +653,7 @@ const handleDriveFileSelect = async (fileData) => {
       {/* Preloaded Documents Modal */}
       {showPreloadedModal && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowPreloadedModal(false)}>
-          <div className="preloaded-modal">
+          <div className="modal-container documents">
             <div className="modal-header">
               <h3>📚 Available Documents</h3>
               <button className="close-btn" onClick={() => setShowPreloadedModal(false)}>✕</button>

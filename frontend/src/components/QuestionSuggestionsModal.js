@@ -57,7 +57,7 @@ const QuestionSuggestionsModal = ({
 
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="question-suggestions-modal">
+      <div className="modal-container question-suggestions">
         <div className="modal-header">
           <div className="header-content">
             <FontAwesomeIcon icon={faQuestionCircle} />

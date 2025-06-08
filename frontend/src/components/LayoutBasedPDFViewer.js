@@ -14,7 +14,7 @@ import {
 import '../styles/pdf-viewer.css';
 import { calculateProvenanceCost, formatCost } from '../utils/ProvenanceOutputsFormatting';
 import { getProvenanceHighlightingBoxesEnhanced, getHighlightingFromMappings } from '../services/api';
-
+import {PDFViewerWithHighlights} from './PDFHighlighter';
 const LayoutBasedPDFViewer = ({
     pdfDocument,
     selectedProvenance,
@@ -1025,7 +1025,7 @@ Provenance: ${details.provenance.substring(0, 200)}...
     }
 
     return (
-        <div className="hybrid-pdf-viewer layout-based fixed-size">
+        <div className="pdf-viewer layout-based fixed-size">
             {/* Header */}
             <div className="pdf-header">
                 <div className="pdf-title">

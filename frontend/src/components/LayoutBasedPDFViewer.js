@@ -93,13 +93,13 @@ const LayoutBasedPDFViewer = ({
         if (pdfDoc && !loading && !isRendering && currentPage !== lastRenderedPage) {
             //console.log(`📄 Page changed from ${lastRenderedPage} to ${currentPage} - rendering`);
             renderPageSafely(currentPage);
-            
+
         }
     }, [pdfDoc, loading, currentPage, zoomLevel, lastRenderedPage]);
 
 
 
-    
+
 
     // Calculate fixed viewer dimensions
     const calculateFixedViewerDimensions = () => {
@@ -146,7 +146,7 @@ const LayoutBasedPDFViewer = ({
         if (!navigationTrigger) return;
 
         //console.log('🧭 Processing navigation trigger:', navigationTrigger);
-        
+
         // For text-based highlighting, we can scroll to the first highlight
         setTimeout(() => {
             const scrolled = PDFTextHighlightingUtils.scrollToFirstHighlight(highlightLayerRef);
@@ -156,7 +156,7 @@ const LayoutBasedPDFViewer = ({
                 console.log('⚠️ No highlights found to scroll to');
             }
         }, 300);
-        
+
     }, [navigationTrigger]);
 
     const loadPDF = async () => {
@@ -319,21 +319,101 @@ const LayoutBasedPDFViewer = ({
                 textLayer.style.top = `${canvasRect.top - containerRect.top}px`;
             }
 
-            // Render text layer for text search
-            if (window.pdfjsLib.renderTextLayer) {
-                await window.pdfjsLib.renderTextLayer({
-                    textContentSource: textContent,
-                    container: textLayer,
-                    viewport: viewport,
-                    textDivs: []
-                });
-            }
+            // Create text divs with stable identifiers
+            const textDivs = [];
 
-            //console.log('✅ Text layer setup completed');
+            textContent.items.forEach((item, itemIndex) => {
+                const textDiv = document.createElement('span');
+
+                // Apply standard PDF.js text styling
+                const transform = item.transform;
+                const style = textDiv.style;
+
+                style.position = 'absolute';
+                style.whiteSpace = 'pre';
+                style.color = 'transparent';
+                style.transformOrigin = '0% 0%';
+
+                // Position calculation
+                if (transform) {
+                    const x = transform[4];
+                    const y = transform[5];
+
+                    style.left = `${x}px`;
+                    style.bottom = `${y}px`;
+                    style.fontSize = `${item.height || 12}px`;
+                    style.fontFamily = item.fontName || 'sans-serif';
+
+                    if (item.width) {
+                        style.width = `${item.width}px`;
+                    }
+                }
+
+                // CRITICAL: Add stable identifiers as data attributes
+                textDiv.textContent = item.str || '';
+
+                // Multiple identification strategies for reliable element finding
+                textDiv.setAttribute('data-stable-index', itemIndex);
+                textDiv.setAttribute('data-page-number', currentPage);
+
+                // Create stable fingerprints
+                const normalizedText = (item.str || '').toLowerCase().replace(/\s+/g, ' ').trim();
+                const textFingerprint = createTextFingerprint(normalizedText, itemIndex);
+                const positionHash = createPositionHash(
+                    transform ? transform[4] : 0,
+                    transform ? transform[5] : 0,
+                    item.width || 0,
+                    item.height || 0
+                );
+
+                textDiv.setAttribute('data-text-fingerprint', textFingerprint);
+                textDiv.setAttribute('data-position-hash', positionHash);
+                textDiv.setAttribute('data-normalized-text', normalizedText);
+
+                // Add context fingerprint (text before/after for disambiguation)
+                const beforeText = itemIndex > 0 ? (textContent.items[itemIndex - 1].str || '') : '';
+                const afterText = itemIndex < textContent.items.length - 1 ? (textContent.items[itemIndex + 1].str || '') : '';
+                const contextFingerprint = createContextFingerprint(beforeText, item.str || '', afterText);
+                textDiv.setAttribute('data-context-fingerprint', contextFingerprint);
+
+                // Add additional metadata for debugging and fallback matching
+                textDiv.setAttribute('data-font-name', item.fontName || 'default');
+                textDiv.setAttribute('data-font-size', item.height || 12);
+                textDiv.setAttribute('data-dir', item.dir || 'ltr');
+
+                // Class for CSS targeting
+                textDiv.className = 'pdf-text-item';
+
+                textLayer.appendChild(textDiv);
+                textDivs.push(textDiv);
+            });
+
+            // Store reference to textDivs for highlighting component
+            textLayerRef.current.textDivs = textDivs;
+            textLayerRef.current.stableItemCount = textContent.items.length;
+
+            console.log(`✅ Text layer setup with ${textDivs.length} stable identifiers`);
 
         } catch (err) {
-            console.error('❌ Error setting up text layer:', err);
+            console.error('❌ Error setting up text layer with stable IDs:', err);
         }
+    };
+
+    // Helper functions for creating stable identifiers
+    const createTextFingerprint = (text, index) => {
+        const cleanText = text.replace(/[^\w]/g, '');
+        return `${cleanText}_${index}_${text.length}`;
+    };
+
+    const createPositionHash = (x, y, width, height) => {
+        return `${Math.round(x)}_${Math.round(y)}_${Math.round(width)}_${Math.round(height)}`;
+    };
+
+    const createContextFingerprint = (before, current, after) => {
+        const cleanBefore = (before || '').replace(/[^\w]/g, '').slice(-10);
+        const cleanCurrent = (current || '').replace(/[^\w]/g, '');
+        const cleanAfter = (after || '').replace(/[^\w]/g, '').slice(0, 10);
+        return `${cleanBefore}|${cleanCurrent}|${cleanAfter}`;
     };
 
     const setupHighlightLayer = () => {
@@ -354,14 +434,14 @@ const LayoutBasedPDFViewer = ({
         //console.log('✅ Highlight layer positioned');
     };
 
-    
+
 
     // Handle highlight clicks - Updated for text highlighter
     const handleHighlightClick = (highlightData) => {
         console.log('🎯 Text highlight clicked:', highlightData);
 
-        
-        
+
+
         setSelectedHighlight({
             index: highlightData.index,
             text: highlightData.text,
@@ -579,7 +659,7 @@ const LayoutBasedPDFViewer = ({
                             <canvas ref={canvasRef} className="pdf-canvas" />
                             <div ref={textLayerRef} className="pdf-text-layer" />
                             <div ref={highlightLayerRef} className="pdf-highlight-layer" />
-                            
+
                             {/* PDFTextHighlighter Integration */}
                             {!isRendering && currentViewport && selectedProvenance && (
                                 <PDFTextHighlighter
@@ -591,6 +671,7 @@ const LayoutBasedPDFViewer = ({
                                     currentViewport={currentViewport}
                                     onHighlightClick={handleHighlightClick}
                                     isRendering={isRendering}
+                                    questionId={activeQuestionId}
                                 />
                             )}
                         </div>
@@ -639,18 +720,18 @@ const LayoutBasedPDFViewer = ({
                                     </div>
                                 )}
                             </div>
-                            
+
                             <div className="magnified-text">
                                 {selectedHighlight.text}
                             </div>
-                            
+
                             {selectedHighlight.searchText && selectedHighlight.searchText !== selectedHighlight.text && (
                                 <div className="search-context">
                                     <h4>Search Context:</h4>
                                     <p>{selectedHighlight.searchText}</p>
                                 </div>
                             )}
-                            
+
                             <div className="provenance-actions">
                                 <button
                                     className="win95-btn feedback"

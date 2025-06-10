@@ -179,11 +179,11 @@ export const getDocumentMappings = async (documentId) => {
   }
 };
 
-export const getSentenceElementMappings = async (documentId, sentenceIds) => {
+export const getSentenceItemMappings = async (documentId, sentenceIds) => {
   try {
     const ids = Array.isArray(sentenceIds) ? sentenceIds.join(',') : sentenceIds;
     const response = await axios.get(
-      `${API_URL}/documents/${documentId}/sentence-elements?ids=${ids}`
+      `${API_URL}/documents/${documentId}/sentence-items?ids=${ids}`
     );
     return response.data;
   } catch (error) {

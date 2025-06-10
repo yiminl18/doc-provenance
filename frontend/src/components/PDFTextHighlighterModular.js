@@ -1,7 +1,7 @@
 // PDFTextHighlighter.js - Refactored to use PDFTextMatcher
 import React, { useState, useEffect, useRef } from 'react';
 import { findTextMatches, findHighConfidenceMatches, testTextMatching } from './PDFTextMatcher';
-import { getSentenceElementMappings } from '../services/api';
+import { getSentenceItemMappings } from '../services/api';
 
 /**
  * PDFTextHighlighter component that uses PDFTextMatcher for text matching
@@ -14,51 +14,629 @@ export function PDFTextHighlighterModular({
     textLayerRef, // Reference to the PDF.js text layer
     highlightLayerRef, // Reference to highlight overlay layer
     currentViewport, // Current PDF.js viewport
+    questionId,
     onHighlightClick = null,
     isRendering = false
 }) {
     const [activeHighlights, setActiveHighlights] = useState([]);
     const [highlightsPersisted, setHighlightsPersisted] = useState(false);
     const [currentProvenanceId, setCurrentProvenanceId] = useState(null);
+    const [stableTextElements, setStableTextElements] = useState([]);
     const highlightElementsRef = useRef(new Map());
     const searchTimeoutRef = useRef(null);
+    const lastProcessedProvenanceRef = useRef(null);
 
     // Extract provenance text from the provenance data
-    const getProvenanceText = () => {
-        if (!provenanceData) return '';
+    const getProvenanceData = () => {
+        if (!provenanceData) return { text: '', sentenceIds: [] };
 
-        // Try different possible text sources
-        return provenanceData.provenance ||
+        const text = provenanceData.provenance ||
             provenanceData.content?.join(' ') ||
-            provenanceData.text ||
-            '';
+            provenanceData.text || '';
+
+        const sentenceIds = 
+            provenanceData?.provenance_ids ||
+            provenanceData?.input_sentence_ids || [];
+
+        return { text, sentenceIds };
     };
 
-    // Main effect: highlight text when provenance changes
+     // Monitor text layer changes to update stable element references
     useEffect(() => {
-        const provenanceText = getProvenanceText();
+        if (textLayerRef?.current && !isRendering) {
+            const elements = extractStableTextElements();
+            setStableTextElements(elements);
+            console.log(`📊 Updated stable text elements: ${elements.length} elements`);
+        }
+    }, [textLayerRef?.current, currentPage, currentViewport, isRendering]);
+
+    // Main effect: highlight text when provenance changes
+   useEffect(() => {
+        const { text: provenanceText, sentenceIds } = getProvenanceData();
         const provenanceId = provenanceData?.provenance_id;
 
-        if (!provenanceText || !textLayerRef?.current || !highlightLayerRef?.current || isRendering) {
+        const provenanceKey = `${provenanceId}_${questionId}_${currentPage}_${documentId}`;
+
+        // Skip if we just processed this exact provenance
+        if (lastProcessedProvenanceRef.current === provenanceKey) {
+            console.log('🔄 Skipping re-processing of same provenance:', provenanceKey);
+            return;
+        }
+
+        if (!provenanceText && sentenceIds.length === 0) {
+            clearHighlights();
+            lastProcessedProvenanceRef.current = null;
+            return;
+        }
+
+        if (!textLayerRef?.current || !highlightLayerRef?.current || isRendering) {
             clearHighlights();
             return;
         }
 
-        // Check if we need to create new highlights
-        if (provenanceId !== currentProvenanceId || !highlightsPersisted) {
-            console.log('🎯 PDFTextHighlighter: Creating highlights for provenance:', provenanceId);
-            setCurrentProvenanceId(provenanceId);
+        // Only proceed if we have stable text elements
+        if (stableTextElements.length === 0) {
+            console.log('⏳ Waiting for stable text elements...');
+            return;
+        }
 
-            // Debounce the highlighting to avoid rapid re-renders
-            if (searchTimeoutRef.current) {
-                clearTimeout(searchTimeoutRef.current);
+        console.log('🎯 Creating highlights for provenance:', provenanceId);
+        
+        // Mark this provenance as being processed
+        lastProcessedProvenanceRef.current = provenanceKey;
+        setCurrentProvenanceId(provenanceId);
+
+        // Debounce highlighting to prevent rapid re-execution
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        searchTimeoutRef.current = setTimeout(() => {
+            highlightProvenance(provenanceText, sentenceIds, provenanceId);
+        }, 150); // Slightly longer debounce
+
+    }, [
+        provenanceData?.provenance_id, // Only track provenance ID changes
+        provenanceData?.provenance_ids, // Track sentence ID changes
+        provenanceData?.input_sentence_ids,
+        provenanceData?.provenance,
+        provenanceData?.content,
+        currentPage,
+        questionId,
+        isRendering,
+        stableTextElements.length, // Only track length, not the array itself
+        getProvenanceData
+    ]);
+
+    /**
+     * Extract stable text elements with IDs from the PDF.js text layer
+     */
+    const extractStableTextElements = () => {
+        if (!textLayerRef?.current) return [];
+
+        const textLayer = textLayerRef.current;
+        const elements = [];
+
+        // Look for elements with stable identifiers
+        const stableElements = textLayer.querySelectorAll('[data-stable-index]');
+        
+        if (stableElements.length > 0) {
+            console.log(`✅ Found ${stableElements.length} elements with stable IDs`);
+            
+            stableElements.forEach((element, index) => {
+                const stableIndex = element.getAttribute('data-stable-index');
+                const text = element.textContent?.trim();
+                
+                if (text && text.length > 0) {
+                    elements.push({
+                        element,
+                        stableIndex: parseInt(stableIndex),
+                        text,
+                        index // DOM index for fallback
+                    });
+                }
+            });
+        } else {
+            // Fallback: use regular elements with generated stable indices
+            console.log(`⚠️ No stable IDs found, generating indices for ${textLayer.children.length} elements`);
+            
+            Array.from(textLayer.children).forEach((element, index) => {
+                const text = element.textContent?.trim();
+                
+                if (text && text.length > 0) {
+                    // Add stable attributes if missing
+                    if (!element.hasAttribute('data-stable-index')) {
+                        element.setAttribute('data-stable-index', index);
+                        element.setAttribute('data-page-number', currentPage);
+                    }
+                    
+                    elements.push({
+                        element,
+                        stableIndex: index,
+                        text,
+                        index
+                    });
+                }
+            });
+        }
+
+        return elements;
+    };
+
+
+    /**
+     * Main highlighting function using stable mappings
+     */
+    const highlightProvenance = async (provenanceText, sentenceIds, highlightId) => {
+        clearHighlights();
+
+        try {
+            // Strategy 1: Use stable mappings if available
+            if (sentenceIds.length > 0) {
+                console.log(`🗺️ Trying stable mappings for ${sentenceIds.length} sentences`);
+                
+                const success = await highlightUsingStableMappings(sentenceIds, highlightId);
+                if (success) {
+                    setHighlightsPersisted(true);
+                    return;
+                }
             }
 
-            searchTimeoutRef.current = setTimeout(() => {
-                highlightProvenanceText(provenanceText, provenanceId);
-            }, 100);
+            // Strategy 2: Fall back to text search
+            if (provenanceText && provenanceText.length > 3) {
+                console.log(`🔍 Falling back to text search for: "${provenanceText.substring(0, 100)}..."`);
+                
+                const success = await highlightUsingTextSearch(provenanceText, highlightId);
+                if (success) {
+                    setHighlightsPersisted(true);
+                    return;
+                }
+            }
+
+            // Strategy 3: Create fallback highlight
+            console.log('⚠️ No highlighting method succeeded, creating fallback');
+            createFallbackHighlight(provenanceText || 'Provenance content', highlightId);
+            setHighlightsPersisted(true);
+
+        } catch (error) {
+            console.error('❌ Error in highlighting:', error);
+            createFallbackHighlight(provenanceText || 'Error in highlighting', highlightId);
+            setHighlightsPersisted(true);
         }
-    }, [provenanceData, currentPage, currentViewport, isRendering, currentProvenanceId, highlightsPersisted]);
+    };
+
+    /**
+     * Highlight using stable element mappings
+     */
+    const highlightUsingStableMappings = async (sentenceIds, highlightId) => {
+        try {
+            const mappingsData = await getSentenceItemMappings(documentId, sentenceIds, currentPage);
+            
+            if (!mappingsData || !mappingsData.sentence_mappings) {
+                console.log('⚠️ No stable mappings available');
+                return false;
+            }
+
+            const highlights = [];
+            const sentenceMappings = mappingsData.sentence_mappings;
+
+            Object.entries(sentenceMappings).forEach(([sentenceId, mapping]) => {
+                if (mapping.stable_matches && mapping.stable_matches.length > 0) {
+                    // Filter matches for current page
+                    const pageMatches = mapping.stable_matches.filter(match => match.page === currentPage);
+                    
+                    pageMatches.forEach(match => {
+                        // Find the corresponding stable element
+                        const stableElement = findStableElement(match);
+                        
+                        if (stableElement) {
+                            highlights.push({
+                                element: stableElement.element,
+                                elementText: stableElement.text,
+                                confidence: match.confidence,
+                                matchType: 'stable_mapping',
+                                strategy: match.match_strategy || 'mapping',
+                                sentenceId,
+                                stableIndex: match.stable_index || match.element_index,
+                                matchedText: match.matched_text || stableElement.text
+                            });
+                        } else {
+                            console.log(`⚠️ Could not find stable element for sentence ${sentenceId}, match index ${match.stable_index || match.element_index}`);
+                        }
+
+                        // get the item_span indices if available
+                        if (match.item_span && match.item_span.length > 0) {
+                            const spanIndices = match.item_span
+                        // find the stable elements for the span
+                            .map(spanIndex => stableTextElements.find(el => el.stableIndex === spanIndex))
+                            .filter(el => el); // Filter out any undefined elements
+
+                            spanIndices.forEach((el, index) => {
+                                highlights.push({
+                                    element: el.element, 
+                                    elementText: el.text,
+                                    confidence: match.confidence, // keep the confidence from the match
+                                    matchType: 'stable_mapping_span',
+                                    strategy: match.match_strategy || 'mapping',
+                                    sentenceId,
+                                    stableIndex: index,
+                                    matchedText: el.text,
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+
+            if (highlights.length > 0) {
+                console.log(`✅ Created ${highlights.length} stable mapping highlights`);
+                createHighlightElements(highlights, highlightId);
+                setActiveHighlights(highlights);
+                return true;
+            }
+
+            console.log('⚠️ No stable elements found for current page');
+            return false;
+
+        } catch (error) {
+            console.error('❌ Error using stable mappings:', error);
+            return false;
+        }
+    };
+
+    /**
+     * Find stable element using multiple strategies
+     */
+    const findStableElement = (match) => {
+        
+        const targetIndex = match.stable_index || match.element_index;
+        
+        // Strategy 1: Direct stable index match
+        let stableElement = stableTextElements.find(el => el.stableIndex === targetIndex);
+        
+        if (stableElement) {
+            console.log(`✅ Found element by stable index ${targetIndex}`);
+            return stableElement;
+        }
+
+        // Strategy 2: Text content matching with selectors
+        if (match.selectors && match.selectors.length > 0) {
+            for (const selector of match.selectors.sort((a, b) => (b.priority || 0) - (a.priority || 0))) {
+                stableElement = findElementBySelector(selector);
+                if (stableElement) {
+                    console.log(`✅ Found element using ${selector.type} selector`);
+                    return stableElement;
+                }
+            }
+        }
+
+        // Strategy 3: Text content fuzzy matching
+        if (match.matched_text) {
+            const matchText = match.matched_text.toLowerCase().trim();
+            stableElement = stableTextElements.find(el => {
+                const elementText = el.text.toLowerCase().trim();
+                return elementText.includes(matchText) || matchText.includes(elementText);
+            });
+            
+            if (stableElement) {
+                console.log(`✅ Found element by text matching: "${stableElement.text.substring(0, 30)}..."`);
+                return stableElement;
+            }
+        }
+
+        console.log(`❌ Could not find stable element for index ${targetIndex}`);
+        return null;
+    };
+
+    /**
+     * Find element using selector strategies
+     */
+    const findElementBySelector = (selector) => {
+        if (!textLayerRef?.current) return null;
+
+        try {
+            switch (selector.type) {
+                case 'stable_index':
+                    const element = textLayerRef.current.querySelector(`[data-stable-index="${selector.stable_index}"]`);
+                    if (element) {
+                        return stableTextElements.find(el => el.element === element);
+                    }
+                    break;
+
+                case 'text_fingerprint':
+                    const fingerprintEl = textLayerRef.current.querySelector(`[data-text-fingerprint="${selector.fingerprint}"]`);
+                    if (fingerprintEl) {
+                        return stableTextElements.find(el => el.element === fingerprintEl);
+                    }
+                    break;
+
+                case 'text_content':
+                    if (selector.text_snippet) {
+                        return stableTextElements.find(el => 
+                            el.text.toLowerCase().includes(selector.text_snippet.toLowerCase())
+                        );
+                    }
+                    break;
+
+                default:
+                    // Try CSS selector
+                    const selectorEl = textLayerRef.current.querySelector(selector.selector);
+                    if (selectorEl) {
+                        return stableTextElements.find(el => el.element === selectorEl);
+                    }
+            }
+        } catch (error) {
+            console.warn(`⚠️ Selector ${selector.type} failed:`, error);
+        }
+
+        return null;
+    };
+
+    /**
+     * Fallback highlighting using text search
+     */
+    const highlightUsingTextSearch = async (searchText, highlightId) => {
+        if (stableTextElements.length === 0) {
+            console.log('⚠️ No stable text elements available for text search');
+            return false;
+        }
+
+        // Use the text matcher to find matches
+        const elements = stableTextElements.map(el => el.element);
+        const matches = findTextMatches(elements, searchText, { debug: true });
+
+        if (matches.length > 0) {
+            console.log(`✅ Found ${matches.length} text search matches`);
+            createHighlightElements(matches, highlightId);
+            setActiveHighlights(matches);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
+     * Create visual highlight elements
+     */
+    const createHighlightElements = (highlights, highlightId) => {
+        if (!highlightLayerRef?.current || highlights.length === 0) return;
+
+        console.log(`🎨 Creating ${highlights.length} highlight elements`);
+
+        highlights.forEach((highlight, index) => {
+            const highlightElement = createSingleHighlight(highlight, index, highlightId);
+            if (highlightElement) {
+                highlightLayerRef.current.appendChild(highlightElement);
+            }
+        });
+
+        console.log(`✅ Created highlights for provenance`);
+    };
+
+    /**
+     * Create a single highlight element
+     */
+    const createSingleHighlight = (highlight, index, highlightId) => {
+        if (!highlight.element || !highlightLayerRef?.current) return null;
+
+        const rect = highlight.element.getBoundingClientRect();
+        const highlightLayer = highlightLayerRef.current;
+        const layerRect = highlightLayer.getBoundingClientRect();
+
+        const left = rect.left - layerRect.left;
+        const top = rect.top - layerRect.top;
+        const width = rect.width;
+        const height = rect.height;
+
+        if (width <= 0 || height <= 0) {
+            console.warn(`⚠️ Invalid dimensions: ${width}x${height}`);
+            return null;
+        }
+
+        const overlay = document.createElement('div');
+        overlay.className = 'pdf-stable-highlight';
+        overlay.setAttribute('data-highlight-id', highlightId);
+        overlay.setAttribute('data-index', index);
+        overlay.setAttribute('data-confidence', highlight.confidence?.toFixed(2) || '1.0');
+        overlay.setAttribute('data-match-type', highlight.matchType || 'stable_mapping');
+        overlay.setAttribute('data-strategy', highlight.strategy || 'mapping');
+
+        // Color coding based on strategy and confidence
+        const { backgroundColor, borderColor } = getHighlightColors(highlight);
+
+        overlay.style.cssText = `
+            position: absolute;
+            left: ${left}px;
+            top: ${top}px;
+            width: ${width}px;
+            height: ${height}px;
+            background-color: ${backgroundColor};
+            border: 2px solid ${borderColor};
+            border-radius: 3px;
+            z-index: 100;
+            pointer-events: auto;
+            cursor: pointer;
+            opacity: ${Math.max(0.7, highlight.confidence || 0.8)};
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        `;
+
+        // Tooltip
+        overlay.title = createTooltip(highlight);
+
+        // Event handlers
+        addHighlightEventHandlers(overlay, highlight, index);
+
+        return overlay;
+    };
+
+    /**
+     * Get colors based on highlight strategy
+     */
+    const getHighlightColors = (highlight) => {
+        if (highlight.strategy === 'mapping' || highlight.matchType === 'stable_mapping') {
+            return {
+                backgroundColor: 'rgba(76, 175, 80, 0.4)', // Green for stable mappings
+                borderColor: 'rgba(76, 175, 80, 0.8)'
+            };
+        } else if (highlight.strategy === 'simple' || highlight.matchType === 'exact_substring') {
+            return {
+                backgroundColor: 'rgba(33, 150, 243, 0.4)', // Blue for exact matches
+                borderColor: 'rgba(33, 150, 243, 0.8)'
+            };
+        } else {
+            return {
+                backgroundColor: 'rgba(255, 193, 7, 0.4)', // Yellow for other matches
+                borderColor: 'rgba(255, 193, 7, 0.8)'
+            };
+        }
+    };
+
+    /**
+     * Create tooltip for highlight
+     */
+    const createTooltip = (highlight) => {
+        let tooltip = `Strategy: ${highlight.strategy || 'Unknown'}\n`;
+        tooltip += `Match Type: ${highlight.matchType || 'Unknown'}\n`;
+        tooltip += `Confidence: ${((highlight.confidence || 0.8) * 100).toFixed(0)}%\n`;
+        
+        if (highlight.sentenceId) {
+            tooltip += `Sentence ID: ${highlight.sentenceId}\n`;
+        }
+        
+        if (highlight.stableIndex !== undefined) {
+            tooltip += `Stable Index: ${highlight.stableIndex}\n`;
+        }
+        
+        tooltip += `Text: "${(highlight.elementText || highlight.matchedText || '').substring(0, 100)}..."`;
+
+        return tooltip;
+    };
+
+    /**
+     * Add event handlers to highlights
+     */
+    const addHighlightEventHandlers = (overlay, highlight, index) => {
+        overlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log(`📍 Clicked stable highlight ${index}:`, highlight);
+
+            // Visual feedback
+            overlay.style.transform = 'scale(1.05)';
+            overlay.style.borderWidth = '3px';
+
+            setTimeout(() => {
+                overlay.style.transform = 'scale(1)';
+                overlay.style.borderWidth = '2px';
+            }, 300);
+
+            if (onHighlightClick) {
+                onHighlightClick({
+                    index,
+                    text: highlight.elementText || highlight.matchedText || '',
+                    confidence: highlight.confidence || 0.8,
+                    matchType: highlight.matchType || 'stable_mapping',
+                    strategy: highlight.strategy || 'mapping',
+                    sentenceId: highlight.sentenceId,
+                    stableIndex: highlight.stableIndex,
+                    page: currentPage
+                });
+            }
+        });
+
+        overlay.addEventListener('mouseenter', () => {
+            overlay.style.transform = 'scale(1.02)';
+            overlay.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+        });
+
+        overlay.addEventListener('mouseleave', () => {
+            overlay.style.transform = 'scale(1)';
+            overlay.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
+        });
+    };
+
+    /**
+     * Create fallback highlight
+     */
+    const createFallbackHighlight = (searchText, highlightId) => {
+        if (!highlightLayerRef?.current) return;
+
+        console.log('🆘 Creating fallback highlight');
+
+        const overlay = document.createElement('div');
+        overlay.className = 'pdf-stable-highlight-fallback';
+        overlay.setAttribute('data-highlight-id', highlightId);
+
+        overlay.style.cssText = `
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            width: 300px;
+            height: 40px;
+            background-color: rgba(244, 67, 54, 0.9);
+            border: 2px solid rgba(244, 67, 54, 1);
+            border-radius: 6px;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        `;
+
+        overlay.innerHTML = `🔍 No stable mappings found`;
+        overlay.title = `Could not find highlights for: "${searchText.substring(0, 100)}..."`;
+
+        overlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (onHighlightClick) {
+                onHighlightClick({
+                    index: 0,
+                    text: searchText,
+                    confidence: 0.0,
+                    matchType: 'fallback',
+                    strategy: 'fallback',
+                    page: currentPage
+                });
+            }
+        });
+
+        highlightLayerRef.current.appendChild(overlay);
+
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+        }, 5000);
+    };
+
+    /**
+     * Clear all highlights
+     */
+    const clearHighlights = () => {
+        if (!highlightLayerRef?.current) return;
+
+        const overlays = highlightLayerRef.current.querySelectorAll(
+            '.pdf-stable-highlight, .pdf-stable-highlight-fallback'
+        );
+
+        overlays.forEach(overlay => {
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+        });
+
+        highlightElementsRef.current.clear();
+        setActiveHighlights([]);
+        setHighlightsPersisted(false);
+    };
+
+
+
+
 
     const highlightProvenanceText = async (searchText, highlightId) => {
         if (!searchText || searchText.length < 3) {
@@ -84,7 +662,7 @@ export function PDFTextHighlighterModular({
             console.log('🎯 Looking for sentence IDs:', sentenceIds);
 
             // Get the pre-computed mappings
-            const mappings = await getSentenceElementMappings(documentId, sentenceIds);
+            const mappings = await getSentenceItemMappings(documentId, sentenceIds);
             console.log('📄 Retrieved mappings:', mappings);
 
             if (!mappings || !mappings.sentence_mappings) {
@@ -100,10 +678,10 @@ export function PDFTextHighlighterModular({
             // Add this to see the structure clearly:
             Object.entries(mappings.sentence_mappings).forEach(([sentenceId, sentenceMapping]) => {
                 console.log(`📝 Sentence ${sentenceId}:`, sentenceMapping.text.substring(0, 100));
-                console.log(`🎯 Element matches:`, sentenceMapping.element_matches.length);
+                console.log(`🎯 Element matches:`, sentenceMapping.stable_matches.length);
 
-                sentenceMapping.element_matches.forEach((match, i) => {
-                    console.log(`   Match ${i}: page ${match.page}, element ${match.element_index}, confidence ${match.confidence}`);
+                sentenceMapping.stable_matches.forEach((match, i) => {
+                    console.log(`   Match ${i}: page ${match.page}, confidence ${match.confidence}`);
                     console.log(`   Strategy: ${match.match_strategy}`);
                     console.log(`   Text: "${match.matched_text?.substring(0, 50)}..."`);
                 });
@@ -114,11 +692,11 @@ export function PDFTextHighlighterModular({
 
             Object.entries(mappings.sentence_mappings).forEach(([sentenceId, sentenceMapping]) => {
 
-                if (sentenceMapping && sentenceMapping.element_matches) {
+                if (sentenceMapping && sentenceMapping.stable_matches) {
                     console.log(`📝 Found mapping for sentence ${sentenceId}:`, sentenceMapping);
 
                     // Filter matches for current page
-                    const currentPageMatches = sentenceMapping.element_matches.filter(
+                    const currentPageMatches = sentenceMapping.stable_matches.filter(
                         match => match.page === currentPage
                     );
 
@@ -197,70 +775,7 @@ export function PDFTextHighlighterModular({
     return validIndices;
 };
 
-   const findElementBySelector = (highlight, textElements) => {
-    const { selectors, matchedText, elementIndex } = highlight;
-    
-    console.log(`🔍 Trying to find element for: "${matchedText?.substring(0, 50)}..."`);
-    
-    // Strategy 1: Try text content selector
-    const textSelector = selectors?.find(s => s.type === 'text_content');
-    if (textSelector && textSelector.text_snippet) {
-        const targetText = textSelector.text_snippet.toLowerCase();
-        console.log(`🎯 Searching for text snippet: "${targetText}"`);
-        
-        for (let i = 0; i < textElements.length; i++) {
-            const elementText = textElements[i].textContent.toLowerCase();
-            if (elementText.includes(targetText.substring(0, 20))) {
-                console.log(`✅ Found by text selector at index ${i}: "${elementText.substring(0, 50)}..."`);
-                
-                // NEW: Remap the entire span
-                const remappedIndices = remapElementSpan(highlight, textElements, i);
-                
-                return { 
-                    elements: remappedIndices.map(idx => textElements[idx]),
-                    indices: remappedIndices,
-                    primaryIndex: i, 
-                    method: 'text_selector' 
-                };
-            }
-        }
-    }
-    
-    // Strategy 2: Search for key phrases (also with remapping)
-    if (matchedText) {
-        const keyPhrases = ['ecce 2019', 'september', 'belfast', 'computing machinery'];
-        
-        for (let i = 0; i < textElements.length; i++) {
-            const elementText = textElements[i].textContent.toLowerCase();
-            
-            const foundPhrases = keyPhrases.filter(phrase => elementText.includes(phrase));
-            if (foundPhrases.length > 0) {
-                console.log(`✅ Found by key phrases [${foundPhrases.join(', ')}] at index ${i}: "${elementText.substring(0, 50)}..."`);
-                
-                // NEW: Remap the entire span
-                const remappedIndices = remapElementSpan(highlight, textElements, i);
-                
-                return { 
-                    elements: remappedIndices.map(idx => textElements[idx]),
-                    indices: remappedIndices,
-                    primaryIndex: i, 
-                    method: 'key_phrases', 
-                    phrases: foundPhrases 
-                };
-            }
-        }
-    }
-    
-    // Strategy 3: Fallback
-    console.log(`⚠️ Falling back to original index ${elementIndex}`);
-    return { 
-        elements: [textElements[elementIndex]],
-        indices: [elementIndex],
-        primaryIndex: elementIndex, 
-        method: 'original_index' 
-    };
-};
-
+  
     const createHighlightsFromMappings = (highlights, highlightId) => {
     if (!highlightLayerRef?.current || !textLayerRef?.current) return;
 
@@ -464,43 +979,7 @@ export function PDFTextHighlighterModular({
         }
     };
 
-    /**
-     * Create visual highlight elements from text matches
-     */
-    const createHighlightElements = (matches, highlightId) => {
-        if (!highlightLayerRef?.current || matches.length === 0) return;
-
-        console.log(`🎨 Creating ${matches.length} highlight elements`);
-
-        // Group matches by line for continuous highlighting
-        const lineGroups = groupMatchesByLine(matches);
-        console.log(`📏 Grouped into ${lineGroups.length} line groups`);
-
-        let highlightsCreated = 0;
-        const newHighlights = new Map();
-
-        lineGroups.forEach((lineMatches, lineIndex) => {
-            if (lineMatches.length === 1) {
-                // Single highlight on line
-                const highlightElement = createSingleHighlight(lineMatches[0], highlightsCreated, highlightId);
-                if (highlightElement) {
-                    newHighlights.set(`${highlightId}_${highlightsCreated}`, highlightElement);
-                    highlightsCreated++;
-                }
-            } else {
-                // Multiple highlights on same line - create continuous span
-                const continuousHighlight = createContinuousHighlight(lineMatches, highlightsCreated, highlightId);
-                if (continuousHighlight) {
-                    newHighlights.set(`${highlightId}_${highlightsCreated}`, continuousHighlight);
-                    highlightsCreated++;
-                }
-            }
-        });
-
-        highlightElementsRef.current = newHighlights;
-        console.log(`✅ Created ${highlightsCreated} highlight elements`);
-    };
-
+   
     /**
      * Group matches by line (same vertical position)
      */
@@ -545,67 +1024,7 @@ export function PDFTextHighlighterModular({
         return lineGroups;
     };
 
-    /**
-     * Create a single highlight element
-     */
-    const createSingleHighlight = (match, index, highlightId) => {
-        if (!match.element || !highlightLayerRef?.current) return null;
-
-        const textElement = match.element;
-        const rect = textElement.getBoundingClientRect();
-        const highlightLayer = highlightLayerRef.current;
-        const layerRect = highlightLayer.getBoundingClientRect();
-
-        // Calculate position relative to highlight layer
-        const left = rect.left - layerRect.left;
-        const top = rect.top - layerRect.top;
-        const width = rect.width;
-        const height = rect.height;
-
-        // Skip invalid dimensions
-        if (width <= 0 || height <= 0) {
-            console.warn(`⚠️ Invalid dimensions: ${width}x${height}`);
-            return null;
-        }
-
-        const overlay = document.createElement('div');
-        overlay.className = 'pdf-text-highlighter-overlay';
-        overlay.setAttribute('data-highlight-id', highlightId);
-        overlay.setAttribute('data-index', index);
-        overlay.setAttribute('data-confidence', match.confidence.toFixed(2));
-        overlay.setAttribute('data-match-type', match.matchType);
-        overlay.setAttribute('data-strategy', match.strategy);
-
-        // Color coding based on match type and strategy
-        const { backgroundColor, borderColor } = getHighlightColors(match);
-
-        overlay.style.cssText = `
-            position: absolute;
-            left: ${left}px;
-            top: ${top}px;
-            width: ${width}px;
-            height: ${height}px;
-            background-color: ${backgroundColor};
-            border: 2px solid ${borderColor};
-            border-radius: 3px;
-            z-index: 100;
-            pointer-events: auto;
-            cursor: pointer;
-            opacity: ${Math.max(0.6, match.confidence)};
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        `;
-
-        // Create tooltip
-        const tooltip = createTooltip(match);
-        overlay.title = tooltip;
-
-        // Add event handlers
-        addHighlightEventHandlers(overlay, match, index);
-
-        highlightLayerRef.current.appendChild(overlay);
-        return overlay;
-    };
+    
 
     /**
      * Create a continuous highlight spanning multiple elements
@@ -685,214 +1104,13 @@ export function PDFTextHighlighterModular({
         return overlay;
     };
 
-    /**
-     * Get colors for highlight based on match type and strategy
-     */
-    const getHighlightColors = (match) => {
-        // Color by strategy first, then by match type
-        if (match.strategy === 'simple') {
-            if (match.matchType === 'exact_substring' || match.matchType === 'exact_match') {
-                return {
-                    backgroundColor: 'rgba(76, 175, 80, 0.4)', // Green for exact
-                    borderColor: 'rgba(76, 175, 80, 0.8)'
-                };
-            } else {
-                return {
-                    backgroundColor: 'rgba(139, 195, 74, 0.4)', // Light green for simple
-                    borderColor: 'rgba(139, 195, 74, 0.8)'
-                };
-            }
-        } else if (match.strategy === 'answer_extraction') {
-            return {
-                backgroundColor: 'rgba(33, 150, 243, 0.4)', // Blue for answer extraction
-                borderColor: 'rgba(33, 150, 243, 0.8)'
-            };
-        } else if (match.strategy === 'phrase') {
-            return {
-                backgroundColor: 'rgba(255, 193, 7, 0.4)', // Yellow for phrase
-                borderColor: 'rgba(255, 193, 7, 0.8)'
-            };
-        } else if (match.strategy === 'word') {
-            return {
-                backgroundColor: 'rgba(255, 152, 0, 0.4)', // Orange for word
-                borderColor: 'rgba(255, 152, 0, 0.8)'
-            };
-        } else if (match.strategy === 'fuzzy') {
-            return {
-                backgroundColor: 'rgba(156, 39, 176, 0.4)', // Purple for fuzzy
-                borderColor: 'rgba(156, 39, 176, 0.8)'
-            };
-        }
+   
 
-        // Default colors
-        return {
-            backgroundColor: 'rgba(96, 125, 139, 0.4)', // Blue-gray default
-            borderColor: 'rgba(96, 125, 139, 0.8)'
-        };
-    };
+    
 
-    /**
-     * Create tooltip text for a match
-     */
-    const createTooltip = (match) => {
-        const strategyDescription = {
-            'simple': 'Simple exact/substring matching',
-            'answer_extraction': 'Answer pattern extraction',
-            'phrase': 'Phrase-based matching',
-            'word': 'Word-based matching',
-            'fuzzy': 'Fuzzy text similarity'
-        };
+   
 
-        let tooltip = `${strategyDescription[match.strategy] || match.strategy}\n`;
-        tooltip += `Match Type: ${match.matchType}\n`;
-        tooltip += `Confidence: ${(match.confidence * 100).toFixed(0)}%\n`;
-
-        if (match.matchingWords && match.totalWords) {
-            tooltip += `Words: ${match.matchingWords.length}/${match.totalWords}\n`;
-        }
-
-        if (match.similarity) {
-            tooltip += `Similarity: ${(match.similarity * 100).toFixed(0)}%\n`;
-        }
-
-        tooltip += `Text: "${match.elementText.substring(0, 100)}${match.elementText.length > 100 ? '...' : ''}"`;
-
-        return tooltip;
-    };
-
-    /**
-     * Add event handlers to highlight elements
-     */
-    const addHighlightEventHandlers = (overlay, match, index) => {
-        // Click handler
-        overlay.addEventListener('click', (e) => {
-            e.stopPropagation();
-            console.log(`📍 Clicked highlight ${index}:`, match.matchType, `(${match.strategy})`);
-
-            // Visual feedback
-            overlay.style.transform = 'scale(1.05)';
-            overlay.style.borderWidth = '3px';
-            overlay.style.zIndex = '200';
-
-            setTimeout(() => {
-                overlay.style.transform = 'scale(1)';
-                overlay.style.borderWidth = '2px';
-                overlay.style.zIndex = '100';
-            }, 300);
-
-            if (onHighlightClick) {
-                onHighlightClick({
-                    index,
-                    text: match.elementText,
-                    confidence: match.confidence,
-                    matchType: match.matchType,
-                    strategy: match.strategy,
-                    searchText: match.searchText,
-                    page: currentPage,
-                    isContinuous: match.isContinuous || false,
-                    spanCount: match.spanCount || 1
-                });
-            }
-        });
-
-        // Hover effects
-        overlay.addEventListener('mouseenter', () => {
-            overlay.style.transform = 'scale(1.02)';
-            overlay.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
-            overlay.style.zIndex = '150';
-        });
-
-        overlay.addEventListener('mouseleave', () => {
-            overlay.style.transform = 'scale(1)';
-            overlay.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
-            overlay.style.zIndex = '100';
-        });
-    };
-
-    /**
-     * Create fallback highlight when no matches found
-     */
-    const createFallbackHighlight = (searchText, highlightId) => {
-        if (!highlightLayerRef?.current) return;
-
-        console.log('🆘 Creating fallback highlight');
-
-        const overlay = document.createElement('div');
-        overlay.className = 'pdf-text-highlighter-fallback';
-        overlay.setAttribute('data-highlight-id', highlightId);
-
-        overlay.style.cssText = `
-            position: absolute;
-            left: 20px;
-            top: 20px;
-            width: 300px;
-            height: 40px;
-            background-color: rgba(244, 67, 54, 0.9);
-            border: 2px solid rgba(244, 67, 54, 1);
-            border-radius: 6px;
-            z-index: 200;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        `;
-
-        overlay.innerHTML = `🔍 No text matches found`;
-        overlay.title = `Could not find text matches for: "${searchText.substring(0, 100)}${searchText.length > 100 ? '...' : ''}"`;
-
-        overlay.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (onHighlightClick) {
-                onHighlightClick({
-                    index: 0,
-                    text: searchText,
-                    confidence: 0.0,
-                    matchType: 'fallback',
-                    strategy: 'fallback',
-                    searchText: searchText,
-                    page: currentPage
-                });
-            }
-        });
-
-        highlightLayerRef.current.appendChild(overlay);
-
-        // Auto-remove fallback after 5 seconds
-        setTimeout(() => {
-            if (overlay.parentNode) {
-                overlay.parentNode.removeChild(overlay);
-            }
-        }, 5000);
-
-        setHighlightsPersisted(true);
-    };
-
-    /**
-     * Clear all highlights
-     */
-    const clearHighlights = () => {
-        if (!highlightLayerRef?.current) return;
-
-        const overlays = highlightLayerRef.current.querySelectorAll(
-            '.pdf-text-highlighter-overlay, .pdf-text-highlighter-fallback'
-        );
-
-        console.log(`🧹 Clearing ${overlays.length} highlights`);
-
-        overlays.forEach(overlay => {
-            if (overlay.parentNode) {
-                overlay.parentNode.removeChild(overlay);
-            }
-        });
-
-        highlightElementsRef.current.clear();
-        setActiveHighlights([]);
-        setHighlightsPersisted(false);
-    };
+    
 
     // Cleanup on unmount
     useEffect(() => {

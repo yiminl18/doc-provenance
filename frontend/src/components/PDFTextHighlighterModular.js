@@ -1,5 +1,5 @@
 // PDFTextHighlighter.js - Refactored to use PDFTextMatcher
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { findTextMatches, findHighConfidenceMatches, testTextMatching } from './PDFTextMatcher';
 import { getSentenceItemMappings } from '../services/api';
 
@@ -27,21 +27,21 @@ export function PDFTextHighlighterModular({
     const lastProcessedProvenanceRef = useRef(null);
 
     // Extract provenance text from the provenance data
-    const getProvenanceData = () => {
+    const getProvenanceData = useCallback(() => {
         if (!provenanceData) return { text: '', sentenceIds: [] };
 
         const text = provenanceData.provenance ||
             provenanceData.content?.join(' ') ||
             provenanceData.text || '';
 
-        const sentenceIds = 
+        const sentenceIds =
             provenanceData?.provenance_ids ||
             provenanceData?.input_sentence_ids || [];
 
         return { text, sentenceIds };
-    };
+    }, [provenanceData]);
 
-     // Monitor text layer changes to update stable element references
+    // Monitor text layer changes to update stable element references
     useEffect(() => {
         if (textLayerRef?.current && !isRendering) {
             const elements = extractStableTextElements();
@@ -50,8 +50,65 @@ export function PDFTextHighlighterModular({
         }
     }, [textLayerRef?.current, currentPage, currentViewport, isRendering]);
 
+    const updateHighlightPositions = useCallback(() => {
+        if (!highlightLayerRef?.current || !textLayerRef?.current) return;
+
+        const highlightLayer = highlightLayerRef.current;
+        const textLayer = textLayerRef.current;
+
+        // Update highlight layer to match text layer positioning
+        highlightLayer.style.position = textLayer.style.position || 'absolute';
+        highlightLayer.style.left = textLayer.style.left || '0px';
+        highlightLayer.style.top = textLayer.style.top || '0px';
+        highlightLayer.style.width = textLayer.style.width || '100%';
+        highlightLayer.style.height = textLayer.style.height || '100%';
+        highlightLayer.style.transform = textLayer.style.transform || 'none';
+
+        // Update individual highlight positions
+        const highlights = highlightLayer.querySelectorAll('.pdf-stable-highlight.zoom-stable');
+
+        highlights.forEach(overlay => {
+            const targetElement = overlay._targetElement;
+            if (!targetElement || !targetElement.parentNode) {
+                console.warn('⚠️ Target element no longer exists, removing highlight');
+                overlay.remove();
+                return;
+            }
+
+            try {
+                // Use the element's current position within the text layer
+                const elementStyle = window.getComputedStyle(targetElement);
+
+                let left = parseFloat(elementStyle.left) || 0;
+                let top = parseFloat(elementStyle.top) || 0;
+                let width = parseFloat(elementStyle.width) || targetElement.offsetWidth;
+                let height = parseFloat(elementStyle.height) || targetElement.offsetHeight;
+
+                // If bottom is used instead of top (PDF.js often uses bottom positioning)
+                if (elementStyle.bottom && elementStyle.bottom !== 'auto') {
+                    const bottom = parseFloat(elementStyle.bottom);
+                    const containerHeight = parseFloat(textLayer.style.height) || textLayer.offsetHeight;
+                    top = containerHeight - bottom - height;
+                }
+
+                // Update overlay position
+                overlay.style.left = `${left}px`;
+                overlay.style.top = `${top}px`;
+                overlay.style.width = `${width}px`;
+                overlay.style.height = `${height}px`;
+
+                console.log(`🔄 Updated highlight ${overlay.getAttribute('data-index')}: ${left},${top} ${width}x${height}`);
+
+            } catch (error) {
+                console.warn('⚠️ Failed to update highlight position:', error);
+            }
+        });
+
+        console.log(`🔄 Updated positions for ${highlights.length} zoom-stable highlights`);
+    }, []);
+
     // Main effect: highlight text when provenance changes
-   useEffect(() => {
+    useEffect(() => {
         const { text: provenanceText, sentenceIds } = getProvenanceData();
         const provenanceId = provenanceData?.provenance_id;
 
@@ -81,7 +138,7 @@ export function PDFTextHighlighterModular({
         }
 
         console.log('🎯 Creating highlights for provenance:', provenanceId);
-        
+
         // Mark this provenance as being processed
         lastProcessedProvenanceRef.current = provenanceKey;
         setCurrentProvenanceId(provenanceId);
@@ -108,6 +165,35 @@ export function PDFTextHighlighterModular({
         getProvenanceData
     ]);
 
+    useEffect(() => {
+        const handleViewportChange = (event) => {
+            // Only respond if we're not rendering and highlights exist
+            if (!isRendering && highlightsPersisted && stableTextElements.length > 0) {
+                console.log('🔍 Received viewport change event, recreating highlights');
+                
+                // On zoom changes, it's safer to recreate highlights from scratch
+                // rather than trying to update positions of potentially stale elements
+                const { text: provenanceText, sentenceIds } = getProvenanceData();
+                const provenanceId = provenanceData?.provenance_id;
+                
+                if (provenanceText || sentenceIds.length > 0) {
+                    setTimeout(() => {
+                        highlightProvenance(provenanceText, sentenceIds, provenanceId);
+                    }, 200); // Longer delay for zoom changes
+                }
+            }
+        };
+
+        document.addEventListener('pdfViewportChanged', handleViewportChange);
+
+        return () => {
+            document.removeEventListener('pdfViewportChanged', handleViewportChange);
+        };
+    }, [isRendering, highlightsPersisted, stableTextElements.length, getProvenanceData, provenanceData?.provenance_id]);
+
+
+
+
     /**
      * Extract stable text elements with IDs from the PDF.js text layer
      */
@@ -119,14 +205,14 @@ export function PDFTextHighlighterModular({
 
         // Look for elements with stable identifiers
         const stableElements = textLayer.querySelectorAll('[data-stable-index]');
-        
+
         if (stableElements.length > 0) {
             console.log(`✅ Found ${stableElements.length} elements with stable IDs`);
-            
+
             stableElements.forEach((element, index) => {
                 const stableIndex = element.getAttribute('data-stable-index');
                 const text = element.textContent?.trim();
-                
+
                 if (text && text.length > 0) {
                     elements.push({
                         element,
@@ -139,17 +225,17 @@ export function PDFTextHighlighterModular({
         } else {
             // Fallback: use regular elements with generated stable indices
             console.log(`⚠️ No stable IDs found, generating indices for ${textLayer.children.length} elements`);
-            
+
             Array.from(textLayer.children).forEach((element, index) => {
                 const text = element.textContent?.trim();
-                
+
                 if (text && text.length > 0) {
                     // Add stable attributes if missing
                     if (!element.hasAttribute('data-stable-index')) {
                         element.setAttribute('data-stable-index', index);
                         element.setAttribute('data-page-number', currentPage);
                     }
-                    
+
                     elements.push({
                         element,
                         stableIndex: index,
@@ -168,13 +254,14 @@ export function PDFTextHighlighterModular({
      * Main highlighting function using stable mappings
      */
     const highlightProvenance = async (provenanceText, sentenceIds, highlightId) => {
-        clearHighlights();
+
 
         try {
+            clearHighlights();
             // Strategy 1: Use stable mappings if available
             if (sentenceIds.length > 0) {
                 console.log(`🗺️ Trying stable mappings for ${sentenceIds.length} sentences`);
-                
+
                 const success = await highlightUsingStableMappings(sentenceIds, highlightId);
                 if (success) {
                     setHighlightsPersisted(true);
@@ -185,7 +272,7 @@ export function PDFTextHighlighterModular({
             // Strategy 2: Fall back to text search
             if (provenanceText && provenanceText.length > 3) {
                 console.log(`🔍 Falling back to text search for: "${provenanceText.substring(0, 100)}..."`);
-                
+
                 const success = await highlightUsingTextSearch(provenanceText, highlightId);
                 if (success) {
                     setHighlightsPersisted(true);
@@ -211,7 +298,7 @@ export function PDFTextHighlighterModular({
     const highlightUsingStableMappings = async (sentenceIds, highlightId) => {
         try {
             const mappingsData = await getSentenceItemMappings(documentId, sentenceIds, currentPage);
-            
+
             if (!mappingsData || !mappingsData.sentence_mappings) {
                 console.log('⚠️ No stable mappings available');
                 return false;
@@ -224,11 +311,11 @@ export function PDFTextHighlighterModular({
                 if (mapping.stable_matches && mapping.stable_matches.length > 0) {
                     // Filter matches for current page
                     const pageMatches = mapping.stable_matches.filter(match => match.page === currentPage);
-                    
+
                     pageMatches.forEach(match => {
                         // Find the corresponding stable element
                         const stableElement = findStableElement(match);
-                        
+
                         if (stableElement) {
                             highlights.push({
                                 element: stableElement.element,
@@ -245,23 +332,25 @@ export function PDFTextHighlighterModular({
                         }
 
                         // get the item_span indices if available
-                        if (match.item_span && match.item_span.length > 0) {
+                        if (match.item_span && match.item_span.length > 1) {
                             const spanIndices = match.item_span
-                        // find the stable elements for the span
-                            .map(spanIndex => stableTextElements.find(el => el.stableIndex === spanIndex))
-                            .filter(el => el); // Filter out any undefined elements
+                                // find the stable elements for the span
+                                .map(spanIndex => stableTextElements.find(el => el.stableIndex === spanIndex))
+                                .filter(el => el); // Filter out any undefined elements
 
                             spanIndices.forEach((el, index) => {
-                                highlights.push({
-                                    element: el.element, 
-                                    elementText: el.text,
-                                    confidence: match.confidence, // keep the confidence from the match
-                                    matchType: 'stable_mapping_span',
-                                    strategy: match.match_strategy || 'mapping',
-                                    sentenceId,
-                                    stableIndex: index,
-                                    matchedText: el.text,
-                                });
+                                if (index > 0) {
+                                    highlights.push({
+                                        element: el.element,
+                                        elementText: el.text,
+                                        confidence: match.confidence, // keep the confidence from the match
+                                        matchType: 'stable_mapping_span',
+                                        strategy: match.match_strategy || 'mapping',
+                                        sentenceId,
+                                        stableIndex: el.stableIndex,
+                                        matchedText: el.text,
+                                    });
+                                }
                             });
                         }
                     });
@@ -288,14 +377,13 @@ export function PDFTextHighlighterModular({
      * Find stable element using multiple strategies
      */
     const findStableElement = (match) => {
-        
+
         const targetIndex = match.stable_index || match.element_index;
-        
+
         // Strategy 1: Direct stable index match
         let stableElement = stableTextElements.find(el => el.stableIndex === targetIndex);
-        
+
         if (stableElement) {
-            console.log(`✅ Found element by stable index ${targetIndex}`);
             return stableElement;
         }
 
@@ -304,7 +392,6 @@ export function PDFTextHighlighterModular({
             for (const selector of match.selectors.sort((a, b) => (b.priority || 0) - (a.priority || 0))) {
                 stableElement = findElementBySelector(selector);
                 if (stableElement) {
-                    console.log(`✅ Found element using ${selector.type} selector`);
                     return stableElement;
                 }
             }
@@ -317,9 +404,8 @@ export function PDFTextHighlighterModular({
                 const elementText = el.text.toLowerCase().trim();
                 return elementText.includes(matchText) || matchText.includes(elementText);
             });
-            
+
             if (stableElement) {
-                console.log(`✅ Found element by text matching: "${stableElement.text.substring(0, 30)}..."`);
                 return stableElement;
             }
         }
@@ -352,7 +438,7 @@ export function PDFTextHighlighterModular({
 
                 case 'text_content':
                     if (selector.text_snippet) {
-                        return stableTextElements.find(el => 
+                        return stableTextElements.find(el =>
                             el.text.toLowerCase().includes(selector.text_snippet.toLowerCase())
                         );
                     }
@@ -413,36 +499,73 @@ export function PDFTextHighlighterModular({
         console.log(`✅ Created highlights for provenance`);
     };
 
-    /**
-     * Create a single highlight element
-     */
+
+    // Update the createSingleHighlight function to use relative positioning
     const createSingleHighlight = (highlight, index, highlightId) => {
         if (!highlight.element || !highlightLayerRef?.current) return null;
 
-        const rect = highlight.element.getBoundingClientRect();
+        // Get the text layer and highlight layer references
+        const textLayer = textLayerRef.current;
         const highlightLayer = highlightLayerRef.current;
-        const layerRect = highlightLayer.getBoundingClientRect();
 
-        const left = rect.left - layerRect.left;
-        const top = rect.top - layerRect.top;
-        const width = rect.width;
-        const height = rect.height;
+        if (!textLayer) return null;
+
+        // Use element's style properties instead of getBoundingClientRect()
+        // PDF.js sets these via CSS transforms that scale with zoom
+        const element = highlight.element;
+        const elementStyle = window.getComputedStyle(element);
+
+        // Get the element's PDF.js-calculated position
+        let left = parseFloat(elementStyle.left) || 0;
+        let top = parseFloat(elementStyle.top) || 0;
+        let width = parseFloat(elementStyle.width) || element.offsetWidth;
+        let height = parseFloat(elementStyle.height) || element.offsetHeight;
+
+        // Handle PDF.js bottom positioning
+        if (elementStyle.bottom && elementStyle.bottom !== 'auto') {
+            const bottom = parseFloat(elementStyle.bottom);
+            const containerHeight = parseFloat(textLayer.style.height) || textLayer.offsetHeight;
+            top = containerHeight - bottom - height;
+        }
+
+        // Alternative approach: Use the element's position relative to its parent
+        if (width <= 0 || height <= 0) {
+            const rect = element.getBoundingClientRect();
+            const textLayerRect = textLayer.getBoundingClientRect();
+            
+            left = rect.left - textLayerRect.left;
+            top = rect.top - textLayerRect.top;
+            width = rect.width;
+            height = rect.height;
+        }
 
         if (width <= 0 || height <= 0) {
-            console.warn(`⚠️ Invalid dimensions: ${width}x${height}`);
+            console.warn(`⚠️ Invalid dimensions for highlight: ${width}x${height}`);
             return null;
         }
 
         const overlay = document.createElement('div');
-        overlay.className = 'pdf-stable-highlight';
+        overlay.className = 'pdf-stable-highlight zoom-stable';
         overlay.setAttribute('data-highlight-id', highlightId);
         overlay.setAttribute('data-index', index);
         overlay.setAttribute('data-confidence', highlight.confidence?.toFixed(2) || '1.0');
         overlay.setAttribute('data-match-type', highlight.matchType || 'stable_mapping');
         overlay.setAttribute('data-strategy', highlight.strategy || 'mapping');
 
-        // Color coding based on strategy and confidence
+        // Store original element reference for zoom updates
+        overlay._targetElement = element;
+        overlay._targetHighlight = highlight;
+
         const { backgroundColor, borderColor } = getHighlightColors(highlight);
+
+        // IMPORTANT: Position the highlight layer the same way as the text layer
+        // Match the text layer's positioning exactly
+        highlightLayer.style.position = textLayer.style.position || 'absolute';
+        highlightLayer.style.left = textLayer.style.left || '0px';
+        highlightLayer.style.top = textLayer.style.top || '0px';
+        highlightLayer.style.width = textLayer.style.width || '100%';
+        highlightLayer.style.height = textLayer.style.height || '100%';
+        highlightLayer.style.transform = textLayer.style.transform || 'none';
 
         overlay.style.cssText = `
             position: absolute;
@@ -459,16 +582,16 @@ export function PDFTextHighlighterModular({
             opacity: ${Math.max(0.7, highlight.confidence || 0.8)};
             transition: all 0.2s ease;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transform-origin: top left;
         `;
 
-        // Tooltip
         overlay.title = createTooltip(highlight);
-
-        // Event handlers
         addHighlightEventHandlers(overlay, highlight, index);
 
         return overlay;
     };
+
+
 
     /**
      * Get colors based on highlight strategy
@@ -499,15 +622,15 @@ export function PDFTextHighlighterModular({
         let tooltip = `Strategy: ${highlight.strategy || 'Unknown'}\n`;
         tooltip += `Match Type: ${highlight.matchType || 'Unknown'}\n`;
         tooltip += `Confidence: ${((highlight.confidence || 0.8) * 100).toFixed(0)}%\n`;
-        
+
         if (highlight.sentenceId) {
             tooltip += `Sentence ID: ${highlight.sentenceId}\n`;
         }
-        
+
         if (highlight.stableIndex !== undefined) {
             tooltip += `Stable Index: ${highlight.stableIndex}\n`;
         }
-        
+
         tooltip += `Text: "${(highlight.elementText || highlight.matchedText || '').substring(0, 100)}..."`;
 
         return tooltip;
@@ -737,84 +860,84 @@ export function PDFTextHighlighterModular({
     };
 
     const remapElementSpan = (highlight, textElements, correctElementIndex) => {
-    const originalIndex = highlight.elementIndex;
-    const offset = correctElementIndex - originalIndex;
-    
-    console.log(`🔄 Remapping: original index ${originalIndex} → correct index ${correctElementIndex} (offset: ${offset})`);
-    
-    if (!highlight.elementIndices || highlight.elementIndices.length <= 1) {
-        // Single element, no span to remap
-        return [correctElementIndex];
-    }
-    
-    // Apply offset to all elements in the span
-    const remappedIndices = highlight.elementIndices.map(originalIdx => {
-        const newIdx = originalIdx + offset;
-        console.log(`   Remapping span element: ${originalIdx} → ${newIdx}`);
-        return newIdx;
-    });
-    
-    // Validate that remapped indices are within bounds and contain reasonable text
-    const validIndices = remappedIndices.filter(idx => {
-        if (idx < 0 || idx >= textElements.length) {
-            console.log(`   ❌ Index ${idx} out of bounds`);
-            return false;
-        }
-        
-        const elementText = textElements[idx].textContent.trim();
-        if (elementText.length === 0) {
-            console.log(`   ❌ Index ${idx} has empty text`);
-            return false;
-        }
-        
-        console.log(`   ✅ Index ${idx}: "${elementText.substring(0, 30)}..."`);
-        return true;
-    });
-    
-    console.log(`🎯 Remapped span: ${highlight.elementIndices.length} → ${validIndices.length} valid elements`);
-    return validIndices;
-};
+        const originalIndex = highlight.elementIndex;
+        const offset = correctElementIndex - originalIndex;
 
-  
+        console.log(`🔄 Remapping: original index ${originalIndex} → correct index ${correctElementIndex} (offset: ${offset})`);
+
+        if (!highlight.elementIndices || highlight.elementIndices.length <= 1) {
+            // Single element, no span to remap
+            return [correctElementIndex];
+        }
+
+        // Apply offset to all elements in the span
+        const remappedIndices = highlight.elementIndices.map(originalIdx => {
+            const newIdx = originalIdx + offset;
+            console.log(`   Remapping span element: ${originalIdx} → ${newIdx}`);
+            return newIdx;
+        });
+
+        // Validate that remapped indices are within bounds and contain reasonable text
+        const validIndices = remappedIndices.filter(idx => {
+            if (idx < 0 || idx >= textElements.length) {
+                console.log(`   ❌ Index ${idx} out of bounds`);
+                return false;
+            }
+
+            const elementText = textElements[idx].textContent.trim();
+            if (elementText.length === 0) {
+                console.log(`   ❌ Index ${idx} has empty text`);
+                return false;
+            }
+
+            console.log(`   ✅ Index ${idx}: "${elementText.substring(0, 30)}..."`);
+            return true;
+        });
+
+        console.log(`🎯 Remapped span: ${highlight.elementIndices.length} → ${validIndices.length} valid elements`);
+        return validIndices;
+    };
+
+
     const createHighlightsFromMappings = (highlights, highlightId) => {
-    if (!highlightLayerRef?.current || !textLayerRef?.current) return;
+        if (!highlightLayerRef?.current || !textLayerRef?.current) return;
 
-    console.log(`🎨 Creating ${highlights.length} highlights from mappings`);
+        console.log(`🎨 Creating ${highlights.length} highlights from mappings`);
 
-    highlights.forEach((highlight, index) => {
-        const textElements = getTextElements();
-        
-        // Use the new smart element finder with span remapping
-        const result = findElementBySelector(highlight, textElements);
-        
-        if (result && result.elements && result.elements.length > 0) {
-            console.log(`✅ Found ${result.elements.length} elements using ${result.method}`);
-            
-            // Create highlights for all elements in the span
-            result.elements.forEach((element, spanIndex) => {
-                if (element) {
-                    console.log(`   Highlighting span element ${spanIndex}: "${element.textContent.substring(0, 30)}..."`);
-                    
-                    const highlightElement = createMappingHighlight(
-                        element, 
-                        highlight, 
-                        `${index}_${spanIndex}`, // Unique ID for each span element
-                        highlightId
-                    );
-                    
-                    if (highlightElement) {
-                        // Add span info to the highlight
-                        highlightElement.setAttribute('data-span-index', spanIndex);
-                        highlightElement.setAttribute('data-span-total', result.elements.length);
-                        highlightLayerRef.current.appendChild(highlightElement);
+        highlights.forEach((highlight, index) => {
+            const textElements = getTextElements();
+
+            // Use the new smart element finder with span remapping
+            const result = findElementBySelector(highlight, textElements);
+
+            if (result && result.elements && result.elements.length > 0) {
+                console.log(`✅ Found ${result.elements.length} elements using ${result.method}`);
+
+                // Create highlights for all elements in the span
+                result.elements.forEach((element, spanIndex) => {
+                    if (element) {
+                        console.log(`   Highlighting span element ${spanIndex}: "${element.textContent.substring(0, 30)}..."`);
+
+                        const highlightElement = createMappingHighlight(
+                            element,
+                            highlight,
+                            `${index}_${spanIndex}`, // Unique ID for each span element
+                            highlightId
+                        );
+
+                        if (highlightElement) {
+                            // Add span info to the highlight
+                            highlightElement.setAttribute('data-span-index', spanIndex);
+                            highlightElement.setAttribute('data-span-total', result.elements.length);
+                            highlightLayerRef.current.appendChild(highlightElement);
+                        }
                     }
-                }
-            });
-        } else {
-            console.log(`❌ Could not find any elements for highlight:`, highlight);
-        }
-    });
-};
+                });
+            } else {
+                console.log(`❌ Could not find any elements for highlight:`, highlight);
+            }
+        });
+    };
 
     const createMappingHighlight = (element, highlight, index, highlightId) => {
         const rect = element.getBoundingClientRect();
@@ -979,7 +1102,7 @@ export function PDFTextHighlighterModular({
         }
     };
 
-   
+
     /**
      * Group matches by line (same vertical position)
      */
@@ -1024,7 +1147,7 @@ export function PDFTextHighlighterModular({
         return lineGroups;
     };
 
-    
+
 
     /**
      * Create a continuous highlight spanning multiple elements
@@ -1104,13 +1227,13 @@ export function PDFTextHighlighterModular({
         return overlay;
     };
 
-   
 
-    
 
-   
 
-    
+
+
+
+
 
     // Cleanup on unmount
     useEffect(() => {
@@ -1134,7 +1257,7 @@ export const PDFTextHighlightingUtils = {
     scrollToFirstHighlight: (highlightLayerRef) => {
         if (!highlightLayerRef?.current) return false;
 
-        const firstHighlight = highlightLayerRef.current.querySelector('.pdf-text-highlighter-overlay');
+        const firstHighlight = highlightLayerRef.current.querySelector('.pdf-stable-highlighter-overlay');
         if (firstHighlight) {
             firstHighlight.scrollIntoView({
                 behavior: 'smooth',
@@ -1155,7 +1278,7 @@ export const PDFTextHighlightingUtils = {
     getHighlightStats: (highlightLayerRef) => {
         if (!highlightLayerRef?.current) return null;
 
-        const highlights = highlightLayerRef.current.querySelectorAll('.pdf-text-highlighter-overlay');
+        const highlights = highlightLayerRef.current.querySelectorAll('.pdf-stable-highlighter-overlay');
         const strategies = {};
         const matchTypes = {};
         let totalConfidence = 0;

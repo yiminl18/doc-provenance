@@ -431,12 +431,12 @@
 }
 
 .pdf-text-layer {
-  position: absolute;
+  position: absolute; /* CRITICAL: Absolute positioning */
   top: 0;
   left: 0;
   z-index: 2;
   overflow: hidden;
-  pointer-events: none;
+  pointer-events: none; /* Allow clicks to pass through */
   
   /* PDF.js text layer styling */
   color: transparent;
@@ -460,19 +460,6 @@
   z-index: 10; /* Above text layer */
   pointer-events: none; /* Allow individual overlays to handle their own events */
   overflow: hidden;
-}
-
-.pdf-text-layer * {
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    transform-origin: 0% 0% !important;
-}
-
-.pdf-highlight-layer * {
-    margin: 0 !important;
-    padding: 0 !important;
-    transform-origin: 0% 0% !important;
 }
 
 /* ===== PROVENANCE OVERLAYS ===== */

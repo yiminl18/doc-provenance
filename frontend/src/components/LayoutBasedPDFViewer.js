@@ -39,6 +39,8 @@ const LayoutBasedPDFViewer = ({
     const [isRendering, setIsRendering] = useState(false);
     const [renderError, setRenderError] = useState(null);
     const [lastRenderedPage, setLastRenderedPage] = useState(null);
+    const [lastRenderedZoom, setLastRenderedZoom] = useState(null);
+    const [renderQueue, setRenderQueue] = useState(null);
 
     // Magnify state
     const [magnifyMode, setMagnifyMode] = useState(false);
@@ -52,6 +54,10 @@ const LayoutBasedPDFViewer = ({
     const renderTaskRef = useRef(null);
     const pdfViewerRef = useRef(null);
     const zoomTimeoutRef = useRef(null);
+    const renderTimeoutRef = useRef(null);
+    const renderPromiseRef = useRef(null);
+
+    const debugWithoutZoom = true;
 
     // Initialize PDF.js worker
     useEffect(() => {
@@ -89,19 +95,6 @@ const LayoutBasedPDFViewer = ({
         loadPDF();
     }, [pdfUrl]);
 
-    // Handle page changes
-    useEffect(() => {
-        if (pdfDoc && !loading && !isRendering && currentPage !== lastRenderedPage) {
-            //console.log(`📄 Page changed from ${lastRenderedPage} to ${currentPage} - rendering`);
-            renderPageSafely(currentPage);
-
-        }
-    }, [pdfDoc, loading, currentPage, zoomLevel, lastRenderedPage]);
-
-
-
-
-
     // Calculate fixed viewer dimensions
     const calculateFixedViewerDimensions = () => {
         const screenWidth = window.screen.width;
@@ -120,35 +113,364 @@ const LayoutBasedPDFViewer = ({
         };
     };
 
+    // Handle page changes
+    useEffect(() => {
+        if (pdfDoc && !loading && !isRendering && currentPage !== lastRenderedPage) {
+            //console.log(`📄 Page changed from ${lastRenderedPage} to ${currentPage} - rendering`);
+            renderPageSafely(currentPage);
+
+        }
+    }, [pdfDoc, loading, currentPage, zoomLevel, lastRenderedPage]);
+
+
+
+
+
+
+
     // Initialize fixed dimensions
     useEffect(() => {
         const dimensions = calculateFixedViewerDimensions();
         setFixedDimensions(dimensions);
-
-        //console.log('📐 Fixed PDF viewer dimensions calculated:', {
-        //    viewerSize: `${dimensions.width}x${dimensions.height}`,
-        //    screenSize: `${dimensions.screenWidth}x${dimensions.screenHeight}`
-        //});
     }, []);
 
-    // Calculate initial zoom for fixed dimensions
     const calculateInitialZoomFixed = (viewport, fixedWidth) => {
-        if (!viewport || !fixedWidth) return 1.0;
+        if (debugWithoutZoom) {
+            console.log('🔒 DEBUG MODE: Zoom locked to 1.0');
+            return 1.0; // Always return 1.0 for debugging
+        }
 
+        if (!viewport || !fixedWidth) return 1.0;
         const padding = 40;
         const availableWidth = fixedWidth - padding;
         const scale = availableWidth / viewport.width;
-
         return Math.max(0.4, Math.min(2.5, scale));
     };
 
-    // Handle navigation triggers - Updated for text-based highlighting
+
+    const requestRender = useCallback(async (pageNum, zoom, force = false) => {
+        const renderKey = `${pageNum}_${zoom.toFixed(3)}`;
+
+        // CRITICAL: Validate prerequisites before attempting render
+        if (!pdfDoc) {
+            console.warn(`🛑 Cannot render ${renderKey}: PDF document not loaded`);
+            return;
+        }
+
+        if (!canvasRef?.current) {
+            console.warn(`🛑 Cannot render ${renderKey}: Canvas ref not available`);
+            return;
+        }
+
+        if (!containerRef?.current) {
+            console.warn(`🛑 Cannot render ${renderKey}: Container ref not available`);
+            return;
+        }
+
+        if (isRendering && !force) {
+            console.log(`⏸️ Render blocked for ${renderKey}: already rendering`);
+            return;
+        }
+
+        // Prevent duplicate renders
+        if (!force && renderQueue === renderKey) {
+            console.log(`🔄 Render already queued: ${renderKey}`);
+            return;
+        }
+
+        // Cancel any pending renders
+        if (renderTimeoutRef.current) {
+            clearTimeout(renderTimeoutRef.current);
+            renderTimeoutRef.current = null;
+        }
+
+        // Cancel active render if exists
+        if (renderTaskRef.current) {
+            console.log('🛑 Cancelling previous render task');
+            try {
+                await renderTaskRef.current.cancel();
+            } catch (e) {
+                // Cancellation errors are expected
+            }
+            renderTaskRef.current = null;
+        }
+
+        // Wait for any ongoing render promise to complete
+        if (renderPromiseRef.current) {
+            try {
+                await renderPromiseRef.current;
+            } catch (e) {
+                // Ignore cancellation errors
+            }
+        }
+
+        setRenderQueue(renderKey);
+
+        // Small delay to ensure canvas is free
+        renderTimeoutRef.current = setTimeout(async () => {
+            try {
+                // Double-check prerequisites before actual render
+                if (!pdfDoc || !canvasRef?.current || !containerRef?.current) {
+                    console.error(`❌ Render prerequisites missing at execution time for ${renderKey}`);
+                    setRenderQueue(null);
+                    return;
+                }
+
+                await performRender(pageNum, zoom);
+                setLastRenderedPage(pageNum);
+                setLastRenderedZoom(zoom);
+            } catch (error) {
+                if (error.name !== 'RenderingCancelledException') {
+                    console.error(`❌ Render failed for ${renderKey}:`, error);
+                    setRenderError(error.message);
+                }
+            } finally {
+                setRenderQueue(null);
+                renderTimeoutRef.current = null;
+            }
+        }, 100);
+    }, [pdfDoc, canvasRef, containerRef, isRendering, renderQueue]);
+
+    // Enhanced performRender with better error handling
+    const performRender = async (pageNum, zoom) => {
+        if (!pdfDoc) {
+            throw new Error('PDF document is not loaded');
+        }
+
+        if (!canvasRef?.current) {
+            throw new Error('Canvas ref is not available');
+        }
+
+        if (!containerRef?.current) {
+            throw new Error('Container ref is not available');
+        }
+
+        console.log(`🎨 Starting render: page ${pageNum} at ${debugWithoutZoom ? '1.0 (LOCKED)' : (zoom * 100).toFixed(0) + '%'}`);
+
+        setIsRendering(true);
+        setRenderError(null);
+
+        try {
+            const page = await pdfDoc.getPage(pageNum);
+            const canvas = canvasRef.current;
+            const context = canvas.getContext('2d');
+
+            // Validate canvas context
+            if (!context) {
+                throw new Error('Failed to get canvas 2D context');
+            }
+
+            const baseViewport = page.getViewport({ scale: 1.0 });
+
+            // FORCE 1.0 scale for debugging
+            let finalScale = debugWithoutZoom ? 1.0 : zoom;
+
+            if (debugWithoutZoom) {
+                console.log('🔒 DEBUG: Using scale 1.0 instead of', zoom);
+                setZoomLevel(1.0); // Update UI to show correct zoom
+            } else if (lastRenderedPage === null && zoom === 1.0 && fixedDimensions) {
+                const initialZoom = calculateInitialZoomFixed(baseViewport, fixedDimensions.width);
+                setZoomLevel(initialZoom);
+                finalScale = initialZoom;
+                console.log(`📏 Setting initial zoom: ${(initialZoom * 100).toFixed(0)}%`);
+            }
+
+            const viewport = page.getViewport({ scale: finalScale });
+            setCurrentViewport(viewport);
+
+            console.log('📐 Viewport details:', {
+                scale: finalScale,
+                width: viewport.width,
+                height: viewport.height,
+                debugMode: debugWithoutZoom
+            });
+
+            // Clear and setup canvas - CRITICAL: Clear before setup
+            const devicePixelRatio = window.devicePixelRatio || 1;
+
+            // Force canvas clear and reset
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.resetTransform(); // Reset any previous transforms
+
+            canvas.width = viewport.width * devicePixelRatio;
+            canvas.height = viewport.height * devicePixelRatio;
+            canvas.style.width = `${viewport.width}px`;
+            canvas.style.height = `${viewport.height}px`;
+
+            // Clear again after resize
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.scale(devicePixelRatio, devicePixelRatio);
+
+            // Create render promise and store it
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport,
+                enableWebGL: false // Disable WebGL to prevent conflicts
+            };
+
+            renderTaskRef.current = page.render(renderContext);
+            renderPromiseRef.current = renderTaskRef.current.promise;
+
+            await renderPromiseRef.current;
+
+            console.log(`✅ PDF render completed for page ${pageNum} at ${(finalScale * 100).toFixed(0)}% zoom`);
+
+            // Setup text and highlight layers
+            await setupTextLayer(page, viewport);
+            setupHighlightLayer();
+
+            // Notify highlighter component
+            notifyHighlighterOfViewportChange();
+
+            console.log(`✅ Page ${pageNum} fully rendered and layers setup`);
+
+        } catch (error) {
+            if (error.name === 'RenderingCancelledException') {
+                console.log(`🛑 Render cancelled for page ${pageNum} - this is normal`);
+                throw error;
+            } else {
+                console.error(`❌ Render error for page ${pageNum}:`, error);
+                throw error;
+            }
+        } finally {
+            renderTaskRef.current = null;
+            renderPromiseRef.current = null;
+            setIsRendering(false);
+        }
+    };
+
+    // Enhanced render effect with better validation
+    useEffect(() => {
+        // CRITICAL: Only proceed if we have all prerequisites
+        if (!pdfDoc || loading || isRendering) {
+            console.log(`⏸️ Render effect skipped: pdfDoc=${!!pdfDoc}, loading=${loading}, isRendering=${isRendering}`);
+            return;
+        }
+
+        if (!canvasRef?.current || !containerRef?.current) {
+            console.log(`⏸️ Render effect skipped: missing refs canvas=${!!canvasRef?.current}, container=${!!containerRef?.current}`);
+            return;
+        }
+
+        const needsPageRender = currentPage !== lastRenderedPage;
+        const needsZoomRender = Math.abs((zoomLevel || 1) - (lastRenderedZoom || 1)) > 0.01;
+
+        if (needsPageRender || needsZoomRender) {
+            const renderType = needsPageRender ? 'page change' : 'zoom change';
+            console.log(`📄 Triggering render for ${renderType}: page ${currentPage}, zoom ${(zoomLevel * 100).toFixed(0)}%`);
+
+            // Clear any existing zoom timeout
+            if (zoomTimeoutRef.current) {
+                clearTimeout(zoomTimeoutRef.current);
+                zoomTimeoutRef.current = null;
+            }
+
+            // Immediate render for page changes, debounced for zoom
+            if (needsPageRender) {
+                requestRender(currentPage, zoomLevel);
+            } else {
+                // Debounce zoom changes
+                zoomTimeoutRef.current = setTimeout(() => {
+                    requestRender(currentPage, zoomLevel);
+                }, 150);
+            }
+        }
+    }, [pdfDoc, loading, currentPage, zoomLevel, lastRenderedPage, lastRenderedZoom, isRendering, requestRender, canvasRef, containerRef]);
+
+    // Add validation useEffect to monitor ref availability
+    useEffect(() => {
+        const checkRefs = () => {
+            const refs = {
+                canvasRef: !!canvasRef?.current,
+                containerRef: !!containerRef?.current,
+                textLayerRef: !!textLayerRef?.current,
+                highlightLayerRef: !!highlightLayerRef?.current
+            };
+
+            const missingRefs = Object.entries(refs).filter(([key, exists]) => !exists).map(([key]) => key);
+
+            if (missingRefs.length > 0) {
+                console.warn(`⚠️ Missing refs: ${missingRefs.join(', ')}`);
+            } else {
+                console.log(`✅ All refs available: ${Object.keys(refs).join(', ')}`);
+            }
+        };
+
+        // Check refs when dependencies change
+        if (pdfDoc && !loading) {
+            setTimeout(checkRefs, 100);
+        }
+    }, [pdfDoc, loading, canvasRef, containerRef, textLayerRef, highlightLayerRef]);
+
+    // Simplified navigation handlers with validation
+    const goToPage = (pageNum) => {
+        if (!pdfDoc) {
+            console.warn('⚠️ Cannot navigate: PDF not loaded');
+            return;
+        }
+
+        if (pageNum >= 1 && pageNum <= totalPages && pageNum !== currentPage && !isRendering) {
+            console.log(`📖 Navigating to page ${pageNum}`);
+            setCurrentPage(pageNum);
+        } else {
+            console.warn(`⚠️ Cannot navigate to page ${pageNum}: invalid or busy`);
+        }
+    };
+
+    // Enhanced zoom handlers with validation
+    const handleZoomIn = () => {
+        if (!pdfDoc) {
+            console.warn('⚠️ Cannot zoom: PDF not loaded');
+            return;
+        }
+
+        if (isRendering) {
+            console.log('⏸️ Zoom in blocked - rendering in progress');
+            return;
+        }
+
+        const newZoom = Math.min(zoomLevel + 0.25, 3);
+        console.log(`🔍 Zoom IN: ${(zoomLevel * 100).toFixed(0)}% → ${(newZoom * 100).toFixed(0)}%`);
+        setZoomLevel(newZoom);
+    };
+
+    const handleZoomOut = () => {
+        if (!pdfDoc) {
+            console.warn('⚠️ Cannot zoom: PDF not loaded');
+            return;
+        }
+
+        if (isRendering) {
+            console.log('⏸️ Zoom out blocked - rendering in progress');
+            return;
+        }
+
+        const newZoom = Math.max(zoomLevel - 0.25, 0.5);
+        console.log(`🔍 Zoom OUT: ${(zoomLevel * 100).toFixed(0)}% → ${(newZoom * 100).toFixed(0)}%`);
+        setZoomLevel(newZoom);
+    };
+
+    const handleResetZoom = () => {
+        if (!pdfDoc) {
+            console.warn('⚠️ Cannot reset zoom: PDF not loaded');
+            return;
+        }
+
+        if (isRendering) {
+            console.log('⏸️ Zoom reset blocked - rendering in progress');
+            return;
+        }
+
+        console.log(`🔍 RESET ZOOM: ${(zoomLevel * 100).toFixed(0)}% → fit-to-width`);
+        setZoomLevel(1.0);
+    };
+
+    // Handle navigation triggers
     useEffect(() => {
         if (!navigationTrigger) return;
 
-        //console.log('🧭 Processing navigation trigger:', navigationTrigger);
+        console.log('🧭 Processing navigation trigger:', navigationTrigger);
 
-        // For text-based highlighting, we can scroll to the first highlight
         setTimeout(() => {
             const scrolled = PDFTextHighlightingUtils.scrollToFirstHighlight(highlightLayerRef);
             if (scrolled) {
@@ -180,6 +502,7 @@ const LayoutBasedPDFViewer = ({
             setTotalPages(pdf.numPages);
             setCurrentPage(1);
             setLastRenderedPage(null);
+            setLastRenderedZoom(null);
             setLoading(false);
 
         } catch (err) {
@@ -187,6 +510,380 @@ const LayoutBasedPDFViewer = ({
             setError(`Failed to load document: ${err.message}`);
             setLoading(false);
         }
+    };
+
+
+
+
+    // CORRECT APPROACH: Use PDF.js built-in text layer rendering
+    const setupTextLayer = async (page, viewport) => {
+        if (!textLayerRef.current) return;
+
+        try {
+            const textContent = await page.getTextContent();
+            const textLayer = textLayerRef.current;
+            const canvas = canvasRef.current;
+            const container = containerRef.current;
+
+            // Clear previous content
+            textLayer.innerHTML = '';
+
+            if (!canvas || !container) return;
+
+            // CRITICAL FIX: Position text layer to match canvas position exactly
+            const canvasRect = canvas.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+
+            // Calculate canvas position relative to its container
+            const canvasLeft = canvasRect.left - containerRect.left;
+            const canvasTop = canvasRect.top - containerRect.top;
+
+            // CRITICAL: Let PDF.js handle all positioning and scaling
+            textLayer.style.position = 'absolute';
+            textLayer.style.left = `${canvasLeft}px`;
+            textLayer.style.top = `${canvasTop}px`;
+            textLayer.style.width = `${viewport.width}px`;
+            textLayer.style.height = `${viewport.height}px`;
+            textLayer.style.overflow = 'hidden';
+            textLayer.style.pointerEvents = 'none';
+            textLayer.style.opacity = '0'; // Keep invisible
+            textLayer.style.transformOrigin = '0% 0%';
+            textLayer.style.margin = '0';
+            textLayer.style.padding = '0';
+            textLayer.style.border = 'none';
+
+            console.log(`🎯 Text layer aligned to canvas:`, {
+                canvasPosition: { left: canvasLeft, top: canvasTop },
+                canvasRect: {
+                    left: canvasRect.left,
+                    top: canvasRect.top,
+                    width: canvasRect.width,
+                    height: canvasRect.height
+                },
+                containerRect: {
+                    left: containerRect.left,
+                    top: containerRect.top
+                },
+                textLayerStyle: {
+                    left: textLayer.style.left,
+                    top: textLayer.style.top,
+                    width: textLayer.style.width,
+                    height: textLayer.style.height
+                }
+            });
+
+            // Use PDF.js TextLayerBuilder approach
+            const textDivs = [];
+
+            textContent.items.forEach((item, itemIndex) => {
+                const textDiv = document.createElement('span');
+
+                // Let PDF.js handle the positioning with its built-in logic
+                const transform = item.transform;
+                if (!transform) return;
+
+                // PDF.js standard approach - minimal manual intervention
+                textDiv.style.position = 'absolute';
+                textDiv.style.whiteSpace = 'pre';
+                textDiv.style.color = 'transparent';
+                textDiv.style.transformOrigin = '0% 0%';
+                textDiv.style.margin = '0';
+                textDiv.style.padding = '0';
+                textDiv.style.border = 'none';
+
+                // CRITICAL: Use PDF.js coordinate system directly
+                const fontHeight = item.height || 12;
+
+                // Apply the transform matrix directly (this is what PDF.js does)
+                const [scaleX, skewY, skewX, scaleY, translateX, translateY] = transform;
+
+
+
+                // Position using bottom-left origin (PDF coordinate system)
+                textDiv.style.left = `${translateX}px`;
+                textDiv.style.bottom = `${translateY}px`; // Use bottom, not top!
+                textDiv.style.fontSize = `${fontHeight}px`;
+                textDiv.style.fontFamily = item.fontName || 'sans-serif';
+
+
+
+                textDiv.textContent = item.str || '';
+
+                // Add our stable identifiers for highlighting
+                textDiv.setAttribute('data-stable-index', itemIndex);
+                textDiv.setAttribute('data-page-number', currentPage);
+                textDiv.setAttribute('data-pdf-x', translateX);
+                textDiv.setAttribute('data-pdf-y', translateY);
+                textDiv.setAttribute('data-font-size', fontHeight);
+
+                // Simplified fingerprinting
+                const normalizedText = (item.str || '').toLowerCase().replace(/\s+/g, ' ').trim();
+                textDiv.setAttribute('data-normalized-text', normalizedText);
+                textDiv.setAttribute('data-text-fingerprint', `${normalizedText}_${itemIndex}_${(item.str || '').length}`);
+
+                textDiv.className = 'pdf-text-item';
+
+                textLayer.appendChild(textDiv);
+                textDivs.push(textDiv);
+
+            });
+
+            textLayerRef.current.textDivs = textDivs;
+            textLayerRef.current.stableItemCount = textContent.items.length;
+
+            console.log(`✅ PDF.js native text layer: ${textDivs.length} elements rendered`);
+            // Temporary - make text layer visible
+            textLayerRef.current.style.opacity = '0.3';
+            textLayerRef.current.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+
+            // Make individual text elements visible
+            document.querySelectorAll('.pdf-text-item').forEach(el => {
+                el.style.color = 'red';
+                el.style.backgroundColor = 'rgba(255, 255, 0, 0.2)';
+            });
+
+        } catch (err) {
+            console.error('❌ Error setting up PDF.js native text layer:', err);
+        }
+    };
+
+    // DEBUG TOOL: Add this to your LayoutBasedPDFViewer.js for debugging alignment
+
+    const debugAlignment = () => {
+        const canvas = canvasRef?.current;
+        const textLayer = textLayerRef?.current;
+        const highlightLayer = highlightLayerRef?.current;
+        const container = containerRef?.current;
+
+        if (!canvas || !textLayer || !highlightLayer || !container) {
+            console.log('❌ Missing refs for alignment debug');
+            return;
+        }
+
+        console.log('🔍 ALIGNMENT DEBUG REPORT');
+        console.log('========================');
+
+        // Get all bounding rects
+        const containerRect = container.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        const textLayerRect = textLayer.getBoundingClientRect();
+        const highlightLayerRect = highlightLayer.getBoundingClientRect();
+
+        console.log('📐 Element Positions:');
+        console.log('Container:', {
+            left: containerRect.left,
+            top: containerRect.top,
+            width: containerRect.width,
+            height: containerRect.height
+        });
+
+        console.log('Canvas:', {
+            left: canvasRect.left,
+            top: canvasRect.top,
+            width: canvasRect.width,
+            height: canvasRect.height,
+            relativeToContainer: {
+                left: canvasRect.left - containerRect.left,
+                top: canvasRect.top - containerRect.top
+            }
+        });
+
+        console.log('Text Layer:', {
+            left: textLayerRect.left,
+            top: textLayerRect.top,
+            width: textLayerRect.width,
+            height: textLayerRect.height,
+            relativeToContainer: {
+                left: textLayerRect.left - containerRect.left,
+                top: textLayerRect.top - containerRect.top
+            },
+            offsetFromCanvas: {
+                left: textLayerRect.left - canvasRect.left,
+                top: textLayerRect.top - canvasRect.top
+            }
+        });
+
+        console.log('Highlight Layer:', {
+            left: highlightLayerRect.left,
+            top: highlightLayerRect.top,
+            width: highlightLayerRect.width,
+            height: highlightLayerRect.height,
+            offsetFromTextLayer: {
+                left: highlightLayerRect.left - textLayerRect.left,
+                top: highlightLayerRect.top - textLayerRect.top
+            }
+        });
+
+        // Check alignment issues
+        const canvasTextOffset = {
+            left: textLayerRect.left - canvasRect.left,
+            top: textLayerRect.top - canvasRect.top
+        };
+
+        const textHighlightOffset = {
+            left: highlightLayerRect.left - textLayerRect.left,
+            top: highlightLayerRect.top - textLayerRect.top
+        };
+
+        console.log('🎯 Alignment Analysis:');
+
+        if (Math.abs(canvasTextOffset.left) > 2 || Math.abs(canvasTextOffset.top) > 2) {
+            console.error('❌ ISSUE: Text layer not aligned with canvas!', canvasTextOffset);
+            console.log('🔧 FIX: Adjust text layer positioning in setupTextLayer()');
+        } else {
+            console.log('✅ Canvas and text layer are aligned');
+        }
+
+        if (Math.abs(textHighlightOffset.left) > 2 || Math.abs(textHighlightOffset.top) > 2) {
+            console.error('❌ ISSUE: Highlight layer not aligned with text layer!', textHighlightOffset);
+            console.log('🔧 FIX: Adjust highlight layer positioning in setupHighlightLayer()');
+        } else {
+            console.log('✅ Text layer and highlight layer are aligned');
+        }
+
+        // Check for problematic CSS
+        const textLayerStyle = window.getComputedStyle(textLayer);
+        const highlightLayerStyle = window.getComputedStyle(highlightLayer);
+
+        console.log('🔍 CSS Analysis:');
+
+        const problematicProps = {
+            textLayer: {},
+            highlightLayer: {}
+        };
+
+        // Check text layer CSS
+        if (textLayerStyle.transform !== 'none') {
+            problematicProps.textLayer.transform = textLayerStyle.transform;
+        }
+        if (textLayerStyle.margin !== '0px') {
+            problematicProps.textLayer.margin = textLayerStyle.margin;
+        }
+        if (textLayerStyle.padding !== '0px') {
+            problematicProps.textLayer.padding = textLayerStyle.padding;
+        }
+
+        // Check highlight layer CSS
+        if (highlightLayerStyle.transform !== 'none') {
+            problematicProps.highlightLayer.transform = highlightLayerStyle.transform;
+        }
+        if (highlightLayerStyle.margin !== '0px') {
+            problematicProps.highlightLayer.margin = highlightLayerStyle.margin;
+        }
+        if (highlightLayerStyle.padding !== '0px') {
+            problematicProps.highlightLayer.padding = highlightLayerStyle.padding;
+        }
+
+        if (Object.keys(problematicProps.textLayer).length > 0) {
+            console.warn('⚠️ Text layer problematic CSS:', problematicProps.textLayer);
+        }
+        if (Object.keys(problematicProps.highlightLayer).length > 0) {
+            console.warn('⚠️ Highlight layer problematic CSS:', problematicProps.highlightLayer);
+        }
+
+
+
+        // Sample element check
+        const firstTextElement = textLayer.querySelector('.pdf-text-item[data-stable-index="256"]');
+        const firstHighlight = highlightLayer.querySelector('.pdf-stable-highlight');
+
+        if (firstTextElement && firstHighlight) {
+            const textElementRect = firstTextElement.getBoundingClientRect();
+            const highlightRect = firstHighlight.getBoundingClientRect();
+
+            const elementOffset = {
+                left: highlightRect.left - textElementRect.left,
+                top: highlightRect.top - textElementRect.top
+            };
+
+            console.log('📝 Sample Element Check:');
+            console.log('Text element:', {
+                text: firstTextElement.textContent.substring(0, 30),
+                position: { left: textElementRect.left, top: textElementRect.top }
+            });
+            console.log('Highlight:', {
+                position: { left: highlightRect.left, top: highlightRect.top }
+            });
+            console.log('Element offset (highlight vs text):', elementOffset);
+
+            if (Math.abs(elementOffset.left) > 5 || Math.abs(elementOffset.top) > 5) {
+                console.error('❌ ISSUE: Significant element misalignment detected!', elementOffset);
+            } else {
+                console.log('✅ Elements are reasonably aligned');
+            }
+        }
+
+        console.log('========================');
+        return {
+            canvasTextOffset,
+            textHighlightOffset,
+            problematicProps,
+            rects: { containerRect, canvasRect, textLayerRect, highlightLayerRect }
+        };
+    };
+
+    // Add this to window for debugging in browser console
+    window.debugPDFAlignment = debugAlignment;
+
+
+
+
+    const setupHighlightLayer = () => {
+        if (!highlightLayerRef.current || !textLayerRef.current) return;
+
+        const highlightLayer = highlightLayerRef.current;
+        const textLayer = textLayerRef.current;
+
+        // Clear highlights
+        highlightLayer.innerHTML = '';
+
+        const textLayerStyle = window.getComputedStyle(textLayer);
+
+        // CRITICAL: Position highlight layer exactly on top of text layer
+        highlightLayer.style.position = 'absolute';
+        highlightLayer.style.left = textLayerStyle.left;      // Match text layer position
+        highlightLayer.style.top = textLayerStyle.top;        // Match text layer position
+        highlightLayer.style.width = textLayerStyle.width;    // Match text layer size
+        highlightLayer.style.height = textLayerStyle.height;  // Match text layer size
+        highlightLayer.style.pointerEvents = 'none';
+        highlightLayer.style.zIndex = '10';
+        highlightLayer.style.transform = 'none';
+        highlightLayer.style.transformOrigin = '0% 0%';
+        highlightLayer.style.overflow = 'visible';
+        highlightLayer.style.margin = '0';
+        highlightLayer.style.padding = '0';
+        highlightLayer.style.border = 'none';
+
+        console.log(`✅ Highlight layer synced with text layer:`, {
+            position: {
+                left: highlightLayer.style.left,
+                top: highlightLayer.style.top,
+                width: highlightLayer.style.width,
+                height: highlightLayer.style.height
+            },
+            textLayerComputedPosition: {
+                left: textLayerStyle.left,
+                top: textLayerStyle.top,
+                transform: textLayerStyle.transform
+            }
+        });
+    };
+
+    // Helper functions for creating stable identifiers
+    const createTextFingerprint = (text, index) => {
+        const cleanText = text.replace(/[^\w]/g, '');
+        return `${cleanText}_${index}_${text.length}`;
+    };
+
+    const createPositionHash = (x, y, width, height) => {
+        return `${Math.round(x)}_${Math.round(y)}_${Math.round(width)}_${Math.round(height)}`;
+    };
+
+    const createContextFingerprint = (before, current, after) => {
+        const cleanBefore = (before || '').replace(/[^\w]/g, '').slice(-10);
+        const cleanCurrent = (current || '').replace(/[^\w]/g, '');
+        const cleanAfter = (after || '').replace(/[^\w]/g, '').slice(0, 10);
+        return `${cleanBefore}|${cleanCurrent}|${cleanAfter}`;
     };
 
     const renderPageSafely = async (pageNum) => {
@@ -225,260 +922,22 @@ const LayoutBasedPDFViewer = ({
         }
     };
 
-   const setupTextLayer = async (page, viewport) => {
-    if (!textLayerRef.current) return;
-
-    try {
-        const textContent = await page.getTextContent();
-        const textLayer = textLayerRef.current;
-
-        // Always recreate text layer for zoom changes to avoid stale references
-        console.log('🔄 Recreating text layer for clean zoom handling');
-        textLayer.innerHTML = '';
-
-        textLayer.style.position = 'absolute';
-        textLayer.style.left = '0px';
-        textLayer.style.top = '0px';
-        textLayer.style.width = `${viewport.width}px`;
-        textLayer.style.height = `${viewport.height}px`;
-        textLayer.style.overflow = 'hidden';
-        textLayer.style.pointerEvents = 'none';
-        textLayer.style.opacity = '0';
-        textLayer.style.setProperty('--scale-factor', viewport.scale);
-
-        // Position relative to canvas
-        const canvas = canvasRef.current;
-        if (canvas) {
-            const canvasRect = canvas.getBoundingClientRect();
-            const containerRect = containerRef.current.getBoundingClientRect();
-            textLayer.style.left = `${canvasRect.left - containerRect.left}px`;
-            textLayer.style.top = `${canvasRect.top - containerRect.top}px`;
-        }
-
-        const textDivs = [];
-
-        textContent.items.forEach((item, itemIndex) => {
-            const textDiv = document.createElement('span');
-            
-            const transform = item.transform || [1, 0, 0, 1, 0, 0];
-            const style = textDiv.style;
-
-            style.position = 'absolute';
-            style.whiteSpace = 'pre';
-            style.color = 'transparent';
-            style.transformOrigin = '0% 0%';
-
-            if (transform) {
-                const x = transform[4];
-                const y = transform[5];
-
-                style.left = `${x}px`;
-                style.bottom = `${y}px`;
-                style.fontSize = `${item.height || 12}px`;
-                style.fontFamily = item.fontName || 'sans-serif';
-
-                if (item.width) {
-                    style.width = `${item.width}px`;
+    // Add this after rendering completes to notify the highlighter:
+    const notifyHighlighterOfViewportChange = () => {
+        // Delay notification to ensure DOM is fully updated
+        setTimeout(() => {
+            const event = new CustomEvent('pdfViewportChanged', {
+                detail: {
+                    scale: zoomLevel,
+                    page: currentPage,
+                    viewport: currentViewport,
+                    timestamp: Date.now()
                 }
-            }
-
-            textDiv.textContent = item.str || '';
-
-            // Add stable identifiers
-            textDiv.setAttribute('data-stable-index', itemIndex);
-            textDiv.setAttribute('data-page-number', currentPage);
-
-            const normalizedText = (item.str || '').toLowerCase().replace(/\s+/g, ' ').trim();
-            const textFingerprint = createTextFingerprint(normalizedText, itemIndex);
-            const positionHash = createPositionHash(
-                transform ? transform[4] : 0,
-                transform ? transform[5] : 0,
-                item.width || 0,
-                item.height || 0
-            );
-
-            textDiv.setAttribute('data-text-fingerprint', textFingerprint);
-            textDiv.setAttribute('data-position-hash', positionHash);
-            textDiv.setAttribute('data-normalized-text', normalizedText);
-
-            const beforeText = itemIndex > 0 ? (textContent.items[itemIndex - 1].str || '') : '';
-            const afterText = itemIndex < textContent.items.length - 1 ? (textContent.items[itemIndex + 1].str || '') : '';
-            const contextFingerprint = createContextFingerprint(beforeText, item.str || '', afterText);
-            textDiv.setAttribute('data-context-fingerprint', contextFingerprint);
-
-            textDiv.setAttribute('data-font-name', item.fontName || 'default');
-            textDiv.setAttribute('data-font-size', item.height || 12);
-            textDiv.setAttribute('data-dir', item.dir || 'ltr');
-
-            textDiv.className = 'pdf-text-item';
-
-            textLayer.appendChild(textDiv);
-            textDivs.push(textDiv);
-        });
-
-        textLayerRef.current.textDivs = textDivs;
-        textLayerRef.current.stableItemCount = textContent.items.length;
-
-        console.log(`✅ Text layer created with ${textDivs.length} stable identifiers at scale ${viewport.scale}`);
-
-    } catch (err) {
-        console.error('❌ Error setting up text layer:', err);
-    }
-};
-
-// Simplify setupHighlightLayer:
-const setupHighlightLayer = () => {
-    if (!highlightLayerRef.current || !textLayerRef.current) return;
-
-    const highlightLayer = highlightLayerRef.current;
-    const textLayer = textLayerRef.current;
-
-    // Clear highlights on zoom/page change - let the highlighter component recreate them
-    highlightLayer.innerHTML = '';
-
-    highlightLayer.style.position = 'absolute';
-    highlightLayer.style.left = textLayer.style.left;
-    highlightLayer.style.top = textLayer.style.top;
-    highlightLayer.style.width = textLayer.style.width;
-    highlightLayer.style.height = textLayer.style.height;
-    highlightLayer.style.pointerEvents = 'none';
-    highlightLayer.style.zIndex = '10';
-
-    console.log(`✅ Highlight layer positioned and cleared for fresh highlights`);
-};
-
-
-    // Add this effect to handle zoom changes without breaking highlight references
-    useEffect(() => {
-        if (pdfDoc && !loading && !isRendering) {
-            // Handle page changes
-            if (currentPage !== lastRenderedPage) {
-                console.log(`📄 Page changed from ${lastRenderedPage} to ${currentPage} - rendering`);
-                renderPageSafely(currentPage);
-            }
-            // Handle zoom changes - but only if we're not already rendering and page hasn't changed
-            else if (lastRenderedPage === null && currentPage && zoomLevel && currentViewport) {
-                const currentScale = currentViewport?.scale || 1;
-                const targetScale = zoomLevel;
-
-                // Only re-render if there's a significant zoom difference
-                if (Math.abs(currentScale - targetScale) > 0.01) {
-                    console.log(`🔍 Zoom changed from ${(currentScale * 100).toFixed(0)}% to ${(targetScale * 100).toFixed(0)}% - re-rendering`);
-
-                    // Small delay to prevent render conflicts
-                    setTimeout(() => {
-                        if (!isRendering) {
-                            renderPageSafely(currentPage);
-                        }
-                    }, 50);
-                }
-            }
-        }
-    }, [pdfDoc, loading, currentPage, zoomLevel, isRendering, lastRenderedPage]);
-
-    // Update the renderPage function to handle zoom vs page changes differently
-    const renderPage = async (pageNum) => {
-    if (!pdfDoc || !canvasRef.current || !containerRef.current) {
-        throw new Error('Missing PDF document or canvas refs');
-    }
-
-    console.log(`🎨 Rendering page ${pageNum}...`);
-
-    const page = await pdfDoc.getPage(pageNum);
-    const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
-
-    const baseViewport = page.getViewport({ scale: 1.0 });
-
-    let finalScale;
-    if (lastRenderedPage === null && zoomLevel === 1.0) {
-        const initialZoom = calculateInitialZoomFixed(baseViewport, fixedDimensions.width);
-        setZoomLevel(initialZoom);
-        finalScale = initialZoom;
-        console.log(`📏 Setting initial zoom: ${(initialZoom * 100).toFixed(0)}%`);
-    } else {
-        finalScale = zoomLevel;
-    }
-
-    const viewport = page.getViewport({ scale: finalScale });
-    setCurrentViewport(viewport);
-
-    // Setup canvas
-    const devicePixelRatio = window.devicePixelRatio || 1;
-    canvas.width = viewport.width * devicePixelRatio;
-    canvas.height = viewport.height * devicePixelRatio;
-    canvas.style.width = `${viewport.width}px`;
-    canvas.style.height = `${viewport.height}px`;
-
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.scale(devicePixelRatio, devicePixelRatio);
-
-    // Render PDF
-    const renderContext = {
-        canvasContext: context,
-        viewport: viewport
+            });
+            document.dispatchEvent(event);
+            console.log('📡 Notified highlighter of viewport change');
+        }, 100);
     };
-
-    renderTaskRef.current = page.render(renderContext);
-    try {
-        await renderTaskRef.current.promise;
-        console.log(`✅ PDF render completed for page ${pageNum} at ${(finalScale * 100).toFixed(0)}% zoom`);
-    } catch (error) {
-        if (error.name === 'RenderingCancelledException') {
-            console.log(`🛑 Render task cancelled for page ${pageNum}`);
-            throw error;
-        } else {
-            console.error(`❌ Render task failed for page ${pageNum}:`, error);
-            throw error;
-        }
-    } finally {
-        renderTaskRef.current = null;
-    }
-
-    // Setup text and highlight layers
-    await setupTextLayer(page, viewport);
-    setupHighlightLayer();
-
-    // Notify highlighter component that viewport has changed
-    notifyHighlighterOfViewportChange();
-
-    console.log(`✅ Page ${pageNum} fully rendered and layers setup at ${(finalScale * 100).toFixed(0)}% zoom`);
-};
-
-    // Helper functions for creating stable identifiers
-    const createTextFingerprint = (text, index) => {
-        const cleanText = text.replace(/[^\w]/g, '');
-        return `${cleanText}_${index}_${text.length}`;
-    };
-
-    const createPositionHash = (x, y, width, height) => {
-        return `${Math.round(x)}_${Math.round(y)}_${Math.round(width)}_${Math.round(height)}`;
-    };
-
-    const createContextFingerprint = (before, current, after) => {
-        const cleanBefore = (before || '').replace(/[^\w]/g, '').slice(-10);
-        const cleanCurrent = (current || '').replace(/[^\w]/g, '');
-        const cleanAfter = (after || '').replace(/[^\w]/g, '').slice(0, 10);
-        return `${cleanBefore}|${cleanCurrent}|${cleanAfter}`;
-    };
-
-
-// Add this after rendering completes to notify the highlighter:
-const notifyHighlighterOfViewportChange = () => {
-    // Delay notification to ensure DOM is fully updated
-    setTimeout(() => {
-        const event = new CustomEvent('pdfViewportChanged', {
-            detail: { 
-                scale: zoomLevel, 
-                page: currentPage,
-                viewport: currentViewport,
-                timestamp: Date.now()
-            }
-        });
-        document.dispatchEvent(event);
-        console.log('📡 Notified highlighter of viewport change');
-    }, 100);
-};
 
 
     // Handle highlight clicks - Updated for text highlighter
@@ -506,90 +965,92 @@ const notifyHighlighterOfViewportChange = () => {
         setSelectedHighlight(null);
     };
 
-    // Navigation handlers
-    const goToPage = (pageNum) => {
-        if (pageNum >= 1 && pageNum <= totalPages && pageNum !== currentPage && !isRendering) {
-            //console.log(`📖 Navigating to page ${pageNum}`);
-            setCurrentPage(pageNum);
+
+    // Update the renderPage function to handle zoom vs page changes differently
+    const renderPage = async (pageNum) => {
+        if (!pdfDoc || !canvasRef.current || !containerRef.current) {
+            throw new Error('Missing PDF document or canvas refs');
         }
+
+        console.log(`🎨 Rendering page ${pageNum}...`);
+
+        const page = await pdfDoc.getPage(pageNum);
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+
+        const baseViewport = page.getViewport({ scale: 1.0 });
+
+        let finalScale;
+        if (lastRenderedPage === null && zoomLevel === 1.0) {
+            const initialZoom = calculateInitialZoomFixed(baseViewport, fixedDimensions.width);
+            setZoomLevel(initialZoom);
+            finalScale = initialZoom;
+            console.log(`📏 Setting initial zoom: ${(initialZoom * 100).toFixed(0)}%`);
+        } else {
+            finalScale = zoomLevel;
+        }
+
+        const viewport = page.getViewport({ scale: finalScale });
+        setCurrentViewport(viewport);
+
+        // Setup canvas
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        canvas.width = viewport.width * devicePixelRatio;
+        canvas.height = viewport.height * devicePixelRatio;
+        canvas.style.width = `${viewport.width}px`;
+        canvas.style.height = `${viewport.height}px`;
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.scale(devicePixelRatio, devicePixelRatio);
+
+        // Render PDF
+        const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+        };
+
+        renderTaskRef.current = page.render(renderContext);
+        try {
+            await renderTaskRef.current.promise;
+            console.log(`✅ PDF render completed for page ${pageNum} at ${(finalScale * 100).toFixed(0)}% zoom`);
+        } catch (error) {
+            if (error.name === 'RenderingCancelledException') {
+                console.log(`🛑 Render task cancelled for page ${pageNum}`);
+                throw error;
+            } else {
+                console.error(`❌ Render task failed for page ${pageNum}:`, error);
+                throw error;
+            }
+        } finally {
+            renderTaskRef.current = null;
+        }
+
+        // Setup text and highlight layers
+        await setupTextLayer(page, viewport);
+        setupHighlightLayer();
+
+        // Notify highlighter component that viewport has changed
+        notifyHighlighterOfViewportChange();
+
+        console.log(`✅ Page ${pageNum} fully rendered and layers setup at ${(finalScale * 100).toFixed(0)}% zoom`);
     };
 
-    const handleZoomIn = () => {
-    if (isRendering) {
-        console.log('⏸️ Zoom in blocked - rendering in progress');
-        return;
-    }
-    
-    // Clear any pending zoom operations
-    if (zoomTimeoutRef.current) {
-        clearTimeout(zoomTimeoutRef.current);
-    }
-    
-    const newZoom = Math.min(zoomLevel + 0.25, 3);
-    console.log(`🔍 Zoom IN: ${(zoomLevel * 100).toFixed(0)}% → ${(newZoom * 100).toFixed(0)}%`);
-    
-    setZoomLevel(newZoom);
-    
-    // Debounce the actual render to prevent rapid zoom clicks
-    zoomTimeoutRef.current = setTimeout(() => {
-        if (!isRendering) {
-            setLastRenderedPage(null); // Force re-render
-        }
-    }, 100);
-};
 
-const handleZoomOut = () => {
-    if (isRendering) {
-        console.log('⏸️ Zoom out blocked - rendering in progress');
-        return;
-    }
-    
-    // Clear any pending zoom operations
-    if (zoomTimeoutRef.current) {
-        clearTimeout(zoomTimeoutRef.current);
-    }
-    
-    const newZoom = Math.max(zoomLevel - 0.25, 0.5);
-    console.log(`🔍 Zoom OUT: ${(zoomLevel * 100).toFixed(0)}% → ${(newZoom * 100).toFixed(0)}%`);
-    
-    setZoomLevel(newZoom);
-    
-    // Debounce the actual render to prevent rapid zoom clicks
-    zoomTimeoutRef.current = setTimeout(() => {
-        if (!isRendering) {
-            setLastRenderedPage(null); // Force re-render
-        }
-    }, 100);
-};
 
- const handleResetZoom = () => {
-    if (isRendering) {
-        console.log('⏸️ Zoom reset blocked - rendering in progress');
-        return;
-    }
-    
-    // Clear any pending zoom operations
-    if (zoomTimeoutRef.current) {
-        clearTimeout(zoomTimeoutRef.current);
-    }
-    
-    console.log(`🔍 RESET ZOOM: ${(zoomLevel * 100).toFixed(0)}% → fit-to-width`);
-    
-    setZoomLevel(1.0);
-    
-    // Debounce the actual render to prevent rapid zoom clicks
-    zoomTimeoutRef.current = setTimeout(() => {
-        if (!isRendering) {
-            setLastRenderedPage(null); // Force re-render
-        }
-    }, 100);
-};
+
+
 
     // Cleanup
     useEffect(() => {
         return () => {
             if (renderTaskRef.current) {
                 renderTaskRef.current.cancel();
+            }
+            if (renderTimeoutRef.current) {
+                clearTimeout(renderTimeoutRef.current);
+            }
+            if (zoomTimeoutRef.current) {
+                clearTimeout(zoomTimeoutRef.current);
             }
         };
     }, []);
@@ -667,6 +1128,13 @@ const handleZoomOut = () => {
                     </span>
                 )}
 
+                {renderQueue && (
+                    <span className="render-queue-indicator">
+                        <FontAwesomeIcon icon={faSpinner} spin />
+                        Queued: {renderQueue}
+                    </span>
+                )}
+
                 {/* Show highlight statistics */}
                 {!isRendering && selectedProvenance && (() => {
                     const stats = PDFTextHighlightingUtils.getHighlightStats(highlightLayerRef);
@@ -738,7 +1206,7 @@ const handleZoomOut = () => {
                 <div className="render-error">
                     <FontAwesomeIcon icon={faExclamationTriangle} />
                     <span>Render Error: {renderError}</span>
-                    <button onClick={() => renderPageSafely(currentPage)} className="win95-btn retry">
+                    <button onClick={() => requestRender(currentPage, zoomLevel, true)} className="win95-btn retry">
                         Retry
                     </button>
                 </div>
@@ -760,6 +1228,8 @@ const handleZoomOut = () => {
                                     currentPage={currentPage}
                                     provenanceData={selectedProvenance}
                                     textLayerRef={textLayerRef}
+                                    canvasRef={canvasRef}
+                                    containerRef={containerRef}
                                     highlightLayerRef={highlightLayerRef}
                                     currentViewport={currentViewport}
                                     onHighlightClick={handleHighlightClick}

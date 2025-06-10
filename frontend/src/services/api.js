@@ -160,20 +160,6 @@ export const checkStatus = async (questionId) => {
   }
 };
 
-// Add these functions to your existing api.js file
-
-// =============================================================================
-// PDF Mappings APIs
-// =============================================================================
-
-// Add these functions to your existing api.js file
-
-// =============================================================================
-// PDF Mappings APIs
-// =============================================================================
-
-// Add these functions to your existing api.js file
-
 // =============================================================================
 // PDF Mappings APIs
 // =============================================================================
@@ -233,7 +219,6 @@ export const getHighlightingFromMappings = async (filename, sentenceIds, current
           const sentenceMapping = mappings[pageKey][sentenceKey];
           
           // Convert to the format expected by your existing highlighting code
-          // CRITICAL: Transform PDFMiner coordinates to PDF.js coordinates
           if (sentenceMapping.highlight_regions && sentenceMapping.highlight_regions.length > 0) {
             // Filter highlights to only include those on the current page
             const currentPageHighlights = sentenceMapping.highlight_regions.filter(region => 
@@ -286,34 +271,213 @@ export const getHighlightingFromMappings = async (filename, sentenceIds, current
   }
 };
 
+// Add these functions to your api.js file
+
 /**
- * Enhanced provenance highlighting that tries mappings first, then falls back to API
+ * Get simple provenance highlighting boxes using direct PDF.js text search
+ */
+export const getSimpleProvenanceBoxes = async (filename, options = {}) => {
+  try {
+    const payload = {
+      sentence_ids: options.sentenceIds || [],
+      provenance_text: options.provenanceText || '',
+      page: options.currentPage || 1
+    };
+    
+    console.log(`🎯 Getting simple highlighting for ${filename}:`, payload);
+    
+    const response = await axios.post(`${API_URL}/documents/${filename}/simple-provenance-boxes`, payload);
+    
+    if (response.data.success) {
+      console.log(`✅ Simple highlighting successful: ${response.data.total_boxes} boxes`);
+      return {
+        success: true,
+        bounding_boxes: response.data.bounding_boxes,
+        statistics: {
+          total_boxes: response.data.total_boxes,
+          search_method: response.data.search_method,
+          pages_with_matches: Object.keys(response.data.bounding_boxes).length
+        }
+      };
+    } else {
+      console.error(`❌ Simple highlighting failed: ${response.data.error}`);
+      return { success: false, error: response.data.error };
+    }
+    
+  } catch (error) {
+    console.error('❌ Error in simple provenance boxes:', error);
+    throw error;
+  }
+};
+
+/**
+ * Test simple highlighting with custom text
+ */
+export const testSimpleHighlighting = async (filename, testText) => {
+  try {
+    const response = await axios.post(`${API_URL}/documents/${filename}/test-simple-highlighting`, {
+      test_text: testText
+    });
+    
+    return response.data;
+    
+  } catch (error) {
+    console.error('❌ Error in test highlighting:', error);
+    throw error;
+  }
+};
+
+/**
+ * Preprocess a document for simple mappings
+ */
+export const preprocessSimpleMapping = async (filename) => {
+  try {
+    console.log(`🔄 Preprocessing simple mappings for ${filename}`);
+    
+    const response = await axios.post(`${API_URL}/documents/${filename}/preprocess-simple-mapping`);
+    
+    if (response.data.success) {
+      console.log(`✅ Preprocessing completed: ${response.data.statistics.success_rate}% success rate`);
+    }
+    
+    return response.data;
+    
+  } catch (error) {
+    console.error('❌ Error in preprocessing:', error);
+    throw error;
+  }
+};
+
+/**
+ * Batch preprocess multiple documents
+ */
+export const batchPreprocessSimpleMappings = async (maxDocuments = 10) => {
+  try {
+    console.log(`🔄 Batch preprocessing up to ${maxDocuments} documents`);
+    
+    const response = await axios.post(`${API_URL}/batch-preprocess-simple-mappings`, {
+      max_documents: maxDocuments
+    });
+    
+    return response.data;
+    
+  } catch (error) {
+    console.error('❌ Error in batch preprocessing:', error);
+    throw error;
+  }
+};
+
+/**
+ * Enhanced version of existing getProvenanceHighlightingBoxes that tries simple method first
  */
 export const getProvenanceHighlightingBoxesEnhanced = async (filename, sentenceIds, provenanceId = null, provenanceText = null, currentPage = 1) => {
   try {
-    console.log(`🎯 Enhanced highlighting for ${filename} on page ${currentPage}`);
+    console.log(`🎯 Enhanced highlighting for ${filename}`);
     
-    // First, try to get highlights from pre-computed mappings
-    try {
-      const mappingsResult = await getHighlightingFromMappings(filename, sentenceIds, currentPage);
-      
-      if (mappingsResult.success && Object.keys(mappingsResult.bounding_boxes).length > 0) {
-        console.log(`✅ Using pre-computed mappings for ${filename}`);
-        return mappingsResult;
+    // Try simple method first if we have provenance text
+    if (provenanceText && provenanceText.length > 10) {
+      try {
+        console.log(`🔄 Trying simple method first...`);
+        
+        const simpleResult = await getSimpleProvenanceBoxes(filename, {
+          provenanceText: provenanceText,
+          currentPage: currentPage
+        });
+        
+        if (simpleResult.success && simpleResult.statistics.total_boxes > 0) {
+          console.log(`✅ Simple method succeeded with ${simpleResult.statistics.total_boxes} boxes`);
+          return {
+            ...simpleResult,
+            method_used: 'simple_pdfjs_search',
+            sentence_ids: sentenceIds // Include for compatibility
+          };
+        }
+      } catch (simpleError) {
+        console.log(`⚠️ Simple method failed, falling back to complex method`);
       }
-    } catch (mappingsError) {
-      console.log(`⚠️ Mappings not available for ${filename}, falling back to API`);
     }
     
-    // Fallback to existing API-based highlighting
-    console.log(`🔄 Falling back to API-based highlighting for ${filename}`);
-    return await getProvenanceHighlightingBoxes(filename, sentenceIds, provenanceId, provenanceText);
+    // Fallback to existing complex method
+    console.log(`🔄 Using complex highlighting method`);
+    
+    // Use existing getProvenanceHighlightingBoxes function
+    const complexResult = await getProvenanceHighlightingBoxes(filename, sentenceIds, provenanceId, provenanceText);
+    
+    if (complexResult) {
+      return {
+        ...complexResult,
+        method_used: 'complex_coordinate_mapping'
+      };
+    }
+    
+    // Final fallback: try simple method with sentence IDs
+    if (sentenceIds && sentenceIds.length > 0) {
+      console.log(`🔄 Final fallback: simple method with sentence IDs`);
+      
+      const fallbackResult = await getSimpleProvenanceBoxes(filename, {
+        sentenceIds: sentenceIds,
+        currentPage: currentPage
+      });
+      
+      if (fallbackResult.success) {
+        return {
+          ...fallbackResult,
+          method_used: 'simple_sentence_lookup'
+        };
+      }
+    }
+    
+    // No method worked
+    return {
+      success: false,
+      error: 'All highlighting methods failed',
+      bounding_boxes: {},
+      statistics: { total_boxes: 0 }
+    };
     
   } catch (error) {
     console.error('❌ Error in enhanced highlighting:', error);
     throw error;
   }
 };
+
+/**
+ * Simple utility to check if a document has simple mappings preprocessed
+ */
+export const hasSimpleMappings = async (filename) => {
+  try {
+    // Try to load a small test to see if mappings exist
+    const testResult = await testSimpleHighlighting(filename, 'test');
+    return testResult.success;
+  } catch (error) {
+    return false;
+  }
+};
+
+/**
+ * Get statistics about simple mapping quality for a document
+ */
+export const getSimpleMappingStats = async (filename) => {
+  try {
+    // This could be enhanced to return actual stats if you store them
+    const testResult = await testSimpleHighlighting(filename, 'the and of in to');
+    
+    return {
+      available: testResult.success,
+      total_boxes: testResult.total_boxes || 0,
+      pages_with_matches: testResult.pages_with_matches || 0,
+      best_confidence: testResult.best_confidence || 0
+    };
+    
+  } catch (error) {
+    return {
+      available: false,
+      error: error.message
+    };
+  }
+};
+
+
 
 
 /**

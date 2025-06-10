@@ -1,3 +1,4 @@
+// LayoutBasedPDFViewer.js - Updated to use PDFTextHighlighter
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -13,8 +14,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/pdf-viewer.css';
 import { calculateProvenanceCost, formatCost } from '../utils/ProvenanceOutputsFormatting';
-import { getProvenanceHighlightingBoxesEnhanced, getHighlightingFromMappings } from '../services/api';
-import {PDFViewerWithHighlights} from './PDFHighlighter';
+import { PDFTextHighlighter, PDFTextHighlightingUtils } from './PDFTextHighlighter'; // Updated import
+
 const LayoutBasedPDFViewer = ({
     pdfDocument,
     selectedProvenance,
@@ -34,19 +35,10 @@ const LayoutBasedPDFViewer = ({
     const [fixedDimensions, setFixedDimensions] = useState(null);
     const [currentViewport, setCurrentViewport] = useState(null);
 
-    // Document sentences for text display
-    const [documentSentences, setDocumentSentences] = useState([]);
-    const [sentencesData, setSentencesData] = useState(null);
-
     // Rendering state
     const [isRendering, setIsRendering] = useState(false);
     const [renderError, setRenderError] = useState(null);
     const [lastRenderedPage, setLastRenderedPage] = useState(null);
-
-    // Highlight persistence state
-    const [activeHighlights, setActiveHighlights] = useState(new Map());
-    const [highlightsPersisted, setHighlightsPersisted] = useState(false);
-    const [currentProvenanceId, setCurrentProvenanceId] = useState(null);
 
     // Magnify state
     const [magnifyMode, setMagnifyMode] = useState(false);
@@ -58,6 +50,7 @@ const LayoutBasedPDFViewer = ({
     const highlightLayerRef = useRef(null);
     const containerRef = useRef(null);
     const renderTaskRef = useRef(null);
+    const pdfViewerRef = useRef(null);
 
     // Initialize PDF.js worker
     useEffect(() => {
@@ -89,10 +82,10 @@ const LayoutBasedPDFViewer = ({
         }
     }, [pdfDocument]);
 
-    // Load PDF and document data
+    // Load PDF
     useEffect(() => {
         if (!pdfUrl || !window.pdfjsLib) return;
-        loadPDFWithDocumentData();
+        loadPDF();
     }, [pdfUrl]);
 
     // Handle page changes
@@ -100,8 +93,24 @@ const LayoutBasedPDFViewer = ({
         if (pdfDoc && !loading && !isRendering && currentPage !== lastRenderedPage) {
             console.log(`📄 Page changed from ${lastRenderedPage} to ${currentPage} - rendering`);
             renderPageSafely(currentPage);
+            
         }
     }, [pdfDoc, loading, currentPage, zoomLevel, lastRenderedPage]);
+
+    // Add this in your handleHighlightClick function or somewhere after a page renders
+useEffect(() => {
+  if (!isRendering && textLayerRef.current && selectedProvenance) {
+    console.log('🔍 DEBUG: Provenance data:', selectedProvenance);
+    
+    // Use the debug utility
+    setTimeout(() => {
+      PDFTextHighlightingUtils.debugTextLayer(textLayerRef);
+      PDFTextHighlightingUtils.testSearch(textLayerRef, 'In');
+    }, 1000);
+  }
+}, [isRendering, selectedProvenance]);
+
+    
 
     // Calculate fixed viewer dimensions
     const calculateFixedViewerDimensions = () => {
@@ -132,255 +141,6 @@ const LayoutBasedPDFViewer = ({
         });
     }, []);
 
-const createLayoutBasedHighlights = async () => {
-    if (!selectedProvenance || !currentViewport || !highlightLayerRef.current) {
-        console.warn('⚠️ Missing requirements for highlighting');
-        return;
-    }
-
-    const { sentences_ids, provenance_id, provenance, content } = selectedProvenance;
-
-    clearHighlights();
-
-    if (!sentences_ids || sentences_ids.length === 0) {
-        console.warn('⚠️ No sentence IDs in provenance');
-        return;
-    }
-
-    // Get the actual provenance text to search for
-    const provenanceText = provenance || (content && content.join(' ')) || '';
-
-    console.log(`🎯 Creating ENHANCED highlights for ${pdfDocument.filename}:`, {
-        sentenceIds: sentences_ids,
-        currentPage: currentPage,
-        provenanceText: provenanceText.substring(0, 100) + '...'
-    });
-
-    try {
-        // Use the enhanced highlighting that tries mappings first
-        const response = await getProvenanceHighlightingBoxesEnhanced(
-            pdfDocument.filename,
-            sentences_ids,
-            provenance_id,
-            provenanceText,
-            currentPage // Pass current page
-        );
-
-        if (response.success && response.bounding_boxes) {
-            console.log('✅ Received bounding boxes:', {
-                dataSource: response.data_source,
-                totalSentences: sentences_ids.length,
-                boxesReceived: Object.keys(response.bounding_boxes).length,
-                avgConfidence: response.statistics?.avg_confidence || 'N/A'
-            });
-
-            let highlightsCreated = 0;
-            const newHighlights = new Map();
-
-            Object.entries(response.bounding_boxes).forEach(([sentenceId, boxes]) => {
-                const sentenceIdNum = parseInt(sentenceId);
-
-                const pageBoxes = boxes.filter(box =>
-                    box.page === currentPage &&
-                    box.confidence > 0.4
-                );
-
-                if (pageBoxes.length === 0) {
-                    console.log(`📄 Sentence ${sentenceId} not on page ${currentPage}`);
-                    return;
-                }
-
-                console.log(`📍 Creating ${pageBoxes.length} highlights for sentence ${sentenceId} (source: ${response.data_source})`);
-
-                pageBoxes.forEach((bbox, bboxIndex) => {
-                    const highlightElement = createPreciseHighlightFromAPI(
-                        bbox,
-                        sentenceIdNum,
-                        bboxIndex,
-                        provenance_id,
-                        provenanceText,
-                        response.data_source // Pass the data source
-                    );
-
-                    if (highlightElement) {
-                        newHighlights.set(`${sentenceId}_${bboxIndex}`, highlightElement);
-                        highlightsCreated++;
-                    }
-                });
-            });
-
-            setActiveHighlights(newHighlights);
-            setHighlightsPersisted(true);
-
-            console.log(`✅ Created ${highlightsCreated} highlights using ${response.data_source}`);
-
-        } else {
-            console.warn('⚠️ Enhanced highlighting failed, using fallback');
-            createFallbackHighlights(sentences_ids, provenance_id);
-        }
-
-    } catch (error) {
-        console.error('❌ Error in enhanced highlighting:', error);
-        createFallbackHighlights(sentences_ids, provenance_id);
-    }
-};
-
-// Update the createPreciseHighlightFromAPI method to handle different coordinate systems
-const createPreciseHighlightFromAPI = (bbox, sentenceId, bboxIndex, provenanceId, sentenceText, dataSource = 'api') => {
-    if (!currentViewport || !highlightLayerRef.current) return null;
-
-    let left, top, width, height;
-
-    // Handle different coordinate systems
-    if (dataSource === 'pre_computed_mapping' && bbox.coordinate_system === 'pdfminer') {
-        // Transform PDFMiner coordinates to PDF.js viewport coordinates
-        
-        // PDFMiner gives us: left, top, width, height (origin at bottom-left)
-        // We need to transform to PDF.js viewport coordinates (origin at top-left)
-        
-        // Get the PDF page height in PDF coordinate space
-        const pageHeightInPdfCoords = currentViewport.height / currentViewport.scale;
-        
-        // Transform coordinates
-        left = bbox.left * currentViewport.scale;
-        
-        // Convert Y coordinate: PDFMiner's top is distance from bottom
-        // PDF.js's top is distance from top
-        const pdfMinertop = bbox.top;
-        const pdfMinerHeight = bbox.height;
-        
-        // In PDFMiner: bottom of region = top, top of region = top + height
-        const regionBottomInPdfCoords = pdfMinertop;
-        const regionTopInPdfCoords = pdfMinertop + pdfMinerHeight;
-        
-        // Convert to PDF.js coordinates (flip Y axis)
-        const topInPdfJsCoords = pageHeightInPdfCoords - regionTopInPdfCoords;
-        
-        top = topInPdfJsCoords * currentViewport.scale;
-        width = bbox.width * currentViewport.scale;
-        height = bbox.height * currentViewport.scale;
-        
-        console.log(`🔄 Coordinate transformation for sentence ${sentenceId}:`, {
-            original: { left: bbox.left, top: bbox.top, width: bbox.width, height: bbox.height },
-            pageHeight: pageHeightInPdfCoords,
-            transformed: { left, top, width, height },
-            scale: currentViewport.scale
-        });
-        
-    } else if (dataSource === 'pre_computed_mapping') {
-        // Pre-computed mappings with different coordinate system
-        left = bbox.x0 * currentViewport.scale;
-        top = bbox.y1 * currentViewport.scale;
-        width = (bbox.x1 - bbox.x0) * currentViewport.scale;
-        height = (bbox.y0 - bbox.y1) * currentViewport.scale;
-    } else {
-        // API-based coordinates (original system)
-        const pdfToViewport = (pdfX, pdfY) => {
-            const viewportX = pdfX * currentViewport.scale;
-            const viewportY = (currentViewport.height / currentViewport.scale - pdfY) * currentViewport.scale;
-            return { x: viewportX, y: viewportY };
-        };
-
-        const topLeft = pdfToViewport(bbox.x0, bbox.y1);
-        const bottomRight = pdfToViewport(bbox.x1, bbox.y0);
-        left = topLeft.x;
-        top = topLeft.y;
-        width = bottomRight.x - topLeft.x;
-        height = bottomRight.y - topLeft.y;
-    }
-
-    // Basic validation
-    if (width <= 0 || height <= 0) {
-        console.warn(`⚠️ Invalid bbox dimensions: ${width}x${height}`);
-        return null;
-    }
-
-    const overlay = document.createElement('div');
-    overlay.className = 'provenance-overlay';
-    overlay.setAttribute('data-sentence-id', sentenceId);
-    overlay.setAttribute('data-bbox-index', bboxIndex);
-    overlay.setAttribute('data-provenance-id', provenanceId);
-    overlay.setAttribute('data-confidence', bbox.confidence.toFixed(2));
-    overlay.setAttribute('data-source', dataSource);
-
-    // Different styling based on data source
-    let backgroundColor, borderColor;
-    if (dataSource === 'pre_computed_mapping') {
-        backgroundColor = 'rgba(76, 175, 80, 0.4)'; // Green for mappings
-        borderColor = 'rgba(76, 175, 80, 0.8)';
-    } else {
-        backgroundColor = 'rgba(255, 193, 7, 0.4)'; // Yellow for API
-        borderColor = 'rgba(255, 193, 7, 0.8)';
-    }
-
-    // Styling with confidence-based transparency
-    const alpha = Math.max(0.3, bbox.confidence * 0.6);
-    const borderAlpha = Math.max(0.5, bbox.confidence);
-
-    overlay.style.cssText = `
-        position: absolute;
-        left: ${left}px;
-        top: ${top}px;
-        width: ${width}px;
-        height: ${height}px;
-        background-color: ${backgroundColor};
-        border: 2px solid ${borderColor};
-        border-radius: 4px;
-        z-index: 9999;
-        pointer-events: auto;
-        cursor: pointer;
-        opacity: 1;
-        display: block;
-        visibility: visible;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    `;
-
-    overlay.title = `Evidence ${bboxIndex + 1}\nSentence: ${sentenceId}\nConfidence: ${(bbox.confidence * 100).toFixed(0)}%\nSource: ${dataSource}`;
-
-    // Add click handler for magnification
-    overlay.addEventListener('click', (e) => {
-        e.stopPropagation();
-        console.log(`📍 Clicked highlight: sentence ${sentenceId}, bbox ${bboxIndex} (${dataSource})`);
-
-        // Visual feedback
-        overlay.style.transform = 'scale(1.05)';
-        overlay.style.borderWidth = '3px';
-        setTimeout(() => {
-            overlay.style.transform = 'scale(1)';
-            overlay.style.borderWidth = '2px';
-        }, 200);
-
-        // Show magnified text
-        showMagnifiedText({
-            sentenceId,
-            sentenceText: sentenceText,
-            bbox,
-            overlayElement: overlay,
-            confidence: bbox.confidence,
-            inputTokens: selectedProvenance.input_token_size,
-            outputTokens: selectedProvenance.output_token_size,
-            source: dataSource
-        });
-    });
-
-    // Hover effects
-    overlay.addEventListener('mouseenter', () => {
-        overlay.style.transform = 'scale(1.02)';
-        overlay.style.zIndex = '600';
-        overlay.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.25)';
-    });
-
-    overlay.addEventListener('mouseleave', () => {
-        overlay.style.transform = 'scale(1)';
-        overlay.style.zIndex = '500';
-        overlay.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
-    });
-
-    highlightLayerRef.current.appendChild(overlay);
-    return overlay;
-};
-
     // Calculate initial zoom for fixed dimensions
     const calculateInitialZoomFixed = (viewport, fixedWidth) => {
         if (!viewport || !fixedWidth) return 1.0;
@@ -392,72 +152,32 @@ const createPreciseHighlightFromAPI = (bbox, sentenceId, bboxIndex, provenanceId
         return Math.max(0.4, Math.min(2.5, scale));
     };
 
-    // Create highlights when provenance is selected
-    const stableCreateHighlights = useCallback(() => {
-        if (selectedProvenance && currentViewport && !isRendering && highlightLayerRef.current) {
-            const provenanceId = selectedProvenance.provenance_id;
-
-            if (provenanceId !== currentProvenanceId || !highlightsPersisted) {
-                console.log('🎯 Creating NEW API-based highlights for provenance:', provenanceId);
-                setCurrentProvenanceId(provenanceId);
-                createLayoutBasedHighlights();
-            }
-        }
-    }, [selectedProvenance?.provenance_id, currentPage, currentViewport, currentProvenanceId, highlightsPersisted, isRendering]);
-
-    // Trigger highlighting after rendering
-    useEffect(() => {
-        if (!isRendering && currentViewport && selectedProvenance) {
-            const timer = setTimeout(() => {
-                console.log('🕐 Timer triggered - checking if highlights should be created');
-                stableCreateHighlights();
-            }, 200);
-
-            return () => {
-                console.log('🕐 Timer cancelled');
-                clearTimeout(timer);
-            };
-        }
-    }, [stableCreateHighlights, isRendering, currentViewport, selectedProvenance]);
-
-    // Handle navigation triggers
+    // Handle navigation triggers - Updated for text-based highlighting
     useEffect(() => {
         if (!navigationTrigger) return;
 
         console.log('🧭 Processing navigation trigger:', navigationTrigger);
-        const { sentenceId } = navigationTrigger;
-
-        if (sentenceId !== undefined) {
-            console.log(`📄 Navigation to sentence ${sentenceId}`);
-
-            // Find any existing highlight for this sentence
-            setTimeout(() => {
-                const existingHighlight = highlightLayerRef.current?.querySelector(`[data-sentence-id="${sentenceId}"]`);
-
-                if (existingHighlight) {
-                    console.log(`✅ Found existing highlight for sentence ${sentenceId}, scrolling`);
-                    existingHighlight.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center',
-                        inline: 'center'
-                    });
-                } else {
-                    console.log(`⚠️ No highlight found for sentence ${sentenceId} on current page`);
-                }
-            }, 300);
-        }
+        
+        // For text-based highlighting, we can scroll to the first highlight
+        setTimeout(() => {
+            const scrolled = PDFTextHighlightingUtils.scrollToFirstHighlight(highlightLayerRef);
+            if (scrolled) {
+                console.log('✅ Scrolled to first text highlight');
+            } else {
+                console.log('⚠️ No highlights found to scroll to');
+            }
+        }, 300);
+        
     }, [navigationTrigger]);
 
-    const loadPDFWithDocumentData = async () => {
+    const loadPDF = async () => {
         setLoading(true);
         setError(null);
         setRenderError(null);
-        setHighlightsPersisted(false);
 
         try {
-            console.log('🔄 Loading PDF with document data...');
+            console.log('🔄 Loading PDF...');
 
-            // Load PDF document
             const loadingTask = window.pdfjsLib.getDocument({
                 url: pdfUrl,
                 verbosity: 0
@@ -470,50 +190,12 @@ const createPreciseHighlightFromAPI = (bbox, sentenceId, bboxIndex, provenanceId
             setTotalPages(pdf.numPages);
             setCurrentPage(1);
             setLastRenderedPage(null);
-
-            // Load document sentences for text display
-            await loadDocumentSentencesAndLayout();
-
             setLoading(false);
 
         } catch (err) {
             console.error('❌ Error loading PDF:', err);
             setError(`Failed to load document: ${err.message}`);
             setLoading(false);
-        }
-    };
-
-    const loadDocumentSentencesAndLayout = async () => {
-        try {
-            console.log('📄 Loading document sentences and layout data');
-
-            const sentencesResponse = await fetch(`/api/documents/${pdfDocument.filename}/sentences`);
-            const layoutResponse = await fetch(`/api/documents/${pdfDocument.filename}/layout`);
-            if (sentencesResponse.ok && layoutResponse.ok) {
-                const sentencesResult = await sentencesResponse.json();
-                const layoutResult = await layoutResponse.json();
-
-
-
-                if (sentencesResult.success && layoutResult.success) {
-                    const sentences = sentencesResult.sentences;
-                    const layout = layoutResult.layout_data;
-
-                    const combinedData = {
-                        sentences: layout.sentences || [],
-                        originalSentences: sentences,
-                        pagesLayout: layout.pages_layout || []
-                    }
-                    setSentencesData(combinedData);
-                    console.log('loaded combined sentences and')
-                    return;
-                }
-            }
-
-            console.warn('⚠️ Could not load document sentences');
-
-        } catch (error) {
-            console.error('❌ Error loading document sentences:', error);
         }
     };
 
@@ -536,10 +218,9 @@ const createPreciseHighlightFromAPI = (bbox, sentenceId, bboxIndex, provenanceId
 
         setIsRendering(true);
         setRenderError(null);
-        setHighlightsPersisted(false);
 
         try {
-            await renderPageWithLayout(pageNum);
+            await renderPage(pageNum);
             setLastRenderedPage(pageNum);
             console.log(`✅ Page ${pageNum} rendered successfully`);
         } catch (error) {
@@ -554,7 +235,7 @@ const createPreciseHighlightFromAPI = (bbox, sentenceId, bboxIndex, provenanceId
         }
     };
 
-    const renderPageWithLayout = async (pageNum) => {
+    const renderPage = async (pageNum) => {
         if (!pdfDoc || !canvasRef.current || !containerRef.current) {
             throw new Error('Missing PDF document or canvas refs');
         }
@@ -637,7 +318,7 @@ const createPreciseHighlightFromAPI = (bbox, sentenceId, bboxIndex, provenanceId
             textLayer.style.height = `${viewport.height}px`;
             textLayer.style.overflow = 'hidden';
             textLayer.style.pointerEvents = 'none';
-            textLayer.style.opacity = '0';
+            textLayer.style.opacity = '0'; // Keep invisible for highlighting
             textLayer.style.setProperty('--scale-factor', viewport.scale);
 
             // Position relative to canvas
@@ -649,7 +330,7 @@ const createPreciseHighlightFromAPI = (bbox, sentenceId, bboxIndex, provenanceId
                 textLayer.style.top = `${canvasRect.top - containerRect.top}px`;
             }
 
-            // Render text layer
+            // Render text layer for text search
             if (window.pdfjsLib.renderTextLayer) {
                 await window.pdfjsLib.renderTextLayer({
                     textContentSource: textContent,
@@ -684,262 +365,31 @@ const createPreciseHighlightFromAPI = (bbox, sentenceId, bboxIndex, provenanceId
         console.log('✅ Highlight layer positioned');
     };
 
-    const createHighlightElements = (highlights, provenanceId) => {
-        if (!highlightLayerRef.current) return;
+    
 
-        const newHighlights = new Map();
-        let elementCount = 0;
+    // Handle highlight clicks - Updated for text highlighter
+    const handleHighlightClick = (highlightData) => {
+        console.log('🎯 Text highlight clicked:', highlightData);
 
-        highlights.forEach((highlight, index) => {
-            // Handle both single coordinates and arrays of coordinates
-            const coordinates = Array.isArray(highlight.coordinates) ?
-                highlight.coordinates : [highlight.coordinates];
-
-            coordinates.forEach((coord, coordIndex) => {
-                const overlay = createHighlightOverlay(
-                    coord,
-                    highlight,
-                    index,
-                    coordIndex,
-                    provenanceId
-                );
-
-                if (overlay) {
-                    newHighlights.set(`${index}_${coordIndex}`, overlay);
-                    elementCount++;
-                }
-            });
+        
+        
+        setSelectedHighlight({
+            index: highlightData.index,
+            text: highlightData.text,
+            confidence: highlightData.confidence,
+            matchType: highlightData.matchType,
+            searchText: highlightData.searchText,
+            page: highlightData.page,
+            inputTokens: selectedProvenance?.input_token_size,
+            outputTokens: selectedProvenance?.output_token_size
         });
-
-        setActiveHighlights(newHighlights);
-        console.log(`✅ Created ${elementCount} highlight elements`);
-    };
-
-
-
-    // Create individual highlight overlay
-    const createHighlightOverlay = (coordinates, highlight, highlightIndex, coordIndex, provenanceId) => {
-        if (!coordinates || !highlightLayerRef.current) return null;
-
-        // Validate coordinates
-        if (coordinates.width <= 0 || coordinates.height <= 0) {
-            console.warn(`Invalid coordinates:`, coordinates);
-            return null;
-        }
-
-        const overlay = document.createElement('div');
-        overlay.className = 'integrated-provenance-highlight';
-        overlay.setAttribute('data-provenance-id', provenanceId);
-        overlay.setAttribute('data-highlight-index', highlightIndex);
-        overlay.setAttribute('data-coord-index', coordIndex);
-        overlay.setAttribute('data-confidence', (highlight.confidence || 0.8).toFixed(2));
-        overlay.setAttribute('data-type', highlight.type);
-
-        // Color coding by highlighting strategy
-        let backgroundColor, borderColor;
-        switch (highlight.type) {
-            case 'bounding_box':
-                backgroundColor = 'rgba(76, 175, 80, 0.3)'; // Green
-                borderColor = 'rgba(76, 175, 80, 0.8)';
-                break;
-            case 'text_match':
-                backgroundColor = 'rgba(33, 150, 243, 0.3)'; // Blue  
-                borderColor = 'rgba(33, 150, 243, 0.8)';
-                break;
-            case 'hybrid_validated':
-                backgroundColor = 'rgba(255, 193, 7, 0.3)'; // Yellow
-                borderColor = 'rgba(255, 193, 7, 0.8)';
-                break;
-            default:
-                backgroundColor = 'rgba(156, 39, 176, 0.3)'; // Purple
-                borderColor = 'rgba(156, 39, 176, 0.8)';
-        }
-
-        overlay.style.cssText = `
-        position: absolute;
-        left: ${coordinates.left}px;
-        top: ${coordinates.top}px;
-        width: ${coordinates.width}px;
-        height: ${coordinates.height}px;
-        background-color: ${backgroundColor};
-        border: 2px solid ${borderColor};
-        border-radius: 3px;
-        z-index: 1000;
-        pointer-events: auto;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    `;
-
-        // Enhanced hover effects
-        overlay.addEventListener('mouseenter', () => {
-            overlay.style.transform = 'scale(1.02)';
-            overlay.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-            overlay.style.zIndex = '1100';
-        });
-
-        overlay.addEventListener('mouseleave', () => {
-            overlay.style.transform = 'scale(1)';
-            overlay.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-            overlay.style.zIndex = '1000';
-        });
-
-        // Click handler with detailed info
-        overlay.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showIntegratedHighlightDetails(highlight, highlightIndex, selectedProvenance);
-        });
-
-        // Tooltip with strategy info
-        overlay.title = `Strategy: ${highlight.type}\nConfidence: ${(highlight.confidence * 100).toFixed(0)}%\nText: "${highlight.text?.substring(0, 50) || 'N/A'}..."`;
-
-        highlightLayerRef.current.appendChild(overlay);
-        return overlay;
-    };
-
-    // Show detailed information about the highlight
-    const showIntegratedHighlightDetails = (highlight, index, provenance) => {
-        console.log('🎯 Integrated highlight clicked:', {
-            strategy: highlight.type,
-            confidence: highlight.confidence,
-            index: index,
-            provenanceId: provenance.provenance_id
-        });
-
-        // Create and show details modal/panel
-        const details = {
-            strategy: highlight.type,
-            confidence: highlight.confidence,
-            text: highlight.text,
-            provenance: provenance.provenance || provenance.content?.join(' ') || 'No text available',
-            metadata: {
-                inputTokens: provenance.input_token_size,
-                outputTokens: provenance.output_token_size,
-                processingTime: provenance.time
-            }
-        };
-
-        // You can replace this with your existing magnify modal
-        if (setSelectedHighlight && setMagnifyMode) {
-            setSelectedHighlight({
-                sentenceId: `highlight_${index}`,
-                sentenceText: highlight.text,
-                confidence: highlight.confidence,
-                strategy: highlight.type,
-                ...details.metadata
-            });
-            setMagnifyMode(true);
-        } else {
-            // Fallback to simple display
-            const message = `
-Strategy: ${details.strategy}
-Confidence: ${(details.confidence * 100).toFixed(0)}%
-Processing Time: ${details.metadata.processingTime?.toFixed(2) || 'N/A'}s
-
-Text: ${details.text?.substring(0, 100) || 'N/A'}...
-
-Provenance: ${details.provenance.substring(0, 200)}...
-        `;
-            alert(message);
-        }
-    };
-
-
-  
-
-    const createFallbackHighlights = (sentenceIds, provenanceId) => {
-        console.log('🆘 Creating fallback highlights');
-
-        let highlightsCreated = 0;
-        const newHighlights = new Map();
-
-        sentenceIds.forEach((sentenceId, index) => {
-            const fallbackBox = {
-                left: 20,
-                top: 20 + (index * 40),
-                width: 250,
-                height: 35
-            };
-
-            const overlay = document.createElement('div');
-            overlay.className = 'provenance-overlay fallback-highlight';
-            overlay.setAttribute('data-sentence-id', sentenceId);
-            overlay.setAttribute('data-provenance-id', provenanceId);
-
-            overlay.style.cssText = `
-                position: absolute;
-                left: ${fallbackBox.left}px;
-                top: ${fallbackBox.top}px;
-                width: ${fallbackBox.width}px;
-                height: ${fallbackBox.height}px;
-                background-color: rgba(255, 69, 0, 0.8);
-                border: 2px solid rgba(255, 69, 0, 1);
-                border-radius: 4px;
-                z-index: 550;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-weight: bold;
-                font-size: 12px;
-                cursor: pointer;
-            `;
-
-            overlay.innerHTML = `📍 Evidence ${index + 1} (Fallback)`;
-            overlay.title = `Fallback highlight for sentence ${sentenceId}`;
-
-            overlay.addEventListener('click', (e) => {
-                e.stopPropagation();
-
-                // Get sentence text for fallback
-                let sentenceText = `Sentence ${sentenceId}`;
-                if (Array.isArray(documentSentences)) {
-                    sentenceText = documentSentences[sentenceId] || sentenceText;
-                } else if (documentSentences && typeof documentSentences === 'object') {
-                    sentenceText = documentSentences[sentenceId] || sentenceText;
-                }
-
-                showMagnifiedText({
-                    sentenceId,
-                    sentenceText: sentenceText,
-                    overlayElement: overlay,
-                    isFallback: true,
-                    inputTokens: selectedProvenance.input_token_size,
-                    outputTokens: selectedProvenance.output_token_size
-                });
-            });
-
-            highlightLayerRef.current.appendChild(overlay);
-            newHighlights.set(`${sentenceId}_fallback`, overlay);
-            highlightsCreated++;
-        });
-
-        setActiveHighlights(newHighlights);
-        setHighlightsPersisted(true);
-        console.log(`✅ Created ${highlightsCreated} fallback highlights`);
-    };
-
-    // Magnify functionality
-    const showMagnifiedText = (highlightData) => {
-        console.log(`🔍 Showing magnified text for highlight:`, highlightData);
-        setSelectedHighlight(highlightData);
         setMagnifyMode(true);
     };
 
+    // Magnify functionality
     const closeMagnify = () => {
         setMagnifyMode(false);
         setSelectedHighlight(null);
-    };
-
-    const clearHighlights = () => {
-        if (!highlightLayerRef.current) return;
-
-        const overlays = highlightLayerRef.current.querySelectorAll('.provenance-overlay');
-        console.log(`🧹 Clearing ${overlays.length} highlights`);
-
-        highlightLayerRef.current.innerHTML = '';
-        setActiveHighlights(new Map());
-        setHighlightsPersisted(false);
     };
 
     // Navigation handlers
@@ -955,8 +405,7 @@ Provenance: ${details.provenance.substring(0, 200)}...
         const newZoom = Math.min(zoomLevel + 0.25, 3);
         console.log(`🔍 Zoom IN: ${(zoomLevel * 100).toFixed(0)}% → ${(newZoom * 100).toFixed(0)}%`);
         setZoomLevel(newZoom);
-        setLastRenderedPage(null); // Force re-render
-        setHighlightsPersisted(false);
+        setLastRenderedPage(null);
     };
 
     const handleZoomOut = () => {
@@ -964,16 +413,14 @@ Provenance: ${details.provenance.substring(0, 200)}...
         const newZoom = Math.max(zoomLevel - 0.25, 0.5);
         console.log(`🔍 Zoom OUT: ${(zoomLevel * 100).toFixed(0)}% → ${(newZoom * 100).toFixed(0)}%`);
         setZoomLevel(newZoom);
-        setLastRenderedPage(null); // Force re-render
-        setHighlightsPersisted(false);
+        setLastRenderedPage(null);
     };
 
     const handleResetZoom = () => {
         if (isRendering) return;
         console.log(`🔍 RESET ZOOM: ${(zoomLevel * 100).toFixed(0)}% → fit-to-width`);
-        setZoomLevel(1.0); // This will trigger initial fit-to-width calculation
-        setLastRenderedPage(null); // Force re-render
-        setHighlightsPersisted(false);
+        setZoomLevel(1.0);
+        setLastRenderedPage(null);
     };
 
     // Cleanup
@@ -985,6 +432,9 @@ Provenance: ${details.provenance.substring(0, 200)}...
         };
     }, []);
 
+    // Extract document ID for highlighter
+    const documentId = pdfDocument?.filename?.replace('.pdf', '') || '';
+
     // Render states
     if (!pdfDocument) {
         return (
@@ -992,7 +442,7 @@ Provenance: ${details.provenance.substring(0, 200)}...
                 <div className="empty-content">
                     <FontAwesomeIcon icon={faFileAlt} size="3x" />
                     <h3>No Document Selected</h3>
-                    <p>Upload a PDF to view content with layout-based highlighting</p>
+                    <p>Upload a PDF to view content with text-based highlighting</p>
                 </div>
             </div>
         );
@@ -1004,7 +454,7 @@ Provenance: ${details.provenance.substring(0, 200)}...
                 <div className="loading-content">
                     <FontAwesomeIcon icon={faSpinner} spin size="2x" />
                     <h3>Loading PDF...</h3>
-                    <p>Initializing layout-based viewer for {pdfDocument.filename}</p>
+                    <p>Initializing text-based viewer for {pdfDocument.filename}</p>
                 </div>
             </div>
         );
@@ -1016,7 +466,7 @@ Provenance: ${details.provenance.substring(0, 200)}...
                 <div className="error-content">
                     <h3>PDF Loading Error</h3>
                     <p>{error}</p>
-                    <button onClick={loadPDFWithDocumentData} className="win95-btn retry">
+                    <button onClick={loadPDF} className="win95-btn retry">
                         Retry
                     </button>
                 </div>
@@ -1025,7 +475,7 @@ Provenance: ${details.provenance.substring(0, 200)}...
     }
 
     return (
-        <div className="pdf-viewer layout-based fixed-size">
+        <div className="pdf-viewer layout-based fixed-size" ref={pdfViewerRef}>
             {/* Header */}
             <div className="pdf-header">
                 <div className="pdf-title">
@@ -1054,6 +504,16 @@ Provenance: ${details.provenance.substring(0, 200)}...
                         Rendering...
                     </span>
                 )}
+
+                {/* Show highlight statistics */}
+                {!isRendering && selectedProvenance && (() => {
+                    const stats = PDFTextHighlightingUtils.getHighlightStats(highlightLayerRef);
+                    return stats && stats.totalHighlights > 0 ? (
+                        <div className="highlight-stats">
+                            <span>✨ {stats.totalHighlights} highlights ({(stats.averageConfidence * 100).toFixed(0)}% avg confidence)</span>
+                        </div>
+                    ) : null;
+                })()}
 
                 {/* Fixed size indicator */}
                 {fixedDimensions && (
@@ -1130,19 +590,33 @@ Provenance: ${details.provenance.substring(0, 200)}...
                             <canvas ref={canvasRef} className="pdf-canvas" />
                             <div ref={textLayerRef} className="pdf-text-layer" />
                             <div ref={highlightLayerRef} className="pdf-highlight-layer" />
+                            
+                            {/* PDFTextHighlighter Integration */}
+                            {!isRendering && currentViewport && selectedProvenance && (
+                                <PDFTextHighlighter
+                                    documentId={documentId}
+                                    currentPage={currentPage}
+                                    provenanceData={selectedProvenance}
+                                    textLayerRef={textLayerRef}
+                                    highlightLayerRef={highlightLayerRef}
+                                    currentViewport={currentViewport}
+                                    onHighlightClick={handleHighlightClick}
+                                    isRendering={isRendering}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Magnify Overlay */}
+            {/* Magnify Overlay - Updated for text highlighting */}
             {magnifyMode && selectedHighlight && (
                 <div className="magnify-overlay" onClick={closeMagnify}>
                     <div className="magnify-content" onClick={(e) => e.stopPropagation()}>
                         <div className="magnify-header">
                             <h3>
                                 <FontAwesomeIcon icon={faSearchPlus} />
-                                Evidence Text {selectedHighlight.isFallback ? '(Fallback)' : '(Precise)'}
+                                Text Match ({selectedHighlight.matchType || 'Text Search'})
                             </h3>
                             <button onClick={closeMagnify} className="close-magnify-btn">
                                 <FontAwesomeIcon icon={faTimes} />
@@ -1150,10 +624,11 @@ Provenance: ${details.provenance.substring(0, 200)}...
                         </div>
                         <div className="magnify-body">
                             <div className="sentence-info">
-                                <span><strong>Sentence ID:</strong> {selectedHighlight.sentenceId}</span>
-                                {selectedHighlight.confidence && (
+                                <span><strong>Match Type:</strong> {selectedHighlight.matchType}</span>
+                                {selectedHighlight.confidence !== undefined && (
                                     <span><strong>Confidence:</strong> {(selectedHighlight.confidence * 100).toFixed(0)}%</span>
                                 )}
+                                <span><strong>Page:</strong> {selectedHighlight.page}</span>
 
                                 {selectedHighlight.inputTokens && selectedHighlight.outputTokens && (
                                     <div className="cost-details">
@@ -1175,9 +650,18 @@ Provenance: ${details.provenance.substring(0, 200)}...
                                     </div>
                                 )}
                             </div>
+                            
                             <div className="magnified-text">
-                                {selectedHighlight.sentenceText}
+                                {selectedHighlight.text}
                             </div>
+                            
+                            {selectedHighlight.searchText && selectedHighlight.searchText !== selectedHighlight.text && (
+                                <div className="search-context">
+                                    <h4>Search Context:</h4>
+                                    <p>{selectedHighlight.searchText}</p>
+                                </div>
+                            )}
+                            
                             <div className="provenance-actions">
                                 <button
                                     className="win95-btn feedback"

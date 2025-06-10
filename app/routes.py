@@ -1,19 +1,21 @@
-import doc_provenance, hashlib, io, json, logging, os, random, sys, time, traceback
+import doc_provenance, hashlib, io, json, logging, os, random, re, sys, time, traceback
 from datetime import datetime, timedelta
 from io import StringIO
-from googleapiclient.http import MediaIoBaseDownload
 import pandas as pd
+from typing import Any, Dict, List, Optional
 from flask import Blueprint, render_template, request, jsonify, current_app, send_from_directory, send_file
 from threading import Thread
 from werkzeug.utils import secure_filename
-from pdfminer.high_level import extract_text
 import doc_provenance.base_strategies
 from  functools import wraps
-from .preprocess_pdfs import save_compatible_sentence_data, extract_sentences_with_compatible_layout, verify_sentence_compatibility, full_pdf_preprocess
-from .utils import estimate_pdf_size_from_pages, is_pdf_text_extractable
-from .provenance_layout_mapper import ProvenanceLayoutMapper, get_provenance_boxes_for_highlighting
+from .preprocess_pdfs import save_compatible_sentence_data, extract_sentences_with_compatible_layout, verify_sentence_compatibility, full_pdf_preprocess_enhanced
+from .utils.file_finder import DocumentFileFinder, find_document_file, get_file_finder, get_document_info
+from .pdf_gdrive_processing import estimate_pdf_size_from_pages, is_pdf_text_extractable
+from .provenance_to_pdfminer_coordinate_mapper import find_provenance_with_pdfjs_compatibility
 from .google_workspace import GoogleDrive, GoogleDriveFileInfo
+from .sentences_to_pdfjs import find_sentence_boxes, find_multiple_sentences, SimplePDFJSMapper
 main = Blueprint('main', __name__)
+
 
 drive_inventory_df = None
 google_drive_service = None
@@ -47,17 +49,17 @@ class ProcessingTimeoutError(Exception):
 # =============================================================================
 
 # Directory configurations
-RESULT_DIR = os.path.join(os.getcwd(), 'app/results')
-UPLOAD_DIR = os.path.join(os.getcwd(), 'app/uploads')
+RESULTS_DIR = os.path.join(os.getcwd(), 'app/results')
+UPLOADS_DIR = os.path.join(os.getcwd(), 'app/uploads')
 STUDY_LOGS_DIR = os.path.join(os.getcwd(), 'app/study_logs')
 QUESTIONS_DIR = os.path.join(os.getcwd(), 'app/questions')
 SENTENCES_DIR = os.path.join(os.getcwd(), 'app/sentences')
-DOWNLOAD_DIR = os.path.join(os.getcwd(), 'app/gdrive_downloads')
+DOWNLOADS_DIR = os.path.join(os.getcwd(), 'app/gdrive_downloads')
 
 # =============================================================================
 
 # Create directories
-for directory in [RESULT_DIR, UPLOAD_DIR, STUDY_LOGS_DIR, QUESTIONS_DIR, SENTENCES_DIR]:
+for directory in [RESULTS_DIR, UPLOADS_DIR, STUDY_LOGS_DIR, QUESTIONS_DIR, SENTENCES_DIR]:
     os.makedirs(directory, exist_ok=True)
 
 def generate_path_hash(gdrive_path, filename):
@@ -74,7 +76,7 @@ def create_safe_filename_with_hash(gdrive_path, original_filename):
 
 def save_path_mapping(path_hash, gdrive_path, filename, safe_filename):
     """Save mapping between hash and original path"""
-    mapping_file = os.path.join(DOWNLOAD_DIR, 'path_mappings.json')
+    mapping_file = os.path.join(DOWNLOADS_DIR, 'path_mappings.json')
     
     # Load existing mappings
     if os.path.exists(mapping_file):
@@ -200,7 +202,7 @@ def initialize_drive_services():
         print("📂 Connected to Google Drive service")
         drive_services_available = True
 
-        logger.info(f"✅ Loaded {len(drive_inventory_df)} PDFs from Drive inventory")
+        #logger.info(f"✅ Loaded {len(drive_inventory_df)} PDFs from Drive inventory")
         return True
     except Exception as e:
         logger.error(f"❌ Failed to initialize Drive services: {e}")
@@ -250,7 +252,7 @@ def drive_status():
 def get_drive_counties():
     """Get counties with PDF statistics"""
     try:
-        logger.info("📍 Counties endpoint called")
+        #logger.info("📍 Counties endpoint called")
         
         if not drive_services_available:
             logger.warning("⚠️ Drive services not available, attempting to initialize...")
@@ -268,7 +270,7 @@ def get_drive_counties():
                 'need_init': True
             }), 503
             
-        logger.info(f"📊 Processing {len(drive_inventory_df)} rows for county stats")
+        #logger.info(f"📊 Processing {len(drive_inventory_df)} rows for county stats")
         
         county_stats = drive_inventory_df.groupby('county').agg({
             'gdrive_name': 'count',
@@ -290,7 +292,7 @@ def get_drive_counties():
                 'estimated_size_mb': round(estimate_pdf_size_from_pages(row.get('total_pages', 0)) / (1024*1024), 1)
             })
         
-        logger.info(f"✅ Returning {len(counties)} counties")
+        #logger.info(f"✅ Returning {len(counties)} counties")
         return jsonify({
             'success': True,
             'counties': sorted(counties, key=lambda x: x['pdf_count'], reverse=True)
@@ -384,7 +386,7 @@ def sample_extractable_documents():
                 'error': 'Google Drive services not properly initialized'
             }), 503
         
-        logger.info(f"🎲 Sampling and processing up to {max_documents} extractable PDFs")
+        #logger.info(f"🎲 Sampling and processing up to {max_documents} extractable PDFs")
         
         # Sample random PDFs
         sample_size = min(max_attempts, len(drive_inventory_df))
@@ -403,16 +405,16 @@ def sample_extractable_documents():
                 gdrive_path = file_row['gdrive_path']
                 file_id = file_row['extracted_file_id']
                 
-                logger.info(f"🔍 Attempt {attempts}: Testing {filename} (ID: {file_id})")
+                #logger.info(f"🔍 Attempt {attempts}: Testing {filename} (ID: {file_id})")
                 
                 # Create path hash and safe filename
                 path_hash = generate_path_hash(gdrive_path, filename)
                 safe_filename = create_safe_filename_with_hash(gdrive_path, filename)
-                filepath = os.path.join(UPLOAD_DIR, safe_filename)
+                filepath = os.path.join(UPLOADS_DIR, safe_filename)
                 
                 # Skip if already processed
                 if os.path.exists(filepath):
-                    logger.info(f"⏭️ Skipping {filename} - already exists")
+                    #logger.info(f"⏭️ Skipping {filename} - already exists")
                     continue
                 
                 # Create GoogleDriveFileInfo object
@@ -433,16 +435,16 @@ def sample_extractable_documents():
                 
                 # Check if PDF has extractable text
                 if not is_pdf_text_extractable(filepath):
-                    logger.info(f"❌ PDF not extractable: {filename}")
+                    #logger.info(f"❌ PDF not extractable: {filename}")
                     os.remove(filepath)  # Clean up
                     continue
                 
-                logger.info(f"✅ Found extractable PDF: {filename} - Processing...")
+                #logger.info(f"✅ Found extractable PDF: {filename} - Processing...")
                 
                 # FULL PROCESSING PIPELINE
                 try:
                     # 1. Extract text and sentences
-                    pdf_text = extract_text(filepath)
+                    pdf_text = doc_provenance.base_strategies.extract_text_from_pdf(filepath)
                     sentences = doc_provenance.base_strategies.extract_sentences_from_pdf(pdf_text)
                     sentences_saved = save_document_sentences(safe_filename, sentences)
                     
@@ -451,7 +453,7 @@ def sample_extractable_documents():
                     try:
                         layout_data = extract_sentences_with_compatible_layout(filepath)
                         save_compatible_sentence_data(safe_filename, layout_data)
-                        logger.info(f"✅ Layout data extracted for {safe_filename}")
+                        #logger.info(f"✅ Layout data extracted for {safe_filename}")
                     except Exception as layout_error:
                         logger.warning(f"⚠️ Layout extraction failed for {filename}: {layout_error}")
                     
@@ -486,7 +488,7 @@ def sample_extractable_documents():
                     }
                     
                     # 4. Save document metadata file
-                    metadata_path = os.path.join(UPLOAD_DIR, f"{os.path.splitext(safe_filename)[0]}_metadata.json")
+                    metadata_path = os.path.join(UPLOADS_DIR, f"{os.path.splitext(safe_filename)[0]}_metadata.json")
                     with open(metadata_path, 'w', encoding='utf-8') as f:
                         json.dump(document_metadata, f, indent=2, ensure_ascii=False, default=str)
                     
@@ -502,7 +504,7 @@ def sample_extractable_documents():
                         'backend_ready': True
                     })
                     
-                    logger.info(f"🎉 Successfully processed {filename} -> {safe_filename}")
+                    #logger.info(f"🎉 Successfully processed {filename} -> {safe_filename}")
                     
                 except Exception as process_error:
                     logger.error(f"❌ Processing failed for {filename}: {process_error}")
@@ -510,7 +512,7 @@ def sample_extractable_documents():
                     try:
                         os.remove(filepath)
                         # Also remove metadata if it was created
-                        metadata_path = os.path.join(UPLOAD_DIR, f"{os.path.splitext(safe_filename)[0]}_metadata.json")
+                        metadata_path = os.path.join(UPLOADS_DIR, f"{os.path.splitext(safe_filename)[0]}_metadata.json")
                         if os.path.exists(metadata_path):
                             os.remove(metadata_path)
                     except:
@@ -527,7 +529,7 @@ def sample_extractable_documents():
                         pass
                 continue
         
-        logger.info(f"🎉 Successfully processed {len(successful_documents)} documents after {attempts} attempts")
+        #logger.info(f"🎉 Successfully processed {len(successful_documents)} documents after {attempts} attempts")
         
         return jsonify({
             'success': True,
@@ -563,7 +565,7 @@ def sample_documents_with_layout():
                 'error': 'Google Drive services not properly initialized'
             }), 503
         
-        logger.info(f"🎯 Sampling until we get {target_documents} documents with successful layout extraction")
+        #logger.info(f"🎯 Sampling until we get {target_documents} documents with successful layout extraction")
         
         successful_documents = []
         total_attempts = 0
@@ -597,16 +599,16 @@ def sample_documents_with_layout():
                     gdrive_path = file_row['gdrive_path']
                     file_id = file_row['extracted_file_id']
                     
-                    logger.info(f"🔍 Attempt {total_attempts}: Testing {filename} for layout extraction")
+                    #logger.info(f"🔍 Attempt {total_attempts}: Testing {filename} for layout extraction")
                     
                     # Create path hash and safe filename
                     path_hash = generate_path_hash(gdrive_path, filename)
                     safe_filename = create_safe_filename_with_hash(gdrive_path, filename)
-                    filepath = os.path.join(DOWNLOAD_DIR, filename)
+                    filepath = os.path.join(DOWNLOADS_DIR, filename)
                     
                     # Skip if already processed
                     if os.path.exists(filepath):
-                        logger.info(f"⏭️ Skipping {filename} - already exists")
+                        #logger.info(f"⏭️ Skipping {filename} - already exists")
                         continue
                     
                     # Create GoogleDriveFileInfo object
@@ -627,12 +629,12 @@ def sample_documents_with_layout():
                     
                     # STEP 1: Check if PDF has extractable text
                     if not is_pdf_text_extractable(filepath):
-                        logger.info(f"❌ PDF not extractable: {filename}")
+                        #logger.info(f"❌ PDF not extractable: {filename}")
                         os.remove(filepath)
                         continue
                     
                     text_extractable_count += 1
-                    logger.info(f"✅ Text extractable: {filename} - Testing layout extraction...")
+                    #logger.info(f"✅ Text extractable: {filename} - Testing layout extraction...")
                     
                     # STEP 2: Try layout extraction (the critical test)
                     layout_data = None
@@ -653,11 +655,11 @@ def sample_documents_with_layout():
                             if layout_saved:
                                 layout_success = True
                                 layout_success_count += 1
-                                logger.info(f"🎯 SUCCESS: Layout extracted for {filename} ({len(layout_data['sentences'])} sentences)")
+                                #logger.info(f"🎯 SUCCESS: Layout extracted for {filename} ({len(layout_data['sentences'])} sentences)")
                             else:
                                 logger.warning(f"⚠️ Layout extraction succeeded but save failed for {filename}")
-                        else:
-                            logger.info(f"❌ Layout extraction returned insufficient data for {filename}")
+                        #else:
+                            #logger.info(f"❌ Layout extraction returned insufficient data for {filename}")
                             
                     except Exception as layout_error:
                         logger.info(f"❌ Layout extraction failed for {filename}: {layout_error}")
@@ -669,10 +671,10 @@ def sample_documents_with_layout():
                     
                     # STEP 3: Full processing for successful layout documents
                     try:
-                        logger.info(f"🔄 Full processing for {filename}...")
+                        #logger.info(f"🔄 Full processing for {filename}...")
                         
                         # Extract text and sentences
-                        pdf_text = extract_text(filepath)
+                        pdf_text = doc_provenance.base_strategies.extract_text_from_pdf(filepath)
                         sentences = doc_provenance.base_strategies.extract_sentences_from_pdf(pdf_text)
                         sentences_saved = save_document_sentences(filepath, sentences)
                         
@@ -709,7 +711,7 @@ def sample_documents_with_layout():
                         }
                         
                         # Save document metadata
-                        metadata_path = os.path.join(UPLOAD_DIR, f"{os.path.splitext(safe_filename)[0]}_metadata.json")
+                        metadata_path = os.path.join(UPLOADS_DIR, f"{os.path.splitext(safe_filename)[0]}_metadata.json")
                         with open(metadata_path, 'w', encoding='utf-8') as f:
                             json.dump(document_metadata, f, indent=2, ensure_ascii=False, default=str)
                         
@@ -727,7 +729,7 @@ def sample_documents_with_layout():
                             'file_id': file_id
                         })
                         
-                        logger.info(f"🎉 COMPLETE: {filename} -> {safe_filename} (#{len(successful_documents)}/{target_documents})")
+                        #logger.info(f"🎉 COMPLETE: {filename} -> {safe_filename} (#{len(successful_documents)}/{target_documents})")
                         
                     except Exception as process_error:
                         logger.error(f"❌ Full processing failed for {filename}: {process_error}")
@@ -755,8 +757,8 @@ def sample_documents_with_layout():
         success_rate = len(successful_documents) / total_attempts if total_attempts > 0 else 0
         layout_success_rate = layout_success_count / text_extractable_count if text_extractable_count > 0 else 0
         
-        logger.info(f"🎯 FINAL RESULTS: {len(successful_documents)}/{target_documents} target documents")
-        logger.info(f"📊 Success rates: {text_extractable_count}/{total_attempts} text extractable, {layout_success_count}/{text_extractable_count} layout success")
+        #logger.info(f"🎯 FINAL RESULTS: {len(successful_documents)}/{target_documents} target documents")
+        #logger.info(f"📊 Success rates: {text_extractable_count}/{total_attempts} text extractable, {layout_success_count}/{text_extractable_count} layout success")
         
         return jsonify({
             'success': True,
@@ -788,7 +790,7 @@ def sample_documents_with_layout():
 def batch_sample_layout_documents():
     """
     Enhanced batch sampling that can run for hours to find layout-compatible PDFs
-    Designed for curl usage to build a library of preloaded documents
+    Designed for curl usage to build a library of documents
     """
     try:
         data = request.get_json() or {}
@@ -803,11 +805,11 @@ def batch_sample_layout_documents():
                 'error': 'Google Drive services not properly initialized'
             }), 503
         
-        logger.info(f"🎯 BATCH SAMPLING: Target {target_documents} documents, max {max_total_attempts} attempts")
+        #logger.info(f"🎯 BATCH SAMPLING: Target {target_documents} documents, max {max_total_attempts} attempts")
         
         # Create a dedicated batch directory
         batch_id = f"batch_{int(time.time())}"
-        batch_dir = os.path.join(DOWNLOAD_DIR, batch_id)
+        batch_dir = os.path.join(DOWNLOADS_DIR, batch_id)
         os.makedirs(batch_dir, exist_ok=True)
         
         # Create log file for this batch
@@ -819,7 +821,7 @@ def batch_sample_layout_documents():
             log_msg = f"[{timestamp}] {message}\n"
             with open(batch_log_file, 'a', encoding='utf-8') as f:
                 f.write(log_msg)
-            logger.info(message)
+            #logger.info(message)
         
         def log_failure(filename, reason, error=None):
             if save_failures:
@@ -840,7 +842,7 @@ def batch_sample_layout_documents():
         download_failures = 0
         
         # Filter and prepare candidate files
-        logger.info("Preparing candidate files...")
+        #logger.info("Preparing candidate files...")
         candidate_files = drive_inventory_df[
             (drive_inventory_df['page_num'].fillna(0) > 0) &  # Has pages
             (drive_inventory_df['page_num'].fillna(0) <= 50) &  # Not too large
@@ -1126,9 +1128,9 @@ def list_batch_results():
     try:
         batch_dirs = []
         
-        if os.path.exists(DOWNLOAD_DIR):
-            for item in os.listdir(DOWNLOAD_DIR):
-                item_path = os.path.join(DOWNLOAD_DIR, item)
+        if os.path.exists(DOWNLOADS_DIR):
+            for item in os.listdir(DOWNLOADS_DIR):
+                item_path = os.path.join(DOWNLOADS_DIR, item)
                 if os.path.isdir(item_path) and item.startswith('batch_'):
                     summary_file = os.path.join(item_path, 'batch_summary.json')
                     if os.path.exists(summary_file):
@@ -1155,7 +1157,7 @@ def list_batch_results():
 def copy_batch_to_uploads(batch_id):
     """Copy successful documents from a batch to the uploads directory for use in the app"""
     try:
-        batch_dir = os.path.join(DOWNLOAD_DIR, batch_id)
+        batch_dir = os.path.join(DOWNLOADS_DIR, batch_id)
         if not os.path.exists(batch_dir):
             return jsonify({
                 'success': False,
@@ -1248,7 +1250,7 @@ def download_and_process_drive_file():
         else:
             actual_file_id = file_id
             
-        logger.info(f"📥 Processing file ID: {actual_file_id}")
+        #logger.info(f"📥 Processing file ID: {actual_file_id}")
         
         # Check if services are available
         if drive_inventory_df is None or google_drive_service is None:
@@ -1286,26 +1288,26 @@ def download_and_process_drive_file():
         gdrive_path = file_row['gdrive_path']
 
         safe_filename = create_safe_filename_with_hash(gdrive_path, filename)
-        filepath = os.path.join(DOWNLOAD_DIR, safe_filename)
+        filepath = os.path.join(DOWNLOADS_DIR, safe_filename)
 
         path_hash = generate_path_hash(gdrive_path, filename)
         
         # Use the extracted file ID for download
         download_file_id = file_row['extracted_file_id']
         
-        logger.info(f"📥 Downloading file: {filename} (ID: {download_file_id})")
+        #logger.info(f"📥 Downloading file: {filename} (ID: {download_file_id})")
         
         
         # Ensure unique filename
         counter = 1
-        while os.path.exists(os.path.join(DOWNLOAD_DIR, path_hash)):
+        while os.path.exists(os.path.join(DOWNLOADS_DIR, path_hash)):
             name, ext = os.path.splitext(secure_filename(path_hash))
             safe_filename = f"{name}_{counter}{ext}"
             counter += 1
             
-        output_path = os.path.join(DOWNLOAD_DIR, path_hash)
+        output_path = os.path.join(DOWNLOADS_DIR, path_hash)
         
-        logger.info(f"📥 Downloading file: {filename} to {filepath}")
+        #logger.info(f"📥 Downloading file: {filename} to {filepath}")
         
         # Create a GoogleDriveFileInfo object for the existing method
         file_info = GoogleDriveFileInfo(
@@ -1333,16 +1335,16 @@ def download_and_process_drive_file():
                 'error': 'PDF does not contain extractable text (likely scanned/image PDF)'
             }), 400
         
-        logger.info(f"✅ PDF has extractable text, processing...")
+        #logger.info(f"✅ PDF has extractable text, processing...")
         
         # Process the PDF
         try:
-            full_pdf_preprocess()
-            pdf_text = extract_text(output_path)
+            full_pdf_preprocess_enhanced()
+            pdf_text = doc_provenance.base_strategies.extract_text_from_pdf(output_path)
             sentences = doc_provenance.base_strategies.extract_sentences_from_pdf(pdf_text)
             sentences_saved = save_document_sentences(output_path, sentences)
             
-            logger.info(f"✅ Successfully processed {output_path}")
+            #logger.info(f"✅ Successfully processed {output_path}")
             
             return jsonify({
                 'success': True,
@@ -1413,117 +1415,12 @@ def save_document_sentences(filename, sentences):
     try:
         with open(sentences_path, 'w', encoding='utf-8') as f:
             json.dump(sentences, f, indent=2, ensure_ascii=False)
-        logger.info(f"Saved {len(sentences)} sentences for {filename}")
+        #logger.info(f"Saved {len(sentences)} sentences for {filename}")
         return True
     except Exception as e:
         logger.error(f"Error saving sentences for {filename}: {e}")
         return False
 
-def load_document_sentences(filename):
-    """Load sentences for a document from the dedicated sentences directory"""
-    sentences_path = get_document_sentences_path(filename)
-    try:
-        if os.path.exists(sentences_path):
-            with open(sentences_path, 'r', encoding='utf-8') as f:
-                sentences = json.load(f)
-            logger.info(f"Loaded {len(sentences)} sentences for {filename}")
-            return sentences
-        else:
-            logger.warning(f"Sentences file not found for {filename}")
-            return None
-    except Exception as e:
-        logger.error(f"Error loading sentences for {filename}: {e}")
-        return None
-
-def get_question_library_path():
-    """Get the path to the questions library file"""
-    return os.path.join(QUESTIONS_DIR, 'questions.json')
-
-def load_questions_library():
-    """Load the questions library"""
-    library_path = get_question_library_path()
-    try:
-        if os.path.exists(library_path):
-            with open(library_path, 'r', encoding='utf-8') as f:
-                library = json.load(f)
-            return library
-        else:
-            # Initialize empty library
-            return {
-                'questions': [],
-                'categories': ['General', 'Content Analysis', 'Methodology', 'Results', 'Custom'],
-                'metadata': {
-                    'created_at': time.time(),
-                    'last_updated': time.time(),
-                    'total_uses': 0
-                }
-            }
-    except Exception as e:
-        logger.error(f"Error loading questions library: {e}")
-        return None
-
-def save_questions_library(library):
-    """Save the questions library"""
-    library_path = get_question_library_path()
-    try:
-        library['metadata']['last_updated'] = time.time()
-        with open(library_path, 'w', encoding='utf-8') as f:
-            json.dump(library, f, indent=2, ensure_ascii=False)
-        logger.info(f"Saved questions library with {len(library['questions'])} questions")
-        return True
-    except Exception as e:
-        logger.error(f"Error saving questions library: {e}")
-        return False
-
-def add_question_to_library(question_text, category='Custom', description='', is_favorite=False):
-    """Add a question to the library"""
-    library = load_questions_library()
-    if not library:
-        return False
-    
-    question_id = str(int(time.time() * 1000))  # Unique ID based on timestamp
-    question_entry = {
-        'id': question_id,
-        'text': question_text,
-        'category': category,
-        'description': description,
-        'is_favorite': is_favorite,
-        'created_at': time.time(),
-        'use_count': 0,
-        'last_used': None,
-        'avg_processing_time': None,
-        'success_rate': 1.0,
-        'tags': []
-    }
-    
-    library['questions'].append(question_entry)
-    return save_questions_library(library)
-
-def update_question_usage(question_id, processing_time=None, success=True):
-    """Update usage statistics for a question"""
-    library = load_questions_library()
-    if not library:
-        return False
-    
-    for question in library['questions']:
-        if question['id'] == question_id:
-            question['use_count'] += 1
-            question['last_used'] = time.time()
-            library['metadata']['total_uses'] += 1
-            
-            if processing_time:
-                if question['avg_processing_time']:
-                    question['avg_processing_time'] = (question['avg_processing_time'] + processing_time) / 2
-                else:
-                    question['avg_processing_time'] = processing_time
-            
-            # Update success rate (simple moving average)
-            current_success_rate = question.get('success_rate', 1.0)
-            question['success_rate'] = (current_success_rate + (1.0 if success else 0.0)) / 2
-            
-            return save_questions_library(library)
-    
-    return False
 
 # =============================================================================
 # Enhanced Answer and Provenance Management
@@ -1531,19 +1428,19 @@ def update_question_usage(question_id, processing_time=None, success=True):
 
 def get_question_answer_path(question_id):
     """Get the path to the answer file for a question"""
-    return os.path.join(RESULT_DIR, question_id, 'answer.json')
+    return os.path.join(RESULTS_DIR, question_id, 'answer.json')
 
 def get_question_provenance_path(question_id):
     """Get the path to the provenance file for a question"""
-    return os.path.join(RESULT_DIR, question_id, 'provenance.json')
+    return os.path.join(RESULTS_DIR, question_id, 'provenance.json')
 
 def get_question_status_path(question_id):
     """Get the path to the status file for a question"""
-    return os.path.join(RESULT_DIR, question_id, 'status.json')
+    return os.path.join(RESULTS_DIR, question_id, 'status.json')
 
 def get_question_metadata_path(question_id):
     """Get the path to the metadata file for a question"""
-    return os.path.join(RESULT_DIR, question_id, 'metadata.json')
+    return os.path.join(RESULTS_DIR, question_id, 'metadata.json')
 
 def save_question_metadata(question_id, metadata):
     """Save metadata for a question processing session"""
@@ -1592,13 +1489,13 @@ def check_answer_ready(question_id):
     try:
         # Check if the file exists and has content
         if not os.path.exists(answer_path):
-            logger.info(f"Answer file not found for question {question_id}")
+            #logger.info(f"Answer file not found for question {question_id}")
             return {'ready': False, 'reason': 'file_not_found'}
         
         # Check if file has content (avoid reading empty/corrupt files)
         file_size = os.path.getsize(answer_path)
         if file_size == 0:
-            logger.info(f"Answer file is empty for question {question_id}")
+            #logger.info(f"Answer file is empty for question {question_id}")
             return {'ready': False, 'reason': 'file_empty'}
         
         # Try to read and parse the file
@@ -1618,7 +1515,7 @@ def check_answer_ready(question_id):
         
         # Check if we have a valid answer
         if answer_text and answer_text.strip():
-            logger.info(f"Valid answer found for question {question_id}")
+            #logger.info(f"Valid answer found for question {question_id}")
             return {
                 'ready': True,
                 'answer': answer_text,
@@ -1626,7 +1523,7 @@ def check_answer_ready(question_id):
                 'timestamp': answer_data.get('timestamp', time.time())
             }
         else:
-            logger.info(f"Answer not ready yet for question {question_id} (answer: {answer_text})")
+            #logger.info(f"Answer not ready yet for question {question_id} (answer: {answer_text})")
             return {'ready': False, 'reason': 'answer_not_ready'}
         
     except Exception as e:
@@ -1639,35 +1536,35 @@ def check_answer_ready(question_id):
 def get_current_provenance_count(question_id):
     """Get the current number of provenances available for a question with debugging"""
     provenance_path = get_question_provenance_path(question_id)
-    logger.info(f"Checking provenance count for question {question_id}")
-    logger.info(f"Provenance path: {provenance_path}")
-    logger.info(f"File exists: {os.path.exists(provenance_path)}")
+    #logger.info(f"Checking provenance count for question {question_id}")
+    #logger.info(f"Provenance path: {provenance_path}")
+    #logger.info(f"File exists: {os.path.exists(provenance_path)}")
     
     try:
         if os.path.exists(provenance_path):
             # Check file size
             file_size = os.path.getsize(provenance_path)
-            logger.info(f"Provenance file size: {file_size} bytes")
+            #logger.info(f"Provenance file size: {file_size} bytes")
             
             with open(provenance_path, 'r', encoding='utf-8') as f:
                 file_content = f.read()
-                logger.info(f"Raw file content: {file_content[:200]}...")  # First 200 chars
+                #logger.info(f"Raw file content: {file_content[:200]}...")  # First 200 chars
                 
             # Reset file pointer and parse JSON
             with open(provenance_path, 'r', encoding='utf-8') as f:
                 provenance_data = json.load(f)
-                logger.info(f"Parsed JSON type: {type(provenance_data)}")
-                logger.info(f"Parsed JSON content: {provenance_data}")
+                #logger.info(f"Parsed JSON type: {type(provenance_data)}")
+                #logger.info(f"Parsed JSON content: {provenance_data}")
             
             if isinstance(provenance_data, list):
                 count = len(provenance_data)
-                logger.info(f"Provenance count: {count}")
+                #logger.info(f"Provenance count: {count}")
                 return count
             else:
                 logger.warning(f"Provenance data is not a list: {type(provenance_data)}")
                 return 0
         else:
-            logger.info(f"Provenance file does not exist: {provenance_path}")
+            #logger.info(f"Provenance file does not exist: {provenance_path}")
             return 0
         
     except json.JSONDecodeError as json_error:
@@ -1750,45 +1647,147 @@ def get_next_provenance(question_id, current_count=0):
 # =============================================================================
 
 def get_all_available_pdfs():
-    """Scan both upload and preload folders and return all PDFs with unified metadata"""
+    """Scan upload and downloads folders and return all PDFs with unified metadata"""
     all_documents = []
     
     # Check uploads folder
     uploads_dir = current_app.config.get('UPLOAD_FOLDER', 'app/uploads')
     if os.path.exists(uploads_dir):
-        all_documents.extend(scan_folder_for_pdfs(uploads_dir, is_preloaded=False))
+        all_documents.extend(scan_folder_for_pdfs(uploads_dir))
 
-    # check gdrive downloads folder
-    #if os.path.exists(DOWNLOAD_DIR):
-    #    for batch_dir in os.listdir(DOWNLOAD_DIR):
-    #        batch_path = os.path.join(DOWNLOAD_DIR, batch_dir)
-    #        logger.info(batch_path)
-    #        for item in os.listdir(batch_path):
-    #            logger.info(item)
-    #            if item.endswith('.pdf'):
-    #                base_name = os.path.splitext(item)[0]
-    #                metadata_file = os.path.join(batch_path, f"{base_name}_metadata.json")
-    #                if os.path.exists(metadata_file):
-    #                    try:
-    #                        with open(metadata_file, 'r', encoding='utf-8') as f:
-    #                            metadata = json.load(f)
-    #                        # Add filepath to metadata
-    #                        metadata['source_folder'] = 'gdrive_downloads'
-    #                        all_documents.append(metadata)
-    #                    except Exception as e:
-    #                        print(f"Failed to load metadata for {item}: {e}")
-    #
+    # Check downloads folder for batch processed documents
+    if os.path.exists(DOWNLOADS_DIR):
+        all_documents.extend(scan_batch_documents(DOWNLOADS_DIR))
+
     return all_documents
 
-def scan_folder_for_pdfs(folder_path, is_preloaded=True):
-    """Unified PDF scanning for any folder"""
+def scan_batch_documents(downloads_dir):
+    """Scan batch_XXXX folders for pre-processed documents"""
+    documents = []
+    
+    try:
+        if not os.path.exists(downloads_dir):
+            return []
+        
+        # Find all batch_XXXX directories
+        batch_dirs = [d for d in os.listdir(downloads_dir) 
+                     if os.path.isdir(os.path.join(downloads_dir, d)) and d.startswith('batch_')]
+        
+        #logger.info(f"Found {len(batch_dirs)} batch directories in {downloads_dir}")
+        
+        for batch_dir in batch_dirs:
+            batch_path = os.path.join(downloads_dir, batch_dir)
+            #logger.info(f"Scanning batch directory: {batch_dir}")
+            
+            try:
+                # Get all metadata files in this batch
+                metadata_files = [f for f in os.listdir(batch_path) 
+                                if f.endswith('_metadata.json')]
+                
+                for metadata_file in metadata_files:
+                    try:
+                        metadata_path = os.path.join(batch_path, metadata_file)
+                        
+                        # Load the metadata
+                        with open(metadata_path, 'r', encoding='utf-8') as f:
+                            batch_metadata = json.load(f)
+                        
+                        # Extract base information
+                        base_name = os.path.splitext(metadata_file)[0].replace('_metadata', '')
+                        pdf_filename = batch_metadata.get('filename', f"{base_name}.pdf")
+                        pdf_path = os.path.join(batch_path, pdf_filename)
+                        
+                        # Verify PDF exists
+                        if not os.path.exists(pdf_path):
+                            logger.warning(f"PDF file not found: {pdf_path}")
+                            continue
+                        
+                        # Check for sentences and layout files
+                        sentences_file = os.path.join(batch_path, f"{base_name}_sentences.json")
+                        layout_file = os.path.join(batch_path, f"{base_name}_layout.json")
+                        
+                        sentences_available = os.path.exists(sentences_file)
+                        layout_available = os.path.exists(layout_file)
+                        
+                        # Get sentence count from sentences file if available
+                        sentence_count = 0
+                        if sentences_available:
+                            try:
+                                with open(sentences_file, 'r', encoding='utf-8') as f:
+                                    sentences_data = json.load(f)
+                                    sentence_count = len(sentences_data) if isinstance(sentences_data, list) else 0
+                            except Exception as e:
+                                logger.warning(f"Could not read sentences from {sentences_file}: {e}")
+                                # Fallback to metadata
+                                sentence_count = batch_metadata.get('processing_info', {}).get('sentence_count', 0)
+                        
+                        # Create unified metadata structure
+                        unified_metadata = {
+                            # Basic file info
+                            'filename': pdf_filename,
+                            'filepath': pdf_path,
+                            'base_name': base_name,
+                            
+                            # Document identification
+                            'document_id': batch_metadata.get('document_id', base_name),
+                            'original_name': batch_metadata.get('original_name', pdf_filename),
+                            'title': batch_metadata.get('title', batch_metadata.get('original_name', pdf_filename)),
+                            
+                            # Content metadata
+                            'text_length': batch_metadata.get('processing_info', {}).get('text_length', 0),
+                            'sentence_count': sentence_count,
+                            'page_count': batch_metadata.get('gdrive_info', {}).get('page_count', 0),
+                            
+                            # Source and processing info
+                            'source': 'batch_processed',
+                            'source_folder': 'downloads',
+                            'batch_id': batch_metadata.get('batch_id', batch_dir),
+                            'processed_at': batch_metadata.get('processing_info', {}).get('processed_at', time.time()),
+                            
+                            # File availability
+                            'sentences_available': sentences_available,
+                            'layout_available': layout_available,
+                            
+                            # Google Drive metadata (if available)
+                            'gdrive_info': batch_metadata.get('gdrive_info', {}),
+                            
+                            # Additional metadata for UI display
+                            'county': batch_metadata.get('gdrive_info', {}).get('county', 'Unknown'),
+                            'agency': batch_metadata.get('gdrive_info', {}).get('agency', 'Unknown'),
+                            'estimated_size_kb': estimate_pdf_size_from_pages(
+                                batch_metadata.get('gdrive_info', {}).get('page_count', 1)
+                            ) // 1024 if 'estimate_pdf_size_from_pages' in globals() else 0,
+                            
+                            # Processing capabilities
+                            'ready_for_qa': sentences_available,
+                            'ready_for_layout_qa': layout_available,
+                        }
+                        
+                        documents.append(unified_metadata)
+                        #logger.info(f"Added batch document: {pdf_filename} ({sentence_count} sentences)")
+                        
+                    except Exception as e:
+                        logger.error(f"Error processing metadata file {metadata_file}: {e}")
+                        continue
+                        
+            except Exception as e:
+                logger.error(f"Error scanning batch directory {batch_dir}: {e}")
+                continue
+    
+    except Exception as e:
+        logger.error(f"Error scanning downloads directory {downloads_dir}: {e}")
+    
+    #logger.info(f"Found {len(documents)} pre-processed documents in batch folders")
+    return documents
+
+def scan_folder_for_pdfs(folder_path):
+    """Simplified PDF scanning using file finder for verification"""
     documents = []
     
     try:
         if not os.path.exists(folder_path):
             return []
         
-        # Get all PDF files
         pdf_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.pdf')]
         
         for pdf_file in pdf_files:
@@ -1796,85 +1795,101 @@ def scan_folder_for_pdfs(folder_path, is_preloaded=True):
                 filepath = os.path.join(folder_path, pdf_file)
                 if not os.path.exists(filepath):
                     continue
-                logger.info(f"Processing PDF: {pdf_file} (Preloaded: {is_preloaded})")
+                    
+                #logger.info(f"Processing PDF: {pdf_file}")
                 base_name = pdf_file.replace('.pdf', '')
-                metadata_file = os.path.join(folder_path, f"{base_name}_metadata.json")
-                sentences_file = get_document_sentences_path(base_name)
-                logger.info(f"Sentences file: {sentences_file}")
-                # Generate consistent document ID
-                file_stat = os.stat(filepath)
-    
+                
+                # Use file finder to check for existing files
+                all_files = get_file_finder().find_all_files(pdf_file)
+                
+                metadata_info = all_files.get('metadata')
+                sentences_info = all_files.get('sentences')
+                
                 # Check if we already have processed this file
-                if os.path.exists(metadata_file) and os.path.exists(sentences_file):
+                if metadata_info and sentences_info:
                     try:
-                        with open(metadata_file, 'r', encoding='utf-8') as f:
+                        with open(metadata_info['path'], 'r', encoding='utf-8') as f:
                             metadata = json.load(f)
                         
-                        # Update document ID and source info
-                        metadata['filepath'] = filepath
-                        metadata['is_preloaded'] = is_preloaded
-                        metadata['source_folder'] = 'preloaded' if is_preloaded else 'uploads'
+                        # Update source info
+                        metadata['filepath'] = filepath                        
+                        # Add file availability info
+                        metadata['sentences_available'] = sentences_info is not None
+                        metadata['layout_available'] = all_files.get('layout') is not None
+                        metadata['ready_for_qa'] = sentences_info is not None
+                        metadata['ready_for_layout_qa'] = all_files.get('layout') is not None
                         
-                        if os.path.exists(filepath):
-                            documents.append(metadata)
+                        documents.append(metadata)
                         continue
                     except Exception as e:
-                        print(f"Failed to load existing metadata for {pdf_file}: {e}")
+                        logger.warning(f"Failed to load existing metadata for {pdf_file}: {e}")
                 
-                # Process new PDF
+                # Process new PDF (existing logic)
                 try:
-                    pdf_text = extract_text(filepath)
+                    #logger.info(f"Processing new PDF: {pdf_file}")
+                    pdf_text = doc_provenance.base_strategies.extract_text_from_pdf(filepath)
                     sentences = doc_provenance.base_strategies.extract_sentences_from_pdf(pdf_text)
-
                     sentences_saved = save_document_sentences(pdf_file, sentences)
 
                     metadata = {
                         'filename': pdf_file,
                         'filepath': filepath,
+                        'base_name': base_name,
+                        'document_id': base_name,
+                        'title': pdf_file,
                         'text_length': len(pdf_text),
-                        'sentence_count': len(sentences_saved),
-                        'is_preloaded': is_preloaded,
-                        'source_folder': 'preloaded' if is_preloaded else 'uploads',
+                        'sentence_count': len(sentences) if isinstance(sentences, list) else 0,
+                        'source_folder': 'uploads',
                         'processed_at': time.time(),
-                        'base_name': base_name
+                        'sentences_available': sentences_saved,
+                        'ready_for_qa': sentences_saved,
+                        'layout_available': False,
+                        'ready_for_layout_qa': False
                     }
                     
-                    # Save metadata
+                    # Save metadata in the same folder
+                    metadata_file = os.path.join(folder_path, f"{base_name}_metadata.json")
                     with open(metadata_file, 'w', encoding='utf-8') as f:
                         json.dump(metadata, f, indent=2, ensure_ascii=False)
                     
-        
                     documents.append(metadata)
+                    #logger.info(f"Successfully processed new PDF: {pdf_file}")
                     
                 except Exception as text_error:
-                    print(f"Failed to extract text from {pdf_file}: {text_error}")
+                    logger.error(f"Failed to extract text from {pdf_file}: {text_error}")
                     continue
                 
             except Exception as e:
-                print(f"Error processing {pdf_file}: {e}")
+                logger.error(f"Error processing {pdf_file}: {e}")
                 continue
     
     except Exception as e:
-        print(f"Error scanning folder {folder_path}: {e}")
+        logger.error(f"Error scanning folder {folder_path}: {e}")
     
     return documents
 
 @main.route('/documents', methods=['GET'])
 def get_available_documents():
-    """Get all available documents from upload folder"""
+    """Get all available documents from upload, and batch folders"""
     try:
         all_documents = get_all_available_pdfs()
         
-        # Separate for UI purposes but same underlying logic
-        uploaded_docs = [doc for doc in all_documents]
+        # Separate by source for UI organization (optional)
+        uploaded_docs = [doc for doc in all_documents if doc.get('source_folder') == 'uploads']
+        batch_docs = [doc for doc in all_documents if doc.get('source_folder') == 'downloads']
         
         return jsonify({
             'success': True,
-            'documents': uploaded_docs,
-            'total_documents': len(all_documents)
+            'documents': all_documents,
+            'total_documents': len(all_documents),
+            'breakdown': {
+                'uploaded': len(uploaded_docs),
+                'batch_processed': len(batch_docs)
+            }
         })
         
     except Exception as e:
+        logger.error(f"Error getting available documents: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -1882,56 +1897,43 @@ def get_available_documents():
     
 @main.route('/documents/<filename>', methods=['GET'])
 def serve_document_pdf(filename):
-    """Unified PDF serving - works for any document with direct file response"""
+    """Unified PDF serving using file finder helper"""
     try:
-        logger.info(f"🔄 Serving PDF for document: {filename}")
+        #logger.info(f"🔄 Serving PDF for document: {filename}")
         
+        # Use the helper to find the PDF
+        pdf_info = get_file_finder().find_file(filename, 'pdf')
         
-        uploads_dir = current_app.config.get('UPLOAD_FOLDER', 'app/uploads')
-        uploads_path = os.path.join(uploads_dir, filename)
-
-        # For Windows compatibility, try multiple path strategies
-        working_path = None
+        if not pdf_info:
+            logger.error(f"❌ PDF not found: {filename}")
+            return jsonify({
+                'error': 'PDF file not found',
+                'filename': filename
+            }), 404
         
-        if os.path.exists(uploads_path):
-            logger.info(f"📍 Found PDF in uploads: {uploads_path}")
-            working_path = uploads_path
+        working_path = pdf_info['path']
+        document_source = pdf_info['location']
         
-
-        # Convert to absolute path for safety
-        working_path = os.path.abspath(os.path.normpath(working_path))
-        logger.info(f"📍 Final absolute path: {working_path}")
+        #logger.info(f"📍 Found PDF in {document_source}: {working_path}")
         
-        # Final verification
-        if not os.path.exists(working_path):
-            logger.error(f"❌ Final verification failed - file not found: {working_path}")
-            return jsonify({'error': 'PDF file verification failed'}), 404
+        # Serve the file
+        response = send_file(
+            working_path,
+            mimetype='application/pdf',
+            as_attachment=False,
+            download_name=filename
+        )
         
-        # Serve the file directly using send_file instead of send_from_directory
-        try:
-            logger.info(f"✅ Attempting to serve PDF directly: {working_path}")
-            
-            # Use send_file with the full path - this bypasses send_from_directory issues
-            response = send_file(
-                working_path,
-                mimetype='application/pdf',
-                as_attachment=False,
-                download_name=filename  # This sets the filename for the browser
-            )
-            
-            logger.info(f"✅ Successfully served PDF: {filename}")
-            return response
-            
-        except Exception as serve_error:
-            logger.error(f"❌ Error in send_file: {serve_error}")
-            import traceback
-            logger.error(f"Send file traceback: {traceback.format_exc()}")
-            return jsonify({'error': f'Failed to serve PDF: {str(serve_error)}'}), 500
+        # Add source headers
+        response.headers['X-Document-Source'] = document_source
+        if pdf_info.get('batch_info'):
+            response.headers['X-Batch-Dir'] = pdf_info['batch_info']['batch_dir']
+        
+        logger.info(f"✅ Successfully served PDF: {filename} from {document_source}")
+        return response
         
     except Exception as e:
-        logger.error(f"❌ PDF serving error for document {filename}: {e}")
-        import traceback
-        logger.error(f"Full traceback: {traceback.format_exc()}")
+        logger.error(f"❌ PDF serving error for {filename}: {e}")
         return jsonify({'error': f'PDF serving error: {str(e)}'}), 500
 
 
@@ -1946,12 +1948,113 @@ def serve_uploaded_file(filename):
         #logger.error(f"Error serving uploaded file {filename}: {e}")
         return jsonify({'error': 'File not found'}), 404
     
+@main.route('/documents/<filename>/batch-info', methods=['GET'])
+def get_document_batch_info(filename):
+    """Get batch information for a document"""
+    try:
+        if not os.path.exists(DOWNLOADS_DIR):
+            return jsonify({
+                'success': True,
+                'has_batch_info': False,
+                'message': 'No download directory found'
+            })
+        
+        # Search for the document in batch directories
+        batch_dirs = [d for d in os.listdir(DOWNLOADS_DIR) 
+                     if os.path.isdir(os.path.join(DOWNLOADS_DIR, d)) and d.startswith('batch_')]
+        
+        for batch_dir in batch_dirs:
+            batch_path = os.path.join(DOWNLOADS_DIR, batch_dir)
+            
+            # Look for metadata files
+            try:
+                metadata_files = [f for f in os.listdir(batch_path) if f.endswith('_metadata.json')]
+                
+                for metadata_file in metadata_files:
+                    metadata_path = os.path.join(batch_path, metadata_file)
+                    
+                    try:
+                        with open(metadata_path, 'r', encoding='utf-8') as f:
+                            metadata = json.load(f)
+                        
+                        # Check if this metadata matches our filename
+                        if (metadata.get('filename') == filename or 
+                            metadata.get('original_name') == filename):
+                            
+                            return jsonify({
+                                'success': True,
+                                'has_batch_info': True,
+                                'batch_info': {
+                                    'batch_id': metadata.get('batch_id', batch_dir),
+                                    'batch_dir': batch_dir,
+                                    'document_id': metadata.get('document_id'),
+                                    'original_name': metadata.get('original_name'),
+                                    'gdrive_info': metadata.get('gdrive_info', {}),
+                                    'processing_info': metadata.get('processing_info', {}),
+                                    'source': metadata.get('source')
+                                }
+                            })
+                            
+                    except Exception as metadata_error:
+                        continue
+                        
+            except Exception as batch_error:
+                continue
+        
+        return jsonify({
+            'success': True,
+            'has_batch_info': False,
+            'message': 'Document not found in batch directories'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting batch info for {filename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    
+@main.route('/documents/<filename>/generated-questions', methods=['GET'])
+def get_generated_questions(filename):
+    """Get pre-generated questions using file finder helper"""
+    try:
+        # Use helper to find questions
+        questions_info = get_file_finder().find_file(filename, 'questions')
+        
+        if not questions_info:
+            return jsonify({
+                'success': True,
+                'questions': [],
+                'has_generated_questions': False,
+                'message': 'No pre-generated questions found for this document'
+            })
+        
+        # Load questions
+        with open(questions_info['path'], 'r', encoding='utf-8') as f:
+            questions_data = json.load(f)
+        
+        return jsonify({
+            'success': True,
+            'questions': questions_data.get('questions', []),
+            'has_generated_questions': True,
+            'metadata': questions_data.get('metadata', {}),
+            'filename': filename
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting generated questions for {filename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+    
 @main.route('/documents/<filename>/sentences', methods=['GET'])
 def get_document_sentences(filename):
     """Get sentences for a specific document from the dedicated sentences directory"""
     try:
         # Load sentences from dedicated directory
-        sentences = load_document_sentences(filename)
+        sentences = get_file_finder().find_file(filename, 'sentences')
         
         if sentences is None:
             return jsonify({'error': 'Sentences file not found'}), 404
@@ -1966,165 +2069,6 @@ def get_document_sentences(filename):
         logger.error(f"Error loading sentences for {filename}: {e}")
         return jsonify({'error': f'Failed to load sentences: {str(e)}'}), 500
     
-# =============================================================================
-# Question Library Routes
-# =============================================================================
-
-@main.route('/questions-library', methods=['GET'])
-def get_questions_library():
-    """Get the questions library"""
-    try:
-        library = load_questions_library()
-        if library:
-            return jsonify({
-                'success': True,
-                'library': library
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'error': 'Failed to load questions library'
-            }), 500
-    except Exception as e:
-        logger.error(f"Error getting questions library: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-@main.route('/questions-library', methods=['POST'])
-def add_question_to_library_route():
-    """Add a question to the library"""
-    try:
-        data = request.json
-        question_text = data.get('question_text', '').strip()
-        category = data.get('category', 'Custom')
-        description = data.get('description', '')
-        is_favorite = data.get('is_favorite', False)
-        
-        if not question_text:
-            return jsonify({
-                'success': False,
-                'error': 'Question text is required'
-            }), 400
-        
-        success = add_question_to_library(question_text, category, description, is_favorite)
-        
-        if success:
-            return jsonify({
-                'success': True,
-                'message': 'Question added to library successfully'
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'error': 'Failed to add question to library'
-            }), 500
-            
-    except Exception as e:
-        logger.error(f"Error adding question to library: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-@main.route('/questions-library/<question_id>', methods=['DELETE'])
-def remove_question_from_library(question_id):
-    """Remove a question from the library"""
-    try:
-        library = load_questions_library()
-        if not library:
-            return jsonify({
-                'success': False,
-                'error': 'Failed to load questions library'
-            }), 500
-        
-        # Find and remove the question
-        original_count = len(library['questions'])
-        library['questions'] = [q for q in library['questions'] if q['id'] != question_id]
-        
-        if len(library['questions']) < original_count:
-            success = save_questions_library(library)
-            if success:
-                return jsonify({
-                    'success': True,
-                    'message': 'Question removed from library'
-                })
-            else:
-                return jsonify({
-                    'success': False,
-                    'error': 'Failed to save updated library'
-                }), 500
-        else:
-            return jsonify({
-                'success': False,
-                'error': 'Question not found in library'
-            }), 404
-            
-    except Exception as e:
-        logger.error(f"Error removing question from library: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-@main.route('/questions-library/<question_id>', methods=['PUT'])
-def update_question_in_library(question_id):
-    """Update a question in the library"""
-    try:
-        data = request.json
-        library = load_questions_library()
-        if not library:
-            return jsonify({
-                'success': False,
-                'error': 'Failed to load questions library'
-            }), 500
-        
-        # Find and update the question
-        question_found = False
-        for question in library['questions']:
-            if question['id'] == question_id:
-                question_found = True
-                
-                # Update allowed fields
-                if 'question_text' in data:
-                    question['text'] = data['question_text'].strip()
-                if 'category' in data:
-                    question['category'] = data['category']
-                if 'description' in data:
-                    question['description'] = data['description']
-                if 'is_favorite' in data:
-                    question['is_favorite'] = data['is_favorite']
-                if 'tags' in data:
-                    question['tags'] = data['tags']
-                
-                break
-        
-        if not question_found:
-            return jsonify({
-                'success': False,
-                'error': 'Question not found in library'
-            }), 404
-        
-        success = save_questions_library(library)
-        if success:
-            return jsonify({
-                'success': True,
-                'message': 'Question updated successfully'
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'error': 'Failed to save updated library'
-            }), 500
-            
-    except Exception as e:
-        logger.error(f"Error updating question in library: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
@@ -2153,7 +2097,7 @@ def upload_file():
         file.save(filepath)
         
         # Extract text from PDF
-        pdf_text = extract_text(filepath)
+        pdf_text = doc_provenance.base_strategies.extract_text_from_pdf(filepath)
         
         # Extract sentences for later use
         sentences = doc_provenance.base_strategies.extract_sentences_from_pdf(pdf_text)
@@ -2205,22 +2149,25 @@ def ask_question():
         return jsonify({'error': 'Question or filename missing'}), 400
     
     # Load sentences from dedicated directory
-    sentences = load_document_sentences(filename)
+    sentences = get_file_finder().find_file(filename, 'sentences')
     if sentences is None:
         return jsonify({'error': 'Document sentences not found. Please re-upload the document.'}), 404
     
     # Get PDF data
-    filepath = os.path.join(UPLOAD_DIR, filename)
+    pdf_file = get_file_finder().find_file(filename, 'pdf')
+
+    filepath = pdf_file['path'] if pdf_file else None
+
     print(f"Processing question for file: {filepath}")
     if not filepath or not os.path.exists(filepath):
         return jsonify({'error': 'PDF file not found'}), 404
     
     # Extract text from PDF
-    pdf_text = extract_text(filepath)
+    pdf_text = doc_provenance.base_strategies.extract_text_from_pdf(filepath)
     
     # Create result path for this question
     question_backend_id = str(int(time.time()))
-    result_path = os.path.join(RESULT_DIR, question_backend_id)
+    result_path = os.path.join(RESULTS_DIR, question_backend_id)
     os.makedirs(result_path, exist_ok=True)
     result_path = result_path + os.sep
     
@@ -2229,7 +2176,6 @@ def ask_question():
         'question_id': question_backend_id,
         'question_text': question,
         'filename': filename,
-        'question_id_from_library': question_id_from_library,
         'created_at': time.time(),
         'max_provenances': EXPERIMENT_TOP_K,
         'user_provenance_count': 0,  # Track how many user has requested
@@ -2254,7 +2200,7 @@ def ask_question():
     #     json.dump([], f)
     
     # Initialize process logs
-    logs_path = os.path.join(os.path.join(RESULT_DIR, question_backend_id), 'process_logs.json')
+    logs_path = os.path.join(os.path.join(RESULTS_DIR, question_backend_id), 'process_logs.json')
     logs = {
         'status': 'started',
         'logs': [f"[{time.strftime('%H:%M:%S')}] Processing started: {question}"],
@@ -2342,11 +2288,6 @@ def ask_question():
                     
                 save_question_metadata(question_backend_id, metadata)
 
-            # Update question library usage if this was from the library
-            if question_id_from_library:
-                processing_time = time.time() - start_time
-                update_question_usage(question_id_from_library, processing_time, success)
-    
     thread = Thread(target=process_question)
     thread.daemon = True
     thread.start()
@@ -2370,7 +2311,7 @@ def check_answer(question_id):
             }), 400
         
         # Check if the question directory exists
-        question_dir = os.path.join(RESULT_DIR, question_id)
+        question_dir = os.path.join(RESULTS_DIR, question_id)
         if not os.path.exists(question_dir):
             logger.warning(f"Question directory not found: {question_dir}")
             return jsonify({
@@ -2516,7 +2457,7 @@ def get_question_status(question_id):
 
 def update_process_log(question_id, message, status=None):
     """Add a new message to the process logs"""
-    logs_path = os.path.join(RESULT_DIR, question_id, 'process_logs.json')
+    logs_path = os.path.join(RESULTS_DIR, question_id, 'process_logs.json')
     try:
         with open(logs_path, 'r') as f:
             logs = json.load(f)
@@ -2548,7 +2489,7 @@ def update_process_log(question_id, message, status=None):
 @main.route('/results/<question_id>', methods=['GET'])
 def get_results(question_id):
     # Check if the provenance file exists
-    provenance_path = os.path.join(RESULT_DIR, question_id, 'provenance.json')
+    provenance_path = os.path.join(RESULTS_DIR, question_id, 'provenance.json')
     if not os.path.exists(provenance_path):
         return jsonify({'error': 'Results not found'}), 404
     
@@ -2557,7 +2498,7 @@ def get_results(question_id):
         data = json.load(f)
     
     # Check if there's an answer file
-    answer_path = os.path.join(RESULT_DIR, question_id, 'answer.json')
+    answer_path = os.path.join(RESULTS_DIR, question_id, 'answer.json')
     answer = None
     if os.path.exists(answer_path):
         with open(answer_path, 'r') as f:
@@ -2572,7 +2513,7 @@ def get_results(question_id):
 @main.route('/check-progress/<question_id>', methods=['GET'])
 def check_progress(question_id):
 
-    question_dir = os.path.join(RESULT_DIR, question_id)
+    question_dir = os.path.join(RESULTS_DIR, question_id)
     # Read the provenance file to check progress
     provenance_path = os.path.join(question_dir, 'provenance.json')
     logs_path = os.path.join(question_dir, 'process_logs.json')
@@ -2642,7 +2583,7 @@ def get_sentences(question_id):
         return jsonify({'error': 'Invalid sentence IDs format'}), 400
     
     # Get sentences file
-    sentences_path = os.path.join(RESULT_DIR, question_id, 'sentences.json')
+    sentences_path = os.path.join(RESULTS_DIR, question_id, 'sentences.json')
     if not os.path.exists(sentences_path):
         return jsonify({'error': 'Sentences not found'}), 404
     
@@ -2666,7 +2607,7 @@ def get_sentences(question_id):
 @main.route('/status/<question_id>', methods=['GET'])
 def check_status(question_id):
     """Check if processing is fully complete and all provenance entries are available"""
-    status_path = os.path.join(RESULT_DIR, question_id, 'status.json')
+    status_path = os.path.join(RESULTS_DIR, question_id, 'status.json')
     
     if os.path.exists(status_path):
         try:
@@ -3306,287 +3247,328 @@ def upload_and_process_pdf():
             "error": f"Upload and processing failed: {str(e)}"
         }), 500
 
+@main.route('/documents/<filename>/mappings')
+def get_document_mappings(filename):
+    """Serve pre-computed PDF mappings for a document"""
+    try:
+        mapping_file = os.path.join(os.getcwd(), 'app', 'mappings', f'{filename}_mappings.json')
+
+        logger.info(f"Mapping file: {mapping_file}")
+        
+        if not os.path.exists(mapping_file):
+            return jsonify({
+                'success': False,
+                'error': f'Mappings not found for document {filename}'
+            }), 404
+        
+        with open(mapping_file, 'r', encoding='utf-8') as f:
+            mappings = json.load(f)
+        
+        return jsonify(mappings)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to load mappings: {str(e)}'
+        }), 500
+
+@main.route('/mappings/index')
+def get_mappings_index():
+    """Get index of all available document mappings"""
+    try:
+        index_file = os.path.join(os.getcwd(), 'app', 'public', 'mappings', 'index.json')
+
+        logger.info(f"Mappings index file: {index_file}")
+        
+        if os.path.exists(index_file):
+            with open(index_file, 'r') as f:
+                index_data = json.load(f)
+            return jsonify(index_data)
+        else:
+            return jsonify({
+                'available_documents': [],
+                'total_mappings': 0
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Failed to load mappings index: {str(e)}'
+        }), 500
+    
+@main.route('/documents/<filename>/simple-provenance-boxes', methods=['POST'])
+def get_simple_provenance_boxes(filename):
+    """
+    Simple provenance highlighting using direct PDF.js text search
+    """
+    try:
+        data = request.get_json()
+        
+        # Extract data from request
+        sentence_ids = data.get('sentence_ids', [])
+        provenance_text = data.get('provenance_text', '')
+        page_num = data.get('page', 1)  # Optional page constraint
+        
+        logger.info(f"🎯 Simple highlighting for {filename}: {len(sentence_ids)} sentences")
+        
+        # Find PDF file
+        pdf_info = get_file_finder().find_file(filename, 'pdf')
+        if not pdf_info:
+            return jsonify({
+                'success': False,
+                'error': 'PDF file not found'
+            }), 404
+        
+        pdf_path = pdf_info['path']
+        
+        # If we have specific provenance text, use that directly
+        if provenance_text and len(provenance_text.strip()) > 5:
+            logger.info(f"Using provenance text: '{provenance_text[:50]}...'")
+            boxes = find_sentence_boxes(pdf_path, provenance_text.strip())
+            
+            # Group by page for frontend compatibility
+            page_boxes = {}
+            for box in boxes:
+                page = box.get('page', 1)
+                if page not in page_boxes:
+                    page_boxes[page] = []
+                page_boxes[page].append(box)
+            
+            return jsonify({
+                'success': True,
+                'bounding_boxes': page_boxes,
+                'total_boxes': len(boxes),
+                'search_method': 'direct_text_search',
+                'provenance_text': provenance_text[:100] + '...' if len(provenance_text) > 100 else provenance_text
+            })
+        
+        # Otherwise, use sentence IDs to get text from sentences file
+        if sentence_ids:
+            sentences_info = get_file_finder().find_file(filename, 'sentences')
+            if not sentences_info:
+                return jsonify({
+                    'success': False,
+                    'error': 'Sentences file not found for sentence ID lookup'
+                }), 404
+            
+            # Load sentences
+            with open(sentences_info['path'], 'r', encoding='utf-8') as f:
+                sentences_data = json.load(f)
+            
+            # Get sentence texts
+            sentence_texts = []
+            for sentence_id in sentence_ids:
+                if sentence_id < len(sentences_data):
+                    if isinstance(sentences_data[sentence_id], dict):
+                        text = sentences_data[sentence_id].get('text', str(sentences_data[sentence_id]))
+                    else:
+                        text = str(sentences_data[sentence_id])
+                    sentence_texts.append(text.strip())
+            
+            if not sentence_texts:
+                return jsonify({
+                    'success': False,
+                    'error': 'No valid sentences found for given IDs'
+                }), 400
+            
+            # Find boxes for all sentences
+            logger.info(f"Finding boxes for {len(sentence_texts)} sentences")
+            
+            # Combine all sentence texts for better matching
+            combined_text = '. '.join(sentence_texts)
+            boxes = find_sentence_boxes(pdf_path, combined_text)
+            
+            # Also try individual sentences if combined doesn't work well
+            if len(boxes) == 0:
+                logger.info("Combined search failed, trying individual sentences")
+                all_results = find_multiple_sentences(pdf_path, sentence_texts)
+                
+                # Flatten results
+                for sentence_text, sentence_boxes in all_results.items():
+                    boxes.extend(sentence_boxes)
+            
+            # Group by page
+            page_boxes = {}
+            for box in boxes:
+                page = box.get('page', 1)
+                if page not in page_boxes:
+                    page_boxes[page] = []
+                page_boxes[page].append(box)
+            
+            return jsonify({
+                'success': True,
+                'bounding_boxes': page_boxes,
+                'total_boxes': len(boxes),
+                'sentence_ids': sentence_ids,
+                'sentence_count': len(sentence_texts),
+                'search_method': 'sentence_id_lookup'
+            })
+        
+        return jsonify({
+            'success': False,
+            'error': 'Either provenance_text or sentence_ids must be provided'
+        }), 400
+        
+    except Exception as e:
+        logger.error(f"Error in simple provenance boxes: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/documents/<filename>/preprocess-simple-mapping', methods=['POST'])
+def preprocess_simple_mapping(filename):
+    """
+    Preprocess a document to create simple sentence mappings
+    """
+    try:
+        logger.info(f"🔄 Preprocessing simple mappings for {filename}")
+        
+        # Find files
+        pdf_info = get_file_finder().find_file(filename, 'pdf')
+        sentences_info = get_file_finder().find_file(filename, 'sentences')
+        
+        if not pdf_info or not sentences_info:
+            return jsonify({
+                'success': False,
+                'error': 'PDF or sentences file not found'
+            }), 404
+        
+        # Create output file path
+        base_name = filename.replace('.pdf', '')
+        mappings_dir = os.path.join(os.getcwd(), 'public', 'mappings')
+        os.makedirs(mappings_dir, exist_ok=True)
+        output_file = os.path.join(mappings_dir, f"{base_name}_simple_mappings.json")
+        
+        # Process using the simple mapper
+        from sentences_to_pdfjs import process_sentences_file
+        
+        result = process_sentences_file(
+            pdf_info['path'],
+            sentences_info['path'],
+            output_file
+        )
+        
+        if 'error' in result:
+            return jsonify({
+                'success': False,
+                'error': result['error']
+            }), 500
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully processed {result["total_sentences"]} sentences',
+            'output_file': output_file,
+            'statistics': {
+                'total_sentences': result['total_sentences'],
+                'found_sentences': result['found_sentences'],
+                'success_rate': result['success_rate']
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error preprocessing simple mapping: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+
 @main.route('/documents/<filename>/provenance-boxes', methods=['POST'])
 def get_provenance_highlighting_boxes(filename):
     """
-    Convert provenance sentence IDs to PDF highlighting boxes
-    
-    Expected payload:
-    {
-        "sentence_ids": [4, 5, 6],
-        "provenance_id": 1
-    }
+    Get precise bounding boxes for provenance text using PDF.js-compatible extraction
+    This ensures coordinates match what PDF.js renders in the frontend
     """
     try:
         data = request.get_json()
-        sentence_ids = data.get('sentence_ids', [])
-        
-        if not sentence_ids:
-            return jsonify({'success': False, 'error': 'No sentence IDs provided'}), 400
-        
-        # Find layout file for this document
-        base_name = filename.replace('.pdf', '')
-        layout_file_paths = [
-            os.path.join(current_app.config.get('UPLOAD_FOLDER', 'app/uploads'), f"{base_name}_layout.json"),
-            # Add other possible paths
-        ]
-        
-        layout_file = None
-        for path in layout_file_paths:
-            if os.path.exists(path):
-                layout_file = path
-                break
-        
-        if not layout_file:
-            return jsonify({'success': False, 'error': 'Layout data not available'}), 404
-        
-        # Use your existing provenance mapper
-        mapper = ProvenanceLayoutMapper(layout_file, debug=False)
-        bounding_boxes = mapper.get_provenance_bounding_boxes(sentence_ids)
-        stats = mapper.get_provenance_statistics(sentence_ids)
-        
-        return jsonify({
-            'success': True,
-            'bounding_boxes': bounding_boxes,
-            'statistics': stats,
-            'sentence_ids': sentence_ids
-        })
-        
-    except Exception as e:
-        logger.error(f"Error getting provenance boxes for {filename}: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-    
-@main.route('/documents/<filename>/provenance-boxes-precise', methods=['POST'])
-def get_provenance_highlighting_boxes_precise(filename):
-    """
-    Get precise bounding boxes for provenance text (not just sentences)
-    """
-    try:
-        data = request.get_json()
-        sentence_ids = data.get('sentence_ids', [])
+        sentence_ids = data.get('sentence_ids', [])  # Keep for compatibility
         provenance_id = data.get('provenance_id')
-        provenance_text = data.get('provenance_text', '')  # New: actual text to highlight
+        provenance_text = data.get('provenance_text', '')
         
-        if not sentence_ids:
-            return jsonify({'success': False, 'error': 'No sentence IDs provided'}), 400
+        if not provenance_text or len(provenance_text.strip()) < 5:
+            return jsonify({'success': False, 'error': 'No meaningful provenance text provided'}), 400
         
-        # Find layout file
-        base_name = filename.replace('.pdf', '')
-        layout_file_paths = [
-            os.path.join(current_app.config.get('UPLOAD_FOLDER', 'app/uploads'), f"{base_name}_layout.json"),
-            os.path.join(UPLOAD_DIR, f"{base_name}_layout.json"),
-        ]
+        # Find PDF file using your existing file finder
+        pdf_info = get_file_finder().find_file(filename, 'pdf')
         
-        layout_file = None
-        for path in layout_file_paths:
-            if os.path.exists(path):
-                layout_file = path
-                break
+        if not pdf_info:
+            return jsonify({'success': False, 'error': 'PDF file not found'}), 404
         
-        if not layout_file:
-            return jsonify({'success': False, 'error': 'Layout data not available'}), 404
+        logger.info(f"🎯 PDF.js-compatible search for: '{provenance_text[:50]}...'")
+        logger.info(f"   PDF: {pdf_info['path']}")
         
-        # If we have provenance text, do precise matching
-        if provenance_text and len(provenance_text.strip()) > 10:
-            logger.info(f"Doing precise text matching for: {provenance_text[:50]}...")
-            precise_boxes = get_precise_text_boxes(layout_file, sentence_ids, provenance_text)
+        # Use PDF.js-compatible text search
+        bounding_boxes = find_provenance_with_pdfjs_compatibility(
+            pdf_info['path'], 
+            provenance_text
+        )
+        
+        if bounding_boxes:
+            # Group by page for consistency with existing format
+            grouped_boxes = {}
+            for box in bounding_boxes:
+                page = box.get('page', 1)
+                logger.info(f"Found box on page {page}: {box}")
+                if page not in grouped_boxes:
+                    grouped_boxes[page] = []
+                grouped_boxes[page].append(box)
             
-            if precise_boxes:
-                return jsonify({
-                    'success': True,
-                    'bounding_boxes': precise_boxes,
-                    'statistics': calculate_box_statistics(precise_boxes),
-                    'sentence_ids': sentence_ids,
-                    'match_type': 'precise_text',
-                    'provenance_text': provenance_text
-                })
-        
-        # Fallback to sentence-level matching
-        logger.info(f"Falling back to sentence-level matching for {len(sentence_ids)} sentences")
-        from .provenance_layout_mapper import ProvenanceLayoutMapper
-        mapper = ProvenanceLayoutMapper(layout_file, debug=False)
-        bounding_boxes = mapper.get_provenance_bounding_boxes(sentence_ids)
-        stats = mapper.get_provenance_statistics(sentence_ids)
-        
-        return jsonify({
-            'success': True,
-            'bounding_boxes': bounding_boxes,
-            'statistics': stats,
-            'sentence_ids': sentence_ids,
-            'match_type': 'sentence_level'
-        })
+            # Calculate statistics
+            total_boxes = len(bounding_boxes)
+            avg_confidence = sum(box['confidence'] for box in bounding_boxes) / total_boxes if total_boxes > 0 else 0
+            
+            # Get match types and add PDF.js specific info
+            match_types = list(set(box['match_type'] for box in bounding_boxes))
+            has_pdfjs_transforms = any('transform' in box for box in bounding_boxes)
+            
+            logger.info(f"✅ PDF.js-compatible search successful: {total_boxes} boxes across {len(grouped_boxes)} pages")
+            
+            return jsonify({
+                'success': True,
+                'bounding_boxes': grouped_boxes,
+                'statistics': {
+                    'total_boxes': total_boxes,
+                    'pages_with_matches': len(grouped_boxes),
+                    'avg_confidence': avg_confidence,
+                    'match_types': match_types,
+                    'has_pdfjs_transforms': has_pdfjs_transforms,
+                    'coordinate_system': 'pdfjs_compatible'
+                },
+                'sentence_ids': sentence_ids,  # Return for compatibility
+                'match_type': 'pdfjs_compatible_search',
+                'provenance_text': provenance_text[:100] + '...' if len(provenance_text) > 100 else provenance_text,
+                'data_source': 'pdfjs_compatible_mapper'
+            })
+        else:
+            logger.warning("PDF.js-compatible search found no matches")
+            
+            return jsonify({
+                'success': True,
+                'bounding_boxes': {},
+                'statistics': {
+                    'total_boxes': 0,
+                    'pages_with_matches': 0,
+                    'avg_confidence': 0,
+                    'match_types': [],
+                    'coordinate_system': 'pdfjs_compatible'
+                },
+                'sentence_ids': sentence_ids,
+                'match_type': 'pdfjs_compatible_search_no_results',
+                'data_source': 'pdfjs_compatible_mapper',
+                'message': 'No matches found with PDF.js-compatible search'
+            })
         
     except Exception as e:
-        logger.error(f"Error getting precise provenance boxes for {filename}: {e}")
+        logger.error(f"Error in PDF.js-compatible provenance search for {filename}: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-def get_precise_text_boxes(layout_file, sentence_ids, provenance_text):
-    """
-    Find bounding boxes for provenance text WITHIN the specified sentences only
-    """
-    import json
-    import re
-    from difflib import SequenceMatcher
-    
-    try:
-        with open(layout_file, 'r', encoding='utf-8') as f:
-            layout_data = json.load(f)
-        
-        # Clean the provenance text for matching
-        clean_provenance = re.sub(r'\s+', ' ', provenance_text.lower().strip())
-        clean_provenance = re.sub(r'[^\w\s]', '', clean_provenance)
-        
-        if len(clean_provenance) < 5:
-            logger.warning("Provenance text too short for precise matching")
-            return {}
-        
-        logger.info(f"Searching for '{clean_provenance[:50]}...' within {len(sentence_ids)} specific sentences")
-        
-        precise_boxes = {}
-        
-        # For each sentence ID, constrain search to that sentence's area
-        for sentence_id in sentence_ids:
-            sentence_data = None
-            for sent in layout_data.get('sentences', []):
-                if sent.get('sentence_id') == sentence_id:
-                    sentence_data = sent
-                    break
-            
-            if not sentence_data or not sentence_data.get('bounding_boxes'):
-                logger.warning(f"No bounding boxes found for sentence {sentence_id}")
-                continue
-            
-            # Get the sentence's bounding area to constrain our search
-            sentence_bounds = sentence_data['bounding_boxes']
-            sentence_page = sentence_data.get('primary_page', sentence_bounds[0].get('page', 1))
-            
-            # Get page layout
-            page_layout = None
-            for page in layout_data.get('pages_layout', []):
-                if page.get('page_num') == sentence_page:
-                    page_layout = page
-                    break
-            
-            if not page_layout or not page_layout.get('elements'):
-                logger.warning(f"No page layout found for sentence {sentence_id} on page {sentence_page}")
-                continue
-            
-            logger.info(f"Searching within sentence {sentence_id} bounds on page {sentence_page}")
-            
-            # Create search areas based on sentence bounds (with padding)
-            search_areas = []
-            for bound in sentence_bounds:
-                search_areas.append({
-                    'x0': bound.get('x0', 0) - 10,
-                    'y0': bound.get('y0', 0) - 5, 
-                    'x1': bound.get('x1', 100) + 10,
-                    'y1': bound.get('y1', 20) + 5
-                })
-            
-            # Search through page elements, but only those within sentence bounds
-            matching_boxes = []
-            
-            for element in page_layout['elements']:
-                if not element.get('text') or len(element['text']) < 3:
-                    continue
-                
-                # Check if element overlaps with any sentence search area
-                element_in_sentence_area = False
-                for area in search_areas:
-                    if not (element.get('x1', 0) < area['x0'] or 
-                           element.get('x0', 0) > area['x1'] or
-                           element.get('y1', 0) < area['y0'] or 
-                           element.get('y0', 0) > area['y1']):
-                        element_in_sentence_area = True
-                        break
-                
-                if not element_in_sentence_area:
-                    continue  # Skip elements outside sentence bounds
-                
-                # Now check if this element contains our provenance text
-                clean_element = re.sub(r'\s+', ' ', element['text'].lower().strip())
-                clean_element = re.sub(r'[^\w\s]', '', clean_element)
-                
-                # Check for direct substring match
-                if clean_provenance in clean_element:
-                    confidence = 0.95
-                    match_type = 'exact_substring_in_sentence'
-                    logger.info(f"Found exact substring match in sentence {sentence_id}: '{clean_element[:50]}'")
-                
-                # Check for partial match
-                elif clean_element in clean_provenance:
-                    confidence = 0.8
-                    match_type = 'partial_match_in_sentence'
-                    logger.info(f"Found partial match in sentence {sentence_id}: '{clean_element[:50]}'")
-                
-                # Check for word overlap
-                else:
-                    provenance_words = set(clean_provenance.split())
-                    element_words = set(clean_element.split())
-                    common_words = provenance_words & element_words
-                    
-                    if len(common_words) >= min(2, len(provenance_words) * 0.5):
-                        overlap_ratio = len(common_words) / len(provenance_words)
-                        confidence = 0.6 + (overlap_ratio * 0.2)
-                        match_type = 'word_overlap_in_sentence'
-                        logger.info(f"Found word overlap in sentence {sentence_id}: {overlap_ratio:.2f} ratio")
-                    else:
-                        continue
-                
-                # Validate box dimensions
-                width = element.get('x1', 0) - element.get('x0', 0)
-                height = element.get('y1', 0) - element.get('y0', 0)
-                
-                if width > 3 and height > 3 and width < 300 and height < 50:
-                    matching_boxes.append({
-                        'page': element.get('page', sentence_page),
-                        'x0': element['x0'],
-                        'y0': element['y0'],
-                        'x1': element['x1'],
-                        'y1': element['y1'],
-                        'confidence': confidence,
-                        'match_type': match_type,
-                        'source': 'sentence_constrained_search',
-                        'sentence_id': sentence_id
-                    })
-            
-            if matching_boxes:
-                # Sort by confidence and take top matches
-                matching_boxes.sort(key=lambda x: x['confidence'], reverse=True)
-                precise_boxes[sentence_id] = matching_boxes[:3]  # Top 3 per sentence
-                
-                logger.info(f"Found {len(matching_boxes)} precise boxes within sentence {sentence_id}")
-            else:
-                logger.warning(f"No precise text matches found within sentence {sentence_id} bounds")
-        
-        return precise_boxes
-        
-    except Exception as e:
-        logger.error(f"Error in sentence-constrained text matching: {e}")
-        return {}
-
-def calculate_box_statistics(bounding_boxes):
-    """Calculate statistics for the bounding boxes"""
-    total_boxes = sum(len(boxes) for boxes in bounding_boxes.values())
-    
-    if total_boxes == 0:
-        return {
-            'total_sentences': len(bounding_boxes),
-            'mapped_sentences': 0,
-            'total_boxes': 0,
-            'avg_confidence': 0
-        }
-    
-    all_boxes = [box for boxes in bounding_boxes.values() for box in boxes]
-    avg_confidence = sum(box['confidence'] for box in all_boxes) / len(all_boxes)
-    
-    return {
-        'total_sentences': len(bounding_boxes),
-        'mapped_sentences': len([boxes for boxes in bounding_boxes.values() if boxes]),
-        'total_boxes': total_boxes,
-        'avg_confidence': avg_confidence,
-        'mapping_success_rate': len([boxes for boxes in bounding_boxes.values() if boxes]) / len(bounding_boxes)
-    }
+ 
 
 @main.route('/pdf-processing-status/<pdf_name>', methods=['GET'])
 def check_pdf_processing_status(pdf_name):
@@ -3837,52 +3819,237 @@ def debug_routes():
     
 @main.route('/documents/<filename>/layout', methods=['GET'])
 def get_document_layout(filename):
-    """Get layout data for a specific document"""
+    """Get layout data with enhanced precision features"""
     try:
-        logging.info(f"🎨 Layout data requested for: {filename}")
+        logger.info(f"🎨 Enhanced layout data requested for: {filename}")
         
-        # Find the document by filename
-        base_name = filename.replace('.pdf', '')
+        # Use helper to find layout
+        layout_info = get_file_finder().find_file(filename, 'layout')
         
-        # Check if layout file exists
-        layout_file = os.path.join(current_app.config.get('LAYOUT_FOLDER', 'app/layout'), f"{base_name}_layout.json")
-        
-        if not os.path.exists(layout_file):
-            # Check if we have basic sentences (for backward compatibility info)
-            sentences_file = get_document_sentences_path(base_name)
-            has_basic_sentences = os.path.exists(sentences_file)
+        if not layout_info:
+            # Check if we have basic sentences for backward compatibility
+            sentences_info = get_file_finder().find_file(filename, 'sentences')
             
             return jsonify({
                 'success': False,
                 'error': 'No layout data available for this document',
-                'has_basic_sentences': has_basic_sentences,
-                'filename': filename
+                'has_basic_sentences': sentences_info is not None,
+                'filename': filename,
+                'suggestion': 'Try processing the PDF with enhanced layout extraction'
             }), 404
         
         # Load layout data
-        try:
-            with open(layout_file, 'r', encoding='utf-8') as f:
-                layout_data = json.load(f)
+        with open(layout_info['path'], 'r', encoding='utf-8') as f:
+            layout_data = json.load(f)
+        
+        # Extract enhancement statistics if available
+        enhancement_stats = layout_data.get('enhancement_stats', {})
+        metadata = layout_data.get('metadata', {})
+        
+        # Calculate some quick stats for the frontend
+        sentences = layout_data.get('sentences', [])
+        total_boxes = sum(len(sent.get('bounding_boxes', [])) for sent in sentences)
+        
+        # Count precision types
+        sub_element_boxes = 0
+        character_level_boxes = 0
+        for sent in sentences:
+            for box in sent.get('bounding_boxes', []):
+                match_type = box.get('match_type', '')
+                if 'precise' in match_type or 'sub_element' in match_type:
+                    sub_element_boxes += 1
+                if 'character' in match_type:
+                    character_level_boxes += 1
+        
+        # Sample some sentences for preview
+        sample_sentences = []
+        for i, sent in enumerate(sentences[:5]):  # First 5 sentences as preview
+            boxes = sent.get('bounding_boxes', [])
+            enhanced_features = sent.get('enhanced_features', {})
             
-            logging.info(f"✅ Layout data loaded for {filename}")
-            
-            return jsonify({
-                'success': True,
-                'layout_data': layout_data,
-                'filename': filename,
-                'layout_available': True
+            sample_sentences.append({
+                'sentence_id': sent.get('sentence_id', i),
+                'text': sent.get('text', '')[:100] + ('...' if len(sent.get('text', '')) > 100 else ''),
+                'box_count': len(boxes),
+                'precision_level': enhanced_features.get('precision_level', 'element'),
+                'has_sub_element_precision': enhanced_features.get('has_sub_element_precision', False),
+                'highest_confidence': max([box.get('confidence', 0) for box in boxes], default=0),
+                'primary_page': sent.get('primary_page', 1)
             })
-            
-        except Exception as e:
-            logging.error(f"Failed to load layout file {layout_file}: {e}")
+        
+        logger.info(f"✅ Enhanced layout data loaded for {filename} from {layout_info['location']}")
+        
+        return jsonify({
+            'success': True,
+            'layout_data': layout_data,
+            'filename': filename,
+            'layout_available': True,
+            'source_location': layout_info['location'],
+            'enhancement_info': {
+                'is_enhanced': metadata.get('layout_mapping_version', '').startswith('2.0'),
+                'precision_level': metadata.get('precision_level', 'element'),
+                'method': metadata.get('method', 'standard'),
+                'total_sentences': len(sentences),
+                'total_boxes': total_boxes,
+                'sub_element_boxes': sub_element_boxes,
+                'character_level_boxes': character_level_boxes,
+                'enhancement_rate': enhancement_stats.get('enhancement_rate', 0)
+            },
+            'sample_sentences': sample_sentences,
+            'metadata': metadata
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting enhanced layout for {filename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/documents/<filename>/layout/test-precision', methods=['GET'])
+def test_layout_precision(filename):
+    """
+    Test endpoint to see how precise the layout mapping is
+    Returns sample sentences with their bounding boxes for visual inspection
+    """
+    try:
+        logger.info(f"🧪 Testing layout precision for: {filename}")
+        
+        # Find layout file
+        layout_info = get_file_finder().find_file(filename, 'layout')
+        
+        if not layout_info:
             return jsonify({
                 'success': False,
-                'error': f'Failed to load layout data: {str(e)}',
-                'filename': filename
-            }), 500
+                'error': 'No layout data available for testing'
+            }), 404
+        
+        # Load layout data
+        with open(layout_info['path'], 'r', encoding='utf-8') as f:
+            layout_data = json.load(f)
+        
+        sentences = layout_data.get('sentences', [])
+        
+        # Find sentences with high-quality matches for testing
+        test_sentences = []
+        
+        for sent in sentences:
+            boxes = sent.get('bounding_boxes', [])
+            enhanced_features = sent.get('enhanced_features', {})
             
+            # Look for sentences with good precision
+            high_conf_boxes = [box for box in boxes if box.get('confidence', 0) > 0.8]
+            precise_boxes = [box for box in boxes if 'precise' in box.get('match_type', '')]
+            
+            if len(high_conf_boxes) > 0 or len(precise_boxes) > 0:
+                test_sentences.append({
+                    'sentence_id': sent.get('sentence_id'),
+                    'text': sent.get('text', ''),
+                    'primary_page': sent.get('primary_page', 1),
+                    'bounding_boxes': boxes,
+                    'enhanced_features': enhanced_features,
+                    'quality_metrics': {
+                        'total_boxes': len(boxes),
+                        'high_confidence_boxes': len(high_conf_boxes),
+                        'precise_boxes': len(precise_boxes),
+                        'avg_confidence': sum(box.get('confidence', 0) for box in boxes) / len(boxes) if boxes else 0,
+                        'has_sub_element': any('sub_element' in box.get('match_type', '') for box in boxes)
+                    }
+                })
+            
+            # Limit to 10 test cases
+            if len(test_sentences) >= 10:
+                break
+        
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'test_sentences': test_sentences,
+            'total_test_cases': len(test_sentences),
+            'layout_info': {
+                'total_sentences': len(sentences),
+                'method': layout_data.get('metadata', {}).get('method', 'unknown'),
+                'precision_level': layout_data.get('metadata', {}).get('precision_level', 'unknown')
+            }
+        })
+        
     except Exception as e:
-        logging.error(f"Error in get_document_layout for {filename}: {e}")
+        logger.error(f"Error testing layout precision for {filename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/documents/<filename>/layout/sentence/<int:sentence_id>', methods=['GET'])
+def get_sentence_layout_detail(filename, sentence_id):
+    """
+    Get detailed layout information for a specific sentence
+    Useful for debugging and testing individual sentence mappings
+    """
+    try:
+        logger.info(f"🔍 Getting detailed layout for sentence {sentence_id} in {filename}")
+        
+        # Find layout file
+        layout_info = get_file_finder().find_file(filename, 'layout')
+        
+        if not layout_info:
+            return jsonify({
+                'success': False,
+                'error': 'No layout data available'
+            }), 404
+        
+        # Load layout data
+        with open(layout_info['path'], 'r', encoding='utf-8') as f:
+            layout_data = json.load(f)
+        
+        sentences = layout_data.get('sentences', [])
+        
+        # Find the specific sentence
+        target_sentence = None
+        for sent in sentences:
+            if sent.get('sentence_id') == sentence_id:
+                target_sentence = sent
+                break
+        
+        if not target_sentence:
+            return jsonify({
+                'success': False,
+                'error': f'Sentence {sentence_id} not found'
+            }), 404
+        
+        # Get pages layout for context
+        pages_layout = layout_data.get('pages_layout', [])
+        primary_page = target_sentence.get('primary_page', 1)
+        
+        # Find the page layout
+        page_elements = []
+        for page in pages_layout:
+            if page.get('page_num') == primary_page:
+                page_elements = page.get('elements', [])
+                break
+        
+        return jsonify({
+            'success': True,
+            'sentence': target_sentence,
+            'sentence_id': sentence_id,
+            'filename': filename,
+            'page_context': {
+                'primary_page': primary_page,
+                'total_page_elements': len(page_elements),
+                'sample_page_elements': page_elements[:5]  # First 5 for context
+            },
+            'analysis': {
+                'text_length': len(target_sentence.get('text', '')),
+                'total_boxes': len(target_sentence.get('bounding_boxes', [])),
+                'page_spans': target_sentence.get('page_spans', []),
+                'enhanced_features': target_sentence.get('enhanced_features', {}),
+                'match_types': list(set(box.get('match_type', 'unknown') 
+                                      for box in target_sentence.get('bounding_boxes', [])))
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting sentence layout detail: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -3891,75 +4058,39 @@ def get_document_layout(filename):
 
 @main.route('/documents/<filename>/sentences', methods=['GET'])
 def get_document_sentences_enhanced(filename):
-    """Enhanced sentences endpoint with layout data info (backward compatibility)"""
+    """Get sentences using file finder helper"""
     try:
-        logging.info(f"📄 Sentences requested for: {filename}")
+        logger.info(f"📄 Sentences requested for: {filename}")
         
-        base_name = filename.replace('.pdf', '')
+        # Use helper to find sentences
+        sentences_info = get_file_finder().find_file(filename, 'sentences')
         
-        # Get sentences (existing functionality)
-        sentence_ids = request.args.get('sentence_ids')
-        if sentence_ids:
-            try:
-                sentence_ids = [int(id.strip()) for id in sentence_ids.split(',')]
-            except ValueError:
-                return jsonify({
-                    'success': False,
-                    'error': 'Invalid sentence_ids format'
-                }), 400
-        
-        # Load sentences using existing function
-        sentences_data = load_document_sentences(base_name)
-        
-        if not sentences_data:
+        if not sentences_info:
             return jsonify({
                 'success': False,
                 'error': 'Document sentences not found',
-                'requested': filename
+                'filename': filename
             }), 404
         
-        # Check if layout data is available
-        layout_file_paths = [
-            os.path.join(current_app.config.get('UPLOAD_FOLDER', 'app/uploads'), f"{base_name}_layout.json"),
-            os.path.join(current_app.config.get('PRELOADED_FOLDER', 'app/preloaded'), f"{base_name}_layout.json")
-        ]
+        # Load sentences
+        with open(sentences_info['path'], 'r', encoding='utf-8') as f:
+            sentences_data = json.load(f)
         
-        has_layout_data = any(os.path.exists(path) for path in layout_file_paths)
-        
-        # Filter sentences if specific IDs requested
-        if sentence_ids:
-            if isinstance(sentences_data, list):
-                # Handle list format
-                filtered_sentences = {}
-                for sid in sentence_ids:
-                    if 0 <= sid < len(sentences_data):
-                        filtered_sentences[sid] = sentences_data[sid]
-                response_sentences = filtered_sentences
-            else:
-                # Handle dict format
-                response_sentences = {
-                    str(sid): sentences_data.get(str(sid), sentences_data.get(sid))
-                    for sid in sentence_ids
-                    if str(sid) in sentences_data or sid in sentences_data
-                }
-        else:
-            # Return all sentences
-            if isinstance(sentences_data, list):
-                response_sentences = sentences_data
-            else:
-                response_sentences = sentences_data
+        # Check if layout is available
+        layout_info = get_file_finder().find_file(filename, 'layout')
         
         return jsonify({
             'success': True,
-            'sentences': response_sentences,
-            'has_layout_data': has_layout_data,
-            'layout_available': has_layout_data,
+            'sentences': sentences_data,
+            'has_layout_data': layout_info is not None,
+            'layout_available': layout_info is not None,
             'filename': filename,
+            'source_location': sentences_info['location'],
             'total_sentences': len(sentences_data) if isinstance(sentences_data, (list, dict)) else 0
         })
         
     except Exception as e:
-        logging.error(f"Error in get_document_sentences_enhanced for {filename}: {e}")
+        logger.error(f"Error getting sentences for {filename}: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
@@ -3978,7 +4109,6 @@ def generate_document_layout(filename):
         # Find the PDF file
         pdf_paths = [
             os.path.join(current_app.config.get('UPLOAD_FOLDER', 'app/uploads'), filename),
-            os.path.join(current_app.config.get('PRELOADED_FOLDER', 'app/preloaded'), filename)
         ]
         
         pdf_path = None

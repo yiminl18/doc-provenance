@@ -169,13 +169,29 @@ export const checkStatus = async (questionId) => {
  */
 export const getDocumentMappings = async (documentId) => {
   try {
-    const response = await axios.get(`${API_URL}/documents/${documentId}/mappings`);
+    const response = await axios.get(`${API_URL}/documents/${documentId}/mappings/sentences`);
+    const mappings = response.data;
+    console.log('Sentence mpappings for document:', documentId, mappings);
     return response.data;
   } catch (error) {
     console.error('Error fetching document mappings:', error);
     throw new Error(error.response?.data?.error || error.message);
   }
 };
+
+export const getSentenceElementMappings = async (documentId, sentenceIds) => {
+  try {
+    const ids = Array.isArray(sentenceIds) ? sentenceIds.join(',') : sentenceIds;
+    const response = await axios.get(
+      `${API_URL}/documents/${documentId}/sentence-elements?ids=${ids}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching sentence element mappings:', error);
+    throw new Error(error.response?.data?.error || error.message);
+  }
+};
+
 
 /**
  * Get index of all available document mappings

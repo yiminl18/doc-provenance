@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import '../styles/pdf-viewer.css';
 import { calculateProvenanceCost, formatCost } from '../utils/ProvenanceOutputsFormatting';
-import { PDFTextHighlighter, PDFTextHighlightingUtils } from './PDFTextHighlighter'; // Updated import
+import { PDFTextHighlighterModular as PDFTextHighlighter, PDFTextHighlightingUtils } from './PDFTextHighlighterModular'; // Updated import
 
 const LayoutBasedPDFViewer = ({
     pdfDocument,
@@ -57,7 +57,7 @@ const LayoutBasedPDFViewer = ({
         if (window.pdfjsLib && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
             window.pdfjsLib.GlobalWorkerOptions.workerSrc =
                 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            console.log('✅ PDF.js worker initialized for layout-based viewer');
+            //console.log('✅ PDF.js worker initialized for layout-based viewer');
         }
     }, []);
 
@@ -73,7 +73,7 @@ const LayoutBasedPDFViewer = ({
             : `/api/documents/${pdfDocument.filename}`;
 
         setPdfUrl(url);
-        console.log('🔗 PDF URL set:', url);
+        //console.log('🔗 PDF URL set:', url);
 
         return () => {
             if (pdfDocument.file && url.startsWith('blob:')) {
@@ -91,24 +91,13 @@ const LayoutBasedPDFViewer = ({
     // Handle page changes
     useEffect(() => {
         if (pdfDoc && !loading && !isRendering && currentPage !== lastRenderedPage) {
-            console.log(`📄 Page changed from ${lastRenderedPage} to ${currentPage} - rendering`);
+            //console.log(`📄 Page changed from ${lastRenderedPage} to ${currentPage} - rendering`);
             renderPageSafely(currentPage);
             
         }
     }, [pdfDoc, loading, currentPage, zoomLevel, lastRenderedPage]);
 
-    // Add this in your handleHighlightClick function or somewhere after a page renders
-useEffect(() => {
-  if (!isRendering && textLayerRef.current && selectedProvenance) {
-    console.log('🔍 DEBUG: Provenance data:', selectedProvenance);
-    
-    // Use the debug utility
-    setTimeout(() => {
-      PDFTextHighlightingUtils.debugTextLayer(textLayerRef);
-      PDFTextHighlightingUtils.testSearch(textLayerRef, 'In');
-    }, 1000);
-  }
-}, [isRendering, selectedProvenance]);
+
 
     
 
@@ -135,10 +124,10 @@ useEffect(() => {
         const dimensions = calculateFixedViewerDimensions();
         setFixedDimensions(dimensions);
 
-        console.log('📐 Fixed PDF viewer dimensions calculated:', {
-            viewerSize: `${dimensions.width}x${dimensions.height}`,
-            screenSize: `${dimensions.screenWidth}x${dimensions.screenHeight}`
-        });
+        //console.log('📐 Fixed PDF viewer dimensions calculated:', {
+        //    viewerSize: `${dimensions.width}x${dimensions.height}`,
+        //    screenSize: `${dimensions.screenWidth}x${dimensions.screenHeight}`
+        //});
     }, []);
 
     // Calculate initial zoom for fixed dimensions
@@ -156,7 +145,7 @@ useEffect(() => {
     useEffect(() => {
         if (!navigationTrigger) return;
 
-        console.log('🧭 Processing navigation trigger:', navigationTrigger);
+        //console.log('🧭 Processing navigation trigger:', navigationTrigger);
         
         // For text-based highlighting, we can scroll to the first highlight
         setTimeout(() => {
@@ -176,7 +165,7 @@ useEffect(() => {
         setRenderError(null);
 
         try {
-            console.log('🔄 Loading PDF...');
+            //console.log('🔄 Loading PDF...');
 
             const loadingTask = window.pdfjsLib.getDocument({
                 url: pdfUrl,
@@ -184,7 +173,7 @@ useEffect(() => {
             });
 
             const pdf = await loadingTask.promise;
-            console.log('✅ PDF loaded:', pdf.numPages, 'pages');
+            //console.log('✅ PDF loaded:', pdf.numPages, 'pages');
 
             setPdfDoc(pdf);
             setTotalPages(pdf.numPages);
@@ -201,17 +190,17 @@ useEffect(() => {
 
     const renderPageSafely = async (pageNum) => {
         if (isRendering) {
-            console.log(`⏸️ Render in progress, skipping page ${pageNum}`);
+            //console.log(`⏸️ Render in progress, skipping page ${pageNum}`);
             return;
         }
 
         // Cancel any existing render task
         if (renderTaskRef.current) {
-            console.log('🛑 Cancelling previous render task');
+            //console.log('🛑 Cancelling previous render task');
             try {
                 renderTaskRef.current.cancel();
             } catch (e) {
-                console.log('🛑 Previous render task cancelled');
+                console.error('🛑 Previous render task cancelled');
             }
             renderTaskRef.current = null;
         }
@@ -222,7 +211,7 @@ useEffect(() => {
         try {
             await renderPage(pageNum);
             setLastRenderedPage(pageNum);
-            console.log(`✅ Page ${pageNum} rendered successfully`);
+            //console.log(`✅ Page ${pageNum} rendered successfully`);
         } catch (error) {
             if (error.name === 'RenderingCancelledException') {
                 console.log(`🛑 Render cancelled for page ${pageNum} - this is normal`);
@@ -240,7 +229,7 @@ useEffect(() => {
             throw new Error('Missing PDF document or canvas refs');
         }
 
-        console.log(`🎨 Rendering page ${pageNum}...`);
+        //console.log(`🎨 Rendering page ${pageNum}...`);
 
         const page = await pdfDoc.getPage(pageNum);
         const canvas = canvasRef.current;
@@ -254,7 +243,7 @@ useEffect(() => {
             const initialZoom = calculateInitialZoomFixed(baseViewport, fixedDimensions.width);
             setZoomLevel(initialZoom);
             finalScale = initialZoom;
-            console.log(`📏 Setting initial zoom: ${(initialZoom * 100).toFixed(0)}%`);
+            //console.log(`📏 Setting initial zoom: ${(initialZoom * 100).toFixed(0)}%`);
         } else {
             finalScale = zoomLevel;
         }
@@ -281,7 +270,7 @@ useEffect(() => {
         renderTaskRef.current = page.render(renderContext);
         try {
             await renderTaskRef.current.promise;
-            console.log(`✅ Render task completed for page ${pageNum}`);
+            //console.log(`✅ Render task completed for page ${pageNum}`);
         } catch (error) {
             if (error.name === 'RenderingCancelledException') {
                 console.log(`🛑 Render task cancelled for page ${pageNum}`);
@@ -300,7 +289,7 @@ useEffect(() => {
         // Setup highlight layer
         setupHighlightLayer();
 
-        console.log(`✅ Page ${pageNum} rendered at ${(finalScale * 100).toFixed(0)}% zoom`);
+        //console.log(`✅ Page ${pageNum} rendered at ${(finalScale * 100).toFixed(0)}% zoom`);
     };
 
     const setupTextLayer = async (page, viewport) => {
@@ -340,7 +329,7 @@ useEffect(() => {
                 });
             }
 
-            console.log('✅ Text layer setup completed');
+            //console.log('✅ Text layer setup completed');
 
         } catch (err) {
             console.error('❌ Error setting up text layer:', err);
@@ -362,7 +351,7 @@ useEffect(() => {
         highlightLayer.style.pointerEvents = 'none';
         highlightLayer.style.zIndex = '10';
 
-        console.log('✅ Highlight layer positioned');
+        //console.log('✅ Highlight layer positioned');
     };
 
     
@@ -395,7 +384,7 @@ useEffect(() => {
     // Navigation handlers
     const goToPage = (pageNum) => {
         if (pageNum >= 1 && pageNum <= totalPages && pageNum !== currentPage && !isRendering) {
-            console.log(`📖 Navigating to page ${pageNum}`);
+            //console.log(`📖 Navigating to page ${pageNum}`);
             setCurrentPage(pageNum);
         }
     };
@@ -403,7 +392,7 @@ useEffect(() => {
     const handleZoomIn = () => {
         if (isRendering) return;
         const newZoom = Math.min(zoomLevel + 0.25, 3);
-        console.log(`🔍 Zoom IN: ${(zoomLevel * 100).toFixed(0)}% → ${(newZoom * 100).toFixed(0)}%`);
+        //console.log(`🔍 Zoom IN: ${(zoomLevel * 100).toFixed(0)}% → ${(newZoom * 100).toFixed(0)}%`);
         setZoomLevel(newZoom);
         setLastRenderedPage(null);
     };
@@ -411,14 +400,14 @@ useEffect(() => {
     const handleZoomOut = () => {
         if (isRendering) return;
         const newZoom = Math.max(zoomLevel - 0.25, 0.5);
-        console.log(`🔍 Zoom OUT: ${(zoomLevel * 100).toFixed(0)}% → ${(newZoom * 100).toFixed(0)}%`);
+        //console.log(`🔍 Zoom OUT: ${(zoomLevel * 100).toFixed(0)}% → ${(newZoom * 100).toFixed(0)}%`);
         setZoomLevel(newZoom);
         setLastRenderedPage(null);
     };
 
     const handleResetZoom = () => {
         if (isRendering) return;
-        console.log(`🔍 RESET ZOOM: ${(zoomLevel * 100).toFixed(0)}% → fit-to-width`);
+        //console.log(`🔍 RESET ZOOM: ${(zoomLevel * 100).toFixed(0)}% → fit-to-width`);
         setZoomLevel(1.0);
         setLastRenderedPage(null);
     };

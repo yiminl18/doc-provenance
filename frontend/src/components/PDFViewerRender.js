@@ -203,23 +203,32 @@ const PDFViewerRender = ({
     };
 
     const setupHighlightLayer = () => {
-    if (!highlightLayerRef.current || !containerRef.current) return;
+        if (!highlightLayerRef.current || !containerRef.current) return;
 
-    const highlightLayer = highlightLayerRef.current;
-    const container = containerRef.current;
-    
-    // Position highlight layer to fill the entire container
-    highlightLayer.style.position = 'absolute';
-    highlightLayer.style.left = '0px';
-    highlightLayer.style.top = '0px';
-    highlightLayer.style.width = '100%';
-    highlightLayer.style.height = '100%';
-    highlightLayer.style.transform = 'none';
-    highlightLayer.style.pointerEvents = 'none';
-    highlightLayer.style.zIndex = '10';
+        const highlightLayer = highlightLayerRef.current;
+        const pageContainer = containerRef.current.querySelector('.pdf-page-container');
 
-    console.log('✅ Highlight layer positioned to fill container');
-};
+        if (!pageContainer) {
+            console.warn('PDF page container not found for highlight layer setup');
+            return;
+        }
+
+        // Position highlight layer to exactly match the pdf-page-container
+        const pageRect = pageContainer.getBoundingClientRect();
+        const containerRect = containerRef.current.getBoundingClientRect();
+
+        highlightLayer.style.position = 'absolute';
+        highlightLayer.style.left = `${pageRect.left - containerRect.left}px`;
+        highlightLayer.style.top = `${pageRect.top - containerRect.top}px`;
+        highlightLayer.style.width = `${pageContainer.offsetWidth}px`;
+        highlightLayer.style.height = `${pageContainer.offsetHeight}px`;
+        highlightLayer.style.transform = pageContainer.style.transform || 'none';
+        highlightLayer.style.transformOrigin = pageContainer.style.transformOrigin || '0 0';
+        highlightLayer.style.pointerEvents = 'none';
+        highlightLayer.style.zIndex = '10';
+
+        console.log('✅ Highlight layer positioned to match page container');
+    };
 
     // Track user navigation vs auto-navigation
     const lastUserNavigationRef = useRef(Date.now());
@@ -292,17 +301,14 @@ const PDFViewerRender = ({
         const updateProvenanceTarget = async () => {
             const targetPage = await getProvenancePage(selectedProvenance);
             setProvenanceTargetPage(targetPage);
-            // ... rest of auto-nav logic
         };
 
         updateProvenanceTarget();
     }, [selectedProvenance?.provenance_id]);
 
-    // Then your button logic:
     const isAwayFromProvenance = selectedProvenance && provenanceTargetPage &&
         renderManager.currentPage !== provenanceTargetPage;
 
-    // Update button handlers to use new goToPage
     const handlePreviousPage = () => {
         goToPage(renderManager.currentPage - 1, 'user');
     };
@@ -312,25 +318,20 @@ const PDFViewerRender = ({
     };
 
     const zoomIn = () => {
-        console.log('🔍 Zoom in clicked');
         lastUserNavigationRef.current = Date.now();
-        const newZoom = Math.min(renderManager.currentZoom * 1.25, 3);
+        const newZoom = Math.min(renderManager.currentZoom * 1.2, 3);
 
-        // Use renderManager instead of manual transform
         renderManager.render(renderManager.currentPage, newZoom);
     };
 
     const zoomOut = () => {
-        console.log('🔍 Zoom out clicked');
         lastUserNavigationRef.current = Date.now();
         const newZoom = Math.max(renderManager.currentZoom * 0.8, 0.5);
 
-        // Use renderManager instead of manual transform
         renderManager.render(renderManager.currentPage, newZoom);
     };
 
     const resetZoom = () => {
-        console.log('🔍 Reset zoom clicked');
         lastUserNavigationRef.current = Date.now();
 
         // Calculate fit-to-width zoom
@@ -355,7 +356,6 @@ const PDFViewerRender = ({
 
 
 
-        // Extract sentence IDs from provenance
         const sentenceIds = provenance?.provenance_ids
 
         if (sentenceIds.length === 0) {
@@ -363,10 +363,8 @@ const PDFViewerRender = ({
             return null;
         }
 
-        // Create cache key
         const cacheKey = `${provenance.provenance_id}_${sentenceIds.join(',')}_${pdfDocument.filename}`;
 
-        // Check cache first
         if (provenancePageCache.has(cacheKey)) {
             const cachedPage = provenancePageCache.get(cacheKey);
             console.log(`📋 Using cached page ${cachedPage} for provenance ${provenance.provenance_id}`);
@@ -376,7 +374,6 @@ const PDFViewerRender = ({
         try {
             console.log(`🔍 Looking up page for provenance ${provenance.provenance_id} with sentences:`, sentenceIds);
 
-            // Get mappings for these sentence IDs
             const mappingsData = await getSentenceItemMappings(pdfDocument.filename, sentenceIds);
 
             if (!mappingsData || !mappingsData.sentence_mappings) {
@@ -384,7 +381,6 @@ const PDFViewerRender = ({
                 return null;
             }
 
-            // Collect all pages from the best stable match
             const pages = new Set();
 
             Object.entries(mappingsData.sentence_mappings).forEach(([sentenceId, mapping]) => {
@@ -399,12 +395,10 @@ const PDFViewerRender = ({
                 return null;
             }
 
-            // Choose the primary page (earliest page if multiple)
             const targetPage = Math.min(...Array.from(pages));
 
             console.log(`🎯 Determined target page: ${targetPage} (from pages: ${Array.from(pages).sort().join(', ')})`);
 
-            // Cache the result
             const newCache = new Map(provenancePageCache);
             newCache.set(cacheKey, targetPage);
             setProvenancePageCache(newCache);
@@ -417,7 +411,6 @@ const PDFViewerRender = ({
         }
     }, [pdfDoc, provenancePageCache]);
 
-    // Add this function to your main PDF viewer component
     const goBackToProvenance = async () => {
         if (!selectedProvenance) {
             console.log('⚠️ No provenance to navigate back to');
@@ -537,13 +530,19 @@ const PDFViewerRender = ({
             const textLayer = textLayerRef.current;
             const highlightLayer = highlightLayerRef.current;
 
+            const pageContainer = containerRef.current.querySelector('.pdf-page-container');
+            if (!pageContainer) {
+                console.warn('PDF page container not found');
+                return null;
+            }
+
             // Get bounding rects
             const elementRect = sourceElement.getBoundingClientRect();
-            const containerRect = containerRef.current.getBoundingClientRect();
+            const pageContainerRect = pageContainer.getBoundingClientRect();
 
             // Calculate position relative to the container (not the highlight layer)
-            const left = elementRect.left - containerRect.left;
-            const top = elementRect.top - containerRect.top;
+            const left = elementRect.left - pageContainerRect.left;
+            const top = elementRect.top - pageContainerRect.top;
             const width = elementRect.width;
             const height = elementRect.height;
 
@@ -560,6 +559,7 @@ const PDFViewerRender = ({
             pointer-events: none;
             z-index: 100;
             border-radius: 2px;
+            transform: non !important;
         `;
 
             return highlightBox;
@@ -572,7 +572,6 @@ const PDFViewerRender = ({
             const existingHighlights = highlightLayerRef.current.querySelectorAll('.provenance-highlight');
             existingHighlights.forEach(el => el.remove());
 
-            // Clear the reference map
             highlightRefsRef.current.clear();
         };
 

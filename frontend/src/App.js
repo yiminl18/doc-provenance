@@ -6,9 +6,10 @@ import Header from './components/Header';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import ProvenanceQA from './components/ProvenanceQA';
-import userStudyLogger from './services/UserStudyLogger';
-import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
+import PDFViewerRender from './components/PDFViewerRender';
+//import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
 import DriveFileBrowser from './components/DriveFileBrowser';
+import QuestionSuggestionsModal from './components/QuestionSuggestionsModal';
 import {
   uploadFile,
   getDocuments,
@@ -27,7 +28,6 @@ function App() {
   const [activeDocumentId, setActiveDocumentId] = useState(null);
   const [selectedProvenance, setSelectedProvenance] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(null);
-  const [pollingInterval, setPollingInterval] = useState(null);
 
   // Questions history state (for history sidebar)
   const [questionsHistory, setQuestionsHistory] = useState(new Map());
@@ -40,7 +40,7 @@ function App() {
   const [preloadedDocuments, setPreloadedDocuments] = useState([]);
   const [loadingPreloaded, setLoadingPreloaded] = useState(false);
   const [showDriveModal, setShowDriveModal] = useState(false);
-
+  const [showQuestionSuggestions, setShowQuestionSuggestions] = useState(false);
   const [navigationTrigger, setNavigationTrigger] = useState(null);
 
 
@@ -236,6 +236,91 @@ function App() {
     }
   };
 
+  const handleShowQuestionSuggestions = async () => {
+  //await logUserInteraction('question_suggestions_click', 'header');
+  setShowQuestionSuggestions(true);
+};
+
+// Add this handler function to App.js  
+const handleSuggestedQuestionSelect = (questionText) => {
+  console.log('🎯 App: Suggested question selected:', questionText);
+  
+  // Close the modal first
+  setShowQuestionSuggestions(false);
+  
+  // Pass the question to ProvenanceQA to submit
+  if (window.integratedQARef && window.integratedQARef.submitQuestion) {
+    window.integratedQARef.submitQuestion(questionText);
+  } else {
+    // Fallback: create a question directly in App
+    handleDirectQuestionSubmit(questionText);
+  }
+};
+
+// Optional: Direct question submission handler (fallback)
+const handleDirectQuestionSubmit = async (questionText) => {
+  if (!activeDocument) {
+    console.warn('No active document for question submission');
+    return;
+  }
+
+  try {
+    // Cancel any existing processing
+    const isProcessing = Array.from(questionsHistory.values()).some(q => q.isProcessing);
+    if (isProcessing) {
+      console.log('🛑 Cancelling existing processing before new submission');
+      // You could implement cancellation logic here if needed
+    }
+
+    // Create question ID
+    const questionId = `q_${Date.now()}`;
+    
+    console.log('🔄 App: Submitting suggested question:', questionText);
+
+    // Submit question to backend
+    const response = await askQuestion(questionText, activeDocument.filename);
+
+    if (response.success && response.question_id) {
+      const backendQuestionId = response.question_id;
+
+      // Create question object
+      const questionData = {
+        id: questionId,
+        backendQuestionId: backendQuestionId,
+        text: questionText,
+        answer: null,
+        answerReady: false,
+        provenanceSources: [],
+        provenanceCount: 0,
+        userProvenanceCount: 0,
+        maxProvenances: 5,
+        canRequestMore: false,
+        isProcessing: true,
+        logs: [`Processing started: ${questionText}`],
+        createdAt: new Date(),
+        processingStatus: 'processing',
+        userMessage: null,
+        processingTime: null,
+        submitTime: Date.now(),
+        cancellable: true,
+        source: 'suggestion' // Mark as coming from suggestions
+      };
+
+      // Add to questions history
+      addQuestion(questionData);
+
+
+
+      console.log('✅ Suggested question processing initialized');
+    } else {
+      throw new Error(response.error || 'Failed to submit suggested question');
+    }
+  } catch (error) {
+    console.error('❌ Error submitting suggested question:', error);
+    // You could show an error message here
+  }
+};
+
 
 
   // Document upload with persistence
@@ -254,13 +339,6 @@ function App() {
         // Store both original filename and backend filename
         const docId = createNewDocument(fileName, response.filename);
 
-        // Log document upload
-        //await userStudyLogger.logDocumentUploaded(
-        //  docId,
-        //  fileName,
-        //  response.metadata?.text_length || 0,
-        //  response.metadata?.sentence_count || 0
-        //);
 
 
         // Update document with metadata from upload
@@ -558,6 +636,7 @@ const handleDriveFileSelect = async (fileData) => {
           handleUploadNewDocument();
         }}
         onShowDrive={handleShowDrive}
+        onShowQuestionSuggestions={handleShowQuestionSuggestions}
       />
         {/* Left Sidebar */}
         <div className="sidebar-panel">
@@ -580,7 +659,7 @@ const handleDriveFileSelect = async (fileData) => {
         <div className="main-content">
           <div className="pdf-section">
             {activeDocument ? (
-              <LayoutBasedPDFViewer
+              <PDFViewerRender
                 pdfDocument={activeDocument}
                 selectedProvenance={selectedProvenance}
                 activeQuestionId={activeQuestionId}
@@ -696,6 +775,16 @@ const handleDriveFileSelect = async (fileData) => {
           </div>
         </div>
       )}
+
+      {/* Question Suggestions Modal - NEW */}
+{showQuestionSuggestions && (
+  <QuestionSuggestionsModal
+    isOpen={showQuestionSuggestions}
+    onClose={() => setShowQuestionSuggestions(false)}
+    filename={activeDocument?.filename}
+    onQuestionSelect={handleSuggestedQuestionSelect}
+  />
+)}
     </div>
   );
 }

@@ -1,13 +1,14 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserSecret, faDatabase, faCloud,faUpload } from '@fortawesome/free-solid-svg-icons';
-
+import { faUserSecret, faDatabase, faCloud, faUpload, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 const Header = ({
   activeDocument, // This will determine if we show the buttons
   onShowPreloaded,
   onUploadDocument,
-  onShowDrive
+  onShowDrive,
+  onShowQuestionSuggestions
 }) => {
+  
   return (
     <div className="app-header-compact">
       <div className="header-left">
@@ -46,9 +47,19 @@ const Header = ({
               <FontAwesomeIcon icon={faCloud} />
               <span>Browse Drive</span>
             </button>
+            {/* Question Suggestions Button */}
+            <button
+              className="win95-btn"
+              onClick={onShowQuestionSuggestions}
+              title="View suggested questions for this document"
+            >
+              <FontAwesomeIcon icon={faQuestionCircle} />
+              Question Suggestions
+            </button>
           </div>
         )}
       </div>
+
     </div>
   );
 };

@@ -34,7 +34,6 @@ import {
     getQuestionStatus,
     fetchSentences
 } from '../services/api';
-import QuestionSuggestionsModal from './QuestionSuggestionsModal';
 
 const ProvenanceQA = forwardRef(({
     pdfDocument,
@@ -52,7 +51,6 @@ const ProvenanceQA = forwardRef(({
     const [currentQuestion, setCurrentQuestion] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
-    const [showQuestionSuggestions, setShowQuestionSuggestions] = useState(false);
 
 
     // Provenance state
@@ -188,25 +186,22 @@ const ProvenanceQA = forwardRef(({
     useImperativeHandle(ref, () => ({
         submitQuestion: (questionText, activeQuestionId) => {
             setCurrentQuestion(questionText);
-            if (inputRef.current) {
-                inputRef.current.focus();
-            }
+            
+            const fakeEvent = null;
+            handleSubmit(fakeEvent, questionText);
 
         }
     }));
 
-    const handleSuggestedQuestionSelect = (questionText) => {
-        setCurrentQuestion(questionText);
-        handleSubmit(null, questionText);
-    };
+
 
 
 
      // Enhanced question submission with cancellation support
     const handleSubmit = async (e, questionTextOverride = null) => {
         if (e) e.preventDefault();
-
-        const questionText = (questionTextOverride || currentQuestion).trim();
+        console.log('🔄 ProvenanceQA: handleSubmit called with questionTextOverride:', questionTextOverride);
+        const questionText = (questionTextOverride.question_text || currentQuestion).trim();
         if (!questionText || isSubmitting || !pdfDocument) return;
 
         // Cancel any currently processing questions before submitting new one
@@ -858,93 +853,9 @@ const ProvenanceQA = forwardRef(({
         );
     }
 
-    const questionsArray = Array.from(questionsHistory.values()).sort(
-        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-    );
-
     return (
         <div className="provenance-qa-component">
-            {/* Question Input Section */}
-            <div className="qa-input-section">
-                <div className="section-header">
-                    <FontAwesomeIcon icon={faTerminal} />
-                    <h4>Ask</h4>
-                    <button
-                        className="win95-btn"
-                        onClick={() => setShowQuestionSuggestions(true)}
-                        disabled={!pdfDocument}
-                        title="View suggested questions for this document"
-                    >
-                        <FontAwesomeIcon icon={faQuestionCircle} />
-                        Question Suggestions
-                    </button>
-                </div>
-
-                {/* Add global cancel button if any questions are processing */}
-                {isProcessing && (
-                    <div className="processing-controls">
-                        <div className="processing-indicator">
-                            <FontAwesomeIcon icon={faSpinner} spin />
-                            <span>Processing questions...</span>
-                        </div>
-                        <button
-                            className="win95-btn cancel"
-                            onClick={() => cancelAllProcessing('user_cancelled')}
-                            title="Cancel all processing questions"
-                        >
-                            <FontAwesomeIcon icon={faStopCircle} />
-                            Cancel All
-                        </button>
-                    </div>
-                )}
-
-                {/* Error Display */}
-                {submitError && (
-                    <div className="submit-error">
-                        <FontAwesomeIcon icon={faExclamationTriangle} />
-                        <span className="error-message">{submitError}</span>
-                        <button className="win95-btn retry" onClick={handleRetry}>
-                            <FontAwesomeIcon icon={faRefresh} />
-                            Retry
-                        </button>
-                    </div>
-                )}
-
-                {/* Question Input */}
-                <form onSubmit={handleSubmit} className="question-form">
-                    <textarea
-                        ref={inputRef}
-                        className={`question-textarea ${submitError ? 'error' : ''}`}
-                        value={currentQuestion}
-                        onChange={(e) => setCurrentQuestion(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder={
-                            isProcessing
-                                ? "Please wait for current question to complete..."
-                                : submitError
-                                    ? "Fix the issue above and try again..."
-                                    : "What would you like to know about this document?"
-                        }
-                        disabled={isSubmitting || isProcessing}
-                        rows={2}
-                    />
-
-                    <button
-                        type="submit"
-                        className={`win95-btn submit ${submitError ? 'error' : ''}`}
-                        disabled={!currentQuestion.trim() || isSubmitting || isProcessing}
-                    >
-                        {isSubmitting ? (
-                            <FontAwesomeIcon icon={faSpinner} spin />
-                        ) : (
-                            <FontAwesomeIcon icon={faPaperPlane} />
-                        )}
-                        <span>
-                            {isSubmitting ? 'Submitting...' : 'Ask Question'}
-                        </span>
-                    </button>
-                </form>
-            </div>
+           
 
             {/* Current Question Display */}
             {activeQuestion && (
@@ -1227,13 +1138,79 @@ const ProvenanceQA = forwardRef(({
                     </div>
                 </div>
             )}
+ {/* Question Input Section */}
+            <div className="qa-input-section">
+                <div className="section-header">
+                    <FontAwesomeIcon icon={faTerminal} />
+                    <h4>Ask</h4>
+ 
+                </div>
 
-            <QuestionSuggestionsModal
-                isOpen={showQuestionSuggestions}
-                onClose={() => setShowQuestionSuggestions(false)}
-                filename={pdfDocument?.filename}
-                onQuestionSelect={handleSuggestedQuestionSelect}
-            />
+                {/* Add global cancel button if any questions are processing */}
+                {isProcessing && (
+                    <div className="processing-controls">
+                        <div className="processing-indicator">
+                            <FontAwesomeIcon icon={faSpinner} spin />
+                            <span>Processing questions...</span>
+                        </div>
+                        <button
+                            className="win95-btn cancel"
+                            onClick={() => cancelAllProcessing('user_cancelled')}
+                            title="Cancel all processing questions"
+                        >
+                            <FontAwesomeIcon icon={faStopCircle} />
+                            Cancel All
+                        </button>
+                    </div>
+                )}
+
+                {/* Error Display */}
+                {submitError && (
+                    <div className="submit-error">
+                        <FontAwesomeIcon icon={faExclamationTriangle} />
+                        <span className="error-message">{submitError}</span>
+                        <button className="win95-btn retry" onClick={handleRetry}>
+                            <FontAwesomeIcon icon={faRefresh} />
+                            Retry
+                        </button>
+                    </div>
+                )}
+
+                {/* Question Input */}
+                <form onSubmit={handleSubmit} className="question-form">
+                    <textarea
+                        ref={inputRef}
+                        className={`question-textarea ${submitError ? 'error' : ''}`}
+                        value={currentQuestion}
+                        onChange={(e) => setCurrentQuestion(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder={
+                            isProcessing
+                                ? "Please wait for current question to complete..."
+                                : submitError
+                                    ? "Fix the issue above and try again..."
+                                    : "What would you like to know about this document?"
+                        }
+                        disabled={isSubmitting || isProcessing}
+                        rows={2}
+                    />
+
+                    <button
+                        type="submit"
+                        className={`win95-btn submit ${submitError ? 'error' : ''}`}
+                        disabled={!currentQuestion.trim() || isSubmitting || isProcessing}
+                    >
+                        {isSubmitting ? (
+                            <FontAwesomeIcon icon={faSpinner} spin />
+                        ) : (
+                            <FontAwesomeIcon icon={faPaperPlane} />
+                        )}
+                        <span>
+                            {isSubmitting ? 'Submitting...' : 'Ask Question'}
+                        </span>
+                    </button>
+                </form>
+            </div>
         </div>
     );
 });

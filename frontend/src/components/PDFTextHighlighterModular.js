@@ -48,7 +48,7 @@ export function PDFTextHighlighterModular({
         if (textLayerRef?.current && !isRendering) {
             const elements = extractStableTextElements();
             setStableTextElements(elements);
-            console.log(`📊 Updated stable text elements: ${elements.length} elements`);
+            //console.log(`📊 Updated stable text elements: ${elements.length} elements`);
         }
     }, [textLayerRef?.current, currentPage, currentViewport, isRendering]);
 
@@ -99,14 +99,14 @@ export function PDFTextHighlighterModular({
                 overlay.style.width = `${width}px`;
                 overlay.style.height = `${height}px`;
 
-                console.log(`🔄 Updated highlight ${overlay.getAttribute('data-index')}: ${left},${top} ${width}x${height}`);
+                //console.log(`🔄 Updated highlight ${overlay.getAttribute('data-index')}: ${left},${top} ${width}x${height}`);
 
             } catch (error) {
                 console.warn('⚠️ Failed to update highlight position:', error);
             }
         });
 
-        console.log(`🔄 Updated positions for ${highlights.length} zoom-stable highlights`);
+        //console.log(`🔄 Updated positions for ${highlights.length} zoom-stable highlights`);
     }, []);
 
     // Main effect: highlight text when provenance changes
@@ -116,45 +116,45 @@ export function PDFTextHighlighterModular({
 
         const provenanceKey = `${provenanceId}_${questionId}_${currentPage}_${documentId}`;
 
-        console.log('🔍 Main highlighting effect triggered:', {
+        /*console.log('🔍 Main highlighting effect triggered:', {
             provenanceKey,
             lastProcessed: lastProcessedProvenanceRef.current,
             hasText: !!provenanceText,
             sentenceIdsCount: sentenceIds.length,
             isRendering,
             stableElementsCount: stableTextElements.length
-        });
+        });*/
 
         // Skip if we just processed this exact provenance
         if (lastProcessedProvenanceRef.current === provenanceKey) {
-            console.log('🔄 Skipping re-processing of same provenance:', provenanceKey);
+            //console.log('🔄 Skipping re-processing of same provenance:', provenanceKey);
             return;
         }
 
         if (!provenanceText && sentenceIds.length === 0) {
-            console.log('⏸️ No provenance data to highlight');
+            //console.log('⏸️ No provenance data to highlight');
             clearHighlights();
             lastProcessedProvenanceRef.current = null;
             return;
         }
 
         if (!textLayerRef?.current || !highlightLayerRef?.current || isRendering) {
-            console.log('⏸️ Not ready for highlighting:', {
+            /*console.log('⏸️ Not ready for highlighting:', {
                 textLayer: !!textLayerRef?.current,
                 highlightLayer: !!highlightLayerRef?.current,
                 isRendering
-            });
+            });*/
             clearHighlights();
             return;
         }
 
         // Only proceed if we have stable text elements
         if (stableTextElements.length === 0) {
-            console.log('⏳ Waiting for stable text elements...');
+            //console.log('⏳ Waiting for stable text elements...');
             return;
         }
 
-        console.log('🎯 Starting highlighting process for provenance:', provenanceId);
+        //console.log('🎯 Starting highlighting process for provenance:', provenanceId);
 
         // Mark this provenance as being processed
         lastProcessedProvenanceRef.current = provenanceKey;
@@ -192,7 +192,7 @@ export function PDFTextHighlighterModular({
 
             // Only respond if we're not rendering and highlights exist
             if (!isRendering && highlightsPersisted && stableTextElements.length > 0) {
-                console.log('🔍 Received viewport change event, recreating highlights');
+                //console.log('🔍 Received viewport change event, recreating highlights');
 
                 const { text: provenanceText, sentenceIds } = getProvenanceData();
                 const provenanceId = provenanceData?.provenance_id;
@@ -232,7 +232,7 @@ export function PDFTextHighlighterModular({
         const stableElements = textLayer.querySelectorAll('[data-stable-index]');
 
         if (stableElements.length > 0) {
-            console.log(`✅ Found ${stableElements.length} elements with stable IDs`);
+            //console.log(`✅ Found ${stableElements.length} elements with stable IDs`);
 
             stableElements.forEach((element, index) => {
                 const stableIndex = element.getAttribute('data-stable-index');
@@ -249,7 +249,7 @@ export function PDFTextHighlighterModular({
             });
         } else {
             // Fallback: use regular elements with generated stable indices
-            console.log(`⚠️ No stable IDs found, generating indices for ${textLayer.children.length} elements`);
+            //console.log(`⚠️ No stable IDs found, generating indices for ${textLayer.children.length} elements`);
 
             Array.from(textLayer.children).forEach((element, index) => {
                 const text = element.textContent?.trim();
@@ -390,7 +390,7 @@ export function PDFTextHighlighterModular({
             }
 
             // Strategy 3: Create fallback highlight
-            console.log('⚠️ No highlighting method succeeded, creating fallback');
+            //console.log('⚠️ No highlighting method succeeded, creating fallback');
             createFallbackHighlight(provenanceText || 'Provenance content', highlightId);
             setHighlightsPersisted(true);
 
@@ -414,7 +414,7 @@ export function PDFTextHighlighterModular({
             const mappingsData = await getSentenceItemMappings(documentId, sentenceIds, currentPage);
 
             if (!mappingsData || !mappingsData.sentence_mappings) {
-                console.log('⚠️ No stable mappings available');
+                //console.log('⚠️ No stable mappings available');
                 return false;
             }
 
@@ -472,13 +472,13 @@ export function PDFTextHighlighterModular({
             });
 
             if (highlights.length > 0) {
-                console.log(`✅ Created ${highlights.length} stable mapping highlights`);
+                //console.log(`✅ Created ${highlights.length} stable mapping highlights`);
                 createHighlightElements(highlights, highlightId);
                 setActiveHighlights(highlights);
                 return true;
             }
 
-            console.log('⚠️ No stable elements found for current page');
+           //console.log('⚠️ No stable elements found for current page');
             return false;
 
         } catch (error) {
@@ -524,7 +524,7 @@ export function PDFTextHighlighterModular({
             }
         }
 
-        console.log(`❌ Could not find stable element for index ${targetIndex}`);
+        //console.log(`❌ Could not find stable element for index ${targetIndex}`);
         return null;
     };
 
@@ -601,7 +601,7 @@ export function PDFTextHighlighterModular({
     const createHighlightElements = (highlights, highlightId) => {
         if (!highlightLayerRef?.current || highlights.length === 0) return;
 
-        console.log(`🎨 Creating ${highlights.length} highlight elements`);
+        //console.log(`🎨 Creating ${highlights.length} highlight elements`);
 
         highlights.forEach((highlight, index) => {
             const highlightElement = createSingleHighlight(highlight, index, highlightId);
@@ -610,7 +610,7 @@ export function PDFTextHighlighterModular({
             }
         });
 
-        console.log(`✅ Created highlights for provenance`);
+        //console.log(`✅ Created highlights for provenance`);
     };
 
     // Add this to your createSingleHighlight function for precise debugging
@@ -650,7 +650,7 @@ export function PDFTextHighlighterModular({
             });
         }
 
-        console.log(`🎯 PRECISE POSITIONING for "${element.textContent.substring(0, 20)}":`, {
+        /*console.log(`🎯 PRECISE POSITIONING for "${element.textContent.substring(0, 20)}":`, {
             method: "DOM bounding rects (fixed coordinate system)",
             elementRect: {
                 left: elementRect.left,
@@ -664,7 +664,7 @@ export function PDFTextHighlighterModular({
             },
             calculatedHighlightPosition: { left, top, width, height },
             alignmentCheck: isOffsetCorrect ? '✅ Aligned' : '❌ Misaligned'
-        });
+        });*/
 
         // Element CSS
         const elementCSS = {
@@ -691,7 +691,7 @@ export function PDFTextHighlighterModular({
             lineHeightOffset: parseFloat(elementStyle.lineHeight) || 0
         }
 
-        console.log(`🔍 PRECISE DEBUG for "${element.textContent.substring(0, 20)}":`, {
+        /*console.logconsole.log(`🔍 PRECISE DEBUG for "${element.textContent.substring(0, 20)}":`, {
             // Element positioning
             elementRect: {
                 left: elementRect.left,
@@ -717,7 +717,7 @@ export function PDFTextHighlighterModular({
 
             // Potential offsets
             potentialOffsets
-        });
+        });*/
 
         // TEST: Try different positioning strategies
         const strategies = {
@@ -727,7 +727,7 @@ export function PDFTextHighlighterModular({
             bothAdjusted: { left: left - potentialOffsets.borderOffset, top: top - parseFloat(elementStyle.fontSize) * 0.1 }
         };
 
-        console.log(`🎯 Position strategies for testing:`, strategies);
+        //console.log(`🎯 Position strategies for testing:`, strategies);
 
         // Use current strategy for now, but log alternatives
         const overlay = document.createElement('div');
@@ -787,9 +787,9 @@ export function PDFTextHighlighterModular({
             return;
         }
 
-        console.log('🔍 SPECIFIC ELEMENT vs HIGHLIGHT DEBUG:');
-        console.log('Stable Element:', stableElement);
-        console.log('Highlight Element:', highlight);
+        //console.log('🔍 SPECIFIC ELEMENT vs HIGHLIGHT DEBUG:');
+        //console.log('Stable Element:', stableElement);
+        //console.log('Highlight Element:', highlight);
 
         // Get absolute positions
         const textRect = stableElement.getBoundingClientRect();
@@ -797,7 +797,7 @@ export function PDFTextHighlighterModular({
         const textLayerRect = textLayer.getBoundingClientRect();
         const highlightLayerRect = highlightLayer.getBoundingClientRect();
 
-        console.log('Text Element:', {
+        /*console.log('Text Element:', {
             text: stableElement.textContent.substring(0, 30),
             absolutePosition: {
                 left: textRect.left,
@@ -834,7 +834,7 @@ export function PDFTextHighlighterModular({
                 width: highlight.style.width,
                 height: highlight.style.height
             }
-        });
+        });*/
 
         // Calculate the actual visual offset
         const visualOffset = {
@@ -844,7 +844,7 @@ export function PDFTextHighlighterModular({
             height: highlightRect.height - textRect.height
         };
 
-        console.log('Visual Offset (highlight vs text):', visualOffset);
+        //console.log('Visual Offset (highlight vs text):', visualOffset);
 
         // Layer positioning comparison
         const layerOffset = {
@@ -852,7 +852,7 @@ export function PDFTextHighlighterModular({
             top: highlightLayerRect.top - textLayerRect.top
         };
 
-        console.log('Layer Offset (highlight layer vs text layer):', layerOffset);
+        //console.log('Layer Offset (highlight layer vs text layer):', layerOffset);
 
         // Expected vs actual highlight position
         const expectedHighlightPosition = {
@@ -865,15 +865,15 @@ export function PDFTextHighlighterModular({
             top: parseFloat(highlight.style.top)
         };
 
-        console.log('Expected highlight position:', expectedHighlightPosition);
-        console.log('Actual highlight position:', actualHighlightPosition);
+        //console.log('Expected highlight position:', expectedHighlightPosition);
+        //console.log('Actual highlight position:', actualHighlightPosition);
 
         const positionDifference = {
             left: actualHighlightPosition.left - expectedHighlightPosition.left,
             top: actualHighlightPosition.top - expectedHighlightPosition.top
         };
 
-        console.log('Position calculation difference:', positionDifference);
+        //console.log('Position calculation difference:', positionDifference);
 
         // Identify the issue
         if (Math.abs(layerOffset.left) > 2 || Math.abs(layerOffset.top) > 2) {
@@ -950,7 +950,7 @@ export function PDFTextHighlighterModular({
     const addHighlightEventHandlers = (overlay, highlight, index) => {
         overlay.addEventListener('click', (e) => {
             e.stopPropagation();
-            console.log(`📍 Clicked stable highlight ${index}:`, highlight);
+            //console.log(`📍 Clicked stable highlight ${index}:`, highlight);
 
             // Visual feedback
             overlay.style.transform = 'scale(1.05)';
@@ -1036,7 +1036,7 @@ export function PDFTextHighlighterModular({
         }
 
         clearHighlights();
-        console.log(`🔍 Highlighting using mappings for: "${searchText.substring(0, 100)}..."`);
+        //console.log(`🔍 Highlighting using mappings for: "${searchText.substring(0, 100)}..."`);
 
         try {
             // Get sentence IDs from provenance data
@@ -1045,29 +1045,29 @@ export function PDFTextHighlighterModular({
                 provenanceData?.input_sentence_ids || [];
 
             if (sentenceIds.length === 0) {
-                console.log('⚠️ No sentence IDs found in provenance data');
+                //console.log('⚠️ No sentence IDs found in provenance data');
                 createFallbackHighlight(searchText, highlightId);
                 return;
             }
 
-            console.log('🎯 Looking for sentence IDs:', sentenceIds);
+            //console.log('🎯 Looking for sentence IDs:', sentenceIds);
 
             // Get the pre-computed mappings
             const mappings = await getSentenceItemMappings(documentId, sentenceIds);
-            console.log('📄 Retrieved mappings:', mappings);
+            //console.log('📄 Retrieved mappings:', mappings);
 
             if (!mappings || !mappings.sentence_mappings) {
-                console.log('⚠️ No sentence mappings found, falling back to text search');
+                //console.log('⚠️ No sentence mappings found, falling back to text search');
                 // Fall back to your existing text search
                 await highlightProvenanceTextOld(searchText, highlightId);
                 return;
             }
 
             // In your highlightProvenanceText function, after getting the response:
-            console.log('📄 Retrieved filtered mappings:', mappings);
+            //console.log('📄 Retrieved filtered mappings:', mappings);
 
             // Add this to see the structure clearly:
-            Object.entries(mappings.sentence_mappings).forEach(([sentenceId, sentenceMapping]) => {
+            /*Object.entries(mappings.sentence_mappings).forEach(([sentenceId, sentenceMapping]) => {
                 console.log(`📝 Sentence ${sentenceId}:`, sentenceMapping.text.substring(0, 100));
                 console.log(`🎯 Element matches:`, sentenceMapping.stable_matches.length);
 
@@ -1076,7 +1076,7 @@ export function PDFTextHighlighterModular({
                     console.log(`   Strategy: ${match.match_strategy}`);
                     console.log(`   Text: "${match.matched_text?.substring(0, 50)}..."`);
                 });
-            });
+            });*/
 
             // Find matching elements for current page
             const highlights = [];
@@ -1084,7 +1084,7 @@ export function PDFTextHighlighterModular({
             Object.entries(mappings.sentence_mappings).forEach(([sentenceId, sentenceMapping]) => {
 
                 if (sentenceMapping && sentenceMapping.stable_matches) {
-                    console.log(`📝 Found mapping for sentence ${sentenceId}:`, sentenceMapping);
+                   //console.log(`📝 Found mapping for sentence ${sentenceId}:`, sentenceMapping);
 
                     // Filter matches for current page
                     const currentPageMatches = sentenceMapping.stable_matches.filter(
@@ -1092,7 +1092,7 @@ export function PDFTextHighlighterModular({
                     );
 
                     if (currentPageMatches.length > 0) {
-                        console.log(`✅ Found ${currentPageMatches.length} matches on page ${currentPage} for sentence ${sentenceId}`);
+                        //console.log(`✅ Found ${currentPageMatches.length} matches on page ${currentPage} for sentence ${sentenceId}`);
 
                         currentPageMatches.forEach(match => {
                             highlights.push({
@@ -1112,12 +1112,12 @@ export function PDFTextHighlighterModular({
             });
 
             if (highlights.length > 0) {
-                console.log(`🎨 Creating highlights for ${highlights.length} mapped elements`);
+                //console.log(`🎨 Creating highlights for ${highlights.length} mapped elements`);
                 createHighlightsFromMappings(highlights, highlightId);
                 setActiveHighlights(highlights);
                 setHighlightsPersisted(true);
             } else {
-                console.log('⚠️ No highlights found for current page, creating fallback');
+                //console.log('⚠️ No highlights found for current page, creating fallback');
                 createFallbackHighlight(searchText, highlightId);
             }
 
@@ -1170,7 +1170,7 @@ export function PDFTextHighlighterModular({
     const createHighlightsFromMappings = (highlights, highlightId) => {
         if (!highlightLayerRef?.current || !textLayerRef?.current) return;
 
-        console.log(`🎨 Creating ${highlights.length} highlights from mappings`);
+        //console.log(`🎨 Creating ${highlights.length} highlights from mappings`);
 
         highlights.forEach((highlight, index) => {
             const textElements = getTextElements();
@@ -1179,12 +1179,12 @@ export function PDFTextHighlighterModular({
             const result = findElementBySelector(highlight, textElements);
 
             if (result && result.elements && result.elements.length > 0) {
-                console.log(`✅ Found ${result.elements.length} elements using ${result.method}`);
+                //console.log(`✅ Found ${result.elements.length} elements using ${result.method}`);
 
                 // Create highlights for all elements in the span
                 result.elements.forEach((element, spanIndex) => {
                     if (element) {
-                        console.log(`   Highlighting span element ${spanIndex}: "${element.textContent.substring(0, 30)}..."`);
+                        //console.log(`   Highlighting span element ${spanIndex}: "${element.textContent.substring(0, 30)}..."`);
 
                         const highlightElement = createMappingHighlight(
                             element,
@@ -1253,7 +1253,7 @@ export function PDFTextHighlighterModular({
         // Simple click handler
         overlay.addEventListener('click', (e) => {
             e.stopPropagation();
-            console.log('🎯 Clicked mapping highlight:', highlight);
+            //console.log('🎯 Clicked mapping highlight:', highlight);
 
             if (onHighlightClick) {
                 onHighlightClick({
@@ -1276,12 +1276,12 @@ export function PDFTextHighlighterModular({
      */
     const highlightProvenanceTextOld = async (searchText, highlightId) => {
         if (!searchText || searchText.length < 3) {
-            console.log('⚠️ Search text too short, skipping');
+            //console.log('⚠️ Search text too short, skipping');
             return;
         }
 
         clearHighlights();
-        console.log(`🔍 Highlighting with PDFTextMatcher: "${searchText.substring(0, 100)}..."`);
+        //console.log(`🔍 Highlighting with PDFTextMatcher: "${searchText.substring(0, 100)}..."`);
 
         try {
             await waitForTextLayer();
@@ -1294,7 +1294,7 @@ export function PDFTextHighlighterModular({
                 return;
             }
 
-            console.log(`📄 Found ${textElements.length} text elements to search`);
+            //console.log(`📄 Found ${textElements.length} text elements to search`);
 
             // Use PDFTextMatcher to find matches
             const matches = findTextMatches(textElements, searchText, {
@@ -1303,27 +1303,27 @@ export function PDFTextHighlighterModular({
                 maxCandidates: 20
             });
 
-            console.log(`🎯 PDFTextMatcher found ${matches.length} matches`);
+            //console.log(`🎯 PDFTextMatcher found ${matches.length} matches`);
 
             if (matches.length > 0) {
                 // Log top matches for debugging
-                matches.slice(0, 3).forEach((match, i) => {
+                /*matches.slice(0, 3).forEach((match, i) => {
                     console.log(`   ${i + 1}. "${match.elementText.substring(0, 50)}..." (${match.matchType}, conf: ${match.confidence.toFixed(2)}, strategy: ${match.strategy})`);
-                });
+                });*/
 
                 // Filter to high-quality matches if we have many
                 const qualityMatches = matches.length > 10
                     ? findHighConfidenceMatches(textElements, searchText, 0.6)
                     : matches;
 
-                console.log(`📊 Using ${qualityMatches.length} quality matches for highlighting`);
+                //console.log(`📊 Using ${qualityMatches.length} quality matches for highlighting`);
 
                 // Create visual highlights from matches
                 createHighlightElements(qualityMatches, highlightId);
                 setActiveHighlights(qualityMatches);
                 setHighlightsPersisted(true);
             } else {
-                console.log('⚠️ No matches found, creating fallback');
+                //console.log('⚠️ No matches found, creating fallback');
                 createFallbackHighlight(searchText, highlightId);
             }
 

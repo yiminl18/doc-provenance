@@ -1056,7 +1056,7 @@ const LayoutBasedPDFViewer = ({
     }, []);
 
     // Extract document ID for highlighter
-    const documentId = pdfDocument?.filename?.replace('.pdf', '') || '';
+    const documentId = pdfDocument?.filename || '';
 
     // Render states
     if (!pdfDocument) {

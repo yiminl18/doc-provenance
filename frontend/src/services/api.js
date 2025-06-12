@@ -167,11 +167,11 @@ export const checkStatus = async (questionId) => {
 /**
  * Get pre-computed PDF mappings for a document
  */
-export const getDocumentMappings = async (documentId) => {
+export const getDocumentMappings = async (filename) => {
   try {
-    const response = await axios.get(`${API_URL}/documents/${documentId}/mappings/sentences`);
+    const response = await axios.get(`${API_URL}/documents/${filename}/mappings/sentences`);
     const mappings = response.data;
-    console.log('Sentence mpappings for document:', documentId, mappings);
+    console.log('Sentence mappings for document:', filename, mappings);
     return response.data;
   } catch (error) {
     console.error('Error fetching document mappings:', error);
@@ -179,11 +179,11 @@ export const getDocumentMappings = async (documentId) => {
   }
 };
 
-export const getSentenceItemMappings = async (documentId, sentenceIds) => {
+export const getSentenceItemMappings = async (filename, sentenceIds) => {
   try {
     const ids = Array.isArray(sentenceIds) ? sentenceIds.join(',') : sentenceIds;
     const response = await axios.get(
-      `${API_URL}/documents/${documentId}/sentence-items?ids=${ids}`
+      `${API_URL}/documents/${filename}/sentence-items?ids=${ids}`
     );
     return response.data;
   } catch (error) {
@@ -654,7 +654,7 @@ export const sampleExtractableDocuments = async (maxDocuments = 5) => {
 // Get pre-generated questions for a document
 export const getGeneratedQuestions = async (filename) => {
   try {
-    const response = await axios.get(`${API_URL}/documents/${filename}/generated-questions`);
+    const response = await axios.get(`${API_URL}/test-questions/${filename}`);
     return response.data;
   } catch (error) {
     console.error('Error getting generated questions:', error);

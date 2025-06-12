@@ -56,7 +56,7 @@ TEST_SUITE_OUTPUT_DIR = os.path.join(os.getcwd(), 'app/test_outputs')
 for directory in [RESULTS_DIR, UPLOADS_DIR, STUDY_LOGS_DIR, QUESTIONS_DIR, SENTENCES_DIR, TEST_SUITE_OUTPUT_DIR]:
     os.makedirs(directory, exist_ok=True)
 
-text_processing_manager = TextProcessingManager(SENTENCES_DIR, RESULTS_DIR)
+text_processing_manager = TextProcessingManager(SENTENCES_DIR, TEST_SUITE_OUTPUT_DIR)
 
 # In routes.py - Add this at the top to debug routing
 @main.route('/test', methods=['GET', 'POST'])
@@ -93,238 +93,6 @@ def rate_limit(calls_per_minute=60):
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# ==============================================================================
-# TEST SUITE HELPERS
-# ==============================================================================
-def get_test_suite_question_dir(question_id: str, filename: str) -> str:
-    """Get the test suite output directory for a specific question"""
-    document_id = filename.replace('.pdf', '') if filename.endswith('.pdf') else filename
-    question_dir = os.path.join(TEST_SUITE_OUTPUT_DIR, 'documents', document_id, question_id)
-    os.makedirs(question_dir, exist_ok=True)
-    return question_dir
-
-def get_question_paths_for_test_suite(question_id: str, filename: str) -> dict:
-    """Get all file paths for a question in test suite format"""
-    question_dir = get_test_suite_question_dir(question_id, filename)
-    
-    return {
-        'question_dir': question_dir,
-        'answer_path': os.path.join(question_dir, 'answer.json'),
-        'provenance_path': os.path.join(question_dir, 'provenance.json'),
-        'metadata_path': os.path.join(question_dir, 'metadata.json'),
-        'status_path': os.path.join(question_dir, 'status.json'),
-        'logs_path': os.path.join(question_dir, 'process_logs.json')
-    }
-
-def find_question_in_test_suite(question_id: str) -> Optional[Tuple[str, str]]:
-    """
-    Find a question in the test suite directory structure
-    Returns: (document_name, filename) or None
-    """
-    docs_dir = os.path.join(TEST_SUITE_OUTPUT_DIR, 'documents')
-    if not os.path.exists(docs_dir):
-        return None
-    
-    for doc_name in os.listdir(docs_dir):
-        doc_dir = os.path.join(docs_dir, doc_name)
-        if os.path.isdir(doc_dir):
-            question_dir = os.path.join(doc_dir, question_id)
-            if os.path.exists(question_dir):
-                filename = f"{doc_name}.pdf"
-                return doc_name, filename
-    
-    return None
-
-def is_test_suite_format() -> bool:
-    """Check if we should use test suite format"""
-    return TEST_SUITE_OUTPUT_DIR != './app/results'
-
-# Metadata helpers
-def load_question_metadata_test_suite(question_id: str, filename: str) -> Optional[Dict]:
-    """Load metadata for a question in test suite format"""
-    paths = get_question_paths_for_test_suite(question_id, filename)
-    try:
-        if os.path.exists(paths['metadata_path']):
-            with open(paths['metadata_path'], 'r', encoding='utf-8') as f:
-                return json.load(f)
-        return None
-    except Exception as e:
-        logger.error(f"Error loading test suite metadata for question {question_id}: {e}")
-        return None
-
-def save_question_metadata_test_suite(question_id: str, filename: str, metadata: Dict) -> bool:
-    """Save metadata for a question in test suite format"""
-    paths = get_question_paths_for_test_suite(question_id, filename)
-    try:
-        with open(paths['metadata_path'], 'w', encoding='utf-8') as f:
-            json.dump(metadata, f, indent=2, ensure_ascii=False)
-        return True
-    except Exception as e:
-        logger.error(f"Error saving test suite metadata for question {question_id}: {e}")
-        return False
-
-def update_process_log_test_suite(question_id: str, filename: str, message: str, status: str = None):
-    """Add a new message to the process logs in test suite format"""
-    paths = get_question_paths_for_test_suite(question_id, filename)
-    
-    try:
-        with open(paths['logs_path'], 'r') as f:
-            logs = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        logs = {'status': 'started', 'logs': [], 'timestamp': time.time(), 'output_format': 'test_suite'}
-    
-    # Format message
-    if message.startswith('Top-') or message.startswith('Labeler') or message.startswith('Provenance:') or 'tokens:' in message or 'Time:' in message:
-        log_entry = message
-    else:
-        log_entry = f"[{time.strftime('%H:%M:%S')}] {message}"
-        
-    logs['logs'].append(log_entry)
-    
-    if status:
-        logs['status'] = status
-    
-    logs['timestamp'] = time.time()
-    
-    with open(paths['logs_path'], 'w') as f:
-        json.dump(logs, f, indent=2, ensure_ascii=False)
-    
-    logger.info(f"Question {question_id}: {message}")
-
-def check_answer_ready_test_suite(question_id: str, filename: str) -> Dict:
-    """Check if answer is ready for a question in test suite format"""
-    paths = get_question_paths_for_test_suite(question_id, filename)
-    answer_path = paths['answer_path']
-    
-    try:
-        if not os.path.exists(answer_path):
-            return {'ready': False, 'reason': 'file_not_found'}
-        
-        file_size = os.path.getsize(answer_path)
-        if file_size == 0:
-            return {'ready': False, 'reason': 'file_empty'}
-        
-        try:
-            with open(answer_path, 'r', encoding='utf-8') as f:
-                answer_data = json.load(f)
-        except json.JSONDecodeError as json_error:
-            logger.warning(f"Invalid JSON in answer file for question {question_id}: {json_error}")
-            return {'ready': False, 'reason': 'invalid_json'}
-        
-        # Extract answer text (test suite format expects lists)
-        answer_list = answer_data.get('answer', [])
-        if isinstance(answer_list, list) and len(answer_list) > 0:
-            answer_text = answer_list[0]
-            if answer_text and answer_text != "Answer is not found":
-                question_list = answer_data.get('question', [''])
-                question_text = question_list[0] if isinstance(question_list, list) else str(question_list)
-                
-                return {
-                    'ready': True,
-                    'answer': answer_text,
-                    'question': question_text,
-                    'timestamp': answer_data.get('timestamp', time.time())
-                }
-            elif answer_text and answer_text == "Answer is not found":
-                logger.info(f"Question {question_id} answer is not found or null")
-                return {'ready': True, 'reason': 'answer_empty'}
-        
-
-
-        return {'ready': False, 'reason': 'answer_not_ready'}
-        
-    except Exception as e:
-        logger.error(f"Unexpected error checking answer for question {question_id}: {e}")
-        return {'ready': False, 'error': str(e), 'reason': 'unexpected_error'}
-
-def get_current_provenance_count_test_suite(question_id: str, filename: str) -> int:
-    """Get the current number of provenances available for a question in test suite format"""
-    paths = get_question_paths_for_test_suite(question_id, filename)
-    provenance_path = paths['provenance_path']
-    
-    try:
-        if os.path.exists(provenance_path):
-            file_size = os.path.getsize(provenance_path)
-            
-            with open(provenance_path, 'r', encoding='utf-8') as f:
-                provenance_data = json.load(f)
-            
-            if isinstance(provenance_data, list):
-                count = len(provenance_data)
-                return count
-            else:
-                logger.warning(f"Provenance data is not a list: {type(provenance_data)}")
-                return 0
-        else:
-            return 0
-        
-    except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error in provenance file for question {question_id}: {e}")
-        return 0
-    except Exception as e:
-        logger.error(f"Error checking provenance count for question {question_id}: {e}")
-        return 0
-
-def get_next_provenance_test_suite(question_id: str, filename: str, current_count: int = 0) -> Dict:
-    """Get the next available provenance for a question in test suite format"""
-    paths = get_question_paths_for_test_suite(question_id, filename)
-    provenance_path = paths['provenance_path']
-    metadata = load_question_metadata_test_suite(question_id, filename)
-    
-    try:
-        if os.path.exists(provenance_path):
-            with open(provenance_path, 'r', encoding='utf-8') as f:
-                provenance_data = json.load(f)
-            
-            if isinstance(provenance_data, list):
-                # Check if we have more provenances than the user has seen
-                if len(provenance_data) > current_count:
-                    # Check if we've hit the user-facing limit
-                    if current_count >= EXPERIMENT_TOP_K:
-                        return {
-                            'has_more': False,
-                            'reason': 'limit_reached',
-                            'message': f'Maximum of {EXPERIMENT_TOP_K} provenances shown'
-                        }
-                    
-                    # Return the next provenance
-                    next_provenance = provenance_data[current_count]
-                    
-                    return {
-                        'has_more': True,
-                        'provenance': next_provenance,
-                        'provenance_index': current_count,
-                        'total_available': len(provenance_data),
-                        'remaining': min(len(provenance_data) - current_count - 1, EXPERIMENT_TOP_K - current_count - 1)
-                    }
-        
-        # Check if processing is still ongoing
-        processing_complete = metadata.get('processing_complete', False) if metadata else False
-        
-        if not processing_complete:
-            return {
-                'has_more': False,
-                'reason': 'processing_ongoing',
-                'message': 'Evidence sources are still being generated. Please try again in a moment.',
-                'retry_suggested': True
-            }
-        else:
-            return {
-                'has_more': False,
-                'reason': 'processing_complete_no_provenances',
-                'message': 'No evidence sources were found for this answer'
-            }
-        
-    except Exception as e:
-        logger.error(f"Error getting next provenance for question {question_id}: {e}")
-        return {
-            'has_more': False,
-            'reason': 'error',
-            'message': f'Error retrieving provenance: {str(e)}'
-        }
-
-
 
 
 # List all routes for debugging
@@ -1226,7 +994,7 @@ def check_answer(question_id):
             }), 400
         
         # Find the question directory using the new structure
-        question_dir = find_question_directory(question_id)
+        question_dir = find_question_directory(question_id, TEST_SUITE_OUTPUT_DIR)
         if not question_dir:
             logger.warning(f"Question directory not found for ID: {question_id}")
             return jsonify({
@@ -1269,7 +1037,7 @@ def get_next_provenance_route(question_id):
         current_count = data.get('current_count', 0)
         
         # Find the question directory
-        question_dir = find_question_directory(question_id)
+        question_dir = find_question_directory(question_id, TEST_SUITE_OUTPUT_DIR)
         if not question_dir:
             return jsonify({
                 'success': False,
@@ -1303,7 +1071,7 @@ def get_next_provenance_route(question_id):
 def get_question_status(question_id):
     """Get comprehensive status for a question"""
     try:
-        question_dir = find_question_directory(question_id)
+        question_dir = find_question_directory(question_id, TEST_SUITE_OUTPUT_DIR)
         if not question_dir:
             return jsonify({
                 'success': False,
@@ -1362,7 +1130,7 @@ def get_question_status(question_id):
 def get_results(question_id):
     # Check if the provenance file exists
     try:
-        question_dir = find_question_directory(question_id)
+        question_dir = find_question_directory(question_id, TEST_SUITE_OUTPUT_DIR)
         if not question_dir:
             return jsonify({
                 'success': False,
@@ -1400,7 +1168,7 @@ def get_results(question_id):
 def check_progress(question_id):
 
     try:
-        question_dir = find_question_directory(question_id)
+        question_dir = find_question_directory(question_id, TEST_SUITE_OUTPUT_DIR)
         if not question_dir:
             return jsonify({
                 'success': False,
@@ -1930,15 +1698,15 @@ def analyze_session_endpoint(session_id):
 # HELPER FUNCTIONS FOR NEW DIRECTORY STRUCTURE
 # =============================================================================
 
-def find_question_directory(question_id):
+def find_question_directory(question_id, BASE_DIR):
     """
     Find the question directory for a given question ID
     Searches through the results directory structure
     """
     try:
         # Search through all PDF directories in results
-        for pdf_dir in os.listdir(RESULTS_DIR):
-            pdf_path = os.path.join(RESULTS_DIR, pdf_dir)
+        for pdf_dir in os.listdir(BASE_DIR):
+            pdf_path = os.path.join(BASE_DIR, pdf_dir)
             if not os.path.isdir(pdf_path):
                 continue
             
@@ -1950,7 +1718,7 @@ def find_question_directory(question_id):
                         return question_dir
         
         # Fallback: check if it's an old-style question ID (direct in results)
-        old_style_dir = os.path.join(RESULTS_DIR, question_id)
+        old_style_dir = os.path.join(BASE_DIR, question_id)
         if os.path.isdir(old_style_dir):
             return old_style_dir
         

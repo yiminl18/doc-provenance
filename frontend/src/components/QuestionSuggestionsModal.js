@@ -36,6 +36,8 @@ const QuestionSuggestionsModal = ({
       const response = await getGeneratedQuestions(filename);
       
       if (response.success) {
+        console.log('Loaded questions:', response.questions);
+        console.log('Metadata:', response.metadata);
         setQuestions(response.questions || []);
         setMetadata(response.metadata || null);
       } else {
@@ -106,7 +108,7 @@ const QuestionSuggestionsModal = ({
                     onClick={() => handleQuestionClick(question)}
                   >
                     <div className="question-number">{index + 1}</div>
-                    <div className="question-text">{question}</div>
+                    <div className="question-text">{question.question_text}</div>
                     <div className="question-action">
                       <FontAwesomeIcon icon={faPaperPlane} />
                     </div>

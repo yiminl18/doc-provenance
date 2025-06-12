@@ -382,7 +382,7 @@ const HistorySidebar = ({
       {/* Question Detail Modal */}
       {selectedQuestionModal && (
         <div className="modal-overlay" onClick={() => setSelectedQuestionModal(null)}>
-          <div className="question-detail-modal" onClick={e => e.stopPropagation()}>
+          <div className="modal-container question-detail" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h4>Question Details</h4>
               <button 

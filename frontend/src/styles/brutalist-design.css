@@ -875,15 +875,17 @@ p {
 
 /* Main Modal Container */
 .modal-container {
+  position: relative;
   background-color: var(--bg-panel);
   border: var(--border-medium) solid var(--win95-border-dark);
   box-shadow: var(--shadow-raised);
-  max-width: 800px;
-  width: 100%;
+  top: var(--header-height);
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   font-family: var(--font-display);
+  z-index: 999;
+  
 }
 
 
@@ -1004,6 +1006,7 @@ p {
   padding: var(--space-6);
   overflow-y: auto;
   min-height: 0;
+  z-index: 999;
 }
 
 /* Progress System */

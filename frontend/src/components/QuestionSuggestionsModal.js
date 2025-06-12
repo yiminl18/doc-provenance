@@ -100,7 +100,7 @@ const QuestionSuggestionsModal = ({
                 </div>
               )}
               
-              <div className="questions-list">
+              <div className="documents-grid">
                 {questions.map((question, index) => (
                   <button
                     key={index}

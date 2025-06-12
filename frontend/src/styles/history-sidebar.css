@@ -512,6 +512,7 @@
 .question-full-section,
 .answer-full-section,
 .provenances-full-section {
+  
   margin-bottom: var(--space-6);
   padding-bottom: var(--space-4);
   border-bottom: var(--border-thin) solid var(--win95-border);

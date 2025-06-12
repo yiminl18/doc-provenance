@@ -246,6 +246,7 @@
   padding: var(--space-3) var(--space-4);
   border-bottom: var(--border-medium) solid var(--win95-border-dark);
   display: flex;
+  max-height: 100px;
   justify-content: space-between;
   align-items: center;
   flex-shrink: 0;

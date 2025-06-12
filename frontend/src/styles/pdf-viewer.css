@@ -3,6 +3,16 @@
    Consistent with existing design system
    ======================================== */
 
+  .pdf-section {
+  /* Remove flex: 1 and height constraints */
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  background-color: var(--bg-paper);
+  position: relative;
+  /* Remove min-height: 0 */
+}
+
 /* ===== MAIN PDF VIEWER CONTAINER ===== */
 .pdf-viewer {
   height: 100%;
@@ -16,9 +26,13 @@
 
 
 /* ===== PDF HEADER ===== */
-.pdf-viewer .pdf-header {
+.pdf-header {
   display: flex;
+  justify-items:flex-start;
   justify-content: space-between;
+  max-height: 100px;
+  flex-wrap: wrap;
+  flex-direction: row;
   align-items: center;
   padding: var(--space-3) var(--space-4);
   background-color: var(--bg-secondary);
@@ -27,9 +41,9 @@
   flex-shrink: 0;
 }
 
-.pdf-viewer .pdf-title {
-  display: flex;
-  align-items: center;
+.pdf-title {
+  flex: .3;
+  align-items: left;
   gap: var(--space-3);
   font-weight: var(--font-semibold);
   color: var(--win95-text);
@@ -38,31 +52,21 @@
   letter-spacing: 0.05em;
 }
 
-.pdf-viewer .pdf-title svg {
+.pdf-title svg {
   color: var(--primary-blue);
   font-size: var(--text-base);
 }
 
-.pdf-viewer .provenance-badge {
-  background-color: var(--success-green);
-  color: white;
-  padding: var(--space-1) var(--space-3);
-  border: var(--border-thin) solid var(--success-green);
-  font-size: var(--text-xs);
-  font-weight: var(--font-semibold);
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  box-shadow: var(--shadow-raised);
-}
-
-.pdf-viewer .pdf-controls {
+.zoom-controls {
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  justify-items:right;
+  align-items: flex-end;
+  flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-.pdf-viewer .win95-btn.control {
+.zoom-controls .win95-btn.control {
   padding: var(--space-2) var(--space-3);
   border: var(--border-medium) solid var(--win95-border-dark);
   background-color: var(--win95-lighter);
@@ -80,7 +84,7 @@
 
 
 
-.pdf-viewer .zoom-display {
+.zoom-controls .zoom-display {
   padding: var(--space-2) var(--space-3);
   font-weight: var(--font-bold);
   color: var(--primary-blue);
@@ -95,8 +99,10 @@
 
 
 /* ===== PAGE NAVIGATION ===== */
-.pdf-viewer .page-navigation {
+.page-navigation {
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: var(--space-4);
@@ -107,7 +113,7 @@
   box-shadow: var(--shadow-pressed);
 }
 
-.pdf-viewer .win95-btn.nav {
+.page-navigation .win95-btn.nav {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -125,24 +131,24 @@
   box-shadow: var(--shadow-raised);
 }
 
-.pdf-viewer .win95-btn.nav:hover:not(:disabled) {
+.page-navigation .win95-btn.nav:hover:not(:disabled) {
   background-color: var(--win95-lightest);
   border-color: var(--primary-blue);
 }
 
-.pdf-viewer .win95-btn.nav:active:not(:disabled) {
+.page-navigation .win95-btn.nav:active:not(:disabled) {
   box-shadow: var(--shadow-pressed);
   transform: translate(1px, 1px);
 }
 
-.pdf-viewer .win95-btn.nav:disabled {
+.page-navigation .win95-btn.nav:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   background-color: var(--bg-secondary);
   color: var(--win95-text-muted);
 }
 
-.pdf-viewer .page-info {
+.page-navigation .page-info {
   font-weight: var(--font-bold);
   color: var(--primary-blue);
   font-family: var(--font-mono);
@@ -157,7 +163,7 @@
   letter-spacing: 0.05em;
 }
 
-.pdf-viewer .sentence-status {
+.pdf-header .sentence-status {
   color: var(--win95-text-muted);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -168,13 +174,13 @@
   letter-spacing: 0.05em;
 }
 
-.pdf-viewer .mapping-quality {
+.pdf-header .mapping-quality {
   color: var(--success-green);
   font-weight: var(--font-semibold);
 }
 
 /* ===== MAIN CONTENT LAYOUT ===== */
-.pdf-viewer .hybrid-content {
+.pdf-viewer {
   flex: 1;
   display: flex;
   overflow: hidden;
@@ -190,14 +196,6 @@
   background-color: var(--bg-paper);
 }
 
-.pdf-viewer .pdf-main-view.with-detail-panel {
-  flex: 0 0 70%;
-  border-right: var(--border-medium) solid var(--win95-border-dark);
-}
-
-.pdf-viewer .pdf-main-view.full-width {
-  flex: 1;
-}
 
 .pdf-viewer .pdf-content {
   width: 100%;
@@ -939,15 +937,7 @@
   overflow: visible;
 }
 
-.pdf-section {
-  /* Remove flex: 1 and height constraints */
-  display: flex;
-  flex-direction: column;
-  overflow: visible;
-  background-color: var(--bg-paper);
-  position: relative;
-  /* Remove min-height: 0 */
-}
+
 
 /* Ensure the viewer fits well in the layout */
 .app-content-grid {

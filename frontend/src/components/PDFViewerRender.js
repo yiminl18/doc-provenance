@@ -11,9 +11,10 @@ import {
     faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 import { useRenderManager } from '../utils/useRenderManager';
-//import { PDFTextHighlighterModular as PDFTextHighlighter } from './PDFTextHighlighterModular';
-import { MinimalTestHighlighter as PDFTextHighlighter } from './MinimalTestHighlighter';
+import { PDFTextHighlighterFixed as PDFTextHighlighter } from './PDFTextHighlighterFixed';
+//import { MinimalTestHighlighter as PDFTextHighlighter } from './MinimalTestHighlighter';
 import { getSentenceItemMappings } from '../services/api';
+import { text } from 'd3';
 
 const PDFViewerRender = ({
     pdfDocument,
@@ -29,6 +30,7 @@ const PDFViewerRender = ({
     const [loadError, setLoadError] = useState(null);
     const [pdfUrl, setPdfUrl] = useState(null);
     const [provenancePageCache, setProvenancePageCache] = useState(new Map())
+    const [provenanceSpanCache, setProvenanceSpanCache] = useState(new Map());
     // Check if user is away from provenance page
     const [provenanceTargetPage, setProvenanceTargetPage] = useState(null);
 
@@ -110,8 +112,7 @@ const PDFViewerRender = ({
         console.log(`📡 Viewport changed: page ${page}, zoom ${(zoom * 100).toFixed(0)}%`);
 
         // Setup text layer when viewport changes
-        setupTextLayer(viewport);
-        setupHighlightLayer();
+        
 
         // Notify highlighter component
         setTimeout(() => {
@@ -122,11 +123,19 @@ const PDFViewerRender = ({
         }, 100);
     }
 
-    const setupTextLayer = async (viewport) => {
+    useEffect(() => {
+        if (renderManager.isReady && renderManager.viewport) {
+            console.log('Setting up layers after render completion');
+            setupTextLayer(renderManager.currentPage, renderManager.viewport);
+            setupHighlightLayer();
+        }
+    }, [renderManager.isReady, renderManager.currentPage, renderManager.viewport]);
+
+    const setupTextLayer = async (pageNumber, viewport) => {
         if (!textLayerRef.current || !pdfDoc) return;
 
         try {
-            const page = await pdfDoc.getPage(renderManager.currentPage);
+            const page = await pdfDoc.getPage(pageNumber);
             const textContent = await page.getTextContent();
             const textLayer = textLayerRef.current;
 
@@ -168,7 +177,7 @@ const PDFViewerRender = ({
 
                 textDiv.textContent = item.str || '';
                 textDiv.setAttribute('data-stable-index', itemIndex);
-                textDiv.setAttribute('data-page-number', renderManager.currentPage);
+                textDiv.setAttribute('data-page-number', pageNumber);
                 textDiv.className = 'pdf-text-item';
 
                 textLayer.appendChild(textDiv);
@@ -278,7 +287,7 @@ const PDFViewerRender = ({
     }, [selectedProvenance?.provenance_id]);
 
     // Then your button logic:
-    const isAwayFromProvenance = provenanceTargetPage &&
+    const isAwayFromProvenance = selectedProvenance && provenanceTargetPage &&
         renderManager.currentPage !== provenanceTargetPage;
 
     // Update button handlers to use new goToPage
@@ -403,6 +412,140 @@ const PDFViewerRender = ({
         }
     };
 
+
+    const SimpleHighlighter = ({ provenanceData, textLayerRef, highlightLayerRef, canvasLayerRef }) => {
+        useEffect(() => {
+            console.log('🔍 Highlighter effect - Layer status:', {
+                textLayer: !!textLayerRef?.current,
+                highlightLayer: !!highlightLayerRef?.current,
+                textLayerChildren: textLayerRef?.current?.children?.length || 0,
+                highlightLayerChildren: highlightLayerRef?.current?.children?.length || 0
+            });
+
+            if (!provenanceData?.provenance || !textLayerRef?.current || !highlightLayerRef?.current || !canvasLayerRef?.current) {
+                console.log('⏸️ Skipping highlight - missing layers');
+                return;
+            }
+
+            const canvas = canvasLayerRef.current;
+            const scale = canvas.offsetWidth / canvas.width; // Actual vs native size
+            console.log('📏 Canvas scale:', scale);
+            const highlightLayer = highlightLayerRef.current;
+            const canvasRect = canvas.getBoundingClientRect();
+            const layerRect = highlightLayer.getBoundingClientRect();
+            console.log('📏 Highlight layer rect:', {
+                left: layerRect.left,
+                top: layerRect.top,
+                width: layerRect.width,
+                height: layerRect.height
+            });
+            console.log('📏 Canvas rect:', {
+                left: canvasRect.left,
+                top: canvasRect.top,
+                width: canvasRect.width,
+                height: canvasRect.height
+            });
+            console.log('📏 Highlight layer position:', {
+                left: highlightLayer.style.left,
+                top: highlightLayer.style.top,
+                width: highlightLayer.style.width,
+                height: highlightLayer.style.height
+            });
+
+            const handleHighlight = async () => {
+                const sentenceIds = provenanceData.provenance_ids || [];
+                const textElements = Array.from(textLayerRef.current.querySelectorAll('[data-stable-index]'));
+
+                console.log('🗺️ Attempting stable mappings for sentences:', sentenceIds);
+
+                const mappingsData = await getSentenceItemMappings(pdfDocument.filename, sentenceIds);
+
+                if (!mappingsData || !mappingsData.sentence_mappings) {
+                    console.log('⚠️ No stable mappings available');
+                    return false;
+                }
+
+                const highlights = [];
+                const sentenceMappings = mappingsData.sentence_mappings;
+                const currentPage = renderManager.currentPage;
+                const sentenceSpans = new Set();
+
+                Object.entries(sentenceMappings).forEach(([sentenceId, mapping]) => {
+                    if (mapping.stable_matches && mapping.stable_matches.length > 0) {
+                        const pageMatches = mapping.stable_matches.filter(match => match.page === renderManager.currentPage);
+                        pageMatches.forEach(match => {
+                            const spanElements = match.item_span || [];
+                            spanElements.forEach(spanIndex => {
+                                sentenceSpans.add(spanIndex);
+                            });
+                        });
+                    }
+                });
+
+
+
+                // Clear previous highlights
+                highlightLayer.querySelectorAll('.temp-highlight').forEach(el => el.remove());
+                const matchingElements = [];
+                // first filter the text elements to only those on the current page
+                sentenceSpans.forEach((index) => {
+                    const element = textLayerRef.current.querySelector(`[data-stable-index="${index}"][data-page-number="${renderManager.currentPage}"]`);
+                    if (element) {
+                        matchingElements.push(element);
+                    }
+                });
+
+                console.log(`🔍 Found ${matchingElements.length} text elements on current page ${renderManager.currentPage}`);
+
+                matchingElements.forEach((textElement) => {
+                    const stableIndex = parseInt(textElement.getAttribute('data-stable-index'));
+
+
+                    highlights.push({
+                        element: textElement,
+                        elementText: textElement.textContent,
+                        stableIndex: stableIndex,
+                        matchedText: textElement.textContent
+                    });
+
+                    const elementRect = textElement.getBoundingClientRect();
+                    const highlightLayerRect = highlightLayer.getBoundingClientRect();
+                    const left = elementRect.left - highlightLayerRect.left;
+                    const top = elementRect.top - highlightLayerRect.top;
+
+                    // Optional: Apply zoom correction if needed
+                    const zoomLevel = renderManager.currentZoom || 1;
+                    const correctedLeft = left / zoomLevel;
+                    const correctedTop = top / zoomLevel;
+
+                    const highlightBox = document.createElement('div');
+                    highlightBox.className = 'temp-highlight'; // Add class for cleanup
+                    highlightBox.title = `Stable Index: ${stableIndex}_Matched Text: ${textElement.textContent}`;
+                    highlightBox.style.cssText = `
+                        position: absolute;
+                        left: ${left}px;
+                        top: ${top}px;
+                        width: ${elementRect.width}px;
+                        height: ${elementRect.height}px;
+                        background: rgba(255, 0, 0, 0.3);
+                        pointer-events: none;
+                        z-index: 1000;
+                    `;
+                    highlightLayer.appendChild(highlightBox);
+
+                });
+
+                console.log(`Found ${highlights.length} text matches`);
+            };
+
+            handleHighlight();
+        }, [provenanceData?.provenance_id]); // Fixed dependency
+
+        return null;
+    };
+
+
+
     // Render states
     if (!pdfDocument) {
         return (
@@ -439,48 +582,55 @@ const PDFViewerRender = ({
                 <div className="pdf-title">
                     <FontAwesomeIcon icon={faFileAlt} />
                     <span>{pdfDocument.filename}</span>
+
+
+                    {renderManager.isRendering && (
+                        <div className="rendering-indicator">
+                            <FontAwesomeIcon icon={faSpinner} spin />
+                            <span>Rendering...</span>
+                        </div>
+                    )}
+
+                    {renderManager.error && (
+                        <div className="render-error">
+                            <FontAwesomeIcon icon={faExclamationTriangle} />
+                            <span>Render Error: {renderManager.error}</span>
+                        </div>
+                    )}
                 </div>
 
-                {renderManager.isRendering && (
-                    <div className="rendering-indicator">
-                        <FontAwesomeIcon icon={faSpinner} spin />
-                        <span>Rendering...</span>
-                    </div>
-                )}
 
-                {renderManager.error && (
-                    <div className="render-error">
-                        <FontAwesomeIcon icon={faExclamationTriangle} />
-                        <span>Render Error: {renderManager.error}</span>
-                    </div>
-                )}
-            </div>
+                {/* Navigation */}
+                <div className="page-navigation">
+                    <button
+                        onClick={() => goToPage(renderManager.currentPage - 1)}
+                        disabled={renderManager.currentPage <= 1 || renderManager.isRendering}
+                        className="win95-btn nav"
+                    >
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                        Previous
+                    </button>
 
-            {/* Navigation */}
-            <div className="page-navigation">
-                <button
-                    onClick={() => goToPage(renderManager.currentPage - 1)}
-                    disabled={renderManager.currentPage <= 1 || renderManager.isRendering}
-                    className="win95-btn nav"
-                >
-                    <FontAwesomeIcon icon={faChevronLeft} />
-                    Previous
-                </button>
+                    <span className="page-info">
+                        Page {renderManager.currentPage} of {totalPages}
+                    </span>
 
-                <span className="page-info">
-                    Page {renderManager.currentPage} of {totalPages}
-                </span>
+                    <button
+                        onClick={() => goToPage(renderManager.currentPage + 1)}
+                        disabled={renderManager.currentPage >= totalPages || renderManager.isRendering}
+                        className="win95-btn nav"
+                    >
+                        Next
+                        <FontAwesomeIcon icon={faChevronRight} />
+                    </button>
+                    {isAwayFromProvenance && (
+                        <button onClick={goBackToProvenance} className="win95-btn control">
+                            ← Back to Provenance (Page {provenanceTargetPage})
+                        </button>
+                    )}
+                </div>
 
-                <button
-                    onClick={() => goToPage(renderManager.currentPage + 1)}
-                    disabled={renderManager.currentPage >= totalPages || renderManager.isRendering}
-                    className="win95-btn nav"
-                >
-                    Next
-                    <FontAwesomeIcon icon={faChevronRight} />
-                </button>
-
-                <div className="pdf-controls">
+                <div className="zoom-controls">
                     <button
                         onClick={zoomOut}
                         disabled={renderManager.isRendering}
@@ -510,13 +660,10 @@ const PDFViewerRender = ({
                         Fit
                     </button>
 
-                    {isAwayFromProvenance && (
-                        <button onClick={goBackToProvenance} className="win95-btn">
-                            ← Back to Provenance (Page {provenanceTargetPage})
-                        </button>
-                    )}
+
                 </div>
             </div>
+
 
             {/* Main Content */}
             <div className="pdf-main-view">
@@ -539,6 +686,15 @@ const PDFViewerRender = ({
                                 currentViewport={renderManager.viewport}
                                 questionId={activeQuestionId}
                                 isRendering={renderManager.isRendering}
+                            />
+                        )}
+
+                        {renderManager.isReady && selectedProvenance && (
+                            <SimpleHighlighter
+                                provenanceData={selectedProvenance}
+                                textLayerRef={textLayerRef}
+                                highlightLayerRef={highlightLayerRef}
+                                canvasLayerRef={canvasRef}
                             />
                         )}
                     </div>

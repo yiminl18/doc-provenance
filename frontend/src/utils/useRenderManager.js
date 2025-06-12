@@ -57,8 +57,9 @@ export function useRenderManager({ pdfDoc, canvasRef, containerRef, onViewportCh
             // Auto-calculate fit-to-width if no zoom specified
             let finalZoom = zoomLevel;
             if (finalZoom === null) {
-                const containerWidth = containerRef.current.offsetWidth;
-                finalZoom = calculateFitToWidthZoom(baseViewport, containerWidth);
+                finalZoom = 1.0;
+                //const containerWidth = containerRef.current.offsetWidth;
+                //finalZoom = calculateFitToWidthZoom(baseViewport, containerWidth);
                 console.log(`📏 Auto-calculated fit-to-width: ${(finalZoom * 100).toFixed(0)}%`);
             }
 

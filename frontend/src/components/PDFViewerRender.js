@@ -11,9 +11,10 @@ import {
     faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 import { useRenderManager } from '../utils/useRenderManager';
-import { PDFTextHighlighterFixed as PDFTextHighlighter } from './PDFTextHighlighterFixed';
+//import { PDFTextHighlighterFixed as PDFTextHighlighter } from './PDFTextHighlighterFixed';
 //import { MinimalTestHighlighter as PDFTextHighlighter } from './MinimalTestHighlighter';
 import { getSentenceItemMappings } from '../services/api';
+import '../styles/pdf-viewer-render.css';
 import { text } from 'd3';
 
 const PDFViewerRender = ({
@@ -29,8 +30,9 @@ const PDFViewerRender = ({
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(null);
     const [pdfUrl, setPdfUrl] = useState(null);
-    const [provenancePageCache, setProvenancePageCache] = useState(new Map())
-    const [provenanceSpanCache, setProvenanceSpanCache] = useState(new Map());
+    const [provenancePageCache, setProvenancePageCache] = useState(new Map());
+
+    const [displayZoom, setDisplayZoom] = useState(1.0);
     // Check if user is away from provenance page
     const [provenanceTargetPage, setProvenanceTargetPage] = useState(null);
 
@@ -108,30 +110,34 @@ const PDFViewerRender = ({
         }
     };
 
-    function handleViewportChange({ page, zoom, viewport }) {
-        console.log(`📡 Viewport changed: page ${page}, zoom ${(zoom * 100).toFixed(0)}%`);
+    function handleViewportChange({ page, zoom, displayViewport, textLayerViewport, zoomRatio }) {
+        console.log(`📡 Viewport changed: page ${page}, display zoom ${(zoom * 100).toFixed(0)}%, text layer zoom: 100%`);
 
-        // Setup text layer when viewport changes
-        
+        // Store both viewports for text layer setup
+        window.currentDisplayViewport = displayViewport;
+        window.currentTextLayerViewport = textLayerViewport;
+        window.currentZoomRatio = zoomRatio;
 
-        // Notify highlighter component
         setTimeout(() => {
+            setupTextLayer(page, displayViewport);
+            setupHighlightLayer();
             const event = new CustomEvent('pdfViewportChanged', {
-                detail: { page, zoom, viewport, timestamp: Date.now() }
+                detail: {
+                    page,
+                    zoom,
+                    displayViewport,
+                    textLayerViewport,
+                    zoomRatio,
+                    timestamp: Date.now()
+                }
             });
             document.dispatchEvent(event);
         }, 100);
     }
 
-    useEffect(() => {
-        if (renderManager.isReady && renderManager.viewport) {
-            console.log('Setting up layers after render completion');
-            setupTextLayer(renderManager.currentPage, renderManager.viewport);
-            setupHighlightLayer();
-        }
-    }, [renderManager.isReady, renderManager.currentPage, renderManager.viewport]);
 
-    const setupTextLayer = async (pageNumber, viewport) => {
+
+    const setupTextLayer = async (pageNumber, displayViewport) => {
         if (!textLayerRef.current || !pdfDoc) return;
 
         try {
@@ -142,6 +148,9 @@ const PDFViewerRender = ({
             // Clear previous content
             textLayer.innerHTML = '';
 
+            const textLayerViewport = page.getViewport({ scale: 1.0 });
+            const zoomRatio = window.currentZoomRatio || 1.0;
+
             // Position text layer to match canvas
             const canvas = canvasRef.current;
             if (canvas) {
@@ -151,8 +160,11 @@ const PDFViewerRender = ({
                 textLayer.style.position = 'absolute';
                 textLayer.style.left = `${canvasRect.left - containerRect.left}px`;
                 textLayer.style.top = `${canvasRect.top - containerRect.top}px`;
-                textLayer.style.width = `${viewport.width}px`;
-                textLayer.style.height = `${viewport.height}px`;
+
+                textLayer.style.width = `${textLayerViewport.width}px`;
+                textLayer.style.height = `${textLayerViewport.height}px`;
+                textLayer.style.transform = `scale(${zoomRatio})`;
+                textLayer.style.transformOrigin = '0 0'; // Scale from top-left
                 textLayer.style.overflow = 'hidden';
                 textLayer.style.opacity = '0';
             }
@@ -191,23 +203,23 @@ const PDFViewerRender = ({
     };
 
     const setupHighlightLayer = () => {
-        if (!highlightLayerRef.current || !textLayerRef.current) return;
+    if (!highlightLayerRef.current || !containerRef.current) return;
 
-        const highlightLayer = highlightLayerRef.current;
-        const textLayer = textLayerRef.current;
-        const textLayerStyle = window.getComputedStyle(textLayer);
+    const highlightLayer = highlightLayerRef.current;
+    const container = containerRef.current;
+    
+    // Position highlight layer to fill the entire container
+    highlightLayer.style.position = 'absolute';
+    highlightLayer.style.left = '0px';
+    highlightLayer.style.top = '0px';
+    highlightLayer.style.width = '100%';
+    highlightLayer.style.height = '100%';
+    highlightLayer.style.transform = 'none';
+    highlightLayer.style.pointerEvents = 'none';
+    highlightLayer.style.zIndex = '10';
 
-        // Position highlight layer exactly on text layer
-        highlightLayer.style.position = 'absolute';
-        highlightLayer.style.left = textLayerStyle.left;
-        highlightLayer.style.top = textLayerStyle.top;
-        highlightLayer.style.width = textLayerStyle.width;
-        highlightLayer.style.height = textLayerStyle.height;
-        highlightLayer.style.pointerEvents = 'none';
-        highlightLayer.style.zIndex = '10';
-
-        console.log('✅ Highlight layer synced with text layer');
-    };
+    console.log('✅ Highlight layer positioned to fill container');
+};
 
     // Track user navigation vs auto-navigation
     const lastUserNavigationRef = useRef(Date.now());
@@ -299,26 +311,42 @@ const PDFViewerRender = ({
         goToPage(renderManager.currentPage + 1, 'user');
     };
 
-    // Update zoom functions to track as user actions
     const zoomIn = () => {
         console.log('🔍 Zoom in clicked');
-        lastUserNavigationRef.current = Date.now(); // Zoom counts as user interaction
+        lastUserNavigationRef.current = Date.now();
         const newZoom = Math.min(renderManager.currentZoom * 1.25, 3);
+
+        // Use renderManager instead of manual transform
         renderManager.render(renderManager.currentPage, newZoom);
     };
 
     const zoomOut = () => {
         console.log('🔍 Zoom out clicked');
-        lastUserNavigationRef.current = Date.now(); // Zoom counts as user interaction
+        lastUserNavigationRef.current = Date.now();
         const newZoom = Math.max(renderManager.currentZoom * 0.8, 0.5);
+
+        // Use renderManager instead of manual transform
         renderManager.render(renderManager.currentPage, newZoom);
     };
 
     const resetZoom = () => {
         console.log('🔍 Reset zoom clicked');
-        lastUserNavigationRef.current = Date.now(); // Zoom counts as user interaction
-        renderManager.render(renderManager.currentPage, null);
+        lastUserNavigationRef.current = Date.now();
+
+        // Calculate fit-to-width zoom
+        if (renderManager.viewport && containerRef.current) {
+            const baseViewport = { width: renderManager.viewport.width / renderManager.currentZoom };
+            const containerWidth = containerRef.current.offsetWidth;
+            const fitZoom = renderManager.calculateFitToWidthZoom(baseViewport, containerWidth);
+
+            // Use renderManager to apply the zoom
+            renderManager.render(renderManager.currentPage, fitZoom);
+        } else {
+            // Fallback to 1.0
+            renderManager.render(renderManager.currentPage, 1.0);
+        }
     };
+
 
 
 
@@ -413,66 +441,57 @@ const PDFViewerRender = ({
     };
 
 
-    const SimpleHighlighter = ({ provenanceData, textLayerRef, highlightLayerRef, canvasLayerRef }) => {
-        useEffect(() => {
-            console.log('🔍 Highlighter effect - Layer status:', {
-                textLayer: !!textLayerRef?.current,
-                highlightLayer: !!highlightLayerRef?.current,
-                textLayerChildren: textLayerRef?.current?.children?.length || 0,
-                highlightLayerChildren: highlightLayerRef?.current?.children?.length || 0
-            });
 
-            if (!provenanceData?.provenance || !textLayerRef?.current || !highlightLayerRef?.current || !canvasLayerRef?.current) {
+
+    const SimpleHighlighter = ({ provenanceData, textLayerRef, highlightLayerRef, currentPage, currentZoom }) => {
+
+        const highlightRefsRef = useRef(new Map()); // highlightElement -> sourceTextElement
+
+        useEffect(() => {
+
+
+            if (!provenanceData?.provenance || !textLayerRef?.current || !highlightLayerRef?.current) {
                 console.log('⏸️ Skipping highlight - missing layers');
                 return;
             }
 
-            const canvas = canvasLayerRef.current;
-            const scale = canvas.offsetWidth / canvas.width; // Actual vs native size
-            console.log('📏 Canvas scale:', scale);
+
             const highlightLayer = highlightLayerRef.current;
-            const canvasRect = canvas.getBoundingClientRect();
-            const layerRect = highlightLayer.getBoundingClientRect();
-            console.log('📏 Highlight layer rect:', {
-                left: layerRect.left,
-                top: layerRect.top,
-                width: layerRect.width,
-                height: layerRect.height
-            });
-            console.log('📏 Canvas rect:', {
-                left: canvasRect.left,
-                top: canvasRect.top,
-                width: canvasRect.width,
-                height: canvasRect.height
-            });
-            console.log('📏 Highlight layer position:', {
-                left: highlightLayer.style.left,
-                top: highlightLayer.style.top,
-                width: highlightLayer.style.width,
-                height: highlightLayer.style.height
-            });
+
 
             const handleHighlight = async () => {
                 const sentenceIds = provenanceData.provenance_ids || [];
-                const textElements = Array.from(textLayerRef.current.querySelectorAll('[data-stable-index]'));
-
-                console.log('🗺️ Attempting stable mappings for sentences:', sentenceIds);
-
                 const mappingsData = await getSentenceItemMappings(pdfDocument.filename, sentenceIds);
 
                 if (!mappingsData || !mappingsData.sentence_mappings) {
                     console.log('⚠️ No stable mappings available');
-                    return false;
+                    return;
                 }
 
-                const highlights = [];
+                const checkPrimaryPage = (mappingsData, currentPage) => {
+                    return Object.values(mappingsData.sentence_mappings).some(mapping =>
+                        mapping.primary_page === currentPage
+                    );
+                };
+
+                const hasContentOnCurrentPage = checkPrimaryPage(mappingsData, currentPage);
+
+                if (!hasContentOnCurrentPage) {
+                    console.log(`📄 No provenance content on page ${currentPage} - no highlighting`);
+                    clearHighlights();
+                    return;
+                }
+
+                console.log(`✅ Found provenance content on page ${currentPage} - proceeding with highlighting`);
+
+                clearHighlights(); // Clear any existing highlights
+
                 const sentenceMappings = mappingsData.sentence_mappings;
-                const currentPage = renderManager.currentPage;
                 const sentenceSpans = new Set();
 
                 Object.entries(sentenceMappings).forEach(([sentenceId, mapping]) => {
                     if (mapping.stable_matches && mapping.stable_matches.length > 0) {
-                        const pageMatches = mapping.stable_matches.filter(match => match.page === renderManager.currentPage);
+                        const pageMatches = mapping.stable_matches.filter(match => match.page === currentPage);
                         pageMatches.forEach(match => {
                             const spanElements = match.item_span || [];
                             spanElements.forEach(spanIndex => {
@@ -482,64 +501,87 @@ const PDFViewerRender = ({
                     }
                 });
 
+                if (sentenceSpans.size === 0) {
+                    console.log(`📄 No stable indices found for page ${currentPage}`);
+                    return; // No fallback
+                }
 
-
-                // Clear previous highlights
-                highlightLayer.querySelectorAll('.temp-highlight').forEach(el => el.remove());
-                const matchingElements = [];
-                // first filter the text elements to only those on the current page
+                let highlightCount = 0;
+                // for all the stable indices, work with their text elements
                 sentenceSpans.forEach((index) => {
-                    const element = textLayerRef.current.querySelector(`[data-stable-index="${index}"][data-page-number="${renderManager.currentPage}"]`);
+                    const element = textLayerRef.current.querySelector(`[data-stable-index="${index}"][data-page-number="${currentPage}"]`);
                     if (element) {
-                        matchingElements.push(element);
+
+                        const highlightBox = createHighlightElement(element);
+                        if (highlightBox) {
+                            highlightLayer.appendChild(highlightBox);
+                            highlightRefsRef.current.set(highlightBox, element); // Store reference
+                            highlightCount++;
+
+                        }
+
                     }
-                });
-
-                console.log(`🔍 Found ${matchingElements.length} text elements on current page ${renderManager.currentPage}`);
-
-                matchingElements.forEach((textElement) => {
-                    const stableIndex = parseInt(textElement.getAttribute('data-stable-index'));
-
-
-                    highlights.push({
-                        element: textElement,
-                        elementText: textElement.textContent,
-                        stableIndex: stableIndex,
-                        matchedText: textElement.textContent
-                    });
-
-                    const elementRect = textElement.getBoundingClientRect();
-                    const highlightLayerRect = highlightLayer.getBoundingClientRect();
-                    const left = elementRect.left - highlightLayerRect.left;
-                    const top = elementRect.top - highlightLayerRect.top;
-
-                    // Optional: Apply zoom correction if needed
-                    const zoomLevel = renderManager.currentZoom || 1;
-                    const correctedLeft = left / zoomLevel;
-                    const correctedTop = top / zoomLevel;
-
-                    const highlightBox = document.createElement('div');
-                    highlightBox.className = 'temp-highlight'; // Add class for cleanup
-                    highlightBox.title = `Stable Index: ${stableIndex}_Matched Text: ${textElement.textContent}`;
-                    highlightBox.style.cssText = `
-                        position: absolute;
-                        left: ${left}px;
-                        top: ${top}px;
-                        width: ${elementRect.width}px;
-                        height: ${elementRect.height}px;
-                        background: rgba(255, 0, 0, 0.3);
-                        pointer-events: none;
-                        z-index: 1000;
-                    `;
-                    highlightLayer.appendChild(highlightBox);
 
                 });
-
-                console.log(`Found ${highlights.length} text matches`);
+                console.log(`✅ Highlighted ${highlightCount} elements on page ${currentPage}`);
             };
 
-            handleHighlight();
-        }, [provenanceData?.provenance_id]); // Fixed dependency
+            setTimeout(handleHighlight, 100);
+        }, [provenanceData?.provenance_id, currentPage, currentZoom]);
+
+
+
+        // Function to create a single highlight element
+        const createHighlightElement = (sourceElement) => {
+            // Get the actual computed styles to account for transforms
+            const textLayer = textLayerRef.current;
+            const highlightLayer = highlightLayerRef.current;
+
+            // Get bounding rects
+            const elementRect = sourceElement.getBoundingClientRect();
+            const containerRect = containerRef.current.getBoundingClientRect();
+
+            // Calculate position relative to the container (not the highlight layer)
+            const left = elementRect.left - containerRect.left;
+            const top = elementRect.top - containerRect.top;
+            const width = elementRect.width;
+            const height = elementRect.height;
+
+            const highlightBox = document.createElement('div');
+            highlightBox.className = 'provenance-highlight';
+            highlightBox.style.cssText = `
+            position: absolute;
+            left: ${left}px;
+            top: ${top}px;
+            width: ${width}px;
+            height: ${height}px;
+            background: rgba(76, 175, 80, 0.4);
+            border: 1px solid rgba(76, 175, 80, 0.8);
+            pointer-events: none;
+            z-index: 100;
+            border-radius: 2px;
+        `;
+
+            return highlightBox;
+        };
+
+        // Function to clear all highlights
+        const clearHighlights = () => {
+            if (!highlightLayerRef?.current) return;
+
+            const existingHighlights = highlightLayerRef.current.querySelectorAll('.provenance-highlight');
+            existingHighlights.forEach(el => el.remove());
+
+            // Clear the reference map
+            highlightRefsRef.current.clear();
+        };
+
+        // Clear highlights when component unmounts
+        useEffect(() => {
+            return () => {
+                clearHighlights();
+            };
+        }, []);
 
         return null;
     };
@@ -576,7 +618,7 @@ const PDFViewerRender = ({
     }
 
     return (
-        <div className="pdf-viewer clean-architecture">
+        <div className="pdf-viewer">
             {/* Header */}
             <div className="pdf-header">
                 <div className="pdf-title">
@@ -666,15 +708,14 @@ const PDFViewerRender = ({
 
 
             {/* Main Content */}
-            <div className="pdf-main-view">
-                <div className="pdf-content" ref={containerRef}>
-                    <div className="pdf-page-container">
-                        <canvas ref={canvasRef} className="pdf-canvas" />
-                        <div ref={textLayerRef} className="pdf-text-layer" />
-                        <div ref={highlightLayerRef} className="pdf-highlight-layer" />
+            <div className="pdf-content" ref={containerRef}>
+                <div className="pdf-page-container">
+                    <canvas ref={canvasRef} className="pdf-canvas" />
+                    <div ref={textLayerRef} className="pdf-text-layer" />
+                    <div ref={highlightLayerRef} className="pdf-highlight-layer" />
 
-                        {/* Highlighter Component */}
-                        {renderManager.isReady && selectedProvenance && (
+                    {/* Highlighter Component */}
+                    {/*{renderManager.isReady && selectedProvenance && (
                             <PDFTextHighlighter
                                 documentId={pdfDocument?.filename || ''}
                                 currentPage={renderManager.currentPage}
@@ -687,17 +728,17 @@ const PDFViewerRender = ({
                                 questionId={activeQuestionId}
                                 isRendering={renderManager.isRendering}
                             />
-                        )}
+                        )}*/}
 
-                        {renderManager.isReady && selectedProvenance && (
-                            <SimpleHighlighter
-                                provenanceData={selectedProvenance}
-                                textLayerRef={textLayerRef}
-                                highlightLayerRef={highlightLayerRef}
-                                canvasLayerRef={canvasRef}
-                            />
-                        )}
-                    </div>
+                    {renderManager.isReady && selectedProvenance && (
+                        <SimpleHighlighter
+                            provenanceData={selectedProvenance}
+                            textLayerRef={textLayerRef}
+                            highlightLayerRef={highlightLayerRef}
+                            currentPage={renderManager.currentPage}
+                            currentZoom={renderManager.currentZoom}
+                        />
+                    )}
                 </div>
             </div>
         </div>

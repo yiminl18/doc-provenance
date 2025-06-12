@@ -1,0 +1,260 @@
+/* PDF Viewer CSS Isolation and Fixes */
+
+/* Isolate PDF viewer from inherited styles */
+.pdf-viewer {
+  /* Reset any inherited positioning */
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  background-color: var(--bg-paper) !important;
+  border: none !important;
+  box-shadow: none !important;
+  
+  /* Prevent interference from parent transforms/scaling */
+  transform: none !important;
+  transform-origin: initial !important;
+  
+  /* Reset any inherited overflow */
+  overflow: visible !important;
+}
+
+/* PDF content area - must allow scrolling and centering */
+.pdf-content {
+  flex: 1 !important;
+  overflow: auto !important;
+  background-color: var(--bg-paper) !important;
+  position: relative !important;
+  min-height: 0 !important;
+  
+  /* Center the PDF content */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  padding: 20px !important;
+  
+  /* Prevent inherited transforms */
+  transform: none !important;
+  transform-origin: initial !important;
+}
+
+/* PDF page container - critical for zoom transforms */
+.pdf-page-container {
+  position: relative !important;
+  display: inline-block !important; /* ESSENTIAL: Prevents width collapse on transform */
+  transform-origin: 0 0 !important; /* ESSENTIAL: Scale from top-left corner */
+  
+  /* Remove any size constraints */
+  min-width: 0 !important;
+  min-height: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  
+  /* Reset any inherited styles */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  
+  /* Ensure proper stacking context */
+  z-index: 0 !important;
+}
+
+/* PDF Canvas - the actual rendered PDF */
+.pdf-canvas {
+  display: block !important;
+  position: relative !important;
+  transform-origin: 0 0 !important; /* ESSENTIAL: Match page container origin */
+  z-index: 0 !important; /* Bottom layer */
+  
+  /* Clean slate */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: white !important;
+  
+  /* Optional: Add subtle shadow */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  
+  /* Prevent any inherited transforms */
+  transform: none !important;
+}
+
+/* Text layer - invisible text for highlighting/selection */
+.pdf-text-layer {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  transform-origin: 0 0 !important; /* ESSENTIAL: Match canvas origin */
+  z-index: 1 !important; /* Above canvas, below highlights */
+  
+  /* Hidden but functional */
+  opacity: 0 !important;
+  pointer-events: none !important;
+  
+  /* Clean positioning */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  overflow: hidden !important;
+  background: none !important;
+}
+
+/* Text elements within text layer */
+.pdf-text-item {
+  position: absolute !important;
+  color: transparent !important;
+  white-space: pre !important;
+  transform-origin: 0 0 !important;
+  
+  /* Clean slate */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  
+  /* Prevent interference */
+  box-sizing: border-box !important;
+}
+
+/* Highlight layer - visible highlights */
+.pdf-highlight-layer {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+  transform-origin: 0 0 !important;
+  z-index: 10 !important; /* Top layer */
+  
+  /* Allow highlight interactions */
+  pointer-events: none !important; /* Layer itself is non-interactive */
+  
+  /* Clean positioning */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  overflow: visible !important; /* Let highlights extend beyond bounds if needed */
+  background: none !important;
+}
+
+/* Individual highlight boxes */
+.provenance-highlight {
+  position: absolute !important;
+  pointer-events: auto !important; /* Individual highlights are clickable */
+  cursor: pointer !important;
+  border-radius: 2px !important;
+  transition: opacity 0.2s ease !important; /* Smooth hover effects */
+  
+  /* Clean positioning */
+  margin: 0 !important;
+  padding: 0 !important;
+  
+  /* Prevent any transforms from parent */
+  transform: none !important;
+  transform-origin: initial !important;
+  
+  /* Ensure proper layering */
+  z-index: 100 !important;
+}
+
+.provenance-highlight:hover {
+  opacity: 0.9 !important; /* Slight hover effect */
+}
+
+/* PDF Header - ensure it doesn't interfere */
+.pdf-header {
+  background-color: var(--bg-secondary) !important;
+  padding: var(--space-3) var(--space-4) !important;
+  border-bottom: var(--border-medium) solid var(--win95-border-dark) !important;
+  display: flex !important;
+  max-height: 100px !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: var(--shadow-raised) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  
+  /* Prevent interference with PDF content */
+  transform: none !important;
+  transform-origin: initial !important;
+}
+
+/* Page navigation controls */
+.page-navigation {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 15px !important;
+  padding: var(--space-3) !important;
+  background: var(--bg-secondary) !important;
+  border-bottom: var(--border-thin) solid var(--win95-border) !important;
+  box-shadow: var(--shadow-raised) !important;
+  z-index: 15 !important;
+  border-top: var(--border-thin) solid var(--win95-border-dark) !important;
+  
+  /* Prevent interference */
+  transform: none !important;
+  position: relative !important;
+}
+
+/* Zoom controls */
+.zoom-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--space-2) !important;
+  
+  /* Prevent interference */
+  transform: none !important;
+  position: relative !important;
+}
+
+.zoom-display {
+  font-family: var(--font-mono) !important;
+  font-weight: var(--font-bold) !important;
+  font-size: var(--text-sm) !important;
+  min-width: 60px !important;
+  text-align: center !important;
+  color: var(--primary-blue) !important;
+  background-color: var(--primary-blue-light) !important;
+  padding: var(--space-2) var(--space-3) !important;
+  border: var(--border-thin) solid var(--primary-blue) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+/* Debug styles - remove these in production */
+
+.pdf-page-container {
+  border: 2px solid blue !important;
+}
+
+.pdf-text-layer {
+  background: rgba(255, 0, 0, 0.1) !important;
+  opacity: 0.3 !important;
+  border: 2px solid red !important;
+}
+
+.pdf-highlight-layer {
+  background: rgba(0, 255, 0, 0.1) !important;
+  border: 2px solid green !important;
+}
+
+/* Loading and error states */
+.pdf-viewer-loading,
+.pdf-viewer-error,
+.pdf-viewer-empty {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  text-align: center !important;
+  color: var(--text-secondary, #666) !important;
+  
+  /* Prevent inheritance issues */
+  transform: none !important;
+  position: relative !important;
+}

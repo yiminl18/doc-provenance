@@ -115,6 +115,8 @@
   z-index: 5;
 }
 
+
+
 /* ===== MAIN CONTENT AREA ===== */
 .main-content {
   grid-area: main;
@@ -235,7 +237,7 @@
 
 .pdf-content {
   flex: 1;
-  overflow-y: auto;
+  overflow: auto;
   background-color: var(--bg-paper);
   position: relative;
   min-height: 0;
@@ -256,6 +258,143 @@
   z-index: 20;
 }
 
+.pdf-page-container {
+  position: relative;
+  display: inline-block; /* ESSENTIAL: Prevents width collapse on transform */
+  transform-origin: 0 0; /* ESSENTIAL: Scale from top-left corner */
+  margin: 20px; /* Add some margin around the PDF */
+  
+  /* Remove any size constraints */
+  min-width: 0;
+  min-height: 0;
+  width: auto;
+  height: auto;
+}
+
+/* PDF Canvas - the actual rendered PDF */
+.pdf-canvas {
+  display: block;
+  position: relative;
+  transform-origin: 0 0; /* ESSENTIAL: Match page container origin */
+  z-index: 0; /* Bottom layer */
+  
+  /* Clean slate */
+  margin: 0;
+  padding: 0;
+  border: none;
+  
+  /* Optional: Add subtle shadow */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Text layer - invisible text for highlighting/selection */
+.pdf-text-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0; /* ESSENTIAL: Match canvas origin */
+  z-index: 1; /* Above canvas, below highlights */
+  
+  /* Hidden but functional */
+  opacity: 0;
+  pointer-events: none;
+  
+  /* Clean positioning */
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+}
+
+/* Text elements within text layer */
+.pdf-text-item {
+  position: absolute;
+  color: transparent;
+  white-space: pre;
+  transform-origin: 0 0;
+  
+  /* Clean slate */
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+/* Highlight layer - visible highlights */
+.pdf-highlight-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0; /* ESSENTIAL: Match other layers */
+  z-index: 10; /* Top layer */
+  
+  /* Allow highlight interactions */
+  pointer-events: none; /* Layer itself is non-interactive */
+  
+  /* Clean positioning */
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow: visible; /* Let highlights extend beyond bounds if needed */
+}
+
+/* Individual highlight boxes */
+.provenance-highlight {
+  position: absolute;
+  pointer-events: auto; /* Individual highlights are clickable */
+  cursor: pointer;
+  border-radius: 2px;
+  transition: opacity 0.2s ease; /* Smooth hover effects */
+  
+  /* Clean positioning */
+  margin: 0;
+  padding: 0;
+}
+
+.provenance-highlight:hover {
+  opacity: 0.9 !important; /* Slight hover effect */
+}
+
+.pdf-text-layer {
+  background: rgba(255, 0, 0, 0.1) !important;
+  opacity: 0.3 !important;
+  border: 2px solid red !important;
+}
+
+.pdf-highlight-layer {
+  background: rgba(0, 255, 0, 0.1) !important;
+  border: 2px solid green !important;
+}
+
+.pdf-page-container {
+  border: 2px solid blue !important;
+}
+
+/* RESPONSIVE: Ensure container can scroll when zoomed */
+.pdf-content {
+  /* Allow both horizontal and vertical scrolling */
+  overflow: auto;
+  
+  /* Center the PDF content */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 10px;
+}
+
+/* OPTIONAL: Loading and error states */
+.pdf-viewer-loading,
+.pdf-viewer-error,
+.pdf-viewer-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: var(--text-secondary, #666);
+}
+
 .page-navigation {
   display: flex;
   align-items: center;
@@ -265,7 +404,6 @@
   background: var(--bg-secondary);
   border-bottom: var(--border-thin) solid var(--win95-border);
   box-shadow: var(--shadow-raised);
-  position: sticky;
   top: 0;
   z-index: 15;
   border-top: var(--border-thin) solid var(--win95-border-dark);

@@ -133,11 +133,11 @@ export function PDFTextHighlighterFixed({
 
             // Strategy 3: Create fallback highlight
             console.log('⚠️ Creating fallback highlight');
-            createFallbackHighlight(provenanceText || 'Provenance content');
+            //createFallbackHighlight(provenanceText || 'Provenance content');
 
         } catch (error) {
             console.error('❌ Error in highlighting:', error);
-            createFallbackHighlight(provenanceText || 'Error in highlighting');
+            //createFallbackHighlight(provenanceText || 'Error in highlighting');
         }
     };
 

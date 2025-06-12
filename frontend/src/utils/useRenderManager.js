@@ -8,6 +8,7 @@ export function useRenderManager({ pdfDoc, canvasRef, containerRef, onViewportCh
     const [currentZoom, setCurrentZoom] = useState(1);
     const [viewport, setViewport] = useState(null);
     const [error, setError] = useState(null);
+    const [hasSetInitialZoom, setHasSetInitialZoom] = useState(false);
 
     // Single render operation tracking
     const renderOperation = useRef(null);
@@ -16,11 +17,11 @@ export function useRenderManager({ pdfDoc, canvasRef, containerRef, onViewportCh
     // Calculate fit-to-width zoom
     const calculateFitToWidthZoom = useCallback((pageViewport, containerWidth) => {
         if (!pageViewport || !containerWidth) return 1;
-        
+
         const padding = 40; // 20px on each side
         const availableWidth = containerWidth - padding;
         const scale = availableWidth / pageViewport.width;
-        
+
         // Reasonable zoom bounds
         return Math.max(0.5, Math.min(3.0, scale));
     }, []);
@@ -33,60 +34,65 @@ export function useRenderManager({ pdfDoc, canvasRef, containerRef, onViewportCh
         }
 
         const renderKey = `page-${pageNum}`;
-        
-        // Skip if already rendering this exact page
+
         if (state === 'rendering' && renderQueue.current === renderKey) {
             console.log('📋 Render skipped: already rendering this page');
             return false;
         }
 
-        // Cancel any existing render
         await cancelCurrentRender();
-
-        // Queue this render
         renderQueue.current = renderKey;
         setState('queued');
         setError(null);
 
         try {
             setState('rendering');
-            
+
             const page = await pdfDoc.getPage(pageNum);
             const baseViewport = page.getViewport({ scale: 1.0 });
-            
-            // Auto-calculate fit-to-width if no zoom specified
-            let finalZoom = zoomLevel;
-            if (finalZoom === null) {
-                finalZoom = 1.0;
-                //const containerWidth = containerRef.current.offsetWidth;
-                //finalZoom = calculateFitToWidthZoom(baseViewport, containerWidth);
-                console.log(`📏 Auto-calculated fit-to-width: ${(finalZoom * 100).toFixed(0)}%`);
+
+            // SMART ZOOM LOGIC: Always create text layer at 1.0, but display at desired zoom
+            let displayZoom = zoomLevel;
+            let textLayerZoom = 1.0; // Always 1.0 for stable mappings
+
+            if (displayZoom === null) {
+                const containerWidth = containerRef.current.offsetWidth;
+                displayZoom = calculateFitToWidthZoom(baseViewport, containerWidth);
+
+                // Only set as initial zoom once
+                if (!hasSetInitialZoom) {
+                    console.log(`📏 Calculated initial fit-to-width: ${(displayZoom * 100).toFixed(0)}%`);
+                    setHasSetInitialZoom(true);
+                }
             }
 
-            const scaledViewport = page.getViewport({ scale: finalZoom });
-            
-            // Setup canvas
+            // Create TWO viewports:
+            // 1. Display viewport for canvas rendering (can be any zoom)
+            const displayViewport = page.getViewport({ scale: displayZoom });
+            // 2. Text layer viewport at 1.0 for stable mapping consistency
+            const textLayerViewport = page.getViewport({ scale: textLayerZoom });
+
+            // Setup canvas with display zoom
             const canvas = canvasRef.current;
             const context = canvas.getContext('2d');
-            
+
             if (!context) {
                 throw new Error('Failed to get canvas context');
             }
 
-            // Clear and resize canvas
             const devicePixelRatio = window.devicePixelRatio || 1;
-            canvas.width = scaledViewport.width * devicePixelRatio;
-            canvas.height = scaledViewport.height * devicePixelRatio;
-            canvas.style.width = `${scaledViewport.width}px`;
-            canvas.style.height = `${scaledViewport.height}px`;
-            
-            context.scale(devicePixelRatio, devicePixelRatio);
-            context.clearRect(0, 0, scaledViewport.width, scaledViewport.height);
+            canvas.width = displayViewport.width * devicePixelRatio;
+            canvas.height = displayViewport.height * devicePixelRatio;
+            canvas.style.width = `${displayViewport.width}px`;
+            canvas.style.height = `${displayViewport.height}px`;
 
-            // Render PDF
+            context.scale(devicePixelRatio, devicePixelRatio);
+            context.clearRect(0, 0, displayViewport.width, displayViewport.height);
+
+            // Render PDF at display zoom
             const renderContext = {
                 canvasContext: context,
-                viewport: scaledViewport,
+                viewport: displayViewport,
                 enableWebGL: false
             };
 
@@ -95,21 +101,25 @@ export function useRenderManager({ pdfDoc, canvasRef, containerRef, onViewportCh
 
             // Success - update state
             setCurrentPage(pageNum);
-            setCurrentZoom(finalZoom);
-            setViewport(scaledViewport);
+            setCurrentZoom(displayZoom);
+            setViewport(displayViewport);
             setState('idle');
-            
-            // Notify parent component
-            if (onViewportChange) {
+
+            // Notify parent with BOTH viewports
+        if (onViewportChange) {
+            setTimeout(() => {
                 onViewportChange({
                     page: pageNum,
-                    zoom: finalZoom,
-                    viewport: scaledViewport
+                    zoom: displayZoom,
+                    displayViewport: displayViewport,
+                    textLayerViewport: textLayerViewport, // Pass both viewports
+                    zoomRatio: displayZoom / textLayerZoom
                 });
-            }
+            }, 0);
+        }
 
-            console.log(`✅ Rendered page ${pageNum} at ${(finalZoom * 100).toFixed(0)}%`);
-            return true;
+        console.log(`✅ Rendered page ${pageNum} at display: ${(displayZoom * 100).toFixed(0)}%, text layer: ${(textLayerZoom * 100).toFixed(0)}%`);
+        return true;
 
         } catch (err) {
             if (err.name === 'RenderingCancelledException') {
@@ -126,7 +136,7 @@ export function useRenderManager({ pdfDoc, canvasRef, containerRef, onViewportCh
             renderOperation.current = null;
             renderQueue.current = null;
         }
-    }, [pdfDoc, canvasRef, containerRef, onViewportChange, calculateFitToWidthZoom]);
+    }, [pdfDoc, canvasRef, containerRef, onViewportChange, calculateFitToWidthZoom, state, currentPage, currentZoom, hasSetInitialZoom]);
 
     // Cancel current render operation
     const cancelCurrentRender = useCallback(async () => {
@@ -164,13 +174,15 @@ export function useRenderManager({ pdfDoc, canvasRef, containerRef, onViewportCh
         currentZoom,
         viewport,
         error,
-        
+
         // Actions
         render,
         cancelCurrentRender,
-        
+
         // Computed
         isRendering: state === 'rendering' || state === 'queued',
-        isReady: state === 'idle' && viewport !== null
+        isReady: state === 'idle' && viewport !== null,
+        hasSetInitialZoom,
+        calculateFitToWidthZoom
     };
 }

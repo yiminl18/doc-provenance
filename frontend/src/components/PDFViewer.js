@@ -10,10 +10,12 @@ import {
     faFileAlt,
     faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
+import * as pdfjsLib from 'pdfjs-dist';
 import { useRenderManager } from '../utils/useRenderManager';
 import { getSentenceItemMappings } from '../services/api';
 //import SimpleHighlighter from './SimpleHighlighter'; 
-import RobustOnTheFlyHighlighter from './RobustOnTheFlyHighlighter';
+//import RobustOnTheFlyHighlighter from './RobustOnTheFlyHighlighter';
+import DirectTextHighlighter from './DirectTextHighlighter';
 import '../styles/pdf-viewer-render.css';
 
 const PDFViewer = ({
@@ -31,7 +33,7 @@ const PDFViewer = ({
     const [pdfUrl, setPdfUrl] = useState(null);
     const [provenancePageCache, setProvenancePageCache] = useState(new Map());
     const [debugMode, setDebugMode] = useState(true);
-    
+
     const [displayZoom, setDisplayZoom] = useState(1.0);
     const [provenanceTargetPage, setProvenanceTargetPage] = useState(null);
     const [pageInputValue, setPageInputValue] = useState('');
@@ -56,10 +58,11 @@ const PDFViewer = ({
 
     // Initialize PDF.js worker
     useEffect(() => {
-        if (window.pdfjsLib && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
-            window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        }
+        // This tells the bundler to include the worker file and gives us its URL
+        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+            'pdfjs-dist/build/pdf.worker.min.mjs',
+            import.meta.url
+        ).toString();
     }, []);
 
     // Generate PDF URL
@@ -94,6 +97,15 @@ const PDFViewer = ({
             renderManager.render(1);
         }
     }, [pdfDocument?.filename]); // Reset when filename changes
+
+    // Add this useEffect in PDFViewer to debug prop changes
+    useEffect(() => {
+        console.log('PDFViewer: selectedProvenance changed:', {
+            provenanceId: selectedProvenance?.provenance_id,
+            provenanceIds: selectedProvenance?.provenance_ids,
+            timestamp: Date.now()
+        });
+    }, [selectedProvenance]);
 
     const loadPDF = async () => {
         setLoading(true);
@@ -372,7 +384,7 @@ const PDFViewer = ({
     const handlePageInputSubmit = (e) => {
         e.preventDefault();
         const pageNum = parseInt(pageInputValue, 10);
-        
+
         if (isNaN(pageNum)) {
             console.warn('Invalid page number entered');
             setPageInputValue('');
@@ -540,7 +552,7 @@ const PDFViewer = ({
                     <span>{pdfDocument.filename}</span>
 
 
-                   {/* Unified status indicator - prioritizes provenance over rendering */}
+                    {/* Unified status indicator - prioritizes provenance over rendering */}
                     {isProvenanceProcessing ? (
                         <div className="status-indicator provenance">
                             <FontAwesomeIcon icon={faSpinner} spin />
@@ -592,8 +604,8 @@ const PDFViewer = ({
                                 <span className="page-total">of {totalPages}</span>
                             </form>
                         ) : (
-                            <span 
-                                className="page-info clickable" 
+                            <span
+                                className="page-info clickable"
                                 onClick={handlePageInfoClick}
                                 title="Click to jump to page"
                             >
@@ -660,7 +672,7 @@ const PDFViewer = ({
                     <div ref={highlightLayerRef} className="pdf-highlight-layer" />
 
                     {/* Highlighter Component */}
-                    {renderManager.isReady && selectedProvenance && (
+                    {/*{renderManager.isReady && selectedProvenance && (
                         <RobustOnTheFlyHighlighter
                             provenanceData={selectedProvenance}
                             activeQuestionId={activeQuestionId}
@@ -682,6 +694,32 @@ const PDFViewer = ({
                             }}
                             className="provenance-highlight"
                             verbose={true} // Set to true for debugging
+                        />
+                    )}*/}
+                    {renderManager.isReady && selectedProvenance && (
+                        <DirectTextHighlighter
+                            provenanceData={selectedProvenance}
+                            activeQuestionId={activeQuestionId}
+                            pdfDocument={pdfDoc}
+                            textLayerRef={textLayerRef}
+                            highlightLayerRef={highlightLayerRef}
+                            containerRef={containerRef}
+                            currentPage={renderManager.currentPage}
+                            currentZoom={renderManager.currentZoom}
+                            documentFilename={pdfDocument?.filename || ''}
+                            highlightStyle={{
+                                backgroundColor: 'rgba(76, 175, 80, 0.4)',
+                                border: '1px solid rgba(76, 175, 80, 0.8)',
+                                borderRadius: '2px'
+                            }}
+                            searchOptions={{
+                                caseSensitive: false,
+                                matchThreshold: 0.75, // Slightly lower for better recall
+                                maxGapBetweenWords: 30, // Pixels between words to group
+                                contextWindow: 3 // Words of context
+                            }}
+                            className="direct-provenance-highlight"
+                            verbose={true} // Enable detailed logging for debugging
                         />
                     )}
                 </div>

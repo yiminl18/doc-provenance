@@ -24,6 +24,27 @@ from pathlib import Path
 from typing import List, Optional
 import argparse
 from datetime import datetime
+from werkzeug.utils import secure_filename
+
+def generate_safe_question_id(base_filename: str, question_text: str) -> str:
+    """
+    Generate a safe question ID based on PDF filename and timestamp
+    This ensures questions are organized by document
+    """
+    safe_filename = secure_filename(base_filename)
+    
+    # Create timestamp-based ID
+    timestamp = str(int(time.time()))
+    
+    # Optionally include a hash of the question for uniqueness
+    # this is for test_suite deterministic question IDs
+    # If question_text is provided, use it to create a unique ID
+    if question_text:
+        import hashlib
+        question_hash = hashlib.md5(question_text.encode()).hexdigest()[:8]
+        return f"{safe_filename}_{question_hash}"
+    else:
+        return f"{safe_filename}_{timestamp}"
 
 # Configure logging
 logging.basicConfig(
@@ -35,7 +56,7 @@ logger = logging.getLogger(__name__)
 class TestSuiteGenerator:
     def __init__(self, 
                  base_url: str = "http://localhost:5000/api",
-                 max_questions_per_doc: int = 5,
+                 max_questions_per_doc: int = 10,
                  answer_timeout: int = 120,
                  request_delay: float = 2.0):
         """
@@ -67,7 +88,7 @@ class TestSuiteGenerator:
 
     def find_documents_with_mappings(self) -> List[str]:
         """Find all documents that have mapping files"""
-        mappings_dir = Path("stable_mappings")
+        mappings_dir = Path("mappings")
         
         if not mappings_dir.exists():
             logger.warning(f"Mappings directory not found: {mappings_dir}")
@@ -102,9 +123,13 @@ class TestSuiteGenerator:
 
     def load_questions_for_document(self, document_basename: str) -> List[str]:
         """Load questions for a specific document by basename"""
-        questions_dir = Path("questions_difficulty")
+        questions_dir = Path("questions")
         question_file = questions_dir / f"{document_basename}_questions.json"
-        
+
+        # Create directory structure: results/{safe_pdf_name}/{question_id}/
+        results_dir = os.path.join(Path("test_outputs"), secure_filename(document_basename))
+
+
         if not question_file.exists():
             logger.warning(f"No questions file found for {document_basename}: {question_file}")
             return []
@@ -119,15 +144,27 @@ class TestSuiteGenerator:
                 questions = data['questions']
             elif isinstance(data, list):
                 questions = data
-            
-            if questions:
-                limited_questions = questions[:self.max_questions_per_doc]
-                logger.info(f"Loaded {len(limited_questions)} questions for {document_basename}")
-                return limited_questions
-            else:
-                logger.warning(f"No questions found in {question_file}")
-                return []
-                
+
+            question_tracker = {generate_safe_question_id(document_basename, question): question for question in questions}
+            limited_questions = []
+            # check if there is a status.json file in the results/<document_basename>/<question_id> directory
+            for question_id in question_tracker.keys():
+                status_file = Path(results_dir) / question_id / "status.json"
+                if status_file.exists():
+                    logger.info(f"Found status file for {question_id}: {status_file}")
+                    # read it, if it has 'processing_complete' set to True, skip this question
+                    with open(status_file, 'r', encoding='utf-8') as sf:
+                        status_data = json.load(sf)
+                        if status_data.get('processing_complete', True):
+                            logger.info(f"Skipping already processed question: {question_id}")
+                        else:
+                            limited_questions.append(question_tracker[question_id])
+                else:
+                    limited_questions.append(question_tracker[question_id])
+            logger.info(f"Loaded {len(limited_questions)} questions for {document_basename}")
+
+            return limited_questions
+
         except Exception as e:
             logger.error(f"Error loading questions from {question_file}: {e}")
             return []
@@ -375,7 +412,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generate test suite for document QA system")
     parser.add_argument("--base-url", default="http://localhost:5000/api",
                        help="Base URL for the API")
-    parser.add_argument("--max-questions", type=int, default=5,
+    parser.add_argument("--max-questions", type=int, default=10,
                        help="Maximum questions per document")
     parser.add_argument("--timeout", type=int, default=120,
                        help="Timeout for answer generation (seconds)")

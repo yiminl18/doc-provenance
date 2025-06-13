@@ -47,7 +47,7 @@ STUDY_LOGS_DIR = os.path.join(os.getcwd(), 'app/study_logs')
 QUESTIONS_DIR = os.path.join(os.getcwd(), 'app/questions')
 SENTENCES_DIR = os.path.join(os.getcwd(), 'app/sentences')
 DOWNLOADS_DIR = os.path.join(os.getcwd(), 'app/gdrive_downloads')
-MAPPINGS_DIR = os.path.join(os.getcwd(), 'app/stable_mappings')
+MAPPINGS_DIR = os.path.join(os.getcwd(), 'app/mappings')
 TEST_SUITE_OUTPUT_DIR = os.path.join(os.getcwd(), 'app/test_outputs')
 
 # =============================================================================

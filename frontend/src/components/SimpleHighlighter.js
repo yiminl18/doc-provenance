@@ -4,6 +4,7 @@ import { getSentenceItemMappings } from '../services/api';
 
 const SimpleHighlighter = ({
     provenanceData,
+    activeQuestionId,
     textLayerRef,
     highlightLayerRef,
     containerRef,
@@ -15,13 +16,14 @@ const SimpleHighlighter = ({
         border: '1px solid rgba(76, 175, 80, 0.8)',
         borderRadius: '2px'
     },
-    className = 'provenance-highlight',
-    verbose = false,
+
     mergeThreshold = {
         yTolerance: 3,
         xGap: 10,
         minOverlap: .5
-    }
+    },
+    className = 'provenance-highlight',
+    verbose = false
 }) => {
     const highlightRefsRef = useRef(new Map()); // highlightElement -> sourceTextElement
 
@@ -31,6 +33,14 @@ const SimpleHighlighter = ({
             console.log(`[SimpleHighlighter] ${message}`, ...args);
         }
     };
+
+    useEffect(() => {
+        // Clear highlights immediately when question changes (even before new provenance arrives)
+        if (activeQuestionId) {
+            log(`🧹 Question changed to ${activeQuestionId}, clearing highlights`);
+            clearHighlights();
+        }
+    }, [activeQuestionId]);
 
     useEffect(() => {
         // Skip if missing required props
@@ -49,7 +59,7 @@ const SimpleHighlighter = ({
         const handleHighlight = async () => {
             try {
                 const sentenceIds = provenanceData.provenance_ids || [];
-                
+
                 if (sentenceIds.length === 0) {
                     log('⚠️ No sentence IDs found in provenance data');
                     clearHighlights();
@@ -106,7 +116,7 @@ const SimpleHighlighter = ({
 
                 // Merge adjacent highlights into continuous lines
                 const mergedHighlights = mergeAdjacentHighlights(individualHighlights);
-                
+
                 log(`🔗 Merged into ${mergedHighlights.length} continuous highlight regions`);
 
                 // Add merged highlights to the DOM
@@ -130,7 +140,7 @@ const SimpleHighlighter = ({
 
         // Small delay to ensure text layer is ready
         const timeoutId = setTimeout(handleHighlight, 100);
-        
+
         return () => clearTimeout(timeoutId);
 
     }, [provenanceData?.provenance_id, currentPage, currentZoom, documentFilename]);
@@ -144,7 +154,7 @@ const SimpleHighlighter = ({
     // Helper function to collect stable indices for the current page
     const collectStableIndices = (mappingsData, currentPage) => {
         const sentenceSpans = new Set();
-        
+
         Object.entries(mappingsData.sentence_mappings).forEach(([sentenceId, mapping]) => {
             if (mapping.stable_matches && mapping.stable_matches.length > 0) {
                 const pageMatches = mapping.stable_matches.filter(match => match.page === currentPage);
@@ -163,7 +173,7 @@ const SimpleHighlighter = ({
     // Helper function to find text element by stable index
     const findTextElement = (stableIndex, pageNumber) => {
         if (!textLayerRef?.current) return null;
-        
+
         return textLayerRef.current.querySelector(
             `[data-stable-index="${stableIndex}"][data-page-number="${pageNumber}"]`
         );
@@ -229,7 +239,7 @@ const SimpleHighlighter = ({
 
         sortedHighlights.forEach((highlight, index) => {
             const box = highlight.box;
-            
+
             if (!currentRegion) {
                 // Start first region
                 currentRegion = {
@@ -244,7 +254,7 @@ const SimpleHighlighter = ({
             } else {
                 // Check if this highlight should be merged with current region
                 const canMerge = shouldMergeHighlights(currentRegion, box);
-                
+
                 if (canMerge) {
                     // Merge into current region
                     currentRegion.left = Math.min(currentRegion.left, box.left);
@@ -253,12 +263,12 @@ const SimpleHighlighter = ({
                     currentRegion.bottom = Math.max(currentRegion.bottom, box.bottom);
                     currentRegion.height = Math.max(currentRegion.height, box.height);
                     currentRegion.sourceElements.push(highlight.element);
-                    
+
                     log(`🔗 Merged highlight into current region. New bounds: (${currentRegion.left}, ${currentRegion.top}) to (${currentRegion.right}, ${currentRegion.bottom})`);
                 } else {
                     // Finish current region and start new one
                     mergedRegions.push(createMergedHighlightElement(currentRegion));
-                    
+
                     currentRegion = {
                         left: box.left,
                         top: box.top,
@@ -267,7 +277,7 @@ const SimpleHighlighter = ({
                         height: box.height,
                         sourceElements: [highlight.element]
                     };
-                    
+
                     log(`➡️ Started new region at (${box.left}, ${box.top}) - couldn't merge with previous`);
                 }
             }
@@ -288,9 +298,9 @@ const SimpleHighlighter = ({
         const verticalOverlap = Math.min(region.bottom, box.bottom) - Math.max(region.top, box.top);
         const minHeight = Math.min(region.height, box.height);
         const overlapRatio = verticalOverlap / minHeight;
-        
+
         const isOnSameLine = overlapRatio >= mergeThreshold.minOverlap;
-        
+
         if (!isOnSameLine) {
             log(`❌ Not same line - overlap ratio: ${overlapRatio.toFixed(2)} (threshold: ${mergeThreshold.minOverlap})`);
             return false;
@@ -299,7 +309,7 @@ const SimpleHighlighter = ({
         // Check horizontal proximity
         const horizontalGap = Math.max(0, box.left - region.right);
         const isCloseHorizontally = horizontalGap <= mergeThreshold.xGap;
-        
+
         if (!isCloseHorizontally) {
             log(`❌ Too far horizontally - gap: ${horizontalGap}px (threshold: ${mergeThreshold.xGap}px)`);
             return false;
@@ -313,11 +323,11 @@ const SimpleHighlighter = ({
     const createMergedHighlightElement = (region) => {
         const highlightElement = document.createElement('div');
         highlightElement.className = className;
-        
+
         // Calculate merged dimensions
         const width = region.right - region.left;
         const height = region.bottom - region.top;
-        
+
         // Apply styles
         const styles = {
             position: 'absolute',
@@ -373,7 +383,7 @@ const SimpleHighlighter = ({
             // Create highlight element
             const highlightBox = document.createElement('div');
             highlightBox.className = className;
-            
+
             // Apply styles
             const styles = {
                 position: 'absolute',

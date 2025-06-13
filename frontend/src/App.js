@@ -6,6 +6,8 @@ import Header from './components/Header';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import ProvenanceQA from './components/ProvenanceQA';
+import ProvenanceQAX from './components/ProvenanceQAX';
+import QuestionHistory from './components/QuestionHistory';
 import PDFViewer from './components/PDFViewer';
 //import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
 import DriveFileBrowser from './components/DriveFileBrowser';
@@ -14,6 +16,7 @@ import {
   uploadFile,
   getDocuments,
   askQuestion,
+  getSentenceItemMappings,
   checkAnswer,
   getNextProvenance,
   getQuestionStatus,
@@ -163,44 +166,44 @@ function App() {
   };
 
   useEffect(() => {
-  if (activeDocumentId) {
-    const activeDoc = documents.get(activeDocumentId);
-    
-    // Check if this is actually a new document (not just a re-selection)
-    const previousDocumentId = localStorage.getItem('lastActiveDocumentId');
-    
-    if (activeDoc && activeDocumentId !== previousDocumentId) {
-      console.log('📄 New document activated, clearing questions history');
-      
-      // Clear all questions and reset active question
-      setQuestionsHistory(new Map());
-      setActiveQuestionId(null);
-      
-      // Clear any selected provenance
-      setSelectedProvenance(null);
-      
-      // Clear navigation and highlight triggers
-      setNavigationTrigger(null);
+    if (activeDocumentId) {
+      const activeDoc = documents.get(activeDocumentId);
 
-      
-      // Log the document change
-      //userStudyLogger.logUserInteraction(
-      //  'document_switched',
-      //  'document_selector',
-      //  {
-      //    from_document: previousDocumentId,
-      //    to_document: activeDocumentId,
-      //    filename: activeDoc.filename
-      //  }
-      //);
-      
-      // Store the current document ID for future comparisons
-      localStorage.setItem('lastActiveDocumentId', activeDocumentId);
-      
-      console.log('✅ Questions cleared for new document:', activeDoc.filename);
+      // Check if this is actually a new document (not just a re-selection)
+      const previousDocumentId = localStorage.getItem('lastActiveDocumentId');
+
+      if (activeDoc && activeDocumentId !== previousDocumentId) {
+        console.log('📄 New document activated, clearing questions history');
+
+        // Clear all questions and reset active question
+        setQuestionsHistory(new Map());
+        setActiveQuestionId(null);
+
+        // Clear any selected provenance
+        setSelectedProvenance(null);
+
+        // Clear navigation and highlight triggers
+        setNavigationTrigger(null);
+
+
+        // Log the document change
+        //userStudyLogger.logUserInteraction(
+        //  'document_switched',
+        //  'document_selector',
+        //  {
+        //    from_document: previousDocumentId,
+        //    to_document: activeDocumentId,
+        //    filename: activeDoc.filename
+        //  }
+        //);
+
+        // Store the current document ID for future comparisons
+        localStorage.setItem('lastActiveDocumentId', activeDocumentId);
+
+        console.log('✅ Questions cleared for new document:', activeDoc.filename);
+      }
     }
-  }
-}, [activeDocumentId, documents]);
+  }, [activeDocumentId, documents]);
 
   // History sidebar handlers
   const handleHistoryDocumentSelect = async (docId) => {
@@ -237,89 +240,89 @@ function App() {
   };
 
   const handleShowQuestionSuggestions = async () => {
-  //await logUserInteraction('question_suggestions_click', 'header');
-  setShowQuestionSuggestions(true);
-};
+    //await logUserInteraction('question_suggestions_click', 'header');
+    setShowQuestionSuggestions(true);
+  };
 
-// Add this handler function to App.js  
-const handleSuggestedQuestionSelect = (questionText) => {
-  console.log('🎯 App: Suggested question selected:', questionText);
-  
-  // Close the modal first
-  setShowQuestionSuggestions(false);
-  
-  // Pass the question to ProvenanceQA to submit
-  if (window.integratedQARef && window.integratedQARef.submitQuestion) {
-    window.integratedQARef.submitQuestion(questionText);
-  } else {
-    // Fallback: create a question directly in App
-    handleDirectQuestionSubmit(questionText);
-  }
-};
+  // Add this handler function to App.js  
+  const handleSuggestedQuestionSelect = (questionText) => {
+    console.log('🎯 App: Suggested question selected:', questionText);
 
-// Optional: Direct question submission handler (fallback)
-const handleDirectQuestionSubmit = async (questionText) => {
-  if (!activeDocument) {
-    console.warn('No active document for question submission');
-    return;
-  }
+    // Close the modal first
+    setShowQuestionSuggestions(false);
 
-  try {
-    // Cancel any existing processing
-    const isProcessing = Array.from(questionsHistory.values()).some(q => q.isProcessing);
-    if (isProcessing) {
-      console.log('🛑 Cancelling existing processing before new submission');
-      // You could implement cancellation logic here if needed
-    }
-
-    // Create question ID
-    const questionId = `q_${Date.now()}`;
-    
-    console.log('🔄 App: Submitting suggested question:', questionText);
-
-    // Submit question to backend
-    const response = await askQuestion(questionText, activeDocument.filename);
-
-    if (response.success && response.question_id) {
-      const backendQuestionId = response.question_id;
-
-      // Create question object
-      const questionData = {
-        id: questionId,
-        backendQuestionId: backendQuestionId,
-        text: questionText,
-        answer: null,
-        answerReady: false,
-        provenanceSources: [],
-        provenanceCount: 0,
-        userProvenanceCount: 0,
-        maxProvenances: 5,
-        canRequestMore: false,
-        isProcessing: true,
-        logs: [`Processing started: ${questionText}`],
-        createdAt: new Date(),
-        processingStatus: 'processing',
-        userMessage: null,
-        processingTime: null,
-        submitTime: Date.now(),
-        cancellable: true,
-        source: 'suggestion' // Mark as coming from suggestions
-      };
-
-      // Add to questions history
-      addQuestion(questionData);
-
-
-
-      console.log('✅ Suggested question processing initialized');
+    // Pass the question to ProvenanceQA to submit
+    if (window.integratedQARef && window.integratedQARef.submitQuestion) {
+      window.integratedQARef.submitQuestion(questionText);
     } else {
-      throw new Error(response.error || 'Failed to submit suggested question');
+      // Fallback: create a question directly in App
+      handleDirectQuestionSubmit(questionText);
     }
-  } catch (error) {
-    console.error('❌ Error submitting suggested question:', error);
-    // You could show an error message here
-  }
-};
+  };
+
+  // Optional: Direct question submission handler (fallback)
+  const handleDirectQuestionSubmit = async (questionText) => {
+    if (!activeDocument) {
+      console.warn('No active document for question submission');
+      return;
+    }
+
+    try {
+      // Cancel any existing processing
+      const isProcessing = Array.from(questionsHistory.values()).some(q => q.isProcessing);
+      if (isProcessing) {
+        console.log('🛑 Cancelling existing processing before new submission');
+        // You could implement cancellation logic here if needed
+      }
+
+      // Create question ID
+      const questionId = `q_${Date.now()}`;
+
+      console.log('🔄 App: Submitting suggested question:', questionText);
+
+      // Submit question to backend
+      const response = await askQuestion(questionText, activeDocument.filename);
+
+      if (response.success && response.question_id) {
+        const backendQuestionId = response.question_id;
+
+        // Create question object
+        const questionData = {
+          id: questionId,
+          backendQuestionId: backendQuestionId,
+          text: questionText,
+          answer: null,
+          answerReady: false,
+          provenanceSources: [],
+          provenanceCount: 0,
+          userProvenanceCount: 0,
+          maxProvenances: 5,
+          canRequestMore: false,
+          isProcessing: true,
+          logs: [`Processing started: ${questionText}`],
+          createdAt: new Date(),
+          processingStatus: 'processing',
+          userMessage: null,
+          processingTime: null,
+          submitTime: Date.now(),
+          cancellable: true,
+          source: 'suggestion' // Mark as coming from suggestions
+        };
+
+        // Add to questions history
+        addQuestion(questionData);
+
+
+
+        console.log('✅ Suggested question processing initialized');
+      } else {
+        throw new Error(response.error || 'Failed to submit suggested question');
+      }
+    } catch (error) {
+      console.error('❌ Error submitting suggested question:', error);
+      // You could show an error message here
+    }
+  };
 
 
 
@@ -377,64 +380,84 @@ const handleDirectQuestionSubmit = async (questionText) => {
   };
 
 
-const handleHighlightInPDF = async (provenance) => {
-  console.log('🔍 App: Highlighting provenance in PDF:', provenance?.provenance_id);
+  const handleHighlightInPDF = async (provenance) => {
+    console.log('🔍 App: Highlighting provenance in PDF:', provenance?.provenance_id);
 
 
-  // Also update selected provenance for normal highlights
-  setSelectedProvenance(provenance);
-  
+    // Also update selected provenance for normal highlights
+    setSelectedProvenance(provenance);
 
-};
+
+  };
+
+  // Helper function to collect stable indices for the current page
+    const collectStableIndices = (mappingsData, currentPage) => {
+        const sentenceSpans = new Set();
+
+        Object.entries(mappingsData.sentence_mappings).forEach(([sentenceId, mapping]) => {
+            if (mapping.stable_matches && mapping.stable_matches.length > 0) {
+                const pageMatches = mapping.stable_matches.filter(match => match.page === currentPage);
+                pageMatches.forEach(match => {
+                    const spanElements = match.item_span || [];
+                    spanElements.forEach(spanIndex => {
+                        sentenceSpans.add(spanIndex);
+                    });
+                });
+            }
+        });
+
+        return sentenceSpans;
+    };
+
+    // Helper function to find text element by stable index
+    const findTextElement = (stableIndex, pageNumber) => {
+        if (!document) return null;
+
+        return document.querySelector(
+            `[data-stable-index="${stableIndex}"][data-page-number="${pageNumber}"]`
+        );
+    };
 
 
   // Function to scroll to specific sentence in provenance panel
-  const scrollToProvenanceSentence = (provenance) => {
+  const scrollToProvenanceSentence = async (provenance) => {
     if (!provenance?.sentences_ids || provenance.sentences_ids.length === 0) return;
 
     try {
-      const firstSentenceId = provenance.sentences_ids[0];
+     
+      const sentenceItemMappings = await getSentenceItemMappings(activeDocument.filename, provenance.sentences_ids);
 
-      // Try multiple selectors to find the sentence element
-      const selectors = [
-        `[data-sentence-id="${firstSentenceId}"]`,
-        `.evidence-sentence[data-sentence-id="${firstSentenceId}"]`,
-        `.sentence-text[data-sentence-id="${firstSentenceId}"]`
-      ];
+      if (!sentenceItemMappings['success']) return;
 
-      let sentenceElement = null;
-      for (const selector of selectors) {
-        sentenceElement = document.querySelector(selector);
-        if (sentenceElement) break;
+      console.log('📜 Sentence item mappings:', sentenceItemMappings);
+
+      const stableSelectors = [];
+      const stableIndices = collectStableIndices(sentenceItemMappings, activeDocument.pageNumber);
+
+      if (stableIndices.size === 0) return;
+
+      stableIndices.forEach(index => {
+        stableSelectors.push(`[data-stable-index="${index}"]`);
+      })
+
+      let stableElement = null;
+      for (const selector of stableSelectors) {
+        stableElement = document.querySelector(selector);
+        if (stableElement) break;
       }
 
-      if (sentenceElement) {
-        console.log('📜 Scrolling to sentence element:', firstSentenceId);
+      if (stableElement) {
+        console.log('📜 Scrolling to stable element:', stableElement);
 
-        // Scroll the sentence into view with smooth animation
-        sentenceElement.scrollIntoView({
+        // Scroll into view for all stable match elements
+        stableElement.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
           inline: 'nearest'
         });
 
-        // Add a longer highlight effect for navigation
-        sentenceElement.classList.add('sentence-highlight-flash');
-        setTimeout(() => {
-          sentenceElement.classList.remove('sentence-highlight-flash');
-        }, 3000); // Longer highlight duration
-
       } else {
-        console.warn('Could not find sentence element for ID:', firstSentenceId);
-
-        // Fallback: scroll the provenance panel to top
-        const provenancePanel = document.querySelector('.current-provenance, .provenance-content');
-        if (provenancePanel) {
-          provenancePanel.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-          });
-        }
+        console.warn('Could not find stable element for provenance ids:', provenance.sentences_ids);
       }
 
     } catch (error) {
@@ -465,7 +488,6 @@ const handleHighlightInPDF = async (provenance) => {
         hasContent: provenance.content && provenance.content.length > 0,
         processingTime: provenance.time
       });
-
       // Trigger scrolling behaviors
       setTimeout(() => {
         scrollToProvenanceSentence(provenance);
@@ -478,42 +500,42 @@ const handleHighlightInPDF = async (provenance) => {
 
   // handle gdrive modal
   const handleShowDrive = async () => {
-  //await logUserInteraction('browse_drive_click', 'document_selector');
-  setShowDriveModal(true);
-};
+    //await logUserInteraction('browse_drive_click', 'document_selector');
+    setShowDriveModal(true);
+  };
 
-// Add Drive file selection handler
-const handleDriveFileSelect = async (fileData) => {
-  try {
-    // Create document using your existing logic
-    const docId = createNewDocument(fileData.filename, fileData.filename);
-    
-    // Update with Drive-specific metadata
-    setDocuments(prev => {
-      const newDocs = new Map(prev);
-      const doc = newDocs.get(docId);
-      if (doc) {
-        doc.isDriveDocument = true;
-        doc.driveFileId = fileData.drive_file_id;
-        doc.source = 'google_drive';
-        // ... other metadata
-        newDocs.set(docId, doc);
-      }
-      return newDocs;
-    });
+  // Add Drive file selection handler
+  const handleDriveFileSelect = async (fileData) => {
+    try {
+      // Create document using your existing logic
+      const docId = createNewDocument(fileData.filename, fileData.filename);
 
-    // Log the Drive document selection
-    //await userStudyLogger.logDocumentSelected(
-    //  docId,
-    //  fileData.filename,
-    //  false, // isPreloaded = false for Drive docs
-    //  'google_drive'
-    //);
+      // Update with Drive-specific metadata
+      setDocuments(prev => {
+        const newDocs = new Map(prev);
+        const doc = newDocs.get(docId);
+        if (doc) {
+          doc.isDriveDocument = true;
+          doc.driveFileId = fileData.drive_file_id;
+          doc.source = 'google_drive';
+          // ... other metadata
+          newDocs.set(docId, doc);
+        }
+        return newDocs;
+      });
 
-  } catch (error) {
-    console.error('Error selecting Drive file:', error);
-  }
-};
+      // Log the Drive document selection
+      //await userStudyLogger.logDocumentSelected(
+      //  docId,
+      //  fileData.filename,
+      //  false, // isPreloaded = false for Drive docs
+      //  'google_drive'
+      //);
+
+    } catch (error) {
+      console.error('Error selecting Drive file:', error);
+    }
+  };
 
 
   // Handle feedback
@@ -623,24 +645,32 @@ const handleDriveFileSelect = async (fileData) => {
 
   return (
     <div className="app-improved">
- 
+
 
       {/* Main Content Grid */}
       <div className="app-content-grid">
-      {/* Header */}
-      <Header
-        activeDocument={activeDocument}
-        onShowPreloaded={handleShowDocuments}
-        onUploadDocument={async () => {
-          //await logUserInteraction('upload_button_click', 'header');
-          handleUploadNewDocument();
-        }}
-        onShowDrive={handleShowDrive}
-        onShowQuestionSuggestions={handleShowQuestionSuggestions}
-      />
+        {/* Header */}
+        <Header
+          activeDocument={activeDocument}
+          onShowPreloaded={handleShowDocuments}
+          onUploadDocument={async () => {
+            //await logUserInteraction('upload_button_click', 'header');
+            handleUploadNewDocument();
+          }}
+          onShowDrive={handleShowDrive}
+          onShowQuestionSuggestions={handleShowQuestionSuggestions}
+        />
         {/* Left Sidebar */}
         <div className="left-panel">
-          <HistorySidebar
+          <QuestionHistory
+            questionsHistory={questionsHistory}
+            activeQuestionId={activeQuestionId}
+            onQuestionSelect={handleHistoryQuestionSelect}
+            onQuestionDelete={handleHistoryQuestionDelete}
+            onProvenanceSelect={handleProvenanceSelect}
+            onFeedbackRequest={openFeedbackModal}
+          />
+          {/* <HistorySidebar
             documents={documents}
             activeDocumentId={activeDocumentId}
             onDocumentUpload={handleDocumentUpload}
@@ -652,7 +682,8 @@ const handleDriveFileSelect = async (fileData) => {
             onQuestionDelete={handleHistoryQuestionDelete}
             onProvenanceSelect={handleProvenanceSelect}
             onFeedbackRequest={openFeedbackModal}
-          />
+          />*/}
+
         </div>
 
         {/* Main Content Area */}
@@ -666,9 +697,9 @@ const handleDriveFileSelect = async (fileData) => {
                 navigationTrigger={navigationTrigger}
                 onFeedbackRequest={openFeedbackModal}
                 onClose={() => { }}
-                />
-             
-              
+              />
+
+
 
             ) : (
               <div className="pdf-empty-state">
@@ -691,7 +722,7 @@ const handleDriveFileSelect = async (fileData) => {
 
         {/* Right Panel */}
         <div className="right-panel">
-          <ProvenanceQA
+          <ProvenanceQAX
             pdfDocument={activeDocument}
             questionsHistory={questionsHistory}  // Pass the history
             activeQuestionId={activeQuestionId}   // Pass active ID
@@ -709,10 +740,10 @@ const handleDriveFileSelect = async (fileData) => {
         </div>
       </div>
       <DriveFileBrowser
-  isOpen={showDriveModal}
-  onClose={() => setShowDriveModal(false)}
-  onFileSelect={handleDriveFileSelect}
-/>
+        isOpen={showDriveModal}
+        onClose={() => setShowDriveModal(false)}
+        onFileSelect={handleDriveFileSelect}
+      />
 
 
       {/* Enhanced Feedback Modal */}
@@ -777,14 +808,14 @@ const handleDriveFileSelect = async (fileData) => {
       )}
 
       {/* Question Suggestions Modal - NEW */}
-{showQuestionSuggestions && (
-  <QuestionSuggestionsModal
-    isOpen={showQuestionSuggestions}
-    onClose={() => setShowQuestionSuggestions(false)}
-    filename={activeDocument?.filename}
-    onQuestionSelect={handleSuggestedQuestionSelect}
-  />
-)}
+      {showQuestionSuggestions && (
+        <QuestionSuggestionsModal
+          isOpen={showQuestionSuggestions}
+          onClose={() => setShowQuestionSuggestions(false)}
+          filename={activeDocument?.filename}
+          onQuestionSelect={handleSuggestedQuestionSelect}
+        />
+      )}
     </div>
   );
 }

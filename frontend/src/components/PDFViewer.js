@@ -12,9 +12,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useRenderManager } from '../utils/useRenderManager';
 import { getSentenceItemMappings } from '../services/api';
-import SimpleHighlighter from './SimpleHighlighter'; // Import your modular highlighter component
+//import SimpleHighlighter from './SimpleHighlighter'; 
+import RobustOnTheFlyHighlighter from './RobustOnTheFlyHighlighter';
 import '../styles/pdf-viewer-render.css';
-import { text } from 'd3';
 
 const PDFViewer = ({
     pdfDocument,
@@ -30,11 +30,15 @@ const PDFViewer = ({
     const [loadError, setLoadError] = useState(null);
     const [pdfUrl, setPdfUrl] = useState(null);
     const [provenancePageCache, setProvenancePageCache] = useState(new Map());
+    const [debugMode, setDebugMode] = useState(true);
     
     const [displayZoom, setDisplayZoom] = useState(1.0);
     const [provenanceTargetPage, setProvenanceTargetPage] = useState(null);
     const [pageInputValue, setPageInputValue] = useState('');
     const [showPageInput, setShowPageInput] = useState(false);
+
+    const [isProvenanceProcessing, setIsProvenanceProcessing] = useState(false);
+    const [provenanceProcessingMessage, setProvenanceProcessingMessage] = useState('');
 
     // Refs
     const canvasRef = useRef(null);
@@ -42,7 +46,6 @@ const PDFViewer = ({
     const textLayerRef = useRef(null);
     const highlightLayerRef = useRef(null);
 
-    console.log('selectedProvenance', selectedProvenance);
     // Render manager - single source of truth for rendering
     const renderManager = useRenderManager({
         pdfDoc,
@@ -267,6 +270,27 @@ const PDFViewer = ({
             });
         }
     };
+
+    // Track provenance processing state
+    useEffect(() => {
+        if (!activeQuestionId) {
+            // No active question - clear processing state
+            setIsProvenanceProcessing(false);
+            setProvenanceProcessingMessage('');
+            return;
+        }
+
+        if (!selectedProvenance) {
+            // Question exists but no provenance yet - show processing
+            setIsProvenanceProcessing(true);
+            setProvenanceProcessingMessage('Finding relevant text passages...');
+        } else {
+            // Provenance arrived - clear processing
+            setIsProvenanceProcessing(false);
+            setProvenanceProcessingMessage('');
+        }
+    }, [activeQuestionId, selectedProvenance]);
+
 
     useEffect(() => {
         // Only auto-navigate when provenance first becomes available
@@ -508,7 +532,7 @@ const PDFViewer = ({
     }
 
     return (
-        <div className="pdf-viewer">
+        <div className={`pdf-viewer ${debugMode ? 'debug-mode' : ''}`}>
             {/* Header */}
             <div className="pdf-header">
                 <div className="pdf-title">
@@ -516,19 +540,23 @@ const PDFViewer = ({
                     <span>{pdfDocument.filename}</span>
 
 
-                    {renderManager.isRendering && (
-                        <div className="rendering-indicator">
+                   {/* Unified status indicator - prioritizes provenance over rendering */}
+                    {isProvenanceProcessing ? (
+                        <div className="status-indicator provenance">
                             <FontAwesomeIcon icon={faSpinner} spin />
-                            <span>Rendering...</span>
+                            <span>Finding Evidence...</span>
                         </div>
-                    )}
-
-                    {renderManager.error && (
-                        <div className="render-error">
+                    ) : renderManager.isRendering ? (
+                        <div className="status-indicator rendering">
+                            <FontAwesomeIcon icon={faSpinner} spin />
+                            <span>Rendering Page...</span>
+                        </div>
+                    ) : renderManager.error ? (
+                        <div className="status-indicator error">
                             <FontAwesomeIcon icon={faExclamationTriangle} />
                             <span>Render Error: {renderManager.error}</span>
                         </div>
-                    )}
+                    ) : null}
                 </div>
 
 
@@ -633,8 +661,9 @@ const PDFViewer = ({
 
                     {/* Highlighter Component */}
                     {renderManager.isReady && selectedProvenance && (
-                        <SimpleHighlighter
+                        <RobustOnTheFlyHighlighter
                             provenanceData={selectedProvenance}
+                            activeQuestionId={activeQuestionId}
                             textLayerRef={textLayerRef}
                             highlightLayerRef={highlightLayerRef}
                             containerRef={containerRef}
@@ -645,6 +674,11 @@ const PDFViewer = ({
                                 backgroundColor: 'rgba(76, 175, 80, 0.4)',
                                 border: '1px solid rgba(76, 175, 80, 0.8)',
                                 borderRadius: '2px'
+                            }}
+                            mergeThreshold={{
+                                yTolerance: 3,
+                                xGap: 10,
+                                minOverlap: 0.5
                             }}
                             className="provenance-highlight"
                             verbose={true} // Set to true for debugging

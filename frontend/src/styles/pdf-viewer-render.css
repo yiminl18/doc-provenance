@@ -227,38 +227,107 @@
   box-shadow: var(--shadow-soft) !important;
 }
 
-/* Debug styles - remove these in production 
 
-.pdf-page-container {
-  border: 2px solid blue !important;
+/* Enhanced PDF canvas with hidden text */
+.pdf-canvas {
+    /* Option 1: show a little bit of text */
+    filter: contrast(0.5) brightness(1.5) saturate(0.2);
+    
+    /* Option 2: Alternative - make text nearly invisible */
+    /* filter: sepia(100%) saturate(0%) brightness(200%); */
 }
 
-.pdf-highlight-layer {
-  background: rgba(0, 255, 0, 0.1) !important;
-  border: 2px solid green !important;
-}
-
-
-
-.provenance-highlight {
-    border: 2px solid magenta !important;
-    box-shadow: 0 0 4px rgba(255, 0, 255, 0.6) !important;
-} */
-
+/* Enhanced text layer styling */
 .pdf-text-layer {
-  background: rgba(255, 0, 0, 0.1) !important;
-  opacity: 0.3 !important;
-  border: 2px solid red !important;
+    position: absolute;
+    opacity: 1 !important; /* Make text visible */
+    z-index: 5; /* Above canvas, below highlights */
+    pointer-events: auto; /* Allow text selection */
+    
+    /* Improve text rendering */
+    -webkit-font-smoothing: antialiased;
+    font-smooth: always;
+    text-rendering: optimizeLegibility;
+    
+    /* Prevent text selection highlighting from interfering */
+    ::selection {
+        background: rgba(0, 123, 255, 0.2);
+    }
 }
 
-
+/* Individual text elements */
 .pdf-text-item {
-    background-color: rgba(255, 255, 0, 0.3) !important;
-    border: 1px solid red !important;
-    opacity: 1 !important;
-    color: blue !important;
+    /* Improve text clarity */
+    color: #000000 !important;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.8);
+    
+    /* Prevent wrapping and maintain PDF layout */
+    white-space: pre;
+    word-break: keep-all;
+    
+    /* Improve positioning precision */
+    transform-origin: left bottom;
+    
+    /* Debug borders (remove in production) */
+    /* border: 1px solid rgba(255, 0, 0, 0.3); */
+    /* background: rgba(255, 255, 0, 0.1); */
 }
 
+/* Enhanced highlights with better coverage */
+.provenance-highlight {
+
+
+    /* Softer, more professional appearance */
+    background: rgba(76, 175, 80, 0.3);
+    border: 1px solid rgba(76, 175, 80, 0.6);
+    border-radius: 2px;
+    
+    /* Subtle shadow for depth */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    
+    /* Ensure highlights don't interfere with text selection */
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Alternative canvas text hiding methods */
+.pdf-canvas.hide-text {
+    /* Method 1: High contrast filter */
+    filter: contrast(0.1) brightness(2.5);
+}
+
+.pdf-canvas.hide-text-alternative {
+    /* Method 2: Desaturate and brighten */
+    filter: saturate(0%) brightness(180%) contrast(50%);
+}
+
+/* Responsive adjustments for different zoom levels */
+.pdf-viewer[data-zoom="low"] .provenance-highlight {
+    /* At low zoom, make highlights more generous */
+    transform: scale(1.05);
+    border-width: 2px;
+}
+
+.pdf-viewer[data-zoom="high"] .provenance-highlight {
+    /* At high zoom, be more precise */
+    transform: scale(1.01);
+    border-width: 0.5px;
+}
+
+/* Debug mode styles */
+.pdf-viewer.debug-mode .pdf-text-item {
+    border: 1px solid rgba(255, 0, 0, 0.5) !important;
+    background: rgba(255, 255, 0, 0.1) !important;
+}
+
+.pdf-viewer.debug-mode .pdf-canvas {
+    opacity: 0.5;
+}
+
+.pdf-viewer.debug-mode .provenance-highlight {
+    background: rgba(0, 255, 0, 0.5) !important;
+    border: 1px solid rgba(0, 255, 0, 0.8) !important;
+}
 
 
 /* Loading and error states */
@@ -278,7 +347,52 @@
   position: relative !important;
 }
 
-/* Page Input Navigation Styles - Brutalist Win95 Theme */
+/* Unified Status Indicator */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 2px outset;
+  padding: 2px 8px;
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Provenance processing variant */
+.status-indicator.provenance {
+  background: #800080; /* Purple for evidence/provenance */
+  color: #ffffff;
+  border-color: #800080;
+  box-shadow: 1px 1px 0px #400040;
+}
+
+/* PDF rendering variant */
+.status-indicator.rendering {
+  background: #008000; /* Green for technical rendering */
+  color: #ffffff;
+  border-color: #008000;
+  box-shadow: 1px 1px 0px #004000;
+}
+
+/* Error variant */
+.status-indicator.error {
+  background: #800000; /* Dark red for errors */
+  color: #ffffff;
+  border-color: #800000;
+  box-shadow: 1px 1px 0px #400000;
+}
+
+.status-indicator .fa-spinner {
+  font-size: 10px;
+}
+
+.status-indicator .fa-exclamation-triangle {
+  font-size: 10px;
+}
 
 .page-info-container {
   display: inline-flex;
@@ -430,7 +544,11 @@
   opacity: 1;
 }
 
-
+/* Ensure proper z-index layering */
+.pdf-header {
+  position: relative;
+  z-index: 100;
+}
 
 .page-input-form {
   position: relative;

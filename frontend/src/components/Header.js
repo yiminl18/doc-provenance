@@ -10,7 +10,7 @@ const Header = ({
 }) => {
   
   return (
-    <div className="app-header-compact">
+    <div className="header compact">
       <div className="header-left">
         <div className="logo">
           <FontAwesomeIcon icon={faUserSecret} />
@@ -22,15 +22,6 @@ const Header = ({
         {/* Only show document actions when there's an active document */}
         {activeDocument && (
           <div className="document-actions">
-            {/* Upload Button */}
-            <button
-              className="win95-btn compact upload"
-              onClick={onUploadDocument}
-              title="Upload PDF"
-            >
-              <FontAwesomeIcon icon={faUpload} />
-              <span>Upload PDF</span>
-            </button>
 
             {/* Browse Documents Button */}
             <button
@@ -42,6 +33,18 @@ const Header = ({
               <span>Browse Documents</span>
             </button>
 
+            {/* Upload Button */}
+            <button
+              className="win95-btn compact upload"
+              onClick={onUploadDocument}
+              title="Upload PDF"
+            >
+              <FontAwesomeIcon icon={faUpload} />
+              <span>Upload PDF</span>
+            </button>
+
+            
+
             {/* Browse Drive Button */}
             <button className="win95-btn compact drive" onClick={onShowDrive}>
               <FontAwesomeIcon icon={faCloud} />
@@ -49,7 +52,7 @@ const Header = ({
             </button>
             {/* Question Suggestions Button */}
             <button
-              className="win95-btn"
+              className="win95-btn compact nav"
               onClick={onShowQuestionSuggestions}
               title="View suggested questions for this document"
             >

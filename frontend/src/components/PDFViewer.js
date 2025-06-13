@@ -11,13 +11,12 @@ import {
     faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 import { useRenderManager } from '../utils/useRenderManager';
-//import { PDFTextHighlighterFixed as PDFTextHighlighter } from './PDFTextHighlighterFixed';
-//import { MinimalTestHighlighter as PDFTextHighlighter } from './MinimalTestHighlighter';
 import { getSentenceItemMappings } from '../services/api';
+import SimpleHighlighter from './SimpleHighlighter'; // Import your modular highlighter component
 import '../styles/pdf-viewer-render.css';
 import { text } from 'd3';
 
-const PDFViewerRender = ({
+const PDFViewer = ({
     pdfDocument,
     selectedProvenance,
     activeQuestionId,
@@ -31,10 +30,11 @@ const PDFViewerRender = ({
     const [loadError, setLoadError] = useState(null);
     const [pdfUrl, setPdfUrl] = useState(null);
     const [provenancePageCache, setProvenancePageCache] = useState(new Map());
-
+    
     const [displayZoom, setDisplayZoom] = useState(1.0);
-    // Check if user is away from provenance page
     const [provenanceTargetPage, setProvenanceTargetPage] = useState(null);
+    const [pageInputValue, setPageInputValue] = useState('');
+    const [showPageInput, setShowPageInput] = useState(false);
 
     // Refs
     const canvasRef = useRef(null);
@@ -84,6 +84,13 @@ const PDFViewerRender = ({
         if (!pdfUrl || !window.pdfjsLib) return;
         loadPDF();
     }, [pdfUrl]);
+
+    useEffect(() => {
+        if (pdfDocument && renderManager.isReady && renderManager.currentPage !== 1) {
+            console.log('📄 New document loaded, resetting to page 1');
+            renderManager.render(1);
+        }
+    }, [pdfDocument?.filename]); // Reset when filename changes
 
     const loadPDF = async () => {
         setLoading(true);
@@ -234,9 +241,6 @@ const PDFViewerRender = ({
     const lastUserNavigationRef = useRef(Date.now());
     const lastAutoNavigationRef = useRef(0);
 
-    // Helper to extract page from provenance (implement based on your data structure)
-    // Implement getProvenancePage using your stable mappings
-    // Enhanced navigation that tracks source
     const goToPage = (pageNum, source = 'user') => {
         console.log(`🎯 goToPage called: ${pageNum} (source: ${source})`, {
             currentPage: renderManager.currentPage,
@@ -264,12 +268,10 @@ const PDFViewerRender = ({
         }
     };
 
-    // SMARTER auto-navigation that respects user actions
     useEffect(() => {
         // Only auto-navigate when provenance first becomes available
         if (!selectedProvenance || !renderManager.isReady) return;
 
-        // Use async function inside effect
         const handleAutoNavigation = async () => {
             try {
                 const provenancePage = await getProvenancePage(selectedProvenance); // AWAIT here!
@@ -287,14 +289,11 @@ const PDFViewerRender = ({
             }
         };
 
-        handleAutoNavigation(); // Call the async function
+        handleAutoNavigation();
 
-        // Only depend on provenance ID changes, not render state
     }, [selectedProvenance?.provenance_id]);
 
 
-
-    // Update this when provenance changes (in your auto-nav effect)
     useEffect(() => {
         if (!selectedProvenance) return;
 
@@ -340,21 +339,67 @@ const PDFViewerRender = ({
             const containerWidth = containerRef.current.offsetWidth;
             const fitZoom = renderManager.calculateFitToWidthZoom(baseViewport, containerWidth);
 
-            // Use renderManager to apply the zoom
             renderManager.render(renderManager.currentPage, fitZoom);
         } else {
-            // Fallback to 1.0
             renderManager.render(renderManager.currentPage, 1.0);
         }
     };
+
+    const handlePageInputSubmit = (e) => {
+        e.preventDefault();
+        const pageNum = parseInt(pageInputValue, 10);
+        
+        if (isNaN(pageNum)) {
+            console.warn('Invalid page number entered');
+            setPageInputValue('');
+            return;
+        }
+
+        if (pageNum >= 1 && pageNum <= totalPages) {
+            console.log(`🎯 Direct navigation to page ${pageNum}`);
+            goToPage(pageNum, 'user');
+            setShowPageInput(false);
+            setPageInputValue('');
+        } else {
+            console.warn(`Page ${pageNum} out of range (1-${totalPages})`);
+            setPageInputValue('');
+        }
+    };
+
+    const handlePageInputKeyDown = (e) => {
+        if (e.key === 'Escape') {
+            setShowPageInput(false);
+            setPageInputValue('');
+        } else if (e.key === 'Enter') {
+            handlePageInputSubmit(e);
+        }
+    };
+
+    const handlePageInfoClick = () => {
+        setShowPageInput(true);
+        setPageInputValue(renderManager.currentPage.toString());
+        // Focus the input after state update
+        setTimeout(() => {
+            const input = document.querySelector('.page-input');
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        }, 0);
+    };
+
+    // Update page input when current page changes (but not if user is actively typing)
+    useEffect(() => {
+        if (!showPageInput) {
+            setPageInputValue('');
+        }
+    }, [renderManager.currentPage, showPageInput]);
 
 
 
 
     const getProvenancePage = useCallback(async (provenance) => {
         if (!provenance || !pdfDocument?.filename) return null;
-
-
 
         const sentenceIds = provenance?.provenance_ids
 
@@ -433,160 +478,6 @@ const PDFViewerRender = ({
         }
     };
 
-
-
-
-    const SimpleHighlighter = ({ provenanceData, textLayerRef, highlightLayerRef, currentPage, currentZoom }) => {
-
-        const highlightRefsRef = useRef(new Map()); // highlightElement -> sourceTextElement
-
-        useEffect(() => {
-
-
-            if (!provenanceData?.provenance || !textLayerRef?.current || !highlightLayerRef?.current) {
-                console.log('⏸️ Skipping highlight - missing layers');
-                return;
-            }
-
-
-            const highlightLayer = highlightLayerRef.current;
-
-
-            const handleHighlight = async () => {
-                const sentenceIds = provenanceData.provenance_ids || [];
-                const mappingsData = await getSentenceItemMappings(pdfDocument.filename, sentenceIds);
-
-                if (!mappingsData || !mappingsData.sentence_mappings) {
-                    console.log('⚠️ No stable mappings available');
-                    return;
-                }
-
-                const checkPrimaryPage = (mappingsData, currentPage) => {
-                    return Object.values(mappingsData.sentence_mappings).some(mapping =>
-                        mapping.primary_page === currentPage
-                    );
-                };
-
-                const hasContentOnCurrentPage = checkPrimaryPage(mappingsData, currentPage);
-
-                if (!hasContentOnCurrentPage) {
-                    console.log(`📄 No provenance content on page ${currentPage} - no highlighting`);
-                    clearHighlights();
-                    return;
-                }
-
-                console.log(`✅ Found provenance content on page ${currentPage} - proceeding with highlighting`);
-
-                clearHighlights(); // Clear any existing highlights
-
-                const sentenceMappings = mappingsData.sentence_mappings;
-                const sentenceSpans = new Set();
-
-                Object.entries(sentenceMappings).forEach(([sentenceId, mapping]) => {
-                    if (mapping.stable_matches && mapping.stable_matches.length > 0) {
-                        const pageMatches = mapping.stable_matches.filter(match => match.page === currentPage);
-                        pageMatches.forEach(match => {
-                            const spanElements = match.item_span || [];
-                            spanElements.forEach(spanIndex => {
-                                sentenceSpans.add(spanIndex);
-                            });
-                        });
-                    }
-                });
-
-                if (sentenceSpans.size === 0) {
-                    console.log(`📄 No stable indices found for page ${currentPage}`);
-                    return; // No fallback
-                }
-
-                let highlightCount = 0;
-                // for all the stable indices, work with their text elements
-                sentenceSpans.forEach((index) => {
-                    const element = textLayerRef.current.querySelector(`[data-stable-index="${index}"][data-page-number="${currentPage}"]`);
-                    if (element) {
-
-                        const highlightBox = createHighlightElement(element);
-                        if (highlightBox) {
-                            highlightLayer.appendChild(highlightBox);
-                            highlightRefsRef.current.set(highlightBox, element); // Store reference
-                            highlightCount++;
-
-                        }
-
-                    }
-
-                });
-                console.log(`✅ Highlighted ${highlightCount} elements on page ${currentPage}`);
-            };
-
-            setTimeout(handleHighlight, 100);
-        }, [provenanceData?.provenance_id, currentPage, currentZoom]);
-
-
-
-        // Function to create a single highlight element
-        const createHighlightElement = (sourceElement) => {
-            // Get the actual computed styles to account for transforms
-            const textLayer = textLayerRef.current;
-            const highlightLayer = highlightLayerRef.current;
-
-            const pageContainer = containerRef.current.querySelector('.pdf-page-container');
-            if (!pageContainer) {
-                console.warn('PDF page container not found');
-                return null;
-            }
-
-            // Get bounding rects
-            const elementRect = sourceElement.getBoundingClientRect();
-            const pageContainerRect = pageContainer.getBoundingClientRect();
-
-            // Calculate position relative to the container (not the highlight layer)
-            const left = elementRect.left - pageContainerRect.left;
-            const top = elementRect.top - pageContainerRect.top;
-            const width = elementRect.width;
-            const height = elementRect.height;
-
-            const highlightBox = document.createElement('div');
-            highlightBox.className = 'provenance-highlight';
-            highlightBox.style.cssText = `
-            position: absolute;
-            left: ${left}px;
-            top: ${top}px;
-            width: ${width}px;
-            height: ${height}px;
-            background: rgba(76, 175, 80, 0.4);
-            border: 1px solid rgba(76, 175, 80, 0.8);
-            pointer-events: none;
-            z-index: 100;
-            border-radius: 2px;
-            transform: non !important;
-        `;
-
-            return highlightBox;
-        };
-
-        // Function to clear all highlights
-        const clearHighlights = () => {
-            if (!highlightLayerRef?.current) return;
-
-            const existingHighlights = highlightLayerRef.current.querySelectorAll('.provenance-highlight');
-            existingHighlights.forEach(el => el.remove());
-
-            highlightRefsRef.current.clear();
-        };
-
-        // Clear highlights when component unmounts
-        useEffect(() => {
-            return () => {
-                clearHighlights();
-            };
-        }, []);
-
-        return null;
-    };
-
-
-
     // Render states
     if (!pdfDocument) {
         return (
@@ -652,9 +543,36 @@ const PDFViewerRender = ({
                         Previous
                     </button>
 
-                    <span className="page-info">
-                        Page {renderManager.currentPage} of {totalPages}
-                    </span>
+                    {/* Page Info with Input */}
+                    <div className="page-info-container">
+                        {showPageInput ? (
+                            <form onSubmit={handlePageInputSubmit} className="page-input-form">
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max={totalPages}
+                                    value={pageInputValue}
+                                    onChange={(e) => setPageInputValue(e.target.value)}
+                                    onKeyDown={handlePageInputKeyDown}
+                                    onBlur={() => {
+                                        // Hide input when clicking outside, but allow form submission
+                                        setTimeout(() => setShowPageInput(false), 150);
+                                    }}
+                                    className="page-input"
+                                    placeholder="Page #"
+                                />
+                                <span className="page-total">of {totalPages}</span>
+                            </form>
+                        ) : (
+                            <span 
+                                className="page-info clickable" 
+                                onClick={handlePageInfoClick}
+                                title="Click to jump to page"
+                            >
+                                Page {renderManager.currentPage} of {totalPages}
+                            </span>
+                        )}
+                    </div>
 
                     <button
                         onClick={() => goToPage(renderManager.currentPage + 1)}
@@ -714,28 +632,22 @@ const PDFViewerRender = ({
                     <div ref={highlightLayerRef} className="pdf-highlight-layer" />
 
                     {/* Highlighter Component */}
-                    {/*{renderManager.isReady && selectedProvenance && (
-                            <PDFTextHighlighter
-                                documentId={pdfDocument?.filename || ''}
-                                currentPage={renderManager.currentPage}
-                                provenanceData={selectedProvenance}
-                                textLayerRef={textLayerRef}
-                                canvasRef={canvasRef}
-                                containerRef={containerRef}
-                                highlightLayerRef={highlightLayerRef}
-                                currentViewport={renderManager.viewport}
-                                questionId={activeQuestionId}
-                                isRendering={renderManager.isRendering}
-                            />
-                        )}*/}
-
                     {renderManager.isReady && selectedProvenance && (
                         <SimpleHighlighter
                             provenanceData={selectedProvenance}
                             textLayerRef={textLayerRef}
                             highlightLayerRef={highlightLayerRef}
+                            containerRef={containerRef}
                             currentPage={renderManager.currentPage}
                             currentZoom={renderManager.currentZoom}
+                            documentFilename={pdfDocument?.filename || ''}
+                            highlightStyle={{
+                                backgroundColor: 'rgba(76, 175, 80, 0.4)',
+                                border: '1px solid rgba(76, 175, 80, 0.8)',
+                                borderRadius: '2px'
+                            }}
+                            className="provenance-highlight"
+                            verbose={true} // Set to true for debugging
                         />
                     )}
                 </div>
@@ -744,4 +656,4 @@ const PDFViewerRender = ({
     );
 };
 
-export default PDFViewerRender;
+export default PDFViewer;

@@ -859,10 +859,10 @@ const ProvenanceQA = forwardRef(({
 
             {/* Current Question Display */}
             {activeQuestion && (
-                <div className="current-question-section">
+                <div className="current-provenance-section">
                     <div className="section-header">
                         <FontAwesomeIcon icon={faFileAlt} />
-                        <h4>Current Question</h4>
+                        <h4>Current Provenance</h4>
                         <div className="question-status">
                             {(() => {
                                 const status = getQuestionStatusUI(activeQuestion);
@@ -883,45 +883,7 @@ const ProvenanceQA = forwardRef(({
                         )}
                     </div>
 
-                    <div className="question-display">
-                        <div className="question-text">{activeQuestion.text}</div>
-
-                        {/* Show cancellation message if cancelled */}
-                        {activeQuestion.processingStatus === 'cancelled' && (
-                            <div className="cancellation-notice">
-                                <FontAwesomeIcon icon={faExclamationCircle} />
-                                <span>{activeQuestion.userMessage}</span>
-                                <button 
-                                    className="win95-btn retry"
-                                    onClick={() => {
-                                        setCurrentQuestion(activeQuestion.text);
-                                        if (inputRef.current) {
-                                            inputRef.current.focus();
-                                        }
-                                    }}
-                                >
-                                    Ask Again
-                                </button>
-                            </div>
-                        )}
-
-                        {/* Answer Section */}
-                        {activeQuestion.answerReady && activeQuestion.answer ? (
-                            <div className="answer-section">
-                                <div className="answer-header">
-                                    <FontAwesomeIcon icon={faCheck} />
-                                    <span>Answer</span>
-                                </div>
-                                <div className="answer-content">{activeQuestion.answer}</div>
-                            </div>
-                        ) : activeQuestion.isProcessing ? (
-                            <div className="answer-pending">
-                                <FontAwesomeIcon icon={faSpinner} spin />
-                                <span>Generating answer...</span>
-                            </div>
-                        ) : null}
-
-                        {/* Provenance Section */}
+                    {/* Provenance Section */}
                         <div className="provenance-section">
                             <div className="provenance-header">
                                 <FontAwesomeIcon icon={faHighlighter} />
@@ -977,7 +939,6 @@ const ProvenanceQA = forwardRef(({
                                                         {Array.isArray(selectedProvenance.content) ? (
                                                             selectedProvenance.content.map((sentence, idx) => (
                                                                 <div key={idx} className="evidence-sentence" data-sentence-id={selectedProvenance.sentences_ids?.[idx]}>
-                                                                    <span className="sentence-number">{idx + 1}</span>
                                                                     <span className="sentence-text">{sentence}</span>
                                                                 </div>
                                                             ))
@@ -1135,6 +1096,46 @@ const ProvenanceQA = forwardRef(({
                                 </div>
                             )}
                         </div>
+
+                    <div className="question-display">
+                        <div className="question-text">{activeQuestion.text}</div>
+
+                        {/* Show cancellation message if cancelled */}
+                        {activeQuestion.processingStatus === 'cancelled' && (
+                            <div className="cancellation-notice">
+                                <FontAwesomeIcon icon={faExclamationCircle} />
+                                <span>{activeQuestion.userMessage}</span>
+                                <button 
+                                    className="win95-btn retry"
+                                    onClick={() => {
+                                        setCurrentQuestion(activeQuestion.text);
+                                        if (inputRef.current) {
+                                            inputRef.current.focus();
+                                        }
+                                    }}
+                                >
+                                    Ask Again
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Answer Section */}
+                        {activeQuestion.answerReady && activeQuestion.answer ? (
+                            <div className="answer-section">
+                                <div className="answer-header">
+                                    <FontAwesomeIcon icon={faCheck} />
+                                    <span>Answer</span>
+                                </div>
+                                <div className="answer-content">{activeQuestion.answer}</div>
+                            </div>
+                        ) : activeQuestion.isProcessing ? (
+                            <div className="answer-pending">
+                                <FontAwesomeIcon icon={faSpinner} spin />
+                                <span>Generating answer...</span>
+                            </div>
+                        ) : null}
+
+                        
                     </div>
                 </div>
             )}

@@ -6,7 +6,7 @@ import Header from './components/Header';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import ProvenanceQA from './components/ProvenanceQA';
-import PDFViewerRender from './components/PDFViewerRender';
+import PDFViewer from './components/PDFViewer';
 //import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
 import DriveFileBrowser from './components/DriveFileBrowser';
 import QuestionSuggestionsModal from './components/QuestionSuggestionsModal';
@@ -639,7 +639,7 @@ const handleDriveFileSelect = async (fileData) => {
         onShowQuestionSuggestions={handleShowQuestionSuggestions}
       />
         {/* Left Sidebar */}
-        <div className="sidebar-panel">
+        <div className="left-panel">
           <HistorySidebar
             documents={documents}
             activeDocumentId={activeDocumentId}
@@ -659,7 +659,7 @@ const handleDriveFileSelect = async (fileData) => {
         <div className="main-content">
           <div className="pdf-section">
             {activeDocument ? (
-              <PDFViewerRender
+              <PDFViewer
                 pdfDocument={activeDocument}
                 selectedProvenance={selectedProvenance}
                 activeQuestionId={activeQuestionId}

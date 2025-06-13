@@ -137,10 +137,10 @@ const HistorySidebar = ({
 
   return (
     <div className="history-sidebar">
-      {/* Documents History Section */}
+      {/* Documents History Section
       <div className="history-section">
         <div 
-          className="section-header clickable"
+          className="header document-section clickable"
           onClick={() => setDocumentsExpanded(!documentsExpanded)}
         >
           <FontAwesomeIcon 
@@ -203,12 +203,12 @@ const HistorySidebar = ({
             </div>
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Questions History Section */}
       <div className="history-section">
         <div 
-          className="section-header clickable"
+          className="header section clickable"
           onClick={() => setQuestionsExpanded(!questionsExpanded)}
         >
           <FontAwesomeIcon 
@@ -248,7 +248,7 @@ const HistorySidebar = ({
                       key={question.id}
                       className={`history-item question-item ${status.className} ${isActive ? 'active' : ''} ${isCollapsed ? 'collapsed' : ''}`}
                     >
-                      <div className="item-header" onClick={() => onQuestionSelect(question.id)}>
+                      <div className="header question-history-item" onClick={() => onQuestionSelect(question.id)}>
                         <div className="item-icon">
                           <FontAwesomeIcon
                             icon={status.icon}
@@ -256,26 +256,10 @@ const HistorySidebar = ({
                             style={{ color: status.color }}
                           />
                         </div>
-                        <div className="item-content">
-                          <div className="item-name question-text">
-                            {question.text.length > 45 
-                              ? `${question.text.substring(0, 42)}...`
-                              : question.text
-                            }
-                          </div>
-                          <div className="item-meta compact">
-                           
-                            <span className="status-text">{status.text}</span>
-                            {question.provenanceSources?.length > 0 && (
-                              <span className="provenance-count">
-                                {question.provenanceSources.length} sources
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                      
                         
                         {/* Action buttons */}
-                        <div className="question-actions-header">
+                        <div className="header question-actions">
                           {/* Detail modal button */}
                           {hasDetails && (
                             <button
@@ -289,6 +273,8 @@ const HistorySidebar = ({
                               <FontAwesomeIcon icon={faEye} />
                             </button>
                           )}
+
+
                           
                           {/* Collapse toggle button */}
                           {hasDetails && (
@@ -319,7 +305,23 @@ const HistorySidebar = ({
                           </button>
                         </div>
                       </div>
-
+                                                <div className="item-content">
+                          <div className="item-name question-text">
+                            {question.text.length > 45 
+                              ? `${question.text.substring(0, 42)}...`
+                              : question.text
+                            }
+                          </div>
+                          <div className="item-meta compact">
+                           
+                            <span className="status-text">{status.text}</span>
+                            {question.provenanceSources?.length > 0 && (
+                              <span className="provenance-count">
+                                {question.provenanceSources.length} sources
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       {/* Expandable Question Details */}
                       {!isCollapsed && hasDetails && (
                         <div className="question-details">

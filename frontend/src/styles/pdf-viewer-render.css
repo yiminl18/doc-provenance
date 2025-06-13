@@ -163,8 +163,10 @@
   opacity: 0.9 !important; /* Slight hover effect */
 }
 
+
+
 /* PDF Header - ensure it doesn't interfere */
-.pdf-header {
+.header.pdf-header {
   background-color: var(--bg-secondary) !important;
   padding: var(--space-3) var(--space-4) !important;
   border-bottom: var(--border-medium) solid var(--win95-border-dark) !important;
@@ -174,9 +176,9 @@
   align-items: center !important;
   flex-shrink: 0 !important;
   box-shadow: var(--shadow-raised) !important;
-  position: sticky !important;
   top: 0 !important;
-  z-index: 20 !important;
+  position: relative;
+  z-index: 100;
   
   /* Prevent interference with PDF content */
   transform: none !important;
@@ -225,11 +227,23 @@
   box-shadow: var(--shadow-soft) !important;
 }
 
-/* Debug styles - remove these in production */
+/* Debug styles - remove these in production 
 
 .pdf-page-container {
   border: 2px solid blue !important;
 }
+
+.pdf-highlight-layer {
+  background: rgba(0, 255, 0, 0.1) !important;
+  border: 2px solid green !important;
+}
+
+
+
+.provenance-highlight {
+    border: 2px solid magenta !important;
+    box-shadow: 0 0 4px rgba(255, 0, 255, 0.6) !important;
+} */
 
 .pdf-text-layer {
   background: rgba(255, 0, 0, 0.1) !important;
@@ -237,10 +251,6 @@
   border: 2px solid red !important;
 }
 
-.pdf-highlight-layer {
-  background: rgba(0, 255, 0, 0.1) !important;
-  border: 2px solid green !important;
-}
 
 .pdf-text-item {
     background-color: rgba(255, 255, 0, 0.3) !important;
@@ -249,10 +259,7 @@
     color: blue !important;
 }
 
-.provenance-highlight {
-    border: 2px solid magenta !important;
-    box-shadow: 0 0 4px rgba(255, 0, 255, 0.6) !important;
-}
+
 
 /* Loading and error states */
 .pdf-viewer-loading,
@@ -269,4 +276,243 @@
   /* Prevent inheritance issues */
   transform: none !important;
   position: relative !important;
+}
+
+/* Page Input Navigation Styles - Brutalist Win95 Theme */
+
+.page-info-container {
+  display: inline-flex;
+  align-items: center;
+  min-width: 120px;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+}
+
+.page-info.clickable {
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
+  padding: 4px 8px;
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  color: #000000;
+  cursor: pointer;
+  user-select: none;
+  min-width: 100px;
+  text-align: center;
+  transition: none; /* No smooth transitions - keep it brutalist */
+  box-shadow: 1px 1px 0px #808080;
+}
+
+.page-info.clickable:hover {
+  background: #d4d0c8;
+  border: 2px outset #d4d0c8;
+  box-shadow: 1px 1px 0px #808080;
+}
+
+.page-info.clickable:active {
+  border: 2px inset #c0c0c0;
+  background: #b8b8b8;
+  box-shadow: inset 1px 1px 0px #808080;
+}
+
+.page-input-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #c0c0c0;
+  border: 2px inset #c0c0c0;
+  padding: 2px 4px;
+  box-shadow: inset 1px 1px 0px #808080;
+}
+
+.page-input {
+  width: 50px;
+  height: 18px;
+  border: 1px inset #c0c0c0;
+  background: #ffffff;
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  font-weight: normal;
+  color: #000000;
+  text-align: center;
+  padding: 1px 2px;
+  margin: 0;
+  outline: none;
+  box-shadow: inset 1px 1px 0px #808080, inset -1px -1px 0px #dfdfdf;
+}
+
+.page-input:focus {
+  background: #ffffff;
+  border: 1px inset #c0c0c0;
+  box-shadow: inset 1px 1px 0px #000080, inset -1px -1px 0px #dfdfdf;
+  /* Win95 blue focus indicator */
+}
+
+.page-input::-webkit-outer-spin-button,
+.page-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.page-input[type=number] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+.page-total {
+  font-family: 'MS Sans Serif', sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  color: #000000;
+  white-space: nowrap;
+  margin-left: 2px;
+}
+
+/* Enhanced page navigation for better visual hierarchy */
+.page-navigation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.page-navigation .win95-btn.nav {
+  min-width: 80px;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+}
+
+.page-navigation .win95-btn.nav:disabled {
+  color: #808080;
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
+  cursor: not-allowed;
+  box-shadow: 1px 1px 0px #808080;
+}
+
+.page-navigation .win95-btn.control {
+  background: #008080; /* Teal accent for important actions */
+  color: #ffffff;
+  border: 2px outset #008080;
+  font-weight: bold;
+  font-size: 11px;
+  padding: 4px 8px;
+  box-shadow: 1px 1px 0px #004040;
+}
+
+.page-navigation .win95-btn.control:hover {
+  background: #20a0a0;
+  border: 2px outset #20a0a0;
+  box-shadow: 1px 1px 0px #004040;
+}
+
+.page-navigation .win95-btn.control:active {
+  background: #006060;
+  border: 2px inset #008080;
+  box-shadow: inset 1px 1px 0px #004040;
+}
+
+/* Visual feedback for interactive elements */
+.page-info.clickable::after {
+  content: " 📝";
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  font-size: 9px;
+  margin-left: 4px;
+}
+
+.page-info.clickable:hover::after {
+  opacity: 1;
+}
+
+
+
+.page-input-form {
+  position: relative;
+  z-index: 101;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .page-info-container {
+    min-width: 90px;
+  }
+  
+  .page-input {
+    width: 40px;
+  }
+  
+  .page-navigation .win95-btn.nav {
+    min-width: 60px;
+    font-size: 10px;
+  }
+  
+  .page-navigation .win95-btn.control {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .page-info.clickable {
+    border: 3px outset #c0c0c0;
+    box-shadow: 2px 2px 0px #000000;
+  }
+  
+  .page-input {
+    border: 2px inset #c0c0c0;
+    box-shadow: inset 2px 2px 0px #808080;
+  }
+  
+  .page-input:focus {
+    box-shadow: inset 2px 2px 0px #000080;
+  }
+}
+
+/* Animation for form appearance (subtle, Win95-style) */
+.page-input-form {
+  animation: pageInputAppear 0.1s ease-out;
+}
+
+@keyframes pageInputAppear {
+  from {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Focus trap styling for accessibility */
+.page-input:invalid {
+  background: #ffe0e0;
+  border: 1px inset #ff8080;
+  box-shadow: inset 1px 1px 0px #ff4040;
+}
+
+/* Loading state for navigation buttons */
+.page-navigation .win95-btn.nav[disabled] .fa-chevron-left,
+.page-navigation .win95-btn.nav[disabled] .fa-chevron-right {
+  opacity: 0.5;
+}
+
+/* Brutalist emphasis for provenance navigation */
+.page-navigation .win95-btn.control {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-width: 3px;
+  box-shadow: 2px 2px 0px #004040, 1px 1px 0px #008080;
+}
+
+.page-navigation .win95-btn.control:active {
+  box-shadow: inset 2px 2px 0px #004040;
+  transform: translate(1px, 1px);
 }

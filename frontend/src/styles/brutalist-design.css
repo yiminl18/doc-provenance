@@ -112,9 +112,9 @@
     inset 1px 1px 0px rgba(0, 0, 0, 0.3);
  
   /* Layout Constants - Slightly more compact */
-  --left-sidebar-width: 220px;
+  --left-panel-width: 220px;
   --right-panel-width: 340px;
-  --header-height: 56px; /* Shorter header */
+  --header-height: 10vh; /* Shorter header */
  
   /* No Transitions - Windows 95 was instant */
   --transition-fast: none;

@@ -107,10 +107,14 @@ const QuestionSuggestionsModal = ({
                     className="question-item"
                     onClick={() => handleQuestionClick(question)}
                   >
-                    <div className="question-number">{index + 1}</div>
                     <div className="question-text">{question.question_text}</div>
-                    <div className="question-action">
-                      <FontAwesomeIcon icon={faPaperPlane} />
+                    <div className="doc-info">
+           
+                    <div className="doc-stats">
+                      <div>
+                        <FontAwesomeIcon icon={faPaperPlane} />
+                      </div>
+                      </div>
                     </div>
                   </button>
                 ))}

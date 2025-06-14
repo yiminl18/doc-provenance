@@ -15,8 +15,9 @@ import { useRenderManager } from '../utils/useRenderManager';
 import { getSentenceItemMappings } from '../services/api';
 //import SimpleHighlighter from './SimpleHighlighter'; 
 //import RobustOnTheFlyHighlighter from './RobustOnTheFlyHighlighter';
-import DirectTextHighlighter from './DirectTextHighlighter';
+//import DirectTextHighlighter from './DirectTextHighlighter';
 import '../styles/pdf-viewer-render.css';
+import CoordinateHighlighter from './CoordinateHighlighter';
 
 const PDFViewer = ({
     pdfDocument,
@@ -131,6 +132,17 @@ const PDFViewer = ({
             setLoading(false);
         }
     };
+
+    // Add this effect to PDFViewer.js for debugging
+useEffect(() => {
+    console.log('🔍 PDFViewer: selectedProvenance changed:', {
+        provenanceId: selectedProvenance?.provenance_id,
+        hasHighlightData: !!selectedProvenance?.highlight_data,
+        sentenceIds: selectedProvenance?.provenance_ids || selectedProvenance?.sentences_ids,
+        currentPage: renderManager.currentPage,
+        timestamp: Date.now()
+    });
+}, [selectedProvenance]);
 
     function handleViewportChange({ page, zoom, displayViewport, textLayerViewport, zoomRatio }) {
         console.log(`📡 Viewport changed: page ${page}, display zoom ${(zoom * 100).toFixed(0)}%, text layer zoom: 100%`);
@@ -697,7 +709,7 @@ const PDFViewer = ({
                         />
                     )}*/}
                     {renderManager.isReady && selectedProvenance && (
-                        <DirectTextHighlighter
+                        <CoordinateHighlighter
                             provenanceData={selectedProvenance}
                             activeQuestionId={activeQuestionId}
                             pdfDocument={pdfDoc}

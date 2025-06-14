@@ -139,7 +139,7 @@ const DirectTextHighlighter = ({
         };
 
         // Small delay to ensure text layer is ready
-        const timeoutId = setTimeout(performHighlighting, 150);
+        const timeoutId = setTimeout(performHighlighting, 100);
         return () => clearTimeout(timeoutId);
 
     }, [

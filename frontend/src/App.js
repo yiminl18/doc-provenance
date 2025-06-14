@@ -442,26 +442,9 @@ useEffect(() => {
 
     try {
      
-      const sentenceItemMappings = await getSentenceItemMappings(activeDocument.filename, provenance.sentences_ids);
 
-      if (!sentenceItemMappings['success']) return;
-
-      console.log('📜 Sentence item mappings:', sentenceItemMappings);
-
-      const stableSelectors = [];
-      const stableIndices = collectStableIndices(sentenceItemMappings, activeDocument.pageNumber);
-
-      if (stableIndices.size === 0) return;
-
-      stableIndices.forEach(index => {
-        stableSelectors.push(`[data-stable-index="${index}"]`);
-      })
-
-      let stableElement = null;
-      for (const selector of stableSelectors) {
-        stableElement = document.querySelector(selector);
-        if (stableElement) break;
-      }
+        const stableElement = document.querySelector('.direct-provenance-highlight');
+  
 
       if (stableElement) {
         console.log('📜 Scrolling to stable element:', stableElement);

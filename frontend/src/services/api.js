@@ -185,6 +185,12 @@ export const getSentenceItemMappings = async (filename, sentenceIds) => {
     const response = await axios.get(
       `${API_URL}/documents/${filename}/sentence-items?ids=${ids}`
     );
+    console.log('✅ Received stable mappings:', {
+            success: response.data.success,
+            sentenceCount: Object.keys(response.data.sentence_mappings || {}).length,
+            foundSentences: response.data.found_sentences?.length || 0
+        });
+
     return response.data;
   } catch (error) {
     console.error('Error fetching sentence element mappings:', error);
@@ -538,6 +544,18 @@ export const getNextProvenance = async (questionId, currentCount = 0) => {
     const response = await axios.post(`${API_URL}/get-next-provenance/${questionId}`, {
       current_count: currentCount
     });
+
+    if (response.data.success && response.data.provenance) {
+            console.log('✅ Received provenance with coordinate data:', {
+                provenanceId: response.data.provenance.provenance_id,
+                hasCoordinates: response.data.provenance.hasCoordinateData,
+                coordinatePages: response.data.provenance.coordinate_highlights ? 
+                    Object.keys(response.data.provenance.coordinate_highlights) : [],
+                sentenceIds: response.data.provenance.provenance_ids
+            });
+        }
+
+
     return response.data;
   } catch (error) {
     console.error('Error getting next provenance:', error);

@@ -144,29 +144,27 @@ const QuestionHistory = ({
                   className={`question-item ${status.className} ${isActive ? 'active' : ''}`}
                 >
               <div className="question-header" onClick={() => onQuestionSelect(question.id)}>
-                    <div className="question-icon">
-                      <FontAwesomeIcon
-                        icon={status.icon}
-                        spin={status.spin}
-                      />
-                    </div>
+                    
                     
                     <div className="question-content">
                       <div className="question-text">
                         {question.text}
                       </div>
                       <div className="question-meta">
+                        <div className="question-icon">
+                      <FontAwesomeIcon
+                        icon={status.icon}
+                        spin={status.spin}
+                      />
+                    </div>
                         <span className="status-text">{status.text}</span>
                         {question.provenanceSources?.length > 0 && (
                           <span className="provenance-count">
                             {question.provenanceSources.length} sources
                           </span>
                         )}
-                        <span className="timestamp">
-                          {formatTimestamp(new Date(question.createdAt))}
-                        </span>
-                      </div>
-                    </div>
+                       
+                     
 
                     <div className="question-actions">
                       {/* Detail modal button */}
@@ -212,6 +210,8 @@ const QuestionHistory = ({
                       </button>
                     </div>
                   </div>
+                   </div>
+                    </div>
                
 
                   {/* Expandable Question Details */}
@@ -289,7 +289,6 @@ const QuestionHistory = ({
                 <h5><FontAwesomeIcon icon={faQuestionCircle} /> Question:</h5>
                 <div className="question-full-text">{selectedQuestionModal.text}</div>
                 <div className="question-meta-full">
-                  <span>Asked: {formatTimestamp(new Date(selectedQuestionModal.createdAt))}</span>
                   {selectedQuestionModal.processingTime && (
                     <span>Processing time: {selectedQuestionModal.processingTime.toFixed(1)}s</span>
                   )}
@@ -309,7 +308,7 @@ const QuestionHistory = ({
                 <div className="provenances-full-section">
                   <h5>
                     <FontAwesomeIcon icon={faHighlighter} /> 
-                    Evidence Sources ({selectedQuestionModal.provenanceSources.length})
+                    Provenance ({selectedQuestionModal.provenanceSources.length})
                   </h5>
                   <div className="provenances-full-list">
                     {selectedQuestionModal.provenanceSources.map((prov, idx) => (

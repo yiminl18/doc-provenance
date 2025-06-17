@@ -7,6 +7,7 @@ import {
     faArrowRight,
     faChevronLeft,
     faChevronRight,
+    faUserSecret,
     faComment
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -75,7 +76,7 @@ const ProvenanceDisplay = ({
             <div className="provenance-display-component">
                 <div className="qa-header">
                     <h4>
-                        <FontAwesomeIcon icon={faHighlighter} />
+                        <FontAwesomeIcon icon={faUserSecret} />
                         Provenance
                     </h4>
                 </div>
@@ -89,10 +90,10 @@ const ProvenanceDisplay = ({
     return (
         <div className="provenance-display-component">
             <div className="qa-header">
-                <div>
-                    <FontAwesomeIcon icon={faHighlighter} />
+                <h4>
+                    <FontAwesomeIcon icon={faUserSecret} />
                     <span>Provenance</span>
-                </div>
+                </h4>
                 {availableProvenances.length > 0 && (
                     <span className="provenance-counter">
                         {currentProvenanceIndex + 1} of {availableProvenances.length}
@@ -235,12 +236,10 @@ const ProvenanceDisplay = ({
                         <FontAwesomeIcon icon={faComment} />
                         Provide Feedback
                     </button>
-                </div>
-            )}
 
-            {/* Get More - Fixed at bottom */}
+                     {/* Get More - Fixed at bottom */}
             {question.canRequestMore && availableProvenances.length > 0 && (
-                <div className="get-more-section">
+              
                     <button
                         className="win95-btn get-more"
                         onClick={onGetNextProvenance}
@@ -258,13 +257,13 @@ const ProvenanceDisplay = ({
                             </>
                         )}
                     </button>
-                    <div className="provenance-info">
-                        Showing {question.userProvenanceCount} of {question.maxProvenances}
-                        {question.provenanceCount > question.userProvenanceCount &&
-                            ` (${question.provenanceCount - question.userProvenanceCount} more available)`}
-                    </div>
+      
+               
+            )}
                 </div>
             )}
+
+           
         </div>
     );
 };

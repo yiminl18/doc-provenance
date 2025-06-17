@@ -13,9 +13,6 @@ import {
 import * as pdfjsLib from 'pdfjs-dist';
 import { useRenderManager } from '../utils/useRenderManager';
 import { getSentenceItemMappings } from '../services/api';
-//import SimpleHighlighter from './SimpleHighlighter'; 
-//import RobustOnTheFlyHighlighter from './RobustOnTheFlyHighlighter';
-//import DirectTextHighlighter from './DirectTextHighlighter';
 import '../styles/pdf-viewer-render.css';
 import CoordinateHighlighter from './CoordinateHighlighter';
 
@@ -153,7 +150,7 @@ useEffect(() => {
         window.currentZoomRatio = zoomRatio;
 
         setTimeout(() => {
-            setupTextLayer(page, displayViewport);
+            setupTextLayerSimple(page, displayViewport);
             setupHighlightLayer();
             const event = new CustomEvent('pdfViewportChanged', {
                 detail: {
@@ -169,14 +166,132 @@ useEffect(() => {
         }, 100);
     }
 
+    // Simpler approach: Use page.render() with textLayer option
+const setupTextLayerSimple = async (pageNumber, displayViewport) => {
+    if (!textLayerRef.current || !pdfDoc) return;
+
+    try {
+        const page = await pdfDoc.getPage(pageNumber);
+        const textContent = await page.getTextContent({
+            includeMarkedContent: true,
+            disableNormalization: true
+        })
+
+        const textLayer = textLayerRef.current;
+        textLayer.innerHTML = '';
+        const textLayerViewport = page.getViewport({ scale: 1.0 });
+        const zoomRatio = window.currentZoomRatio || 1.0;
+
+        // Position text layer to match canvas
+        const canvas = canvasRef.current;
+         if (!canvas) {
+            console.warn('⚠️ Canvas not available for text layer positioning');
+            return;
+        }
+  
+            const canvasRect = canvas.getBoundingClientRect();
+            const containerRect = containerRef.current.getBoundingClientRect();
+
+            textLayer.style.position = 'absolute';
+            textLayer.style.left = `${canvasRect.left - containerRect.left}px`;
+            textLayer.style.top = `${canvasRect.top - containerRect.top}px`;
+            textLayer.style.width = `${textLayerViewport.width}px`;
+            textLayer.style.height = `${textLayerViewport.height}px`;
+            textLayer.style.transform = `scale(${zoomRatio})`;
+            textLayer.style.transformOrigin = '0 0'; // Scale from top-left
+            textLayer.className = 'textLayer pdf-text-layer';
+            textLayer.style.setProperty('--scale-factor', textLayerViewport.scale.toString());
+            textLayer.style.opacity = debugMode ? '0.3' : '0';
+        
+
+         // Process text items using the textLayerViewport (1.0 scale)
+        const items = textContent.items;
+        const styles = textContent.styles || {};
+
+        items.forEach((item, itemIndex) => {
+            if (!item.transform || !item.str) return;
+
+            const transform = item.transform;
+            const [scaleX, skewY, skewX, scaleY, translateX, translateY] = transform;
+
+            const span = document.createElement('span');
+            
+            // Calculate positioning based on textLayerViewport (1.0 scale)
+            const fontSize = Math.sqrt(scaleX * scaleX + skewY * skewY);
+            const angle = Math.atan2(skewY, scaleX);
+            
+            // Position using PDF coordinates (textLayerViewport coordinates)
+            span.style.position = 'absolute';
+            span.style.left = `${translateX}px`;
+            span.style.bottom = `${translateY}px`; // PDF uses bottom-left origin
+            span.style.fontSize = `${fontSize}px`;
+            span.style.color = 'transparent';
+            span.style.whiteSpace = 'pre';
+            span.style.cursor = 'text';
+            span.style.transformOrigin = '0% 0%';
+            
+            // Handle font family
+            const fontName = item.fontName;
+            if (fontName && styles[fontName] && styles[fontName].fontFamily) {
+                span.style.fontFamily = styles[fontName].fontFamily;
+            } else if (fontName) {
+                // Map common PDF fonts to web fonts
+                if (fontName.includes('Arial') || fontName.includes('Helvetica')) {
+                    span.style.fontFamily = 'Arial, Helvetica, sans-serif';
+                } else if (fontName.includes('Times')) {
+                    span.style.fontFamily = 'Times, "Times New Roman", serif';
+                } else if (fontName.includes('Courier')) {
+                    span.style.fontFamily = 'Courier, "Courier New", monospace';
+                } else {
+                    span.style.fontFamily = 'serif';
+                }
+            } else {
+                span.style.fontFamily = 'serif';
+            }
+
+            // Handle rotation
+            if (Math.abs(angle) > 0.01) {
+                span.style.transform = `rotate(${angle}rad)`;
+            }
+
+            // CRITICAL: Set the exact text content - preserve all spaces!
+            span.textContent = item.str;
+            
+            
+            // Add metadata for highlighting and debugging
+            span.setAttribute('data-stable-index', itemIndex);
+            span.setAttribute('data-page-number', pageNumber);
+            span.setAttribute('data-original-text', item.str);
+            span.setAttribute('data-font-size', fontSize.toFixed(2));
+            span.setAttribute('data-font-name', fontName || 'unknown');
+            span.classList.add('pdf-text-item');
+
+            textLayer.appendChild(span);
+        });
+
+        console.log(`✅ Text layer created: ${items.length} elements at 1.0 scale`);
+
+        // Debug: Log some sample text to verify spacing
+        if (debugMode && items.length > 0) {
+            const sampleTexts = items.slice(0, 5).map((item, i) => `${i}: "${item.str}"`);
+            console.log('📝 Sample text items:', sampleTexts.join(' | '));
+        }
+
+    } catch (err) {
+        console.error('❌ Text layer setup failed:', err);
+    }
+};
 
 
-    const setupTextLayer = async (pageNumber, displayViewport) => {
+    const setupTextLayerManual = async (pageNumber, displayViewport) => {
         if (!textLayerRef.current || !pdfDoc) return;
 
         try {
             const page = await pdfDoc.getPage(pageNumber);
-            const textContent = await page.getTextContent();
+            const textContent = await page.getTextContent({
+                normalizeWhitespace: false,
+                disableCombineTextItems: false
+            });
             const textLayer = textLayerRef.current;
 
             // Clear previous content
@@ -326,7 +441,7 @@ useEffect(() => {
 
                 if (provenancePage && provenancePage !== renderManager.currentPage) {
                     console.log(`🧭 Auto-navigating to provenance page ${provenancePage}`);
-                    goToPage(provenancePage);
+                    goToPage(provenancePage, 'auto');
                 } else if (provenancePage) {
                     console.log(`✅ Already on provenance page ${provenancePage}`);
                 } else {
@@ -477,14 +592,30 @@ useEffect(() => {
             const pages = new Set();
 
             Object.entries(mappingsData.sentence_mappings).forEach(([sentenceId, mapping]) => {
-                if (mapping && mapping.stable_matches && mapping.stable_matches.length > 0) {
-                    pages.add(mapping.primary_page);
+                console.log(`🔍 Processing sentence ${sentenceId}:`, {
+                    hasMapping: !!mapping,
+                    hasStableElements: !!mapping?.stable_elements,
+                    hasStableMatches: !!mapping?.stable_matches,
+                    primaryPage: mapping?.primary_page,
+                    found: mapping?.found
+                });
+
+                if (mapping && mapping.stable_elements && mapping.stable_elements.length > 0) {
+
+                    mapping.stable_elements.forEach((element) => {
+                        if (element.page && element.page > 0) {
+                            pages.add(element.page);
+                        } else {
+                            console.warn(`⚠️ Invalid page number in stable element: ${JSON.stringify(element)}`);
+                        }
+                    });
                 }
             });
 
 
+
             if (pages.size === 0) {
-                console.log('⚠️ No pages found in stable matches');
+                console.log('⚠️ No pages found in stable elements');
                 return null;
             }
 
@@ -587,7 +718,7 @@ useEffect(() => {
                 {/* Navigation */}
                 <div className="page-navigation">
                     <button
-                        onClick={() => goToPage(renderManager.currentPage - 1)}
+                        onClick={() => goToPage(renderManager.currentPage - 1, 'user')}
                         disabled={renderManager.currentPage <= 1 || renderManager.isRendering}
                         className="win95-btn nav"
                     >
@@ -627,7 +758,7 @@ useEffect(() => {
                     </div>
 
                     <button
-                        onClick={() => goToPage(renderManager.currentPage + 1)}
+                        onClick={() => goToPage(renderManager.currentPage + 1, 'user')}
                         disabled={renderManager.currentPage >= totalPages || renderManager.isRendering}
                         className="win95-btn nav"
                     >
@@ -684,30 +815,7 @@ useEffect(() => {
                     <div ref={highlightLayerRef} className="pdf-highlight-layer" />
 
                     {/* Highlighter Component */}
-                    {/*{renderManager.isReady && selectedProvenance && (
-                        <RobustOnTheFlyHighlighter
-                            provenanceData={selectedProvenance}
-                            activeQuestionId={activeQuestionId}
-                            textLayerRef={textLayerRef}
-                            highlightLayerRef={highlightLayerRef}
-                            containerRef={containerRef}
-                            currentPage={renderManager.currentPage}
-                            currentZoom={renderManager.currentZoom}
-                            documentFilename={pdfDocument?.filename || ''}
-                            highlightStyle={{
-                                backgroundColor: 'rgba(76, 175, 80, 0.4)',
-                                border: '1px solid rgba(76, 175, 80, 0.8)',
-                                borderRadius: '2px'
-                            }}
-                            mergeThreshold={{
-                                yTolerance: 3,
-                                xGap: 10,
-                                minOverlap: 0.5
-                            }}
-                            className="provenance-highlight"
-                            verbose={true} // Set to true for debugging
-                        />
-                    )}*/}
+                   
                     {renderManager.isReady && selectedProvenance && (
                         <CoordinateHighlighter
                             provenanceData={selectedProvenance}

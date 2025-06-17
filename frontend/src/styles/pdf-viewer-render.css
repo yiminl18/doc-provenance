@@ -80,25 +80,102 @@
   transform: none !important;
 }
 
-/* Text layer - invisible text for highlighting/selection */
-.pdf-text-layer {
-  position: absolute !important;
-  left: 0 !important;
-  top: 0 !important;
-  transform-origin: 0 0 !important; /* ESSENTIAL: Match canvas origin */
-  z-index: 1 !important; /* Above canvas, below highlights */
-  
-  /* Hidden but functional */
-  opacity: 0 !important;
-  pointer-events: none !important;
-  
-  /* Clean positioning */
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  overflow: hidden !important;
-  background: none !important;
+/* 
+   SOLUTION: Import PDF.js official CSS and use correct classes
+   Add this CSS to fix the spacing issue
+*/
+
+/* ===== PDF.JS OFFICIAL TEXT LAYER CSS ===== */
+/* This is the exact CSS from pdfjs-dist/web/pdf_viewer.css */
+
+.textLayer {
+    position: absolute !important;
+    text-align: initial !important;
+    inset: 0 !important;
+    overflow: hidden !important;
+    opacity: 0.25 !important; /* Change to 0 for production */
+    line-height: 1 !important;
+    -webkit-text-size-adjust: none !important;
+    -moz-text-size-adjust: none !important;
+    font-size-adjust: none !important;
+    text-size-adjust: none !important;
+    forced-color-adjust: none !important;
+    transform-origin: 0 0 !important;
+    z-index: 2 !important;
 }
+
+.textLayer :is(span, br) {
+    color: transparent !important;
+    position: absolute !important;
+    white-space: pre !important;
+    cursor: text !important;
+    transform-origin: 0% 0% !important;
+}
+
+.textLayer span.markedContent {
+    top: 0 !important;
+    height: 0 !important;
+}
+
+.textLayer .highlight {
+    --highlight-bg-color: rgb(180 0 170);
+    --highlight-selected-bg-color: rgb(0 100 0);
+    margin: -1px !important;
+    padding: 1px !important;
+    background-color: var(--highlight-bg-color) !important;
+    border-radius: 4px !important;
+}
+
+@media screen and (forced-colors: active) {
+    .textLayer .highlight {
+        --highlight-bg-color: Highlight;
+        --highlight-selected-bg-color: ButtonText;
+    }
+}
+
+/* ===== OVERRIDE YOUR EXISTING TEXT LAYER CSS ===== */
+/* Replace your .pdf-text-layer class with this */
+
+.pdf-text-layer {
+    /* Use the official PDF.js textLayer class instead */
+    position: absolute !important;
+    text-align: initial !important;
+    inset: 0 !important;
+    overflow: hidden !important;
+    opacity: 0.25 !important; /* For debugging - set to 0 in production */
+    line-height: 1 !important;
+    -webkit-text-size-adjust: none !important;
+    -moz-text-size-adjust: none !important;
+    text-size-adjust: none !important;
+    forced-color-adjust: none !important;
+    transform-origin: 0 0 !important;
+    z-index: 2 !important;
+}
+
+.pdf-text-layer span {
+    color: transparent !important;
+    position: absolute !important;
+    white-space: pre !important;
+    cursor: text !important;
+    transform-origin: 0% 0% !important;
+}
+
+/* Debug mode override */
+.pdf-viewer.debug-mode .pdf-text-layer {
+    opacity: 0.4 !important;
+}
+
+.pdf-viewer.debug-mode .pdf-text-layer span {
+    color: rgba(255, 0, 0, 0.8) !important;
+    background: rgba(255, 255, 0, 0.1) !important;
+    border: 1px solid rgba(255, 0, 0, 0.3) !important;
+}
+
+/* Production mode */
+.pdf-viewer:not(.debug-mode) .pdf-text-layer {
+    opacity: 0 !important;
+}
+
 
 /* Text elements within text layer */
 .pdf-text-item {
@@ -237,41 +314,8 @@
     /* filter: sepia(100%) saturate(0%) brightness(200%); */
 }
 
-/* Enhanced text layer styling */
-.pdf-text-layer {
-    position: absolute;
-    opacity: 1 !important; /* Make text visible */
-    z-index: 5; /* Above canvas, below highlights */
-    pointer-events: auto; /* Allow text selection */
-    
-    /* Improve text rendering */
-    -webkit-font-smoothing: antialiased;
-    font-smooth: always;
-    text-rendering: optimizeLegibility;
-    
-    /* Prevent text selection highlighting from interfering */
-    ::selection {
-        background: rgba(0, 123, 255, 0.2);
-    }
-}
 
-/* Individual text elements */
-.pdf-text-item {
-    /* Improve text clarity */
-    color: #000000 !important;
-    text-shadow: 0 0 1px rgba(255, 255, 255, 0.8);
-    
-    /* Prevent wrapping and maintain PDF layout */
-    white-space: pre;
-    word-break: keep-all;
-    
-    /* Improve positioning precision */
-    transform-origin: left bottom;
-    
-    /* Debug borders (remove in production) */
-    /* border: 1px solid rgba(255, 0, 0, 0.3); */
-    /* background: rgba(255, 255, 0, 0.1); */
-}
+
 
 /* Enhanced highlights with better coverage */
 .provenance-highlight {
@@ -318,6 +362,7 @@
 .pdf-viewer.debug-mode .pdf-text-item {
     border: 1px solid rgba(255, 0, 0, 0.5) !important;
     background: rgba(255, 255, 0, 0.1) !important;
+    color: var(--win95-text) !important;
 }
 
 .pdf-viewer.debug-mode .pdf-canvas {
@@ -327,6 +372,12 @@
 .pdf-viewer.debug-mode .provenance-highlight {
     background: rgba(0, 255, 0, 0.5) !important;
     border: 1px solid rgba(0, 255, 0, 0.8) !important;
+}
+
+.pdf-viewer.debug-mode .pdf-text-layer {
+  opacity: .3 !important;
+    color: red !important;
+    pointer-events: auto !important; /* Allow interaction for debugging */
 }
 
 

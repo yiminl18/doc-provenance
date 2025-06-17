@@ -6,9 +6,9 @@ import Header from './components/Header';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import ProvenanceQA from './components/ProvenanceQA';
-import ProvenanceQAX from './components/ProvenanceQAX';
 import QuestionHistory from './components/QuestionHistory';
 import PDFViewer from './components/PDFViewer';
+import ReactPDFViewer from './components/ReactPDFViewer';
 //import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
 import DriveFileBrowser from './components/DriveFileBrowser';
 import QuestionSuggestionsModal from './components/QuestionSuggestionsModal';
@@ -672,7 +672,7 @@ useEffect(() => {
           onShowQuestionSuggestions={handleShowQuestionSuggestions}
         />
         {/* Left Sidebar */}
-        <div className="left-panel">
+         {/*<div className="left-panel">
           <QuestionHistory
             questionsHistory={questionsHistory}
             activeQuestionId={activeQuestionId}
@@ -681,7 +681,7 @@ useEffect(() => {
             onProvenanceSelect={handleProvenanceSelect}
             onFeedbackRequest={openFeedbackModal}
           />
-          {/* <HistorySidebar
+          <HistorySidebar
             documents={documents}
             activeDocumentId={activeDocumentId}
             onDocumentUpload={handleDocumentUpload}
@@ -693,9 +693,9 @@ useEffect(() => {
             onQuestionDelete={handleHistoryQuestionDelete}
             onProvenanceSelect={handleProvenanceSelect}
             onFeedbackRequest={openFeedbackModal}
-          />*/}
+          />
 
-        </div>
+        </div>*/}
 
         {/* Main Content Area */}
         <div className="main-content">
@@ -733,7 +733,7 @@ useEffect(() => {
 
         {/* Right Panel */}
         <div className="right-panel">
-          <ProvenanceQAX
+          <ProvenanceQA
             pdfDocument={activeDocument}
             questionsHistory={questionsHistory}  // Pass the history
             activeQuestionId={activeQuestionId}   // Pass active ID

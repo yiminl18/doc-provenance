@@ -113,7 +113,7 @@
  
   /* Layout Constants - Slightly more compact */
   --left-panel-width: 220px;
-  --right-panel-width: 340px;
+  --right-panel-width: 30%;
   --header-height: 10vh; /* Shorter header */
  
   /* No Transitions - Windows 95 was instant */

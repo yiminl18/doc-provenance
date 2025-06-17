@@ -9,6 +9,7 @@ import ProvenanceQA from './components/ProvenanceQA';
 import QuestionHistory from './components/QuestionHistory';
 import PDFViewer from './components/PDFViewer';
 import ReactPDFViewer from './components/ReactPDFViewer';
+import DocumentSelectionModal from './components/DocumentSelectionModal';
 //import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
 import DriveFileBrowser from './components/DriveFileBrowser';
 import QuestionSuggestionsModal from './components/QuestionSuggestionsModal';
@@ -165,66 +166,66 @@ function App() {
   };
 
   // Add this new useEffect to handle question switching and provenance management
-useEffect(() => {
-  console.log(`🔄 Active question changed to: ${activeQuestionId}`);
-  
-  if (!activeQuestionId) {
-    // No active question - clear provenance
-    console.log('❌ No active question - clearing provenance');
-    setSelectedProvenance(null);
-    return;
-  }
+  useEffect(() => {
+    console.log(`🔄 Active question changed to: ${activeQuestionId}`);
 
-  // Get the current question data
-  const currentQuestion = questionsHistory.get(activeQuestionId);
-  
-  if (!currentQuestion) {
-    // Question not found - clear provenance
-    console.log('❌ Question not found in history - clearing provenance');
-    setSelectedProvenance(null);
-    return;
-  }
+    if (!activeQuestionId) {
+      // No active question - clear provenance
+      console.log('❌ No active question - clearing provenance');
+      setSelectedProvenance(null);
+      return;
+    }
 
-  // Check if this question has any provenance sources
-  if (currentQuestion.provenanceSources && currentQuestion.provenanceSources.length > 0) {
-    // Question has provenance - restore the last viewed one (or first one)
-    const lastViewedProvenance = currentQuestion.lastViewedProvenance || currentQuestion.provenanceSources[0];
-    console.log(`✅ Restoring provenance for question ${activeQuestionId}:`, lastViewedProvenance?.provenance_id);
-    setSelectedProvenance(lastViewedProvenance);
-  } else {
-    // Question has no provenance yet - clear it
-    console.log(`⚪ Question ${activeQuestionId} has no provenance yet - clearing`);
-    setSelectedProvenance(null);
-  }
-}, [activeQuestionId, questionsHistory]);
+    // Get the current question data
+    const currentQuestion = questionsHistory.get(activeQuestionId);
+
+    if (!currentQuestion) {
+      // Question not found - clear provenance
+      console.log('❌ Question not found in history - clearing provenance');
+      setSelectedProvenance(null);
+      return;
+    }
+
+    // Check if this question has any provenance sources
+    if (currentQuestion.provenanceSources && currentQuestion.provenanceSources.length > 0) {
+      // Question has provenance - restore the last viewed one (or first one)
+      const lastViewedProvenance = currentQuestion.lastViewedProvenance || currentQuestion.provenanceSources[0];
+      console.log(`✅ Restoring provenance for question ${activeQuestionId}:`, lastViewedProvenance?.provenance_id);
+      setSelectedProvenance(lastViewedProvenance);
+    } else {
+      // Question has no provenance yet - clear it
+      console.log(`⚪ Question ${activeQuestionId} has no provenance yet - clearing`);
+      setSelectedProvenance(null);
+    }
+  }, [activeQuestionId, questionsHistory]);
 
   useEffect(() => {
-  if (activeDocumentId) {
-    const activeDoc = documents.get(activeDocumentId);
+    if (activeDocumentId) {
+      const activeDoc = documents.get(activeDocumentId);
 
-    // Check if this is actually a new document (not just a re-selection)
-    const previousDocumentId = localStorage.getItem('lastActiveDocumentId');
+      // Check if this is actually a new document (not just a re-selection)
+      const previousDocumentId = localStorage.getItem('lastActiveDocumentId');
 
-    if (activeDoc && activeDocumentId !== previousDocumentId) {
-      console.log('📄 New document activated, clearing questions history');
+      if (activeDoc && activeDocumentId !== previousDocumentId) {
+        console.log('📄 New document activated, clearing questions history');
 
-      // Clear all questions and reset active question
-      setQuestionsHistory(new Map());
-      setActiveQuestionId(null);
+        // Clear all questions and reset active question
+        setQuestionsHistory(new Map());
+        setActiveQuestionId(null);
 
-      // Clear any selected provenance
-      setSelectedProvenance(null);
+        // Clear any selected provenance
+        setSelectedProvenance(null);
 
-      // Clear navigation and highlight triggers
-      setNavigationTrigger(null);
+        // Clear navigation and highlight triggers
+        setNavigationTrigger(null);
 
-      // Store the current document ID for future comparisons
-      localStorage.setItem('lastActiveDocumentId', activeDocumentId);
+        // Store the current document ID for future comparisons
+        localStorage.setItem('lastActiveDocumentId', activeDocumentId);
 
-      console.log('✅ Questions and provenance cleared for new document:', activeDoc.filename);
+        console.log('✅ Questions and provenance cleared for new document:', activeDoc.filename);
+      }
     }
-  }
-}, [activeDocumentId, documents]);
+  }, [activeDocumentId, documents]);
 
 
 
@@ -408,32 +409,32 @@ useEffect(() => {
   };
 
   // Helper function to collect stable indices for the current page
-    const collectStableIndices = (mappingsData, currentPage) => {
-        const sentenceSpans = new Set();
+  const collectStableIndices = (mappingsData, currentPage) => {
+    const sentenceSpans = new Set();
 
-        Object.entries(mappingsData.sentence_mappings).forEach(([sentenceId, mapping]) => {
-            if (mapping.stable_matches && mapping.stable_matches.length > 0) {
-                const pageMatches = mapping.stable_matches.filter(match => match.page === currentPage);
-                pageMatches.forEach(match => {
-                    const spanElements = match.item_span || [];
-                    spanElements.forEach(spanIndex => {
-                        sentenceSpans.add(spanIndex);
-                    });
-                });
-            }
+    Object.entries(mappingsData.sentence_mappings).forEach(([sentenceId, mapping]) => {
+      if (mapping.stable_matches && mapping.stable_matches.length > 0) {
+        const pageMatches = mapping.stable_matches.filter(match => match.page === currentPage);
+        pageMatches.forEach(match => {
+          const spanElements = match.item_span || [];
+          spanElements.forEach(spanIndex => {
+            sentenceSpans.add(spanIndex);
+          });
         });
+      }
+    });
 
-        return sentenceSpans;
-    };
+    return sentenceSpans;
+  };
 
-    // Helper function to find text element by stable index
-    const findTextElement = (stableIndex, pageNumber) => {
-        if (!document) return null;
+  // Helper function to find text element by stable index
+  const findTextElement = (stableIndex, pageNumber) => {
+    if (!document) return null;
 
-        return document.querySelector(
-            `[data-stable-index="${stableIndex}"][data-page-number="${pageNumber}"]`
-        );
-    };
+    return document.querySelector(
+      `[data-stable-index="${stableIndex}"][data-page-number="${pageNumber}"]`
+    );
+  };
 
 
   // Function to scroll to specific sentence in provenance panel
@@ -441,10 +442,10 @@ useEffect(() => {
     if (!provenance?.sentences_ids || provenance.sentences_ids.length === 0) return;
 
     try {
-     
 
-        const stableElement = document.querySelector('.direct-provenance-highlight');
-  
+
+      const stableElement = document.querySelector('.direct-provenance-highlight');
+
 
       if (stableElement) {
         console.log('📜 Scrolling to stable element:', stableElement);
@@ -465,48 +466,48 @@ useEffect(() => {
     }
   };
 
- const handleProvenanceSelect = async (provenance) => {
-  console.log('🎯 App: Provenance selected:', provenance);
+  const handleProvenanceSelect = async (provenance) => {
+    console.log('🎯 App: Provenance selected:', provenance);
 
-  // Always update the selected provenance
-  setSelectedProvenance(provenance);
+    // Always update the selected provenance
+    setSelectedProvenance(provenance);
 
-  // Also store this as the "last viewed" provenance for the current question
-  if (activeQuestionId && provenance) {
-    console.log(`💾 Storing provenance ${provenance.provenance_id} as last viewed for question ${activeQuestionId}`);
-    
-    setQuestionsHistory(prev => {
-      const newHistory = new Map(prev);
-      const currentQuestion = newHistory.get(activeQuestionId);
-      
-      if (currentQuestion) {
-        const updatedQuestion = { 
-          ...currentQuestion, 
-          lastViewedProvenance: provenance 
-        };
-        newHistory.set(activeQuestionId, updatedQuestion);
-      }
-      
-      return newHistory;
-    });
-  }
+    // Also store this as the "last viewed" provenance for the current question
+    if (activeQuestionId && provenance) {
+      console.log(`💾 Storing provenance ${provenance.provenance_id} as last viewed for question ${activeQuestionId}`);
 
-  if (provenance) {
-    console.log('✅ Provenance details:', {
-      id: provenance.provenance_id,
-      sentences: provenance.sentences_ids?.length || 0,
-      hasContent: provenance.content && provenance.content.length > 0,
-      processingTime: provenance.time
-    });
-    
-    // Trigger scrolling behaviors
-    setTimeout(() => {
-      scrollToProvenanceSentence(provenance);
-    }, 100);
-  } else {
-    console.log('❌ No provenance selected - clearing highlights');
-  }
-};
+      setQuestionsHistory(prev => {
+        const newHistory = new Map(prev);
+        const currentQuestion = newHistory.get(activeQuestionId);
+
+        if (currentQuestion) {
+          const updatedQuestion = {
+            ...currentQuestion,
+            lastViewedProvenance: provenance
+          };
+          newHistory.set(activeQuestionId, updatedQuestion);
+        }
+
+        return newHistory;
+      });
+    }
+
+    if (provenance) {
+      console.log('✅ Provenance details:', {
+        id: provenance.provenance_id,
+        sentences: provenance.sentences_ids?.length || 0,
+        hasContent: provenance.content && provenance.content.length > 0,
+        processingTime: provenance.time
+      });
+
+      // Trigger scrolling behaviors
+      setTimeout(() => {
+        scrollToProvenanceSentence(provenance);
+      }, 100);
+    } else {
+      console.log('❌ No provenance selected - clearing highlights');
+    }
+  };
 
 
   // handle gdrive modal
@@ -672,7 +673,7 @@ useEffect(() => {
           onShowQuestionSuggestions={handleShowQuestionSuggestions}
         />
         {/* Left Sidebar */}
-         {/*<div className="left-panel">
+        {/*<div className="left-panel">
           <QuestionHistory
             questionsHistory={questionsHistory}
             activeQuestionId={activeQuestionId}
@@ -773,49 +774,12 @@ useEffect(() => {
 
       {/* Preloaded Documents Modal */}
       {showPreloadedModal && (
-        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowPreloadedModal(false)}>
-          <div className="modal-container documents">
-            <div className="modal-header">
-              <h3>📚 Available Documents</h3>
-              <button className="close-btn" onClick={() => setShowPreloadedModal(false)}>✕</button>
-            </div>
-            <div className="modal-body">
-              {loadingPreloaded ? (
-                <div className="loading-state">
-                  <p>Loading available documents...</p>
-                </div>
-              ) : preloadedDocuments.length > 0 ? (
-                <>
-                  <p>Choose from documents:</p>
-                  <div className="documents-grid">
-                    {preloadedDocuments.map(doc => (
-                      <button
-                        key={doc.filename}
-                        className="document-card"
-                        onClick={() => handleDocumentSelect(doc)}
-                        disabled={loadingPreloaded}
-                      >
-                        <div className="doc-icon">📄</div>
-                        <div className="doc-info">
-                          <h4>{doc.filename}</h4>
-                          <div className="doc-stats">
-                            <span>{Math.round(doc.text_length / 1000)}k chars</span>
-                            <span>{doc.sentence_count} sentences</span>
-
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="empty-state">
-                  <p>No documents are currently available.</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <DocumentSelectionModal
+          isOpen={showPreloadedModal}
+          onClose={() => setShowPreloadedModal(false)}
+          onDocumentSelect={handleDocumentSelect}
+          showProvenanceStats={true}
+        />
       )}
 
       {/* Question Suggestions Modal - NEW */}

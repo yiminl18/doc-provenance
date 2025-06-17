@@ -6,7 +6,7 @@
   position: relative !important;
   display: flex !important;
   flex-direction: column !important;
-  height: 100% !important;
+  height: 100vh !important;
   background-color: var(--bg-paper) !important;
   border: none !important;
   box-shadow: none !important;
@@ -26,12 +26,19 @@
   background-color: var(--bg-paper) !important;
   position: relative !important;
   min-height: 0 !important;
+
+   /* Ensure proper scrolling container */
+  height: 100% !important; /* Take full available height */
   
   /* Center the PDF content */
   display: flex !important;
   justify-content: center !important;
   align-items: flex-start !important;
   padding: 20px !important;
+
+   /* Ensure scrollbars are always available when needed */
+  scrollbar-width: auto; /* Firefox */
+  -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
   
   /* Prevent inherited transforms */
   transform: none !important;
@@ -49,6 +56,8 @@
   min-height: 0 !important;
   width: auto !important;
   height: auto !important;
+  max-width: none !important; /* Don't constrain width */
+  max-height: none !important; /* Don't constrain height */
   
   /* Reset any inherited styles */
   margin: 0 !important;
@@ -58,6 +67,7 @@
   
   /* Ensure proper stacking context */
   z-index: 0 !important;
+  overflow: visible !important;
 }
 
 /* PDF Canvas - the actual rendered PDF */
@@ -93,7 +103,7 @@
     text-align: initial !important;
     inset: 0 !important;
     overflow: hidden !important;
-    opacity: 0.25 !important; /* Change to 0 for production */
+    opacity: 0.1 !important; /* Change to 0 for production */
     line-height: 1 !important;
     -webkit-text-size-adjust: none !important;
     -moz-text-size-adjust: none !important;
@@ -109,7 +119,7 @@
     position: absolute !important;
     white-space: pre !important;
     cursor: text !important;
-    transform-origin: 0% 0% !important;
+    transform-origin: 0 0 !important;
 }
 
 .textLayer span.markedContent {
@@ -133,16 +143,13 @@
     }
 }
 
-/* ===== OVERRIDE YOUR EXISTING TEXT LAYER CSS ===== */
-/* Replace your .pdf-text-layer class with this */
 
 .pdf-text-layer {
-    /* Use the official PDF.js textLayer class instead */
     position: absolute !important;
     text-align: initial !important;
     inset: 0 !important;
     overflow: hidden !important;
-    opacity: 0.25 !important; /* For debugging - set to 0 in production */
+    opacity: 0.1 !important; /* For debugging - set to 0 in production */
     line-height: 1 !important;
     -webkit-text-size-adjust: none !important;
     -moz-text-size-adjust: none !important;
@@ -162,7 +169,7 @@
 
 /* Debug mode override */
 .pdf-viewer.debug-mode .pdf-text-layer {
-    opacity: 0.4 !important;
+    opacity: 0.1 !important;
 }
 
 .pdf-viewer.debug-mode .pdf-text-layer span {
@@ -305,14 +312,6 @@
 }
 
 
-/* Enhanced PDF canvas with hidden text */
-.pdf-canvas {
-    /* Option 1: show a little bit of text */
-    filter: contrast(0.5) brightness(1.5) saturate(0.2);
-    
-    /* Option 2: Alternative - make text nearly invisible */
-    /* filter: sepia(100%) saturate(0%) brightness(200%); */
-}
 
 
 
@@ -334,16 +333,6 @@
     z-index: 10;
 }
 
-/* Alternative canvas text hiding methods */
-.pdf-canvas.hide-text {
-    /* Method 1: High contrast filter */
-    filter: contrast(0.1) brightness(2.5);
-}
-
-.pdf-canvas.hide-text-alternative {
-    /* Method 2: Desaturate and brighten */
-    filter: saturate(0%) brightness(180%) contrast(50%);
-}
 
 /* Responsive adjustments for different zoom levels */
 .pdf-viewer[data-zoom="low"] .provenance-highlight {
@@ -365,20 +354,13 @@
     color: var(--win95-text) !important;
 }
 
-.pdf-viewer.debug-mode .pdf-canvas {
-    opacity: 0.5;
-}
+
 
 .pdf-viewer.debug-mode .provenance-highlight {
     background: rgba(0, 255, 0, 0.5) !important;
     border: 1px solid rgba(0, 255, 0, 0.8) !important;
 }
 
-.pdf-viewer.debug-mode .pdf-text-layer {
-  opacity: .3 !important;
-    color: red !important;
-    pointer-events: auto !important; /* Allow interaction for debugging */
-}
 
 
 /* Loading and error states */

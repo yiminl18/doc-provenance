@@ -1,6 +1,6 @@
 // EnhancedDirectTextHighlighter.js - Uses coordinate-based highlighting when available
 import React, { useEffect, useRef } from 'react';
-import { getSentenceItemMappings } from '../services/api';
+import { getSentenceItemMappings, getDocumentRegions, getPdfJSCache } from '../services/api';
 import { 
     getWords,
     calculateSimilarity,
@@ -9,6 +9,7 @@ import {
     textMatching,         // All matching algorithms
     textUtils            // General utilities
 } from '../utils/textSimilarity';
+import {findExactTextSpans, findProvenanceHighlights } from '../utils/ExactTextMatcher';
 
 const CoordinateHighlighter = ({
     provenanceData,
@@ -100,6 +101,7 @@ const CoordinateHighlighter = ({
 
                 // Debug overlays if verbose
                 if (verbose) {
+                    await createExactTextHighlights(stableMappings, sentenceIds);
                     //await createSearchRegionOverlays(stableMappings, sentenceIds, currentPage);
                     //await createSimilarityDebugOverlays(stableMappings, sentenceTexts, sentenceIds, currentPage);
                 }
@@ -392,6 +394,8 @@ const CoordinateHighlighter = ({
         log(`   📈 Filter efficiency: ${((totalElementsProcessed - totalElementsFiltered) / totalElementsProcessed * 100).toFixed(1)}% reduction`);
     };
 
+
+
     /**
      * Create highlight with enhanced similarity-based styling
      */
@@ -584,6 +588,51 @@ const CoordinateHighlighter = ({
         };
     };
 
+    const createExactTextHighlights = async (stableMappings, provenanceIds) => {
+        if (!highlightLayerRef?.current) return;
+
+        const regionCoords = await getDocumentRegions(documentFilename, provenanceIds);
+
+        log('Region coordinates for exact text highlights:', regionCoords);
+
+        const primaryPageNumber = regionCoords.coordinate_regions[0]?.pages[0]; // Get first page from first region
+
+        console.log(`📄 Primary page number for exact text highlights: ${primaryPageNumber}`);
+
+        let pdfJSCache = null;
+
+        const pdfJSCacheResponse = await getPdfJSCache(documentFilename, primaryPageNumber);
+        if (pdfJSCacheResponse.success) {
+            pdfJSCache = pdfJSCacheResponse.pdf_pages[primaryPageNumber] || {};
+        }
+
+        log('📄 PDF.js cache for exact text highlights:', pdfJSCache);
+
+        log('stableMappings:', stableMappings);
+
+
+        const textSpans = findExactTextSpans(stableMappings, provenanceIds, primaryPageNumber, pdfJSCache);
+
+        textSpans.forEach(span => {
+        span.elements.forEach(element => {
+            const highlightElement = document.createElement('div');
+            highlightElement.className = `${className} exact-text-highlight`;
+            highlightElement.setAttribute('data-sentence-ids', span.sentence_ids.join(','));
+            highlightElement.setAttribute('data-stable-index', element.stableIndex);
+            highlightElement.setAttribute('data-confidence', span.confidence);
+            
+            // Position based on element coordinates
+            Object.assign(highlightElement.style, {
+                left: `${element.coordinates.x}px`,
+                top: `${element.coordinates.y}px`,
+                width: `${element.coordinates.width}px`,
+                height: `${element.coordinates.height}px`
+            });
+            
+            highlightLayerRef.current.appendChild(highlightElement);
+        });
+    });
+    }
     /**
      * Create debug overlays showing similarity calculations
      */
@@ -1007,66 +1056,6 @@ const CoordinateHighlighter = ({
     };
 
 
-   
-    // COORDINATE-BASED HIGHLIGHTING
-    const handleCoordinateBasedHighlighting = async (highlightData, sentenceIds) => {
-        log(`🎯 Coordinate highlighting data:`, {
-            sentenceCount: highlightData.sentence_count,
-            totalElements: highlightData.stable_elements?.length,
-            pagesWithHighlights: Object.keys(highlightData.highlights_by_page || {}),
-            currentPage: currentPage
-        });
-
-        const highlightsOnCurrentPage = highlightData.highlights_by_page?.[currentPage];
-        
-        if (!highlightsOnCurrentPage || highlightsOnCurrentPage.length === 0) {
-            log(`📄 No coordinate highlights for page ${currentPage}`);
-            log(`📄 Available pages:`, Object.keys(highlightData.highlights_by_page || {}));
-            return;
-        }
-
-        log(`🎯 Found ${highlightsOnCurrentPage.length} coordinate highlights for page ${currentPage}`);
-
-        let successfulHighlights = 0;
-        let missingElements = 0;
-
-        for (const highlight of highlightsOnCurrentPage) {
-            const stableIndex = highlight.stable_index;
-            
-            // ENHANCED: More flexible element finding
-            const textElement = findTextElement(stableIndex, currentPage);
-
-            if (textElement) {
-                const highlightElement = createCoordinateHighlightElement(textElement, highlight);
-                if (highlightElement) {
-                    highlightLayerRef.current.appendChild(highlightElement);
-                    
-                    // Store reference
-                    const highlightKey = `coord_${stableIndex}_${highlight.sentence_id || 'unknown'}`;
-                    activeHighlights.current.set(highlightKey, {
-                        element: highlightElement,
-                        stableIndex: stableIndex,
-                        sentenceId: highlight.sentence_id,
-                        type: 'coordinate'
-                    });
-
-                    successfulHighlights++;
-                }
-            } else {
-                missingElements++;
-                log(`⚠️ Text element not found for stable index ${stableIndex}`);
-            }
-        }
-
-        log(`✅ Created ${successfulHighlights} coordinate highlights, ${missingElements} missing elements on page ${currentPage}`);
-
-        // DEBUG: If no highlights were created, investigate
-        if (successfulHighlights === 0) {
-            log('🔍 DEBUGGING: No highlights created, investigating...');
-            debugTextLayerElements();
-        }
-    };
-
      // ENHANCED: More flexible text element finding
     const findTextElement = (stableIndex, pageNumber) => {
         if (!textLayerRef?.current) {
@@ -1093,26 +1082,7 @@ const CoordinateHighlighter = ({
         return null;
     };
 
-    // DEBUG: Investigate text layer structure
-    const debugTextLayerElements = () => {
-        if (!textLayerRef?.current) return;
 
-        const allElements = textLayerRef.current.querySelectorAll('[data-stable-index]');
-        log(`🔍 Text layer debug:`, {
-            totalElements: allElements.length,
-            currentPage: currentPage,
-            sampleElements: Array.from(allElements).slice(0, 5).map(el => ({
-                stableIndex: el.getAttribute('data-stable-index'),
-                pageNumber: el.getAttribute('data-page-number'),
-                text: el.textContent?.substring(0, 30),
-                classList: el.className
-            }))
-        });
-
-        // Check if elements have the expected page number
-        const elementsOnCurrentPage = textLayerRef.current.querySelectorAll(`[data-page-number="${currentPage}"]`);
-        log(`🔍 Elements on page ${currentPage}:`, elementsOnCurrentPage.length);
-    };
 
     // Create highlight element from coordinate data
     const createCoordinateHighlightElement = (textElement, highlightInfo) => {

@@ -164,27 +164,12 @@ export const checkStatus = async (questionId) => {
 // PDF Mappings APIs
 // =============================================================================
 
-/**
- * get coordinate regions for a document
- */
 
-export const getDocumentRegions = async (filename, sentenceIds) => {
-  try {
-    const ids = Array.isArray(sentenceIds) ? sentenceIds.join(',') : sentenceIds;
-    const response = await axios.get(`${API_URL}/documents/${filename}/coordinate-regions?ids=${ids}`);
-    console.log('Regions for document:', filename, response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching document regions:', error);
-    throw new Error(error.response?.data?.error || error.message);
-  }
-}
 
 export const getPdfJSCache = async (filename, pageNum) => {
   try {
     const pages = Array.isArray(pageNum) ? pageNum.join(',') : pageNum;
-    const response = await axios.get(`${API_URL}/documents/${filename}/pdfjs-cache?page_num=${pages}`);
-    console.log('PDF.js cache for document:', filename, response.data);
+    const response = await axios.get(`${API_URL}/documents/${filename}/pdfjs-cache?pages=${pages}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching PDF.js cache:', error);
@@ -215,8 +200,7 @@ export const getSentenceItemMappings = async (filename, sentenceIds) => {
     );
     console.log('✅ Received stable mappings:', {
             success: response.data.success,
-            sentenceCount: Object.keys(response.data.sentence_mappings || {}).length,
-            foundSentences: response.data.found_sentences?.length || 0
+            summary: response.data.summary
         });
 
     return response.data;

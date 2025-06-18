@@ -381,7 +381,7 @@
 }
 
 /* Unified Status Indicator */
-.status-indicator {
+.status-indicator-pdf {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -396,7 +396,7 @@
 }
 
 /* Provenance processing variant */
-.status-indicator.provenance {
+.status-indicator-pdf.provenance {
   background: #800080; /* Purple for evidence/provenance */
   color: #ffffff;
   border-color: #800080;
@@ -404,7 +404,7 @@
 }
 
 /* PDF rendering variant */
-.status-indicator.rendering {
+.status-indicator-pdf.rendering {
   background: #008000; /* Green for technical rendering */
   color: #ffffff;
   border-color: #008000;
@@ -412,18 +412,18 @@
 }
 
 /* Error variant */
-.status-indicator.error {
+.status-indicator-pdf.error {
   background: #800000; /* Dark red for errors */
   color: #ffffff;
   border-color: #800000;
   box-shadow: 1px 1px 0px #400000;
 }
 
-.status-indicator .fa-spinner {
+.status-indicator-pdf .fa-spinner {
   font-size: 10px;
 }
 
-.status-indicator .fa-exclamation-triangle {
+.status-indicator-pdf .fa-exclamation-triangle {
   font-size: 10px;
 }
 

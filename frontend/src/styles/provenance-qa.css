@@ -10,6 +10,7 @@
   height: var(--header-height);
   display: flex;
   align-items: center;
+  flex-direction: row;
   justify-content: space-between;
   box-shadow: var(--shadow-raised);
   flex-shrink: 0;
@@ -28,7 +29,7 @@
   letter-spacing: 0.05em;
 }
 
-.status-indicator {
+.status-indicator-pqa {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -38,10 +39,10 @@
   text-transform: uppercase;
 }
 
-.status-indicator.processing { color: var(--warning-orange); }
-.status-indicator.completed { color: var(--success-green); }
-.status-indicator.error { color: var(--danger-red); }
-.status-indicator.cancelled { color: var(--accent-purple); }
+.status-indicator-pqa.processing { color: var(--warning-orange); }
+.status-indicator-pqa.completed { color: var(--success-green); }
+.status-indicator-pqa.error { color: var(--danger-red); }
+.status-indicator-pqa.cancelled { color: var(--accent-purple); }
 
 /* ===== SHARED EMPTY STATES ===== */
 .empty-state {

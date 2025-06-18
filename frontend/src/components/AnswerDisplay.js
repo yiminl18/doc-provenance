@@ -78,7 +78,7 @@ const AnswerDisplay = ({
                     <FontAwesomeIcon icon={faFileAlt} />
                     Current Question
                 </h4>
-                <div className={`status-indicator ${status.className}`}>
+                <div className={`status-indicator-pqa ${status.className}`}>
                     <FontAwesomeIcon 
                         icon={status.icon} 
                         spin={status.spin}

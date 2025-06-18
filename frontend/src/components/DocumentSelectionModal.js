@@ -42,7 +42,7 @@ const DocumentSelectionModal = ({
       const response = await getDocuments();
       
       if (response.success && response.documents) {
-        console.log('📚 Documents loaded:', response.documents);
+        //console.log('📚 Documents loaded:', response.documents);
         setDocuments(response.documents);
         
         // Load provenance stats for each document if enabled
@@ -63,7 +63,7 @@ const DocumentSelectionModal = ({
   };
 
   const loadProvenanceStatsForDocuments = async (docs) => {
-    console.log('📊 Loading provenance stats for documents...');
+    //console.log('📊 Loading provenance stats for documents...');
     
     // Load stats for each document in parallel
     const statsPromises = docs.map(async (doc) => {
@@ -96,7 +96,7 @@ const DocumentSelectionModal = ({
     });
 
     await Promise.allSettled(statsPromises);
-    console.log('✅ Provenance stats loading completed');
+    //console.log('✅ Provenance stats loading completed');
   };
 
   const calculateDocumentStats = (questions, metadata) => {

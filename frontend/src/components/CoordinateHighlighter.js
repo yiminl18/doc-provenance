@@ -1,7 +1,7 @@
 // EnhancedDirectTextHighlighter.js - Uses coordinate-based highlighting when available
 import React, { useEffect, useRef } from 'react';
-import { getSentenceItemMappings, getDocumentRegions, getPdfJSCache } from '../services/api';
-import { 
+import { getSentenceItemMappings, getPdfJSCache } from '../services/api';
+import {
     getWords,
     calculateSimilarity,
     textNormalization,    // All normalization functions
@@ -9,7 +9,8 @@ import {
     textMatching,         // All matching algorithms
     textUtils            // General utilities
 } from '../utils/textSimilarity';
-import {findExactTextSpans, findProvenanceHighlights } from '../utils/ExactTextMatcher';
+
+import { findExactTextSpans, findProvenanceHighlights } from '../utils/ExactTextMatcher';
 
 const CoordinateHighlighter = ({
     provenanceData,
@@ -68,9 +69,9 @@ const CoordinateHighlighter = ({
         }
     }, [activeQuestionId, provenanceData?.provenance_ids]);
 
-     // Main highlighting effect
+    // Main highlighting effect
     useEffect(() => {
-       
+
         if (!provenanceData?.provenance_ids || !documentFilename || !pdfDocument) {
             log('⏸️ Missing required data for highlighting');
             clearAllHighlights();
@@ -78,7 +79,7 @@ const CoordinateHighlighter = ({
         }
 
         const sentenceIds = provenanceData.provenance_ids || [];
-        
+
         log(`🎯 Found sentence IDs:`, sentenceIds);
 
 
@@ -86,9 +87,9 @@ const CoordinateHighlighter = ({
             try {
                 clearAllHighlights();
 
-                 // Get stable mappings for these sentences
+                // Get stable mappings for these sentences
                 const stableMappings = await getStableMappings(sentenceIds);
-                
+
                 if (!stableMappings) {
                     log('❌ No stable mappings found');
                     return;
@@ -96,12 +97,12 @@ const CoordinateHighlighter = ({
 
                 const sentenceTexts = await getSentenceTexts(sentenceIds);
 
-                 // Create enhanced highlights with frontend similarity
-                await createEnhancedHighlightsWithSimilarity(stableMappings, sentenceTexts, sentenceIds, currentPage);
+                // Create enhanced highlights with frontend similarity
+                await createEnhancedHighlightsWithSimilarity(stableMappings);
 
                 // Debug overlays if verbose
                 if (verbose) {
-                    await createExactTextHighlights(stableMappings, sentenceIds);
+                    //await createExactTextHighlights(stableMappings, sentenceIds);
                     //await createSearchRegionOverlays(stableMappings, sentenceIds, currentPage);
                     //await createSimilarityDebugOverlays(stableMappings, sentenceTexts, sentenceIds, currentPage);
                 }
@@ -136,32 +137,32 @@ const CoordinateHighlighter = ({
 
         const results = [];
         const sentenceWords = getWords(sentenceText);
-        
+
         for (const element of elements) {
             const similarity = calculateSimilarity(sentenceText, element.text);
-            
+
             if (similarity.combined >= minSimilarity) {
                 results.push({
                     ...element,
                     frontendSimilarity: similarity,
                     frontendScore: similarity.combined,
                     // Combine with backend confidence if available
-                    finalScore: element.combined_confidence 
+                    finalScore: element.combined_confidence
                         ? (similarity.combined * similarityWeight) + (element.combined_confidence * (1 - similarityWeight))
                         : similarity.combined
                 });
             }
         }
-        
+
         // Sort by final score and return top matches
         return results
             .sort((a, b) => b.finalScore - a.finalScore)
             .slice(0, maxElements);
     };
 
-     /**
-     * Group consecutive high-similarity elements (highlighting-specific logic)
-     */
+    /**
+    * Group consecutive high-similarity elements (highlighting-specific logic)
+    */
     const groupConsecutiveElements = (elements, options = {}) => {
         const {
             maxGap = 50, // Maximum pixel gap between elements to group
@@ -213,12 +214,12 @@ const CoordinateHighlighter = ({
         return groups;
     };
 
-     /**
-     * Get sentence texts for frontend similarity calculation
-     */
+    /**
+    * Get sentence texts for frontend similarity calculation
+    */
     const getSentenceTexts = async (sentenceIds) => {
         const cacheKey = `sentences_${documentFilename}`;
-        
+
         if (sentenceTextsCache.current.has(cacheKey)) {
             const cached = sentenceTextsCache.current.get(cacheKey);
             return sentenceIds.reduce((result, id) => {
@@ -231,7 +232,7 @@ const CoordinateHighlighter = ({
             // You'll need to add this API endpoint or modify existing one
             // For now, we'll extract from provenance data or mappings
             log('📝 Getting sentence texts for similarity calculation');
-            
+
             // If provenance data includes the text, use that
             if (provenanceData?.provenance) {
                 return sentenceIds.reduce((result, id, index) => {
@@ -255,67 +256,86 @@ const CoordinateHighlighter = ({
     /**
      * Create enhanced highlights using frontend text similarity (same filtering as debug version)
      */
-    const createEnhancedHighlightsWithSimilarity = async (stableMappings, sentenceTexts, sentenceIds, pageNumber) => {
+    const createEnhancedHighlightsWithSimilarity = async (stableMappings) => {
         if (!highlightLayerRef?.current) {
             log('❌ Highlight layer not available');
             return;
         }
 
+        // need to iterate over the entries in stableMappings
+        const pages = new Set();
+
+        Object.entries(stableMappings).forEach(([sentenceId, mapping]) => {
+            if (mapping.found) {
+                if (!mapping.spans_multiple_pages) {
+                    pages.add(mapping.page_number);
+                } else {
+                    log(`⚠️ Sentence ${sentenceId} spans multiple pages`);
+                    return
+                }
+            } else {
+                log(`⚠️ No stable mappings found for sentence ${sentenceId}`);
+                return
+            }
+        });
+
+        const primaryPageNumber = Array.from(pages);
+
+        console.log(`📄 Primary page number for exact text highlights: ${primaryPageNumber}`);
+
+
         let highlightCount = 0;
         let totalElementsProcessed = 0;
         let totalElementsFiltered = 0;
 
-        // Use the provenance text for similarity calculation (same as debug version)
-        const provenanceText = provenanceData?.provenance || '';
-        
-        if (!provenanceText) {
-            log('❌ No provenance text available for similarity calculation');
-            return;
-        }
-
-        log(`🧠 Using provenance text for similarity filtering: "${provenanceText.substring(0, 100)}${provenanceText.length > 100 ? '...' : ''}"`);
-
         // Collect all elements from all sentences (same as debug version)
         const allElements = [];
-        
-        for (const sentenceId of sentenceIds) {
-            const mapping = stableMappings[sentenceId];
-            
-            if (!mapping?.stable_elements?.length) {
-                log(`⚠️ No stable elements for sentence ${sentenceId}`);
-                continue;
+        let provenanceText = '';
+
+
+        Object.entries(stableMappings).forEach(([sentenceId, mapping]) => {
+
+            // Use the provenance text for similarity calculation (same as debug version)
+            provenanceText = mapping.sentence_text || '';
+
+            if (!provenanceText) {
+                log('❌ No provenance text available for similarity calculation');
+                return;
             }
 
+            log(`🧠 Using provenance text for similarity filtering: "${provenanceText.substring(0, 100)}${provenanceText.length > 100 ? '...' : ''}"`);
+
+        
+
+
+
             // Filter elements for current page (same criteria as debug version)
-            const elementsOnPage = mapping.stable_elements.filter(element => 
-                element.page === pageNumber && 
-                element.text && 
-                element.text.trim().length > 0 &&
-                element.text_similarity > 0
+            const elementsOnPage = mapping.stable_elements.filter(element =>
+                element.page === primaryPageNumber &&
+                element.sentence_text
             );
 
-            log(`📄 Found ${elementsOnPage.length} elements for sentence ${sentenceId} on page ${pageNumber}`);
+            log(`📄 Found ${elementsOnPage.length} elements for sentence ${sentenceId} on page ${primaryPageNumber}`);
 
             for (const element of elementsOnPage) {
                 allElements.push({
                     ...element,
-                    sourceSentenceId: sentenceId,
-                    originalBackendConfidence: element.combined_confidence || 0
+                    sourceSentenceId: sentenceId
                 });
             }
-        }
+        });
 
         totalElementsProcessed = allElements.length;
         log(`🔍 Total elements to analyze: ${allElements.length}`);
 
         // Apply individual element similarity filtering (EXACT same as debug version)
         const filteredElements = [];
-        
+
         for (const element of allElements) {
             try {
                 // Calculate similarity against provenance text (same as debug)
-                const similarity = calculateSimilarity(provenanceText, element.text);
-                
+                const similarity = calculateSimilarity(element.sentence_text, element.text);
+
                 // Apply same minimum threshold as debug version
                 if (similarity.combined >= frontendSimilarityThresholds.minimum) {
                     filteredElements.push({
@@ -323,7 +343,7 @@ const CoordinateHighlighter = ({
                         frontendSimilarity: similarity,
                         frontendScore: similarity.combined,
                         // Combine with backend confidence
-                        finalScore: element.originalBackendConfidence 
+                        finalScore: element.originalBackendConfidence
                             ? (similarity.combined * 0.6) + (element.originalBackendConfidence * 0.4)
                             : similarity.combined
                     });
@@ -335,7 +355,7 @@ const CoordinateHighlighter = ({
         }
 
         totalElementsFiltered = filteredElements.length;
-        
+
         log(`🎯 Similarity filtering results: ${totalElementsFiltered}/${totalElementsProcessed} elements passed`);
         log(`📊 Similarity scores:`, filteredElements.map(el => ({
             text: el.text.substring(0, 20),
@@ -354,14 +374,14 @@ const CoordinateHighlighter = ({
 
         // Limit to max elements for performance
         const elementsToHighlight = filteredElements.slice(0, groupingOptions.maxElementsPerSentence);
-        
+
         if (elementsToHighlight.length < filteredElements.length) {
             log(`⚡ Limited to top ${elementsToHighlight.length}/${filteredElements.length} elements for highlighting`);
         }
 
         // Group nearby high-similarity elements
         const elementGroups = groupConsecutiveElements(
-            elementsToHighlight, 
+            elementsToHighlight,
             groupingOptions
         );
 
@@ -369,11 +389,11 @@ const CoordinateHighlighter = ({
 
         // Create highlights for each group
         for (const group of elementGroups) {
-            const highlight = await createSimilarityBasedHighlight(group, 'mixed', provenanceText, pageNumber);
-            
+            const highlight = await createSimilarityBasedHighlight(group, 'mixed', group.sentence_text, primaryPageNumber);
+
             if (highlight) {
                 highlightCount++;
-                
+
                 // Log detailed similarity info
                 const groupSimilarityInfo = group.map(el => ({
                     text: el.text,
@@ -382,12 +402,12 @@ const CoordinateHighlighter = ({
                     final: el.finalScore?.toFixed(3),
                     similarity_breakdown: el.frontendSimilarity
                 }));
-                
+
                 log(`✨ Created similarity-based highlight group:`, groupSimilarityInfo);
             }
         }
 
-        log(`✅ Enhanced highlighting complete on page ${pageNumber}:`);
+        log(`✅ Enhanced highlighting complete on page ${primaryPageNumber}:`);
         log(`   📊 ${highlightCount} highlights created`);
         log(`   🔍 ${totalElementsProcessed} elements processed`);
         log(`   🎯 ${totalElementsFiltered} elements passed similarity filter`);
@@ -415,15 +435,15 @@ const CoordinateHighlighter = ({
 
             // Create the highlight element with enhanced styling
             const highlightElement = createSimilarityStyledHighlight(
-                textElements, 
-                sentenceId, 
-                elementGroup, 
+                textElements,
+                sentenceId,
+                elementGroup,
                 provenanceText
             );
-            
+
             if (highlightElement) {
                 highlightLayerRef.current.appendChild(highlightElement);
-                
+
                 // Store reference for cleanup
                 const highlightKey = `similarity_${sentenceId}_${elementGroup[0].stable_index}`;
                 activeHighlights.current.set(highlightKey, {
@@ -483,7 +503,7 @@ const CoordinateHighlighter = ({
             // Create highlight element
             const highlightElement = document.createElement('div');
             highlightElement.className = `${className} similarity-highlight similarity-${styling.tier}`;
-            
+
             // Set data attributes for debugging and interaction
             highlightElement.setAttribute('data-sentence-id', sentenceId);
             highlightElement.setAttribute('data-element-count', elementGroup.length);
@@ -536,7 +556,7 @@ const CoordinateHighlighter = ({
 
             log(`✨ Created ${styling.label} similarity highlight: ${width.toFixed(1)}x${height.toFixed(1)} at (${left.toFixed(1)}, ${top.toFixed(1)})`);
             log(`📊 Scores - Frontend: ${avgFrontendScore.toFixed(3)}, Backend: ${avgBackendScore.toFixed(3)}, Final: ${avgFinalScore.toFixed(3)}`);
-            
+
             return highlightElement;
 
         } catch (error) {
@@ -551,7 +571,7 @@ const CoordinateHighlighter = ({
     const getSimilarityBasedStyling = (frontendScore, backendScore, finalScore) => {
         // Use final score as primary, but consider frontend score for color intensity
         let tier, baseColor, label, opacity;
-        
+
         if (finalScore >= frontendSimilarityThresholds.high) {
             tier = 'high';
             baseColor = [76, 175, 80]; // Green
@@ -591,47 +611,83 @@ const CoordinateHighlighter = ({
     const createExactTextHighlights = async (stableMappings, provenanceIds) => {
         if (!highlightLayerRef?.current) return;
 
-        const regionCoords = await getDocumentRegions(documentFilename, provenanceIds);
+        console.log('stableMappings:', stableMappings, 'provenanceIds:', provenanceIds);
 
-        log('Region coordinates for exact text highlights:', regionCoords);
+        // need to iterate over the entries in stableMappings
+        const pages = new Set();
 
-        const primaryPageNumber = regionCoords.coordinate_regions[0]?.pages[0]; // Get first page from first region
+        Object.entries(stableMappings).forEach(([sentenceId, mapping]) => {
+            if (mapping.found) {
+                if (!mapping.spans_multiple_pages) {
+                    pages.add(mapping.page_number);
+                } else {
+                    log(`⚠️ Sentence ${sentenceId} spans multiple pages`);
+                    return
+                }
+            } else {
+                log(`⚠️ No stable mappings found for sentence ${sentenceId}`);
+                return
+            }
+        });
+
+        const primaryPageNumber = Array.from(pages);
 
         console.log(`📄 Primary page number for exact text highlights: ${primaryPageNumber}`);
 
         let pdfJSCache = null;
 
+        if (!primaryPageNumber || primaryPageNumber.length === 0) {
+            log('❌ No pages found for exact text highlights');
+            return;
+        }
         const pdfJSCacheResponse = await getPdfJSCache(documentFilename, primaryPageNumber);
         if (pdfJSCacheResponse.success) {
             pdfJSCache = pdfJSCacheResponse.pdf_pages[primaryPageNumber] || {};
         }
 
-        log('📄 PDF.js cache for exact text highlights:', pdfJSCache);
 
-        log('stableMappings:', stableMappings);
+        const pageContainer = containerRef.current?.querySelector('.pdf-page-container');
+        if (!pageContainer) return null;
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const pageRect = pageContainer.getBoundingClientRect();
 
-
-        const textSpans = findExactTextSpans(stableMappings, provenanceIds, primaryPageNumber, pdfJSCache);
+        const textSpans = findExactTextSpans(stableMappings, provenanceIds, primaryPageNumber, pdfJSCache, {
+            includeWordMatching: true,
+            minWordMatchThreshold: 3
+        });
 
         textSpans.forEach(span => {
-        span.elements.forEach(element => {
-            const highlightElement = document.createElement('div');
-            highlightElement.className = `${className} exact-text-highlight`;
-            highlightElement.setAttribute('data-sentence-ids', span.sentence_ids.join(','));
-            highlightElement.setAttribute('data-stable-index', element.stableIndex);
-            highlightElement.setAttribute('data-confidence', span.confidence);
-            
-            // Position based on element coordinates
-            Object.assign(highlightElement.style, {
-                left: `${element.coordinates.x}px`,
-                top: `${element.coordinates.y}px`,
-                width: `${element.coordinates.width}px`,
-                height: `${element.coordinates.height}px`
+            span.elements.forEach(element => {
+                const highlightElement = document.createElement('div');
+                highlightElement.className = `${className} exact-text-highlight`;
+                highlightElement.setAttribute('data-sentence-ids', span.sentence_ids.join(','));
+                highlightElement.setAttribute('data-stable-index', element.stableIndex);
+                highlightElement.setAttribute('data-confidence', span.confidence);
+
+                const coordinates = element.coordinates;
+
+                const convertedBbox = convertBboxToScreenWithZoomHandling(coordinates);
+                //const left = coordinates.x;
+                //const top = coordinates.y;
+                //const width = coordinates.width;
+                //const height = coordinates.height;
+                const left = convertedBbox.x;
+                const top = convertedBbox.y;
+                const width = convertedBbox.width;
+                const height = convertedBbox.height;
+
+                // Position based on element coordinates
+                Object.assign(highlightElement.style, {
+                    position: 'absolute',
+                    left: `${left}px`,
+                    top: `${top}px`,
+                    width: `${width}px`,
+                    height: `${height}px`
+                });
+
+                highlightLayerRef.current.appendChild(highlightElement);
             });
-            
-            highlightLayerRef.current.appendChild(highlightElement);
         });
-    });
     }
     /**
      * Create debug overlays showing similarity calculations
@@ -644,20 +700,20 @@ const CoordinateHighlighter = ({
         for (const sentenceId of sentenceIds) {
             const mapping = stableMappings[sentenceId];
             const sentenceText = sentenceTexts[sentenceId] || '';
-            
+
             if (!mapping?.stable_elements?.length || !sentenceText) continue;
 
             const elementsOnPage = mapping.stable_elements.filter(element => element.page === pageNumber);
-            
+
             for (const element of elementsOnPage) {
                 if (!element.coordinates) continue;
 
                 // Calculate similarity for this specific element
                 const similarity = calculateSimilarity(sentenceText, element.text);
-                
+
                 if (similarity.combined >= frontendSimilarityThresholds.minimum) {
                     const debugOverlay = createSimilarityDebugBox(element, similarity, sentenceId, pageNumber);
-                    
+
                     if (debugOverlay) {
                         highlightLayerRef.current.appendChild(debugOverlay);
                     }
@@ -675,7 +731,7 @@ const CoordinateHighlighter = ({
         try {
             const coords = element.coordinates;
             const screenRect = convertBboxToScreenWithZoomHandling(coords);
-            
+
             if (!screenRect) return null;
 
             const debugBox = document.createElement('div');
@@ -712,7 +768,7 @@ const CoordinateHighlighter = ({
                 border-radius: 2px;
                 white-space: nowrap;
             `;
-            
+
             scoreLabel.textContent = `S:${similarity.combined.toFixed(2)} T:${similarity.token.toFixed(2)} O:${similarity.overlap.toFixed(2)}`;
             debugBox.appendChild(scoreLabel);
 
@@ -726,7 +782,7 @@ const CoordinateHighlighter = ({
                 `Jaccard: ${similarity.jaccard.toFixed(3)}`,
                 `Words - Sentence: ${similarity.sentenceWordCount}, Element: ${similarity.elementWordCount}`
             ].join('\n');
-            
+
             debugBox.title = tooltipInfo;
 
             return debugBox;
@@ -737,10 +793,10 @@ const CoordinateHighlighter = ({
         }
     };
 
-     /**
-     * Create search region overlays for debugging
-     * Shows the PDFMiner→PDFjs search regions where the algorithm looked for text
-     */
+    /**
+    * Create search region overlays for debugging
+    * Shows the PDFMiner→PDFjs search regions where the algorithm looked for text
+    */
     const createSearchRegionOverlays = async (stableMappings, sentenceIds, pageNumber) => {
         if (!highlightLayerRef?.current) return;
 
@@ -750,7 +806,7 @@ const CoordinateHighlighter = ({
 
         for (const sentenceId of sentenceIds) {
             const mapping = stableMappings[sentenceId];
-            
+
             if (!mapping?.search_regions?.length) {
                 log(`⚠️ No search regions for sentence ${sentenceId}`);
                 continue;
@@ -758,7 +814,7 @@ const CoordinateHighlighter = ({
 
             // Filter search regions for current page
             const regionsOnPage = mapping.search_regions.filter(region => region.page === pageNumber);
-            
+
             if (regionsOnPage.length === 0) {
                 log(`📄 No search regions for sentence ${sentenceId} on page ${pageNumber}`);
                 continue;
@@ -769,12 +825,12 @@ const CoordinateHighlighter = ({
             // Create overlay for each search region
             for (let i = 0; i < regionsOnPage.length; i++) {
                 const region = regionsOnPage[i];
-                
+
                 const regionOverlay = createSearchRegionBox(region, sentenceId, pageNumber, i);
-                
+
                 if (regionOverlay) {
                     highlightLayerRef.current.appendChild(regionOverlay);
-                    
+
                     // Store reference for cleanup
                     const regionKey = `search_${sentenceId}_${i}`;
                     searchRegions.current.set(regionKey, {
@@ -784,7 +840,7 @@ const CoordinateHighlighter = ({
                         region: region,
                         type: 'search_region'
                     });
-                    
+
                     regionCount++;
                 }
             }
@@ -806,10 +862,10 @@ const CoordinateHighlighter = ({
             // Use the PDFjs bbox which should match our coordinate system
             const bbox = region.pdfjs_bbox;
 
-             // Create a virtual text element with the PDFjs bbox coordinates
+            // Create a virtual text element with the PDFjs bbox coordinates
             // This ensures the same zoom handling as the actual highlights
             const screenRect = convertBboxToScreenWithZoomHandling(bbox);
-            
+
 
             // Create search region box element
             const searchBox = document.createElement('div');
@@ -854,7 +910,7 @@ const CoordinateHighlighter = ({
                 border: 1px solid rgba(0, 191, 255, 1);
                 box-shadow: 0 1px 3px rgba(0,0,0,0.3);
             `;
-            
+
             // Label content: Search region info
             const confidence = (region.confidence || 0).toFixed(2);
             const elementCount = region.element_count || 0;
@@ -873,11 +929,11 @@ const CoordinateHighlighter = ({
                 `PDFjs BBox: (${bbox.x}, ${bbox.y}) ${bbox.width}×${bbox.height}`,
                 `Converted Coords: (${region.x0}, ${region.y0}) → (${region.x1}, ${region.y1})`
             ].join('\n');
-            
+
             searchBox.title = tooltipText;
 
             log(`🔍 Created search region box for sentence ${sentenceId}, region ${regionIndex} at (${screenRect.x.toFixed(1)}, ${screenRect.y.toFixed(1)}) ${screenRect.width.toFixed(1)}×${screenRect.height.toFixed(1)}`);
-            
+
             return searchBox;
 
         } catch (error) {
@@ -886,10 +942,10 @@ const CoordinateHighlighter = ({
         }
     };
 
-     /**
-     * Convert bbox to screen coordinates with consistent zoom handling
-     * This matches the approach used by the highlights
-     */
+    /**
+    * Convert bbox to screen coordinates with consistent zoom handling
+    * This matches the approach used by the highlights
+    */
     const convertBboxToScreenWithZoomHandling = (bbox) => {
         const pageContainer = containerRef.current?.querySelector('.pdf-page-container');
         if (!pageContainer) return null;
@@ -929,12 +985,12 @@ const CoordinateHighlighter = ({
 
         for (const sentenceId of sentenceIds) {
             const mapping = stableMappings[sentenceId];
-            
+
             if (!mapping?.stable_elements?.length) continue;
 
             // Filter elements for current page
             const elementsOnPage = mapping.stable_elements.filter(element => element.page === pageNumber);
-            
+
             if (elementsOnPage.length === 0) continue;
 
             // Create a region overlay for each stable element
@@ -942,10 +998,10 @@ const CoordinateHighlighter = ({
                 if (!element.coordinates) continue;
 
                 const regionOverlay = createCoordinateRegionBox(element, sentenceId, pageNumber);
-                
+
                 if (regionOverlay) {
                     highlightLayerRef.current.appendChild(regionOverlay);
-                    
+
                     // Store reference for cleanup
                     const regionKey = `region_${sentenceId}_${element.stable_index}`;
                     coordinateRegions.current.set(regionKey, {
@@ -955,7 +1011,7 @@ const CoordinateHighlighter = ({
                         coordinates: element.coordinates,
                         type: 'coordinate_region'
                     });
-                    
+
                     regionCount++;
                 }
             }
@@ -976,9 +1032,9 @@ const CoordinateHighlighter = ({
         try {
             // Convert PDF coordinates to screen coordinates using the text layer approach
             const coords = element.coordinates;
-            
+
             const screenRect = convertBboxToScreenWithZoomHandling(coords);
-            
+
             if (!screenRect) return null;
 
             // Create region box element
@@ -1023,7 +1079,7 @@ const CoordinateHighlighter = ({
                 white-space: nowrap;
                 max-width: ${screenRect.width + 20}px;
             `;
-            
+
             // Label content: sentence ID + confidence + text preview
             const confidence = (element.combined_confidence || 0).toFixed(2);
             const textPreview = element.text.length > 8 ? element.text.substring(0, 8) + '…' : element.text;
@@ -1042,11 +1098,11 @@ const CoordinateHighlighter = ({
                 `Match Source: ${element.match_source || 'unknown'}`,
                 `Coordinates: (${coords.x.toFixed(1)}, ${coords.y.toFixed(1)}) ${coords.width.toFixed(1)}×${coords.height.toFixed(1)}`
             ].join('\n');
-            
+
             regionBox.title = tooltipText;
 
             log(`🗺️ Created region box for sentence ${sentenceId}, element "${element.text}" at (${screenRect.x.toFixed(1)}, ${screenRect.y.toFixed(1)})`);
-            
+
             return regionBox;
 
         } catch (error) {
@@ -1056,7 +1112,7 @@ const CoordinateHighlighter = ({
     };
 
 
-     // ENHANCED: More flexible text element finding
+    // ENHANCED: More flexible text element finding
     const findTextElement = (stableIndex, pageNumber) => {
         if (!textLayerRef?.current) {
             log('❌ textLayerRef not available');
@@ -1147,14 +1203,14 @@ const CoordinateHighlighter = ({
     };
 
 
-     /**
-     * Get stable mappings for sentence IDs from your existing API
-     */
+    /**
+    * Get stable mappings for sentence IDs from your existing API
+    */
     const getStableMappings = async (sentenceIds) => {
         if (!sentenceIds?.length || !documentFilename) return null;
 
         const cacheKey = `${documentFilename}_${sentenceIds.join(',')}_${currentPage}`;
-        
+
         if (mappingsCache.current.has(cacheKey)) {
             log('📋 Using cached stable mappings');
             return mappingsCache.current.get(cacheKey);
@@ -1162,21 +1218,21 @@ const CoordinateHighlighter = ({
 
         try {
             log(`🔍 Fetching stable mappings for sentences:`, sentenceIds);
-            
+
             const response = await getSentenceItemMappings(documentFilename, sentenceIds);
-            
+
             if (!response?.success || !response?.sentence_mappings) {
                 log('❌ No sentence mappings in response');
                 return null;
             }
 
             log(`✅ Received mappings for ${Object.keys(response.sentence_mappings).length} sentences`);
-            
+
 
 
             // Cache the result
             mappingsCache.current.set(cacheKey, response.sentence_mappings);
-            
+
             return response.sentence_mappings;
 
         } catch (error) {
@@ -1199,7 +1255,7 @@ const CoordinateHighlighter = ({
 
         for (const sentenceId of sentenceIds) {
             const mapping = stableMappings[sentenceId];
-            
+
             if (!mapping?.stable_elements?.length) {
                 log(`⚠️ No stable elements for sentence ${sentenceId}`);
                 continue;
@@ -1226,14 +1282,14 @@ const CoordinateHighlighter = ({
 
             // Group nearby elements and create highlights
             const highlightGroups = groupNearbyElements(elementsOnPage);
-            
+
             for (const group of highlightGroups) {
                 const highlight = await createHighlightFromElementGroup(group, sentenceId, pageNumber);
-                
+
                 if (highlight) {
                     highlightCount++;
 
-                     // Log confidence details for analysis
+                    // Log confidence details for analysis
                     const confidenceInfo = group.map(el => ({
                         text: el.text,
                         combined: el.combined_confidence?.toFixed(3),
@@ -1252,7 +1308,7 @@ const CoordinateHighlighter = ({
         if (elementsOnOtherPages > 0) {
             log(`📊 ${elementsOnOtherPages} total elements found on other pages`);
         }
-        
+
         if (highlightCount === 0 && sentenceIds.length > 0) {
             log('🔍 No highlights created - debugging');
             debugHighlightCreation(stableMappings, sentenceIds, pageNumber);
@@ -1316,14 +1372,14 @@ const CoordinateHighlighter = ({
 
         // Determine confidence tier and color
         let tier, bgColor, borderColor, label;
-        
+
         if (avgCombined >= overlapConfidenceThresholds.high) {
             tier = 'high';
             bgColor = 'rgba(76, 175, 80, 0.4)';   // Green
             borderColor = 'rgba(76, 175, 80, 0.8)';
             label = '🟢 HIGH';
         } else if (avgCombined >= overlapConfidenceThresholds.medium) {
-            tier = 'medium'; 
+            tier = 'medium';
             bgColor = 'rgba(255, 193, 7, 0.4)';    // Yellow/Orange
             borderColor = 'rgba(255, 193, 7, 0.8)';
             label = '🟡 MED';
@@ -1351,7 +1407,7 @@ const CoordinateHighlighter = ({
     /**
      * Create a highlight element from a group of stable elements
      */
-   const createHighlightFromElementGroup = async (elementGroup, sentenceId, pageNumber) => {
+    const createHighlightFromElementGroup = async (elementGroup, sentenceId, pageNumber) => {
         if (!containerRef?.current || elementGroup.length === 0) return null;
 
         try {
@@ -1369,10 +1425,10 @@ const CoordinateHighlighter = ({
 
             // Use the existing text elements' positions (which already handle zoom correctly)
             const highlightElement = createHighlightFromTextElements(textElements, sentenceId, elementGroup);
-            
+
             if (highlightElement) {
                 highlightLayerRef.current.appendChild(highlightElement);
-                
+
                 // Store reference for cleanup
                 const highlightKey = `coord_${sentenceId}_${elementGroup[0].stable_index}`;
                 activeHighlights.current.set(highlightKey, {
@@ -1385,7 +1441,7 @@ const CoordinateHighlighter = ({
 
                 log(`✨ Created highlight for sentence ${sentenceId}, group of ${elementGroup.length} elements`);
                 log(`📝 Group text: "${elementGroup.map(e => e.text).join(' ')}"`);
-                
+
                 return highlightElement;
             }
 
@@ -1464,12 +1520,12 @@ const CoordinateHighlighter = ({
                 `Text Sim: ${confidenceStyle.confidence.text_similarity.toFixed(3)}`,
                 `Text: "${elementGroup.map(e => e.text).join(' ')}"`
             ].join('\n');
-            
+
             highlightElement.title = tooltipText;
 
             log(`✨ Created ${confidenceStyle.confidence.label} highlight: ${width.toFixed(1)}x${height.toFixed(1)} at (${left.toFixed(1)}, ${top.toFixed(1)})`);
             log(`📊 Confidence metrics:`, confidenceStyle.confidence);
-            
+
             return highlightElement;
 
         } catch (error) {
@@ -1484,7 +1540,7 @@ const CoordinateHighlighter = ({
      */
     const debugHighlightCreation = (stableMappings, sentenceIds, pageNumber) => {
         log('🔍 DEBUGGING: Why no highlights were created');
-        
+
         for (const sentenceId of sentenceIds) {
             const mapping = stableMappings[sentenceId];
             log(`🔍 Sentence ${sentenceId}:`, {
@@ -1527,7 +1583,7 @@ const CoordinateHighlighter = ({
     const clearAllHighlights = () => {
         if (!highlightLayerRef?.current) return;
 
-         // Clear regular highlights
+        // Clear regular highlights
         const existingHighlights = highlightLayerRef.current.querySelectorAll(`.${className}`);
         existingHighlights.forEach(el => el.remove());
 
@@ -1559,6 +1615,7 @@ const CoordinateHighlighter = ({
             coordinateRegions.current.clear();
         };
     }, []);
+
 
     return null;
 };

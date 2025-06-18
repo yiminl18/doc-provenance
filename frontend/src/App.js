@@ -112,7 +112,7 @@ function App() {
 
     try {
       setLoadingPreloaded(true);
-      console.log('🔄 Loading document:', doc_obj);
+      //console.log('🔄 Loading document:', doc_obj);
 
       // Log document selection
       //await userStudyLogger.logDocumentSelected(
@@ -264,7 +264,7 @@ function App() {
 
   // Add this handler function to App.js  
   const handleSuggestedQuestionSelect = (questionText) => {
-    console.log('🎯 App: Suggested question selected:', questionText);
+    //console.log('🎯 App: Suggested question selected:', questionText);
 
     // Close the modal first
     setShowQuestionSuggestions(false);
@@ -296,7 +296,7 @@ function App() {
       // Create question ID
       const questionId = `q_${Date.now()}`;
 
-      console.log('🔄 App: Submitting suggested question:', questionText);
+      //console.log('🔄 App: Submitting suggested question:', questionText);
 
       // Submit question to backend
       const response = await askQuestion(questionText, activeDocument.filename);
@@ -332,7 +332,7 @@ function App() {
 
 
 
-        console.log('✅ Suggested question processing initialized');
+        //console.log('✅ Suggested question processing initialized');
       } else {
         throw new Error(response.error || 'Failed to submit suggested question');
       }
@@ -493,12 +493,7 @@ function App() {
     }
 
     if (provenance) {
-      console.log('✅ Provenance details:', {
-        id: provenance.provenance_id,
-        sentences: provenance.sentences_ids?.length || 0,
-        hasContent: provenance.content && provenance.content.length > 0,
-        processingTime: provenance.time
-      });
+      
 
       // Trigger scrolling behaviors
       setTimeout(() => {
@@ -576,7 +571,7 @@ function App() {
     setLoadingPreloaded(true);
     try {
       const response = await getDocuments();
-      console.log('📚 Preloaded documents fetched:', response);
+      //console.log('📚 Preloaded documents fetched:', response);
       if (response.success && response.documents) {
         setPreloadedDocuments(response.documents);
       } else {

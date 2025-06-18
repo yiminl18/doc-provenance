@@ -15,6 +15,7 @@ import { useRenderManager } from '../utils/useRenderManager';
 import { getSentenceItemMappings } from '../services/api';
 import '../styles/pdf-viewer-render.css';
 import CoordinateHighlighter from './CoordinateHighlighter';
+import HybridCoordinateHighlighter from './HybridCoordinateHighlighter';
 
 const PDFViewer = ({
     pdfDocument,
@@ -96,14 +97,7 @@ const PDFViewer = ({
         }
     }, [pdfDocument?.filename]); // Reset when filename changes
 
-    // Add this useEffect in PDFViewer to debug prop changes
-    useEffect(() => {
-        console.log('PDFViewer: selectedProvenance changed:', {
-            provenanceId: selectedProvenance?.provenance_id,
-            provenanceIds: selectedProvenance?.provenance_ids,
-            timestamp: Date.now()
-        });
-    }, [selectedProvenance]);
+
 
     const loadPDF = async () => {
         setLoading(true);
@@ -130,16 +124,7 @@ const PDFViewer = ({
         }
     };
 
-    // Add this effect to PDFViewer.js for debugging
-useEffect(() => {
-    console.log('🔍 PDFViewer: selectedProvenance changed:', {
-        provenanceId: selectedProvenance?.provenance_id,
-        hasHighlightData: !!selectedProvenance?.highlight_data,
-        sentenceIds: selectedProvenance?.provenance_ids || selectedProvenance?.sentences_ids,
-        currentPage: renderManager.currentPage,
-        timestamp: Date.now()
-    });
-}, [selectedProvenance]);
+
 
     function handleViewportChange({ page, zoom, displayViewport, textLayerViewport, zoomRatio }) {
         console.log(`📡 Viewport changed: page ${page}, display zoom ${(zoom * 100).toFixed(0)}%, text layer zoom: 100%`);
@@ -697,17 +682,17 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
 
                     {/* Unified status indicator - prioritizes provenance over rendering */}
                     {isProvenanceProcessing ? (
-                        <div className="status-indicator provenance">
+                        <div className="status-indicator-pdf provenance">
                             <FontAwesomeIcon icon={faSpinner} spin />
                             <span>Finding Evidence...</span>
                         </div>
                     ) : renderManager.isRendering ? (
-                        <div className="status-indicator rendering">
+                        <div className="status-indicator-pdf rendering">
                             <FontAwesomeIcon icon={faSpinner} spin />
                             <span>Rendering Page...</span>
                         </div>
                     ) : renderManager.error ? (
-                        <div className="status-indicator error">
+                        <div className="status-indicator-pdf error">
                             <FontAwesomeIcon icon={faExclamationTriangle} />
                             <span>Render Error: {renderManager.error}</span>
                         </div>
@@ -816,8 +801,33 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
 
                     {/* Highlighter Component */}
                    
-                    {renderManager.isReady && selectedProvenance && (
+                    {/*{renderManager.isReady && selectedProvenance && (
                         <CoordinateHighlighter
+                            provenanceData={selectedProvenance}
+                            activeQuestionId={activeQuestionId}
+                            pdfDocument={pdfDoc}
+                            textLayerRef={textLayerRef}
+                            highlightLayerRef={highlightLayerRef}
+                            containerRef={containerRef}
+                            currentPage={renderManager.currentPage}
+                            currentZoom={renderManager.currentZoom}
+                            documentFilename={pdfDocument?.filename || ''}
+                            highlightStyle={{
+                                backgroundColor: 'rgba(76, 175, 80, 0.4)',
+                                border: '1px solid rgba(76, 175, 80, 0.8)',
+                                borderRadius: '2px'
+                            }}
+                            searchOptions={{
+                                caseSensitive: false,
+                                matchThreshold: 0.75, // Slightly lower for better recall
+                                maxGapBetweenWords: 30, // Pixels between words to group
+                                contextWindow: 3 // Words of context
+                            }}
+                            className="direct-provenance-highlight"
+                            verbose={true} // Enable detailed logging for debugging
+                        />*/}
+                        {renderManager.isReady && selectedProvenance && (
+                        <HybridCoordinateHighlighter
                             provenanceData={selectedProvenance}
                             activeQuestionId={activeQuestionId}
                             pdfDocument={pdfDoc}

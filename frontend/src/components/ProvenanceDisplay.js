@@ -24,18 +24,43 @@ const ProvenanceDisplay = ({
 
     const availableProvenances = question?.provenanceSources || [];
 
-    // Auto-select provenance when available
     useEffect(() => {
         if (availableProvenances.length > 0) {
-            if (currentProvenanceIndex >= availableProvenances.length) {
-                setCurrentProvenanceIndex(0);
+            // When new provenance is added, automatically jump to the latest one
+            const latestIndex = availableProvenances.length - 1;
+            
+            // Only update if we're not already showing the latest provenance
+            if (currentProvenanceIndex !== latestIndex) {
+                console.log(`🎯 ProvenanceDisplay: Jumping to latest provenance (index ${latestIndex})`);
+                setCurrentProvenanceIndex(latestIndex);
             }
-            const provenance = availableProvenances[currentProvenanceIndex];
+            
+            const provenance = availableProvenances[latestIndex];
             setSelectedProvenance(provenance);
+            
+            // Trigger navigation and selection for the new provenance
+            if (provenance?.sentences_ids?.length > 0 && onNavigationTrigger) {
+                onNavigationTrigger({
+                    sentenceId: provenance.sentences_ids[0],
+                    timestamp: Date.now(),
+                    provenanceId: provenance.provenance_id
+                });
+            }
+
+            if (onProvenanceSelect) {
+                onProvenanceSelect(provenance);
+            }
         } else {
             setSelectedProvenance(null);
         }
-    }, [availableProvenances.length, currentProvenanceIndex]);
+    }, [availableProvenances.length]); // Only depend on length change, not currentProvenanceIndex
+
+    useEffect(() => {
+        if (availableProvenances.length > 0 && currentProvenanceIndex < availableProvenances.length) {
+            const provenance = availableProvenances[currentProvenanceIndex];
+            setSelectedProvenance(provenance);
+        }
+    }, [currentProvenanceIndex, availableProvenances]);
 
     const handleDotNavigation = (index) => {
         setCurrentProvenanceIndex(index);

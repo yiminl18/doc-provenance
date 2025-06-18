@@ -42,7 +42,7 @@ const QuestionSuggestionsModal = ({
       const response = await getGeneratedQuestions(filename);
 
       if (response.success) {
-        console.log('Loaded questions:', response.questions);
+        //console.log('Loaded questions:', response.questions);
         setQuestions(response.questions || []);
       } else {
         setError('Failed to load questions');
@@ -59,12 +59,6 @@ const QuestionSuggestionsModal = ({
     onClose();
   };
 
-  const toggleProvenanceDetails = (questionId) => {
-    setShowProvenanceDetails(prev => ({
-      ...prev,
-      [questionId]: !prev[questionId]
-    }));
-  };
 
   const formatNumber = (num) => {
     if (num >= 1000) {

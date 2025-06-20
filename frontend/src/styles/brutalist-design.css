@@ -876,10 +876,11 @@ p {
 /* Main Modal Container */
 .modal-container {
   position: relative;
-  background-color: var(--bg-panel);
+  background-color: var(--bg-paper);
   border: var(--border-medium) solid var(--win95-border-dark);
   box-shadow: var(--shadow-raised);
   top: var(--header-height);
+  left: 10vh;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -917,9 +918,8 @@ p {
 /* Document Selection Modal Styles */
 
 /* Modal container */
-.modal-container.document-selection {
+.modal-container .document-selection {
   max-width: 800px;
-  width: 90%;
   max-height: 80vh;
 }
 
@@ -1380,7 +1380,7 @@ p {
 /* Main Modal Container */
 
 
-.modal-container.question-suggetions {
+.modal-container .question-suggetions {
   background-color: var(--bg-panel);
   border: var(--border-thick) solid var(--win95-border-dark);
   box-shadow: var(--shadow-raised);
@@ -1393,7 +1393,7 @@ p {
 }
 
 
-.modal-container.user-study-modal.enhanced {
+.modal-container .user-study-modal.enhanced {
   max-width: 900px;
 }
 
@@ -1404,7 +1404,7 @@ p {
   padding: var(--space-4) var(--space-6);
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   flex-shrink: 0;
 }
 

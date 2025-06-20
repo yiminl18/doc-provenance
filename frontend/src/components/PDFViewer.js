@@ -16,6 +16,8 @@ import { getSentenceItemMappings } from '../services/api';
 import '../styles/pdf-viewer-render.css';
 import CoordinateHighlighter from './CoordinateHighlighter';
 import HybridCoordinateHighlighter from './HybridCoordinateHighlighter';
+import SpatialConsumptionHighlighter from './SpatialConsumptionHighlighter';
+import NewWordOrderHighlighter from './NewWordOrderHighlighter';
 
 const PDFViewer = ({
     pdfDocument,
@@ -158,7 +160,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
     try {
         const page = await pdfDoc.getPage(pageNumber);
         const textContent = await page.getTextContent({
-            includeMarkedContent: true,
+            includeMarkedContent: false,
             disableNormalization: true
         })
 
@@ -684,7 +686,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                     {isProvenanceProcessing ? (
                         <div className="status-indicator-pdf provenance">
                             <FontAwesomeIcon icon={faSpinner} spin />
-                            <span>Finding Evidence...</span>
+                            <span>Waiting for provenance...</span>
                         </div>
                     ) : renderManager.isRendering ? (
                         <div className="status-indicator-pdf rendering">
@@ -825,7 +827,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                             }}
                             className="direct-provenance-highlight"
                             verbose={true} // Enable detailed logging for debugging
-                        />*/}
+                        />
                         {renderManager.isReady && selectedProvenance && (
                         <HybridCoordinateHighlighter
                             provenanceData={selectedProvenance}
@@ -849,6 +851,57 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                                 contextWindow: 3 // Words of context
                             }}
                             className="direct-provenance-highlight"
+                            verbose={true} // Enable detailed logging for debugging
+                        />
+                        {renderManager.isReady && selectedProvenance && (
+                        <SpatialConsumptionHighlighter
+                            provenanceData={selectedProvenance}
+                            activeQuestionId={activeQuestionId}
+                            pdfDocument={pdfDoc}
+                            textLayerRef={textLayerRef}
+                            highlightLayerRef={highlightLayerRef}
+                            containerRef={containerRef}
+                            currentPage={renderManager.currentPage}
+                            currentZoom={renderManager.currentZoom}
+                            documentFilename={pdfDocument?.filename || ''}
+                            highlightStyle={{
+                                backgroundColor: 'rgba(76, 175, 80, 0.4)',
+                                border: '1px solid rgba(76, 175, 80, 0.8)',
+                                borderRadius: '2px'
+                            }}
+                            searchOptions={{
+                                caseSensitive: false,
+                                matchThreshold: 0.75, // Slightly lower for better recall
+                                maxGapBetweenWords: 30, // Pixels between words to group
+                                contextWindow: 3 // Words of context
+                            }}
+                            className="direct-provenance-highlight"
+                            verbose={true} // Enable detailed logging for debugging
+                        />
+                    )}*/}
+                    {renderManager.isReady && selectedProvenance && (
+                        <NewWordOrderHighlighter
+                            provenanceData={selectedProvenance}
+                            activeQuestionId={activeQuestionId}
+                            pdfDocument={pdfDoc}
+                            textLayerRef={textLayerRef}
+                            highlightLayerRef={highlightLayerRef}
+                            containerRef={containerRef}
+                            currentPage={renderManager.currentPage}
+                            currentZoom={renderManager.currentZoom}
+                            documentFilename={pdfDocument?.filename || ''}
+                            highlightStyle={{
+                                backgroundColor: 'rgba(76, 175, 80, 0.4)',
+                                border: '1px solid rgba(76, 175, 80, 0.8)',
+                                borderRadius: '2px'
+                            }}
+                            searchOptions={{
+                                caseSensitive: false,
+                                matchThreshold: 0.75, // Slightly lower for better recall
+                                maxGapBetweenWords: 30, // Pixels between words to group
+                                contextWindow: 3 // Words of context
+                            }}
+                            className="new-order-highlight"
                             verbose={true} // Enable detailed logging for debugging
                         />
                     )}

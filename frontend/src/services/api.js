@@ -196,11 +196,11 @@ export const getSentenceItemMappings = async (filename, sentenceIds) => {
   try {
     const ids = Array.isArray(sentenceIds) ? sentenceIds.join(',') : sentenceIds;
     const response = await axios.get(
-      `${API_URL}/documents/${filename}/sentence-items?ids=${ids}`
+      `${API_URL}/documents/${filename}/sentence-items-enhanced?ids=${ids}`
     );
     console.log('✅ Received stable mappings:', {
             success: response.data.success,
-            summary: response.data.summary
+            summary: response.data.quality_metrics
         });
 
     return response.data;

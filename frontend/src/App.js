@@ -1,14 +1,15 @@
+import { useAppState } from './contexts/AppStateContext';
 import React, { useState, useEffect, useCallback } from 'react';
 import './styles/brutalist-design.css';
 import './styles/layout.css';
-import HistorySidebar from './components/HistorySidebar';
+//import HistorySidebar from './components/HistorySidebar';
 import Header from './components/Header';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import ProvenanceQA from './components/ProvenanceQA';
 import QuestionHistory from './components/QuestionHistory';
 import PDFViewer from './components/PDFViewer';
-import ReactPDFViewer from './components/ReactPDFViewer';
+//import ReactPDFViewer from './components/ReactPDFViewer';
 import DocumentSelectionModal from './components/DocumentSelectionModal';
 //import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
 import DriveFileBrowser from './components/DriveFileBrowser';
@@ -24,18 +25,35 @@ import {
   fetchSentences
 } from './services/api';
 
+
 function App() {
+
+  const { state, dispatch } = useAppState();
+  const { questionsHistory, activeQuestionId, selectedProvenance, navigationTrigger } = state;
+  // Create wrapper functions that match your original setter signatures
+  const setActiveQuestionId = useCallback((questionId) => {
+    dispatch({ type: 'SET_ACTIVE_QUESTION', payload: questionId });
+  }, [dispatch]);
+
+  const setSelectedProvenance = useCallback((provenance) => {
+    dispatch({ type: 'SET_SELECTED_PROVENANCE', payload: provenance });
+  }, [dispatch]);
+
+  const setNavigationTrigger = useCallback((trigger) => {
+    dispatch({ type: 'SET_NAVIGATION_TRIGGER', payload: trigger });
+  }, [dispatch]);
+
   const EXPERIMENT_TOP_K = 5;
 
   // documents state
   const [documents, setDocuments] = useState(new Map());
   const [activeDocumentId, setActiveDocumentId] = useState(null);
-  const [selectedProvenance, setSelectedProvenance] = useState(null);
+  //const [selectedProvenance, setSelectedProvenance] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(null);
 
   // Questions history state (for history sidebar)
-  const [questionsHistory, setQuestionsHistory] = useState(new Map());
-  const [activeQuestionId, setActiveQuestionId] = useState(null);
+  //const [questionsHistory, setQuestionsHistory] = useState(new Map());
+  //const [activeQuestionId, setActiveQuestionId] = useState(null);
 
   // Modal state
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
@@ -45,7 +63,7 @@ function App() {
   const [loadingPreloaded, setLoadingPreloaded] = useState(false);
   const [showDriveModal, setShowDriveModal] = useState(false);
   const [showQuestionSuggestions, setShowQuestionSuggestions] = useState(false);
-  const [navigationTrigger, setNavigationTrigger] = useState(null);
+  //const [navigationTrigger, setNavigationTrigger] = useState(null);
 
   // Get active document
   const activeDocument = activeDocumentId ? documents.get(activeDocumentId) : null;
@@ -72,7 +90,7 @@ function App() {
   };
 
   // Add this function to update questions from ProvenanceQA
-  const updateQuestion = useCallback((questionId, updates) => {
+  /*const updateQuestion = useCallback((questionId, updates) => {
     console.log(`🔄 App: updateQuestion called for ${questionId}:`, updates);
 
     setQuestionsHistory(prev => {
@@ -82,29 +100,45 @@ function App() {
       if (currentQuestion) {
         const updatedQuestion = { ...currentQuestion, ...updates };
         newHistory.set(questionId, updatedQuestion);
-      } else {
-        console.error(`❌ Question ${questionId} not found in App's history!`);
-      }
+      } //else {
+        //console.error(`❌ Question ${questionId} not found in App's history!`);
+      //}
 
       return newHistory;
     });
-  }, []);
+  }, []);*/
 
-  // Add this function to add new questions
+  const updateQuestion = useCallback((questionId, updates) => {
+    dispatch({
+      type: 'UPDATE_QUESTION',
+      payload: { questionId, updates }
+    });
+  }, [dispatch]);
+
+  /*// Add this function to add new questions
   const addQuestion = useCallback((questionData) => {
     console.log(`➕ App: Adding new question:`, questionData.id);
 
     setQuestionsHistory(prev => new Map(prev).set(questionData.id, questionData));
     setActiveQuestionId(questionData.id);
-  }, []);
+  }, []);*/
+
+  const addQuestion = useCallback((questionData) => {
+    dispatch({ type: 'ADD_QUESTION', payload: questionData });
+  }, [dispatch]);
 
   const handleNavigationTrigger = useCallback((navTrigger) => {
+    // Check if this is a meaningful trigger
+    if (!navTrigger || (navigationTrigger?.timestamp === navTrigger.timestamp)) {
+      return; // Skip duplicate or empty triggers
+    }
     console.log('🎯 App: Received navigation trigger from ProvenanceQA:', navTrigger);
-    setNavigationTrigger(navTrigger);
-
+    //setNavigationTrigger(navTrigger);
+    dispatch({ type: 'SET_NAVIGATION_TRIGGER', payload: navTrigger });
     // Clear trigger after a delay to prevent re-triggers
     setTimeout(() => {
-      setNavigationTrigger(null);
+      //setNavigationTrigger(null);
+      dispatch({ type: 'SET_NAVIGATION_TRIGGER', payload: null });
     }, 2000);
   }, []); // Empty dependency array - this function never changes
 
@@ -128,11 +162,13 @@ function App() {
         sentence_count: doc_obj.sentence_count || 0
       });
 
-      console.log('🧹 Clearing questions before loading new document');
-      setQuestionsHistory(new Map());
-      setActiveQuestionId(null);
-      setSelectedProvenance(null);
-      setNavigationTrigger(null);
+      //console.log('🧹 Clearing questions before loading new document');
+      //setQuestionsHistory(new Map());
+      //setActiveQuestionId(null);
+      //setSelectedProvenance(null);
+      //setNavigationTrigger(null);
+
+      dispatch({ type: 'DOCUMENT_CHANGED' });
 
       setDocuments(prev => {
         const newDocs = new Map(prev);
@@ -167,12 +203,14 @@ function App() {
 
   // Add this new useEffect to handle question switching and provenance management
   useEffect(() => {
-    console.log(`🔄 Active question changed to: ${activeQuestionId}`);
+    //console.log(`🔄 Active question changed to: ${activeQuestionId}`);
 
-    if (!activeQuestionId) {
+    /*if (!activeQuestionId) {
       // No active question - clear provenance
       console.log('❌ No active question - clearing provenance');
-      setSelectedProvenance(null);
+      //setSelectedProvenance(null);
+      dispatch({ type: 'SET_SELECTED_PROVENANCE', payload: null });
+
       return;
     }
 
@@ -182,7 +220,8 @@ function App() {
     if (!currentQuestion) {
       // Question not found - clear provenance
       console.log('❌ Question not found in history - clearing provenance');
-      setSelectedProvenance(null);
+      //setSelectedProvenance(null);
+      dispatch({ type: 'SET_SELECTED_PROVENANCE', payload: null });
       return;
     }
 
@@ -191,17 +230,20 @@ function App() {
       // Question has provenance - restore the last viewed one (or first one)
       const lastViewedProvenance = currentQuestion.lastViewedProvenance || currentQuestion.provenanceSources[0];
       console.log(`✅ Restoring provenance for question ${activeQuestionId}:`, lastViewedProvenance?.provenance_id);
-      setSelectedProvenance(lastViewedProvenance);
+      //setSelectedProvenance(lastViewedProvenance);
+      dispatch({ type: 'SET_SELECTED_PROVENANCE', payload: lastViewedProvenance });
     } else {
       // Question has no provenance yet - clear it
       console.log(`⚪ Question ${activeQuestionId} has no provenance yet - clearing`);
-      setSelectedProvenance(null);
-    }
+      //setSelectedProvenance(null);
+      dispatch({ type: 'SET_SELECTED_PROVENANCE', payload: null }); 
+    //}*/
   }, [activeQuestionId, questionsHistory]);
 
   useEffect(() => {
     if (activeDocumentId) {
-      const activeDoc = documents.get(activeDocumentId);
+      console.log('📄 Active document changed:', activeDocumentId);
+      /*const activeDoc = documents.get(activeDocumentId);
 
       // Check if this is actually a new document (not just a re-selection)
       const previousDocumentId = localStorage.getItem('lastActiveDocumentId');
@@ -210,20 +252,20 @@ function App() {
         console.log('📄 New document activated, clearing questions history');
 
         // Clear all questions and reset active question
-        setQuestionsHistory(new Map());
-        setActiveQuestionId(null);
+        //setQuestionsHistory(new Map());
+        //setActiveQuestionId(null);
+        //// Clear any selected provenance
+        //setSelectedProvenance(null);
+        //// Clear navigation and highlight triggers
+        //setNavigationTrigger(null);
 
-        // Clear any selected provenance
-        setSelectedProvenance(null);
-
-        // Clear navigation and highlight triggers
-        setNavigationTrigger(null);
+        dispatch({ type: 'DOCUMENT_CHANGED' });
 
         // Store the current document ID for future comparisons
         localStorage.setItem('lastActiveDocumentId', activeDocumentId);
 
         console.log('✅ Questions and provenance cleared for new document:', activeDoc.filename);
-      }
+      }*/
     }
   }, [activeDocumentId, documents]);
 
@@ -231,7 +273,8 @@ function App() {
 
   const handleHistoryQuestionSelect = async (questionId) => {
     //await logUserInteraction('question_select', 'history_sidebar', { question_id: questionId });
-    setActiveQuestionId(questionId);
+    //setActiveQuestionId(questionId);
+    dispatch({ type: 'SET_ACTIVE_QUESTION', payload: questionId });
 
     // Also tell the ProvenanceQA component about this selection
     if (window.integratedQARef && window.integratedQARef.selectQuestion) {
@@ -239,7 +282,7 @@ function App() {
     }
   };
 
-  const handleHistoryQuestionDelete = async (questionId) => {
+  /*const handleHistoryQuestionDelete = async (questionId) => {
     if (window.confirm('Are you sure you want to delete this question from history?')) {
       //await logUserInteraction('question_delete', 'history_sidebar', { question_id: questionId });
 
@@ -255,7 +298,7 @@ function App() {
         return newHistory;
       });
     }
-  };
+  };*/
 
   const handleShowQuestionSuggestions = async () => {
     //await logUserInteraction('question_suggestions_click', 'header');
@@ -403,8 +446,8 @@ function App() {
 
 
     // Also update selected provenance for normal highlights
-    setSelectedProvenance(provenance);
-
+    //setSelectedProvenance(provenance);
+    dispatch({ type: 'SET_SELECTED_PROVENANCE', payload: provenance });
 
   };
 
@@ -469,31 +512,44 @@ function App() {
   const handleProvenanceSelect = async (provenance) => {
     console.log('🎯 App: Provenance selected:', provenance);
 
-    // Always update the selected provenance
-    setSelectedProvenance(provenance);
+    // Check if this provenance is already selected
+    if (selectedProvenance?.provenance_id === provenance?.provenance_id) {
+      console.log('⚪ Provenance already selected, skipping update');
+      return;
+    }
+
+    //setSelectedProvenance(provenance);
+    dispatch({ type: 'SET_SELECTED_PROVENANCE', payload: provenance });
 
     // Also store this as the "last viewed" provenance for the current question
     if (activeQuestionId && provenance) {
       console.log(`💾 Storing provenance ${provenance.provenance_id} as last viewed for question ${activeQuestionId}`);
 
-      setQuestionsHistory(prev => {
-        const newHistory = new Map(prev);
-        const currentQuestion = newHistory.get(activeQuestionId);
-
-        if (currentQuestion) {
-          const updatedQuestion = {
-            ...currentQuestion,
-            lastViewedProvenance: provenance
-          };
-          newHistory.set(activeQuestionId, updatedQuestion);
+      dispatch({
+        type: 'UPDATE_QUESTION',
+        payload: {
+          questionId: activeQuestionId,
+          updates: { lastViewedProvenance: provenance }
         }
-
-        return newHistory;
       });
-    }
+      //setQuestionsHistory(prev => {
+      //  const newHistory = new Map(prev);
+      //  const currentQuestion = newHistory.get(activeQuestionId);
+      //
+      //  if (currentQuestion) {
+      //    const updatedQuestion = {
+      //      ...currentQuestion,
+      //      lastViewedProvenance: provenance
+      //    };
+      //    newHistory.set(activeQuestionId, updatedQuestion);
+      //  }
+      //
+      //  return newHistory;
+      //});
+    }//
 
     if (provenance) {
-      
+
 
       // Trigger scrolling behaviors
       setTimeout(() => {
@@ -614,7 +670,7 @@ function App() {
   };
 
   // Page/document navigation logging
-  useEffect(() => {
+  /*useEffect(() => {
     if (activeDocumentId) {
       const activeDoc = documents.get(activeDocumentId);
       if (activeDoc) {
@@ -629,10 +685,10 @@ function App() {
         //);
       }
     }
-  }, [activeDocumentId, documents]);
+  }, [activeDocumentId, documents]);*/
 
   // Performance monitoring
-  useEffect(() => {
+  /*useEffect(() => {
     // Log performance metrics periodically
     const performanceInterval = setInterval(() => {
       if (performance && performance.memory) {
@@ -648,9 +704,10 @@ function App() {
     }, 30000); // Every 30 seconds
 
     return () => clearInterval(performanceInterval);
-  }, []);
+  }, []);*/
 
   return (
+
     <div className="app-improved">
 
 
@@ -787,6 +844,7 @@ function App() {
         />
       )}
     </div>
+
   );
 }
 

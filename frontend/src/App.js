@@ -487,7 +487,7 @@ function App() {
     try {
 
 
-      const stableElement = document.querySelector('.direct-provenance-highlight');
+      const stableElement = document.querySelector('.provenance-highlight');
 
 
       if (stableElement) {

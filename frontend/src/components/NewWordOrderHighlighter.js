@@ -1,10 +1,9 @@
-// SequentialWordOrderHighlighter.js - Spatial + Consumption + Sequential Word Order Filtering
 import React, { useEffect, useRef } from 'react';
 import { getSentenceItemMappings } from '../services/api';
+import { useAppState } from '../contexts/AppStateContext';
 
 const NewWordOrderHighlighter = ({
     provenanceData,
-    activeQuestionId,
     pdfDocument,
     textLayerRef,
     highlightLayerRef,
@@ -17,25 +16,48 @@ const NewWordOrderHighlighter = ({
         border: '2px solid rgba(76, 175, 80, 0.8)',
         borderRadius: '3px'
     },
-    className = 'sequential-word-order-highlight',
+    className,
     verbose = true
 }) => {
+    const { state } = useAppState();
+    const { activeQuestionId, selectedProvenance } = state;
+    const lastProcessedQuestionRef = useRef(null);
+    const lastProcessedProvenanceRef = useRef(null);
     const activeHighlights = useRef(new Map());
     const mappingsCache = useRef(new Map());
 
     const log = (message, ...args) => {
         if (verbose) {
-            console.log(`[SequentialWordOrder] ${message}`, ...args);
+            console.log(`[NewWordOrder] ${message}`, ...args);
         }
     };
 
-    // Clear highlights when question or provenance changes
     useEffect(() => {
-        if (activeQuestionId || provenanceData?.provenance_ids) {
-            log(`🆔 Question or provenance changed - clearing highlights`);
+        if (lastProcessedQuestionRef.current && lastProcessedQuestionRef.current !== activeQuestionId) {
+            log('🧹 Question changed, clearing all highlights');
             clearAllHighlights();
+            lastProcessedProvenanceRef.current = null;
         }
-    }, [activeQuestionId, provenanceData?.provenance_ids]);
+        lastProcessedQuestionRef.current = activeQuestionId;
+    }, [activeQuestionId]);
+
+    useEffect(() => {
+        const currentProvenanceId = selectedProvenance?.provenance_id;
+        
+        if (lastProcessedProvenanceRef.current === currentProvenanceId) {
+            log('⚪ Same provenance, skipping processing');
+            return;
+        }
+
+        if (activeQuestionId || selectedProvenance?.provenance_ids) {
+            log(`🆔 Processing new provenance for question ${activeQuestionId}`);
+            lastProcessedProvenanceRef.current = currentProvenanceId;
+        } else {
+            log('🧹 No provenance, clearing highlights');
+            clearAllHighlights();
+            lastProcessedProvenanceRef.current = null;
+        }
+    }, [activeQuestionId, selectedProvenance?.provenance_id]);
 
     // Main highlighting effect
     useEffect(() => {
@@ -45,14 +67,13 @@ const NewWordOrderHighlighter = ({
             return;
         }
 
-        const sentenceIds = provenanceData.provenance_ids || [];
-        log(`🎯 Sequential word order highlighting for sentences:`, sentenceIds);
+        const sentenceIds = selectedProvenance.provenance_ids || [];
+        log(`🎯 Enhanced word order highlighting for sentences:`, sentenceIds);
 
         const performHighlighting = async () => {
             try {
                 clearAllHighlights();
 
-                // Get stable mappings for these sentences
                 const stableMappings = await getStableMappings(sentenceIds);
 
                 if (!stableMappings) {
@@ -60,11 +81,10 @@ const NewWordOrderHighlighter = ({
                     return;
                 }
 
-                // Create highlights with sequential word order filtering
-                await createSequentialWordOrderHighlights(stableMappings);
+                await createEnhancedWordOrderHighlights(stableMappings);
 
             } catch (error) {
-                console.error('[SequentialWordOrder] Error during highlighting:', error);
+                console.error('[EnhancedWordOrder] Error during highlighting:', error);
                 clearAllHighlights();
             }
         };
@@ -73,16 +93,13 @@ const NewWordOrderHighlighter = ({
         return () => clearTimeout(timeoutId);
 
     }, [
-        provenanceData?.provenance_id,
-        JSON.stringify(provenanceData?.provenance_ids),
+        selectedProvenance?.provenance_id,
+        JSON.stringify(selectedProvenance?.provenance_ids),
         currentPage,
         documentFilename,
         activeQuestionId
     ]);
 
-    /**
-     * Get stable mappings for sentence IDs (same as before)
-     */
     const getStableMappings = async (sentenceIds) => {
         if (!sentenceIds?.length || !documentFilename) return null;
 
@@ -110,15 +127,14 @@ const NewWordOrderHighlighter = ({
     };
 
     /**
-     * Create highlights using spatial + consumption + sequential word order filtering
+     * FIXED: Enhanced highlighting that balances content coverage with sequential analysis
      */
-    const createSequentialWordOrderHighlights = async (stableMappings) => {
+    const createEnhancedWordOrderHighlights = async (stableMappings) => {
         if (!highlightLayerRef?.current) {
             log('❌ Highlight layer not available');
             return;
         }
 
-        // Filter for current page and found sentences
         const currentPageSentences = Object.entries(stableMappings).filter(([sentenceId, mapping]) => {
             return mapping.found && 
                    mapping.page_number === parseInt(currentPage) &&
@@ -135,161 +151,378 @@ const NewWordOrderHighlighter = ({
         let highlightCount = 0;
 
         for (const [sentenceId, mapping] of currentPageSentences) {
-            // Step 1: Apply existing spatial + consumption filtering
-            const relevantElements = applySpatialConsumptionFiltering(
+            log(`\n🔍 Analyzing sentence ${sentenceId}: "${mapping.sentence_text.substring(0, 80)}..."`);
+            
+            // Step 1: Basic filtering (consumption + word relevance)
+            const basicFilteredElements = applyBasicFiltering(
                 mapping.stable_elements, 
                 mapping.sentence_text,
                 sentenceId
             );
 
-            if (relevantElements.length === 0) {
-                log(`⚠️ No relevant elements after spatial-consumption filtering for sentence ${sentenceId}`);
+            if (basicFilteredElements.length === 0) {
+                log(`⚠️ No elements passed basic filtering for sentence ${sentenceId}`);
                 continue;
             }
 
-            // Step 2: Apply sequential word order filtering (NEW)
-            const sequentiallyFilteredElements = applySequentialWordOrderFilter(
-                relevantElements,
+            log(`✅ ${basicFilteredElements.length} elements passed basic filtering`);
+
+            // Step 2: Enhanced analysis with content priority
+            const analyzedElements = analyzeElementsWithContentPriority(
+                basicFilteredElements,
                 mapping.sentence_text,
                 sentenceId
             );
 
-            if (sequentiallyFilteredElements.length === 0) {
-                log(`⚠️ No elements passed sequential word order filter for sentence ${sentenceId}`);
+            // Step 3: Select best elements using hybrid approach
+            const selectedElements = selectElementsWithHybridApproach(
+                analyzedElements,
+                mapping.sentence_text,
+                sentenceId
+            );
+
+            if (selectedElements.length === 0) {
+                log(`⚠️ No elements selected for sentence ${sentenceId}`);
                 continue;
             }
 
-            // Step 3: Create spatially-coherent groups from filtered elements
-            const spatialGroups = createSpatiallyCoherentGroups(sequentiallyFilteredElements, mapping.sentence_text);
+            log(`✅ Selected ${selectedElements.length} elements for highlighting`);
 
-            // Step 4: Create highlights for each group
+            // Step 4: Create spatially-coherent groups
+            const spatialGroups = createSpatiallyCoherentGroups(selectedElements, mapping.sentence_text);
+
+            // Step 5: Create highlights
             for (const group of spatialGroups) {
                 const highlight = await createHighlightFromSpatialGroup(group, sentenceId, mapping.sentence_text);
                 
                 if (highlight) {
                     highlightCount++;
-                    log(`✨ Created sequential highlight for sentence ${sentenceId}, group of ${group.elements.length} elements`);
+                    log(`✨ Created highlight for sentence ${sentenceId}, group of ${group.elements.length} elements`);
                 }
             }
         }
 
-        log(`✅ Created ${highlightCount} sequential word order highlights on page ${currentPage}`);
+        log(`✅ Created ${highlightCount} enhanced highlights on page ${currentPage}`);
     };
 
     /**
-     * NEW: Apply sequential word order filtering
-     * Rewards elements that capture sentence beginnings/endings and follow logical word order
+     * Basic filtering: consumption ratio + word relevance
      */
-    const applySequentialWordOrderFilter = (elements, sentenceText, sentenceId) => {
-        log(`🔄 Applying sequential word order filter to ${elements.length} elements for sentence ${sentenceId}`);
+    const applyBasicFiltering = (stableElements, sentenceText, sentenceId) => {
+        if (!stableElements || !sentenceText) return [];
 
-        // Extract sentence words with positions
+        const sentenceWords = new Set(
+            sentenceText.toLowerCase()
+                .replace(/[^\w\s]/g, ' ')
+                .split(/\s+/)
+                .filter(word => word.length > 1) // Allow shorter words
+        );
+
+        const filteredElements = stableElements.filter(element => {
+            // Must have words and consumption data
+            if (!element.words_consumed || !element.consumption_ratio) {
+                return false;
+            }
+
+            // Lower consumption threshold to catch more content
+            if (element.consumption_ratio < 0.05) {
+                return false;
+            }
+
+            const consumedWords = Array.isArray(element.words_consumed) 
+                ? element.words_consumed 
+                : [];
+
+            const relevantConsumedWords = consumedWords.filter(word => 
+                sentenceWords.has(word.toLowerCase())
+            );
+
+            // Must have at least one relevant word
+            if (relevantConsumedWords.length === 0) {
+                return false;
+            }
+
+            // Store for later analysis
+            element.relevantWords = relevantConsumedWords;
+            element.wordRelevanceRatio = relevantConsumedWords.length / Math.max(consumedWords.length, 1);
+
+            return true;
+        });
+
+        log(`🔍 Basic filtering: ${filteredElements.length}/${stableElements.length} elements passed (${sentenceWords.size} sentence words)`);
+        return filteredElements;
+    };
+
+    /**
+     * FIXED: Analyze elements with content coverage priority
+     */
+    const analyzeElementsWithContentPriority = (elements, sentenceText, sentenceId) => {
         const sentenceWords = extractSentenceWordsWithPositions(sentenceText);
         
-        if (sentenceWords.length === 0) {
-            log(`⚠️ No words found in sentence text`);
-            return elements;
-        }
-
-        log(`📝 Sentence has ${sentenceWords.length} words: ${sentenceWords.slice(0, 5).map(w => w.word).join(' ')}${sentenceWords.length > 5 ? '...' : ''}`);
-
-        // Analyze each element for word order compliance
-        const analyzedElements = elements.map(element => 
-            analyzeElementWordOrder(element, sentenceWords, sentenceId)
-        );
-
-        // Find anchor elements (those with sentence start/end words)
-        const anchorElements = findAnchorElements(analyzedElements, sentenceWords);
-        log(`⚓ Found ${anchorElements.length} anchor elements (start/end words)`);
-
-        // Build sequential chains from anchors
-        const sequentialChains = buildSequentialChains(anchorElements, analyzedElements, sentenceWords);
-        log(`🔗 Built ${sequentialChains.length} sequential chains`);
-
-        // Select best elements from chains
-        const selectedElements = selectBestSequentialElements(sequentialChains, sentenceWords);
-        
-        log(`✅ Sequential filter: ${selectedElements.length}/${elements.length} elements selected`);
-        return selectedElements;
+        return elements.map(element => {
+            const analysis = analyzeElementContentCoverage(element, sentenceWords);
+            
+            // Log detailed analysis for debugging
+            if (element.relevantWords && element.relevantWords.length > 3) {
+                log(`🔍 Element ${element.stable_index}: "${element.text?.substring(0, 40)}..." - Score: ${analysis.contentScore.toFixed(3)}, Words: [${element.relevantWords.join(', ')}]`);
+            }
+            
+            return {
+                ...element,
+                ...analysis
+            };
+        });
     };
 
     /**
-     * Extract sentence words with their positions in the sentence
+     * Analyze element for content coverage (prioritizes substantial content)
      */
-    const extractSentenceWordsWithPositions = (sentenceText) => {
-        return sentenceText.toLowerCase()
-            .replace(/[^\w\s]/g, ' ')
-            .split(/\s+/)
-            .filter(word => word.length > 1)
-            .map((word, index) => ({ 
-                word, 
-                position: index, 
-                isFirst: index === 0,
-                isLast: false // Will be set after we know the length
-            }))
-            .map((wordObj, index, array) => ({
-                ...wordObj,
-                isLast: index === array.length - 1
-            }));
-    };
-
-    /**
-     * Analyze element for word order compliance
-     */
-    const analyzeElementWordOrder = (element, sentenceWords, sentenceId) => {
+    const analyzeElementContentCoverage = (element, sentenceWords) => {
         const consumedWords = element.words_consumed || [];
-        const relevantWords = consumedWords.filter(word => 
-            sentenceWords.some(sw => sw.word === word.toLowerCase())
-        );
+        const relevantWords = element.relevantWords || [];
 
-        // Map consumed words to their sentence positions
+        // Map words to sentence positions
         const wordPositions = relevantWords.map(word => {
             const sentenceWord = sentenceWords.find(sw => sw.word === word.toLowerCase());
             return sentenceWord ? sentenceWord.position : -1;
         }).filter(pos => pos >= 0).sort((a, b) => a - b);
 
-        // Calculate sequential properties
-        const hasFirstWord = relevantWords.some(word => 
-            sentenceWords[0] && sentenceWords[0].word === word.toLowerCase()
+        // Calculate content metrics
+        const contentCoverage = relevantWords.length / sentenceWords.length;
+        const consumptionQuality = element.consumption_ratio || 0;
+        const wordRelevanceRatio = element.wordRelevanceRatio || 0;
+        
+        // Check for important content indicators
+        const hasSubstantialContent = relevantWords.length >= 3;
+        const hasImportantWords = relevantWords.some(word => 
+            ['must', 'shall', 'required', 'within', 'days', 'form', 'received', 'signature'].includes(word.toLowerCase())
         );
         
-        const hasLastWord = relevantWords.some(word => 
-            sentenceWords[sentenceWords.length - 1] && 
-            sentenceWords[sentenceWords.length - 1].word === word.toLowerCase()
-        );
-
-        // Calculate word order consistency
+        // Position analysis
+        const hasFirstWord = wordPositions.length > 0 && wordPositions[0] === 0;
+        const hasLastWord = wordPositions.length > 0 && wordPositions[wordPositions.length - 1] === sentenceWords.length - 1;
         const orderConsistency = calculateWordOrderConsistency(wordPositions);
 
-        // Calculate sentence coverage contribution
-        const coverageContribution = wordPositions.length / sentenceWords.length;
-
-        // Calculate sequential score
-        const sequentialScore = calculateSequentialScore(
-            hasFirstWord, hasLastWord, orderConsistency, coverageContribution, element.consumption_ratio
-        );
+        // Calculate comprehensive content score
+        let contentScore = 0;
+        
+        // Heavy weight on content coverage and quality
+        contentScore += contentCoverage * 0.4;
+        contentScore += consumptionQuality * 0.2;
+        contentScore += wordRelevanceRatio * 0.1;
+        
+        // Bonus for substantial content
+        if (hasSubstantialContent) contentScore += 0.15;
+        if (hasImportantWords) contentScore += 0.1;
+        
+        // Bonus for position (but not required)
+        if (hasFirstWord) contentScore += 0.03;
+        if (hasLastWord) contentScore += 0.02;
+        
+        // Categorize element
+        const isHighContent = hasSubstantialContent && contentCoverage >= 0.15;
+        const isAnchor = hasFirstWord || hasLastWord;
+        const isImportant = hasImportantWords || contentCoverage >= 0.2;
 
         return {
-            ...element,
-            // Word order analysis
             relevantWords,
             wordPositions,
+            contentCoverage,
+            hasSubstantialContent,
+            hasImportantWords,
             hasFirstWord,
             hasLastWord,
             orderConsistency,
-            coverageContribution,
-            sequentialScore,
-            // Categorization
-            isAnchor: hasFirstWord || hasLastWord,
-            isSequential: orderConsistency >= 0.7 && wordPositions.length >= 2
+            contentScore: Math.min(1.0, contentScore),
+            isHighContent,
+            isAnchor,
+            isImportant
         };
     };
 
     /**
-     * Calculate word order consistency for an element
+     * FIXED: Hybrid selection approach - prioritizes content while considering sequence
      */
+    const selectElementsWithHybridApproach = (analyzedElements, sentenceText, sentenceId) => {
+        // Sort by content score (descending)
+        const sortedByContent = [...analyzedElements].sort((a, b) => b.contentScore - a.contentScore);
+        
+        log(`📊 Top elements by content score:`);
+        sortedByContent.slice(0, 5).forEach((el, i) => {
+            log(`   ${i + 1}. Score: ${el.contentScore.toFixed(3)} | Words: ${el.relevantWords.length} | Text: "${el.text?.substring(0, 30)}..."`);
+        });
+
+        const candidateElements = [];
+        
+        // Strategy 1: Always include high-content elements (regardless of position)
+        const highContentElements = sortedByContent.filter(el => el.isHighContent);
+        highContentElements.forEach(el => {
+            if (!candidateElements.find(selected => selected.stable_index === el.stable_index)) {
+                candidateElements.push(el);
+                log(`✅ Candidate high-content element: "${el.text?.substring(0, 30)}..." (score: ${el.contentScore.toFixed(3)})`);
+            }
+        });
+
+        // Strategy 2: Include anchor elements if they have decent content
+        const anchorElements = sortedByContent.filter(el => 
+            el.isAnchor && el.contentScore >= 0.2 && !candidateElements.find(s => s.stable_index === el.stable_index)
+        );
+        anchorElements.forEach(el => {
+            candidateElements.push(el);
+            log(`✅ Candidate anchor element: "${el.text?.substring(0, 30)}..." (score: ${el.contentScore.toFixed(3)})`);
+        });
+
+        // Strategy 3: Fill remaining with next highest scoring elements
+        const remainingElements = sortedByContent.filter(el => 
+            !candidateElements.find(s => s.stable_index === el.stable_index) && 
+            el.contentScore >= 0.15 // Reasonable threshold
+        );
+
+        const maxTotalElements = 12; // Allow more candidates for reading order filter
+        const remainingSlots = Math.max(0, maxTotalElements - candidateElements.length);
+        
+        remainingElements.slice(0, remainingSlots).forEach(el => {
+            candidateElements.push(el);
+            log(`✅ Candidate additional element: "${el.text?.substring(0, 30)}..." (score: ${el.contentScore.toFixed(3)})`);
+        });
+
+        log(`🎯 Initial candidates: ${candidateElements.length} elements`);
+        
+        // NEW: Apply reading order filter with sentence coverage tracking
+        const finalSelectedElements = applyReadingOrderCoverageFilter(candidateElements, sentenceText, sentenceId);
+        
+        log(`🎯 Final selection after reading order filter: ${finalSelectedElements.length} elements`);
+        
+        return finalSelectedElements;
+    };
+
+    /**
+     * NEW: Apply reading order filter with cumulative sentence coverage tracking
+     */
+    const applyReadingOrderCoverageFilter = (candidateElements, sentenceText, sentenceId) => {
+        log(`\n📖 Applying reading order coverage filter for sentence ${sentenceId}`);
+        
+        // Get sentence words for tracking coverage
+        const sentenceWords = extractSentenceWordsWithPositions(sentenceText);
+        const totalSentenceWords = sentenceWords.length;
+        
+        // Sort candidates by reading order (top-to-bottom, left-to-right)
+        const sortedByReadingOrder = [...candidateElements].sort((a, b) => {
+            const yDiff = a.coordinates.y - b.coordinates.y;
+            if (Math.abs(yDiff) > 5) return yDiff; // Different lines
+            return a.coordinates.x - b.coordinates.x; // Same line, left-to-right
+        });
+
+        log(`📍 Elements in reading order:`);
+        sortedByReadingOrder.forEach((el, i) => {
+            log(`   ${i + 1}. Y:${Math.round(el.coordinates.y)} X:${Math.round(el.coordinates.x)} | "${el.text?.substring(0, 25)}..." | Words: [${el.relevantWords.join(', ')}]`);
+        });
+
+        // Track cumulative sentence coverage
+        const coveredWordPositions = new Set();
+        const selectedElements = [];
+        let cumulativeCoverage = 0;
+        
+        // Coverage thresholds
+        const EXCELLENT_COVERAGE_THRESHOLD = 0.8;  // 80% of sentence covered
+        const GOOD_COVERAGE_THRESHOLD = 0.6;       // 60% of sentence covered
+        const DIMINISHING_RETURNS_THRESHOLD = 0.05; // Don't add elements that contribute <5% new coverage
+
+        for (const element of sortedByReadingOrder) {
+            // Calculate what new coverage this element would add
+            const elementWordPositions = new Set(element.wordPositions);
+            const newWordPositions = [...elementWordPositions].filter(pos => !coveredWordPositions.has(pos));
+            const newCoverageContribution = newWordPositions.length / totalSentenceWords;
+            
+            // Calculate current coverage before adding this element
+            const currentCoverage = coveredWordPositions.size / totalSentenceWords;
+            
+            log(`🔍 Evaluating element: "${element.text?.substring(0, 25)}..."`);
+            log(`   Current coverage: ${(currentCoverage * 100).toFixed(1)}%`);
+            log(`   New contribution: ${(newCoverageContribution * 100).toFixed(1)}% (${newWordPositions.length} new words)`);
+            log(`   Element score: ${element.contentScore.toFixed(3)}`);
+
+            // Decision logic for inclusion
+            let shouldInclude = false;
+            let reason = '';
+
+            // Always include high-value elements if we haven't hit excellent coverage
+            if (element.contentScore >= 0.6 && currentCoverage < EXCELLENT_COVERAGE_THRESHOLD) {
+                shouldInclude = true;
+                reason = 'High-value element below excellent coverage threshold';
+            }
+            // Include anchor elements if they contribute meaningfully
+            else if (element.isAnchor && newCoverageContribution >= DIMINISHING_RETURNS_THRESHOLD) {
+                shouldInclude = true;
+                reason = 'Anchor element with meaningful contribution';
+            }
+            // Include elements that make significant coverage contributions
+            else if (newCoverageContribution >= 0.15) { // 15% or more new coverage
+                shouldInclude = true;
+                reason = 'Significant coverage contribution';
+            }
+            // Include moderate contributors if we're still below good coverage
+            else if (currentCoverage < GOOD_COVERAGE_THRESHOLD && newCoverageContribution >= DIMINISHING_RETURNS_THRESHOLD) {
+                shouldInclude = true;
+                reason = 'Moderate contribution below good coverage threshold';
+            }
+            // Skip elements with diminishing returns
+            else if (newCoverageContribution < DIMINISHING_RETURNS_THRESHOLD) {
+                reason = `Diminishing returns (${(newCoverageContribution * 100).toFixed(1)}% < ${(DIMINISHING_RETURNS_THRESHOLD * 100)}%)`;
+            }
+            // Skip if we already have excellent coverage
+            else if (currentCoverage >= EXCELLENT_COVERAGE_THRESHOLD) {
+                reason = `Excellent coverage already achieved (${(currentCoverage * 100).toFixed(1)}%)`;
+            }
+            else {
+                reason = 'Below inclusion thresholds';
+            }
+
+            if (shouldInclude) {
+                selectedElements.push(element);
+                
+                // Update coverage tracking
+                newWordPositions.forEach(pos => coveredWordPositions.add(pos));
+                cumulativeCoverage = coveredWordPositions.size / totalSentenceWords;
+                
+                log(`   ✅ INCLUDED: ${reason}`);
+                log(`   📊 New cumulative coverage: ${(cumulativeCoverage * 100).toFixed(1)}%`);
+                
+                // Early termination if we have excellent coverage and enough elements
+                if (cumulativeCoverage >= EXCELLENT_COVERAGE_THRESHOLD && selectedElements.length >= 3) {
+                    log(`   🎯 Excellent coverage achieved with ${selectedElements.length} elements, stopping early`);
+                    break;
+                }
+            } else {
+                log(`   ❌ SKIPPED: ${reason}`);
+            }
+        }
+
+        log(`\n📊 Reading order filter summary:`);
+        log(`   Candidates processed: ${sortedByReadingOrder.length}`);
+        log(`   Elements selected: ${selectedElements.length}`);
+        log(`   Final coverage: ${(cumulativeCoverage * 100).toFixed(1)}%`);
+        log(`   Covered word positions: ${Array.from(coveredWordPositions).sort((a,b) => a-b).join(', ')}`);
+
+        return selectedElements;
+    };
+
+    // Utility functions (keeping existing ones)
+    const extractSentenceWordsWithPositions = (sentenceText) => {
+        return sentenceText.toLowerCase()
+            .replace(/[^\w\s]/g, ' ')
+            .split(/\s+/)
+            .filter(word => word.length > 1)
+            .map((word, index, array) => ({ 
+                word, 
+                position: index, 
+                isFirst: index === 0,
+                isLast: index === array.length - 1
+            }));
+    };
+
     const calculateWordOrderConsistency = (positions) => {
-        if (positions.length <= 1) return 1; // Single words are always consistent
+        if (positions.length <= 1) return 1;
 
         let correctTransitions = 0;
         for (let i = 1; i < positions.length; i++) {
@@ -301,202 +534,55 @@ const NewWordOrderHighlighter = ({
         return correctTransitions / (positions.length - 1);
     };
 
-    /**
-     * Calculate sequential score for an element
-     */
-    const calculateSequentialScore = (hasFirstWord, hasLastWord, orderConsistency, coverageContribution, consumptionRatio) => {
-        let score = 0;
+    const createSpatiallyCoherentGroups = (elements, sentenceText) => {
+        if (elements.length === 0) return [];
 
-        // Anchor bonuses
-        if (hasFirstWord) score += 0.3;  // Big bonus for sentence start
-        if (hasLastWord) score += 0.2;   // Bonus for sentence end
-
-        // Order consistency bonus
-        score += orderConsistency * 0.2;
-
-        // Coverage contribution
-        score += coverageContribution * 0.2;
-
-        // Consumption quality
-        score += (consumptionRatio || 0) * 0.1;
-
-        return Math.min(1.0, score);
-    };
-
-    /**
-     * Find anchor elements (containing first or last words)
-     */
-    const findAnchorElements = (analyzedElements, sentenceWords) => {
-        return analyzedElements.filter(element => element.isAnchor);
-    };
-
-    /**
-     * Build sequential chains starting from anchor elements
-     */
-    const buildSequentialChains = (anchorElements, allElements, sentenceWords) => {
-        const chains = [];
-
-        // Start chains from each anchor element
-        anchorElements.forEach(anchor => {
-            const chain = buildChainFromAnchor(anchor, allElements, sentenceWords);
-            if (chain.elements.length > 0) {
-                chains.push(chain);
-            }
+        const sortedElements = [...elements].sort((a, b) => {
+            const yDiff = a.coordinates.y - b.coordinates.y;
+            if (Math.abs(yDiff) > 5) return yDiff;
+            return a.coordinates.x - b.coordinates.x;
         });
 
-        return chains;
-    };
-
-    /**
-     * Build a sequential chain starting from an anchor element
-     */
-    const buildChainFromAnchor = (anchor, allElements, sentenceWords) => {
-        const chain = {
-            anchorElement: anchor,
-            elements: [anchor],
-            totalCoverage: anchor.coverageContribution,
-            averageSequentialScore: anchor.sequentialScore,
-            isComplete: false
+        const groups = [];
+        let currentGroup = {
+            elements: [sortedElements[0]],
+            avgConsumption: sortedElements[0].consumption_ratio || 0,
+            totalRelevantWords: (sortedElements[0].relevantWords || []).length,
+            avgContentScore: sortedElements[0].contentScore || 0,
+            spatialCohesion: 1.0
         };
 
-        // Track covered word positions
-        const coveredPositions = new Set(anchor.wordPositions);
+        for (let i = 1; i < sortedElements.length; i++) {
+            const current = sortedElements[i];
+            const lastInGroup = currentGroup.elements[currentGroup.elements.length - 1];
 
-        // Sort other elements by spatial proximity to anchor
-        const candidateElements = allElements
-            .filter(el => el !== anchor && !el.isAnchor) // Don't include other anchors
-            .map(el => ({
-                ...el,
-                distanceFromAnchor: calculateSpatialDistance(anchor, el)
-            }))
-            .sort((a, b) => a.distanceFromAnchor - b.distanceFromAnchor);
+            const distance = calculateSpatialDistance(lastInGroup, current);
+            const maxGroupDistance = 60;
 
-        // Add elements that continue the sequence
-        for (const candidate of candidateElements) {
-            // Check if this element continues the word sequence
-            const continuesSequence = checkIfContinuesSequence(
-                candidate, 
-                coveredPositions, 
-                sentenceWords,
-                anchor
-            );
-
-            if (continuesSequence) {
-                chain.elements.push(candidate);
-                candidate.wordPositions.forEach(pos => coveredPositions.add(pos));
-                chain.totalCoverage = coveredPositions.size / sentenceWords.length;
-                
-                // Update average sequential score
-                const totalScore = chain.elements.reduce((sum, el) => sum + el.sequentialScore, 0);
-                chain.averageSequentialScore = totalScore / chain.elements.length;
-
-                // Check if we've covered most of the sentence
-                if (chain.totalCoverage >= 0.7) {
-                    chain.isComplete = true;
-                    break; // Stop adding elements for this chain
-                }
+            if (distance <= maxGroupDistance) {
+                currentGroup.elements.push(current);
+                const len = currentGroup.elements.length;
+                currentGroup.avgConsumption = 
+                    (currentGroup.avgConsumption * (len - 1) + (current.consumption_ratio || 0)) / len;
+                currentGroup.avgContentScore = 
+                    (currentGroup.avgContentScore * (len - 1) + (current.contentScore || 0)) / len;
+                currentGroup.totalRelevantWords += (current.relevantWords || []).length;
+            } else {
+                groups.push(currentGroup);
+                currentGroup = {
+                    elements: [current],
+                    avgConsumption: current.consumption_ratio || 0,
+                    avgContentScore: current.contentScore || 0,
+                    totalRelevantWords: (current.relevantWords || []).length,
+                    spatialCohesion: 1.0
+                };
             }
         }
 
-        return chain;
+        groups.push(currentGroup);
+        return groups;
     };
 
-    /**
-     * Check if an element continues the word sequence
-     */
-    const checkIfContinuesSequence = (candidate, coveredPositions, sentenceWords, anchor) => {
-        // Element must have good spatial proximity (already filtered by distance)
-        const spatialThreshold = 80; // pixels
-        if (candidate.distanceFromAnchor > spatialThreshold) {
-            return false;
-        }
-
-        // Element must have reasonable consumption quality
-        if ((candidate.consumption_ratio || 0) < 0.1) {
-            return false;
-        }
-
-        // Element should have words that logically follow the covered positions
-        const candidatePositions = candidate.wordPositions;
-        const maxCoveredPosition = Math.max(...Array.from(coveredPositions));
-        const minCoveredPosition = Math.min(...Array.from(coveredPositions));
-
-        // Check if candidate has words that extend the sequence
-        const extendsSequence = candidatePositions.some(pos => 
-            pos > maxCoveredPosition || // Continues forward
-            pos < minCoveredPosition    // Fills in backward
-        );
-
-        // Or fills gaps in the sequence
-        const fillsGaps = candidatePositions.some(pos => 
-            pos > minCoveredPosition && pos < maxCoveredPosition && !coveredPositions.has(pos)
-        );
-
-        return extendsSequence || fillsGaps;
-    };
-
-    /**
-     * Select best elements from all chains
-     */
-    const selectBestSequentialElements = (chains, sentenceWords) => {
-        if (chains.length === 0) return [];
-
-        // Rank chains by quality
-        const rankedChains = chains
-            .map(chain => ({
-                ...chain,
-                chainScore: calculateChainScore(chain, sentenceWords)
-            }))
-            .sort((a, b) => b.chainScore - a.chainScore);
-
-        log(`📊 Chain rankings:`);
-        rankedChains.forEach((chain, index) => {
-            log(`   ${index + 1}. Score: ${chain.chainScore.toFixed(3)}, Coverage: ${(chain.totalCoverage * 100).toFixed(1)}%, Elements: ${chain.elements.length}`);
-        });
-
-        // Select elements from the best chain(s)
-        const selectedElements = [];
-        const usedElements = new Set();
-
-        // Always include the best chain
-        if (rankedChains.length > 0) {
-            const bestChain = rankedChains[0];
-            bestChain.elements.forEach(element => {
-                if (!usedElements.has(element.stable_index)) {
-                    selectedElements.push(element);
-                    usedElements.add(element.stable_index);
-                }
-            });
-
-            log(`✅ Selected best chain with ${bestChain.elements.length} elements (score: ${bestChain.chainScore.toFixed(3)})`);
-        }
-
-        return selectedElements;
-    };
-
-    /**
-     * Calculate overall score for a chain
-     */
-    const calculateChainScore = (chain, sentenceWords) => {
-        const coverageWeight = 0.4;
-        const sequentialWeight = 0.3;
-        const anchorWeight = 0.2;
-        const completenessWeight = 0.1;
-
-        const coverageScore = chain.totalCoverage;
-        const sequentialScore = chain.averageSequentialScore;
-        const anchorScore = chain.anchorElement.isAnchor ? 1.0 : 0.0;
-        const completenessScore = chain.isComplete ? 1.0 : 0.0;
-
-        return (coverageScore * coverageWeight) +
-               (sequentialScore * sequentialWeight) +
-               (anchorScore * anchorWeight) +
-               (completenessScore * completenessWeight);
-    };
-
-    /**
-     * Calculate spatial distance between two elements
-     */
     const calculateSpatialDistance = (element1, element2) => {
         const coords1 = element1.coordinates;
         const coords2 = element2.coordinates;
@@ -514,100 +600,6 @@ const NewWordOrderHighlighter = ({
         const dy = center1.y - center2.y;
         
         return Math.sqrt(dx * dx + dy * dy);
-    };
-
-    // Include the other utility functions from previous implementation
-    // (applySpatialConsumptionFiltering, createSpatiallyCoherentGroups, etc.)
-    
-    const applySpatialConsumptionFiltering = (stableElements, sentenceText, sentenceId) => {
-        // Use the same logic from the previous spatial-consumption highlighter
-        // This is the existing logic that works well
-        
-        if (!stableElements || !sentenceText) return [];
-
-        const sentenceWords = new Set(
-            sentenceText.toLowerCase()
-                .replace(/[^\w\s]/g, ' ')
-                .split(/\s+/)
-                .filter(word => word.length > 2)
-        );
-
-        const filteredElements = stableElements.filter(element => {
-            if (!element.words_consumed || !element.consumption_ratio) {
-                return false;
-            }
-
-            if (element.consumption_ratio < 0.1) {
-                return false;
-            }
-
-            const consumedWords = Array.isArray(element.words_consumed) 
-                ? element.words_consumed 
-                : [];
-
-            const relevantConsumedWords = consumedWords.filter(word => 
-                sentenceWords.has(word.toLowerCase())
-            );
-
-            if (relevantConsumedWords.length === 0) {
-                return false;
-            }
-
-            const wordRelevanceRatio = relevantConsumedWords.length / consumedWords.length;
-            if (element.consumption_ratio > 0.5 && wordRelevanceRatio < 0.5) {
-                return false;
-            }
-
-            return true;
-        });
-
-        filteredElements.sort((a, b) => b.consumption_ratio - a.consumption_ratio);
-        return filteredElements;
-    };
-
-    const createSpatiallyCoherentGroups = (elements, sentenceText) => {
-        if (elements.length === 0) return [];
-
-        const sortedElements = [...elements].sort((a, b) => {
-            const yDiff = a.coordinates.y - b.coordinates.y;
-            if (Math.abs(yDiff) > 5) return yDiff;
-            return a.coordinates.x - b.coordinates.x;
-        });
-
-        const groups = [];
-        let currentGroup = {
-            elements: [sortedElements[0]],
-            avgConsumption: sortedElements[0].consumption_ratio || 0,
-            totalRelevantWords: (sortedElements[0].relevantWords || []).length,
-            spatialCohesion: 1.0
-        };
-
-        for (let i = 1; i < sortedElements.length; i++) {
-            const current = sortedElements[i];
-            const lastInGroup = currentGroup.elements[currentGroup.elements.length - 1];
-
-            const distance = calculateSpatialDistance(lastInGroup, current);
-            const maxGroupDistance = 60;
-
-            if (distance <= maxGroupDistance) {
-                currentGroup.elements.push(current);
-                currentGroup.avgConsumption = 
-                    (currentGroup.avgConsumption * (currentGroup.elements.length - 1) + 
-                     (current.consumption_ratio || 0)) / currentGroup.elements.length;
-                currentGroup.totalRelevantWords += (current.relevantWords || []).length;
-            } else {
-                groups.push(currentGroup);
-                currentGroup = {
-                    elements: [current],
-                    avgConsumption: current.consumption_ratio || 0,
-                    totalRelevantWords: (current.relevantWords || []).length,
-                    spatialCohesion: 1.0
-                };
-            }
-        }
-
-        groups.push(currentGroup);
-        return groups;
     };
 
     const createHighlightFromSpatialGroup = async (spatialGroup, sentenceId, sentenceText) => {
@@ -632,13 +624,13 @@ const NewWordOrderHighlighter = ({
             if (highlightElement) {
                 highlightLayerRef.current.appendChild(highlightElement);
 
-                const highlightKey = `sequential_${sentenceId}_${spatialGroup.elements[0].stable_index}`;
+                const highlightKey = `enhanced_${sentenceId}_${spatialGroup.elements[0].stable_index}`;
                 activeHighlights.current.set(highlightKey, {
                     element: highlightElement,
                     sentenceId: sentenceId,
                     spatialGroup: spatialGroup,
                     textElements: textElements,
-                    type: 'sequential_word_order'
+                    type: 'enhanced_word_order'
                 });
 
                 return highlightElement;
@@ -673,8 +665,8 @@ const NewWordOrderHighlighter = ({
                 return null;
             }
 
-            // Enhanced styling based on sequential analysis
-            const groupStyle = getSequentialGroupStyle(spatialGroup);
+            // Enhanced styling based on content analysis
+            const groupStyle = getEnhancedGroupStyle(spatialGroup);
 
             const highlightDiv = document.createElement('div');
             highlightDiv.className = className;
@@ -693,17 +685,16 @@ const NewWordOrderHighlighter = ({
                 boxShadow: '0 0 2px rgba(0,0,0,0.2)'
             });
 
-            // Enhanced tooltip
-            const hasAnchor = spatialGroup.elements.some(el => el.isAnchor);
-            const avgSequentialScore = spatialGroup.elements.reduce((sum, el) => 
-                sum + (el.sequentialScore || 0), 0) / spatialGroup.elements.length;
+            // Enhanced tooltip with content analysis
+            const hasHighContent = spatialGroup.elements.some(el => el.isHighContent);
+            const avgContentScore = spatialGroup.avgContentScore || 0;
 
             highlightDiv.title = `
 Sentence: ${sentenceId}
 Text: "${sentenceText.substring(0, 60)}..."
-Sequential Score: ${(avgSequentialScore * 100).toFixed(1)}%
-Has Anchor: ${hasAnchor ? 'Yes' : 'No'}
-Avg Consumption: ${(spatialGroup.avgConsumption * 100).toFixed(1)}%
+Content Score: ${(avgContentScore * 100).toFixed(1)}%
+High Content: ${hasHighContent ? 'Yes' : 'No'}
+Total Words: ${spatialGroup.totalRelevantWords}
 Elements: ${spatialGroup.elements.length}
             `.trim();
 
@@ -715,28 +706,24 @@ Elements: ${spatialGroup.elements.length}
         }
     };
 
-    const getSequentialGroupStyle = (spatialGroup) => {
-        const hasAnchor = spatialGroup.elements.some(el => el.isAnchor);
-        const avgSequentialScore = spatialGroup.elements.reduce((sum, el) => 
-            sum + (el.sequentialScore || 0), 0) / spatialGroup.elements.length;
+    const getEnhancedGroupStyle = (spatialGroup) => {
+        const hasHighContent = spatialGroup.elements.some(el => el.isHighContent);
+        const avgContentScore = spatialGroup.avgContentScore || 0;
 
-        if (hasAnchor && avgSequentialScore >= 0.7) {
+        if (hasHighContent && avgContentScore >= 0.6) {
             return {
-                backgroundColor: 'rgba(76, 175, 80, 0.4)',   // Green - excellent sequential match
-                border: '2px solid rgba(76, 175, 80, 0.8)',
-                label: 'SEQUENTIAL MATCH'
+                backgroundColor: 'rgba(76, 175, 80, 0.4)',   // Green - excellent content match
+                border: '2px solid rgba(76, 175, 80, 0.8)'
             };
-        } else if (avgSequentialScore >= 0.5) {
+        } else if (avgContentScore >= 0.4) {
             return {
-                backgroundColor: 'rgba(255, 193, 7, 0.4)',    // Yellow - good match
-                border: '2px solid rgba(255, 193, 7, 0.8)',
-                label: 'GOOD SEQUENCE'
+                backgroundColor: 'rgba(255, 193, 7, 0.4)',    // Yellow - good content match
+                border: '2px solid rgba(255, 193, 7, 0.8)'
             };
         } else {
             return {
                 backgroundColor: 'rgba(255, 152, 0, 0.4)',    // Orange - basic match
-                border: '2px solid rgba(255, 152, 0, 0.8)',
-                label: 'BASIC MATCH'
+                border: '2px solid rgba(255, 152, 0, 0.8)'
             };
         }
     };
@@ -765,7 +752,7 @@ Elements: ${spatialGroup.elements.length}
         existingHighlights.forEach(el => el.remove());
 
         activeHighlights.current.clear();
-        log('🧹 Cleared all sequential word order highlights');
+        log('🧹 Cleared all enhanced highlights');
     };
 
     // Clear cache when document changes

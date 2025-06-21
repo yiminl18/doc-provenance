@@ -1,4 +1,4 @@
-// CleanPDFViewer.js - Simplified main component
+import { useAppState } from '../contexts/AppStateContext'
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -21,11 +21,18 @@ import NewWordOrderHighlighter from './NewWordOrderHighlighter';
 
 const PDFViewer = ({
     pdfDocument,
-    selectedProvenance,
-    activeQuestionId,
+    //selectedProvenance,
+    //activeQuestionId,
     onClose,
     onFeedbackRequest
 }) => {
+     // Get state from context
+    const { state } = useAppState();
+    const { selectedProvenance, activeQuestionId, navigationTrigger } = state;
+    
+    // Add tracking refs
+    const lastProcessedQuestionRef = useRef(null);
+    const lastProcessedProvenanceRef = useRef(null);
     // Core state
     const [pdfDoc, setPdfDoc] = useState(null);
     const [totalPages, setTotalPages] = useState(0);
@@ -98,6 +105,22 @@ const PDFViewer = ({
             renderManager.render(1);
         }
     }, [pdfDocument?.filename]); // Reset when filename changes
+
+    useEffect(() => {
+        if (lastProcessedQuestionRef.current && lastProcessedQuestionRef.current !== activeQuestionId) {
+            console.log('🧹 PDFViewer: Question changed, clearing state');
+            
+            // Clear provenance-related state
+            setProvenancePageCache(new Map());
+            setProvenanceTargetPage(null);
+            setIsProvenanceProcessing(false);
+            setProvenanceProcessingMessage('');
+            
+            // Reset provenance tracking
+            lastProcessedProvenanceRef.current = null;
+        }
+        lastProcessedQuestionRef.current = activeQuestionId;
+    }, [activeQuestionId]);
 
 
 
@@ -415,16 +438,26 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
             setIsProvenanceProcessing(false);
             setProvenanceProcessingMessage('');
         }
-    }, [activeQuestionId, selectedProvenance]);
+    }, [activeQuestionId, selectedProvenance?.provenance_id]); // Use provenance_id for better tracking
 
-
+    // Update the auto-navigation effect:
     useEffect(() => {
-        // Only auto-navigate when provenance first becomes available
-        if (!selectedProvenance || !renderManager.isReady) return;
+        // Only auto-navigate when provenance first becomes available for this question
+        if (!selectedProvenance || !renderManager.isReady || !activeQuestionId) return;
+
+        const currentProvenanceId = selectedProvenance.provenance_id;
+        
+        // Skip if we already processed this provenance
+        if (lastProcessedProvenanceRef.current === currentProvenanceId) {
+            console.log('⚪ PDFViewer: Same provenance, skipping auto-navigation');
+            return;
+        }
 
         const handleAutoNavigation = async () => {
             try {
-                const provenancePage = await getProvenancePage(selectedProvenance); // AWAIT here!
+                console.log(`🧭 PDFViewer: Processing new provenance ${currentProvenanceId} for question ${activeQuestionId}`);
+                
+                const provenancePage = await getProvenancePage(selectedProvenance);
 
                 if (provenancePage && provenancePage !== renderManager.currentPage) {
                     console.log(`🧭 Auto-navigating to provenance page ${provenancePage}`);
@@ -434,6 +467,8 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                 } else {
                     console.log('⚠️ No target page found for provenance');
                 }
+                
+                lastProcessedProvenanceRef.current = currentProvenanceId;
             } catch (error) {
                 console.error('❌ Error in auto-navigation:', error);
             }
@@ -441,7 +476,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
 
         handleAutoNavigation();
 
-    }, [selectedProvenance?.provenance_id]);
+    }, [selectedProvenance?.provenance_id, activeQuestionId]);
 
 
     useEffect(() => {
@@ -882,7 +917,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                     {renderManager.isReady && selectedProvenance && (
                         <NewWordOrderHighlighter
                             provenanceData={selectedProvenance}
-                            activeQuestionId={activeQuestionId}
+                            //activeQuestionId={activeQuestionId}
                             pdfDocument={pdfDoc}
                             textLayerRef={textLayerRef}
                             highlightLayerRef={highlightLayerRef}
@@ -901,7 +936,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                                 maxGapBetweenWords: 30, // Pixels between words to group
                                 contextWindow: 3 // Words of context
                             }}
-                            className="new-order-highlight"
+                            className="provenance-highlight"
                             verbose={true} // Enable detailed logging for debugging
                         />
                     )}

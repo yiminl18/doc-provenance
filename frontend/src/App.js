@@ -756,9 +756,9 @@ function App() {
             {activeDocument ? (
               <PDFViewer
                 pdfDocument={activeDocument}
-                selectedProvenance={selectedProvenance}
-                activeQuestionId={activeQuestionId}
-                navigationTrigger={navigationTrigger}
+                //selectedProvenance={selectedProvenance}
+                //activeQuestionId={activeQuestionId}
+                //navigationTrigger={navigationTrigger}
                 onFeedbackRequest={openFeedbackModal}
                 onClose={() => { }}
               />

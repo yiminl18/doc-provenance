@@ -16,7 +16,9 @@
     "react-dom": "^18.2.0",
     "react-pdf": "^9.2.1",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "wink-eng-lite-web-model": "^1.8.1",
+    "wink-nlp": "^2.3.2"
   },
   "scripts": {
     "start": "react-scripts start",

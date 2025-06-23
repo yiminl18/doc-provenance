@@ -18,6 +18,7 @@ import CoordinateHighlighter from './CoordinateHighlighter';
 import HybridCoordinateHighlighter from './HybridCoordinateHighlighter';
 import SpatialConsumptionHighlighter from './SpatialConsumptionHighlighter';
 import NewWordOrderHighlighter from './NewWordOrderHighlighter';
+import NLPHighlighter from './NLPHighlighter';
 
 const PDFViewer = ({
     pdfDocument,
@@ -915,7 +916,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                         />
                     )}*/}
                     {renderManager.isReady && selectedProvenance && (
-                        <NewWordOrderHighlighter
+                        <NLPHighlighter
                             provenanceData={selectedProvenance}
                             //activeQuestionId={activeQuestionId}
                             pdfDocument={pdfDoc}

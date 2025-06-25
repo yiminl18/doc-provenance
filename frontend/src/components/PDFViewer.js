@@ -14,8 +14,10 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { useRenderManager } from '../utils/useRenderManager';
 import { getSentenceItemMappings } from '../services/api';
 import '../styles/pdf-viewer-render.css';
+import ExactMatchHighlighter from './DirectTextHighlighter';
 import CoordinateHighlighter from './CoordinateHighlighter';
 import HybridCoordinateHighlighter from './HybridCoordinateHighlighter';
+import Pylighter from './Pylighter';
 import SpatialConsumptionHighlighter from './SpatialConsumptionHighlighter';
 import NewWordOrderHighlighter from './NewWordOrderHighlighter';
 import NLPHighlighter from './NLPHighlighter';
@@ -27,10 +29,10 @@ const PDFViewer = ({
     onClose,
     onFeedbackRequest
 }) => {
-     // Get state from context
+    // Get state from context
     const { state } = useAppState();
     const { selectedProvenance, activeQuestionId, navigationTrigger } = state;
-    
+
     // Add tracking refs
     const lastProcessedQuestionRef = useRef(null);
     const lastProcessedProvenanceRef = useRef(null);
@@ -110,13 +112,13 @@ const PDFViewer = ({
     useEffect(() => {
         if (lastProcessedQuestionRef.current && lastProcessedQuestionRef.current !== activeQuestionId) {
             console.log('🧹 PDFViewer: Question changed, clearing state');
-            
+
             // Clear provenance-related state
             setProvenancePageCache(new Map());
             setProvenanceTargetPage(null);
             setIsProvenanceProcessing(false);
             setProvenanceProcessingMessage('');
-            
+
             // Reset provenance tracking
             lastProcessedProvenanceRef.current = null;
         }
@@ -178,28 +180,28 @@ const PDFViewer = ({
     }
 
     // Simpler approach: Use page.render() with textLayer option
-const setupTextLayerSimple = async (pageNumber, displayViewport) => {
-    if (!textLayerRef.current || !pdfDoc) return;
+    const setupTextLayerSimple = async (pageNumber, displayViewport) => {
+        if (!textLayerRef.current || !pdfDoc) return;
 
-    try {
-        const page = await pdfDoc.getPage(pageNumber);
-        const textContent = await page.getTextContent({
-            includeMarkedContent: false,
-            disableNormalization: true
-        })
+        try {
+            const page = await pdfDoc.getPage(pageNumber);
+            const textContent = await page.getTextContent({
+                includeMarkedContent: false,
+                disableNormalization: true
+            })
 
-        const textLayer = textLayerRef.current;
-        textLayer.innerHTML = '';
-        const textLayerViewport = page.getViewport({ scale: 1.0 });
-        const zoomRatio = window.currentZoomRatio || 1.0;
+            const textLayer = textLayerRef.current;
+            textLayer.innerHTML = '';
+            const textLayerViewport = page.getViewport({ scale: 1.0 });
+            const zoomRatio = window.currentZoomRatio || 1.0;
 
-        // Position text layer to match canvas
-        const canvas = canvasRef.current;
-         if (!canvas) {
-            console.warn('⚠️ Canvas not available for text layer positioning');
-            return;
-        }
-  
+            // Position text layer to match canvas
+            const canvas = canvasRef.current;
+            if (!canvas) {
+                console.warn('⚠️ Canvas not available for text layer positioning');
+                return;
+            }
+
             const canvasRect = canvas.getBoundingClientRect();
             const containerRect = containerRef.current.getBoundingClientRect();
 
@@ -213,85 +215,85 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
             textLayer.className = 'textLayer pdf-text-layer';
             textLayer.style.setProperty('--scale-factor', textLayerViewport.scale.toString());
             textLayer.style.opacity = debugMode ? '0.3' : '0';
-        
 
-         // Process text items using the textLayerViewport (1.0 scale)
-        const items = textContent.items;
-        const styles = textContent.styles || {};
 
-        items.forEach((item, itemIndex) => {
-            if (!item.transform || !item.str) return;
+            // Process text items using the textLayerViewport (1.0 scale)
+            const items = textContent.items;
+            const styles = textContent.styles || {};
 
-            const transform = item.transform;
-            const [scaleX, skewY, skewX, scaleY, translateX, translateY] = transform;
+            items.forEach((item, itemIndex) => {
+                if (!item.transform || !item.str) return;
 
-            const span = document.createElement('span');
-            
-            // Calculate positioning based on textLayerViewport (1.0 scale)
-            const fontSize = Math.sqrt(scaleX * scaleX + skewY * skewY);
-            const angle = Math.atan2(skewY, scaleX);
-            
-            // Position using PDF coordinates (textLayerViewport coordinates)
-            span.style.position = 'absolute';
-            span.style.left = `${translateX}px`;
-            span.style.bottom = `${translateY}px`; // PDF uses bottom-left origin
-            span.style.fontSize = `${fontSize}px`;
-            span.style.color = 'transparent';
-            span.style.whiteSpace = 'pre';
-            span.style.cursor = 'text';
-            span.style.transformOrigin = '0% 0%';
-            
-            // Handle font family
-            const fontName = item.fontName;
-            if (fontName && styles[fontName] && styles[fontName].fontFamily) {
-                span.style.fontFamily = styles[fontName].fontFamily;
-            } else if (fontName) {
-                // Map common PDF fonts to web fonts
-                if (fontName.includes('Arial') || fontName.includes('Helvetica')) {
-                    span.style.fontFamily = 'Arial, Helvetica, sans-serif';
-                } else if (fontName.includes('Times')) {
-                    span.style.fontFamily = 'Times, "Times New Roman", serif';
-                } else if (fontName.includes('Courier')) {
-                    span.style.fontFamily = 'Courier, "Courier New", monospace';
+                const transform = item.transform;
+                const [scaleX, skewY, skewX, scaleY, translateX, translateY] = transform;
+
+                const span = document.createElement('span');
+
+                // Calculate positioning based on textLayerViewport (1.0 scale)
+                const fontSize = Math.sqrt(scaleX * scaleX + skewY * skewY);
+                const angle = Math.atan2(skewY, scaleX);
+
+                // Position using PDF coordinates (textLayerViewport coordinates)
+                span.style.position = 'absolute';
+                span.style.left = `${translateX}px`;
+                span.style.bottom = `${translateY}px`; // PDF uses bottom-left origin
+                span.style.fontSize = `${fontSize}px`;
+                span.style.color = 'transparent';
+                span.style.whiteSpace = 'pre';
+                span.style.cursor = 'text';
+                span.style.transformOrigin = '0% 0%';
+
+                // Handle font family
+                const fontName = item.fontName;
+                if (fontName && styles[fontName] && styles[fontName].fontFamily) {
+                    span.style.fontFamily = styles[fontName].fontFamily;
+                } else if (fontName) {
+                    // Map common PDF fonts to web fonts
+                    if (fontName.includes('Arial') || fontName.includes('Helvetica')) {
+                        span.style.fontFamily = 'Arial, Helvetica, sans-serif';
+                    } else if (fontName.includes('Times')) {
+                        span.style.fontFamily = 'Times, "Times New Roman", serif';
+                    } else if (fontName.includes('Courier')) {
+                        span.style.fontFamily = 'Courier, "Courier New", monospace';
+                    } else {
+                        span.style.fontFamily = 'serif';
+                    }
                 } else {
                     span.style.fontFamily = 'serif';
                 }
-            } else {
-                span.style.fontFamily = 'serif';
+
+                // Handle rotation
+                if (Math.abs(angle) > 0.01) {
+                    span.style.transform = `rotate(${angle}rad)`;
+                }
+
+                // CRITICAL: Set the exact text content - preserve all spaces!
+                span.textContent = item.str;
+
+
+                // Add metadata for highlighting and debugging
+                span.setAttribute('data-stable-index', itemIndex);
+                span.setAttribute('data-page-number', pageNumber);
+                span.setAttribute('data-original-text', item.str);
+                span.setAttribute('data-font-size', fontSize.toFixed(2));
+                span.setAttribute('data-font-name', fontName || 'unknown');
+                span.classList.add('pdf-text-item');
+
+                textLayer.appendChild(span);
+            });
+
+            console.log(`✅ Text layer created: ${items.length} elements at 1.0 scale`);
+
+            // Debug: Log some sample text to verify spacing
+            if (debugMode && items.length > 0) {
+                const sampleTexts = items.slice(0, 5).map((item, i) => `${i}: "${item.str}"`);
+                console.log('📝 Sample text items:', sampleTexts.join(' | '));
             }
 
-            // Handle rotation
-            if (Math.abs(angle) > 0.01) {
-                span.style.transform = `rotate(${angle}rad)`;
-            }
-
-            // CRITICAL: Set the exact text content - preserve all spaces!
-            span.textContent = item.str;
-            
-            
-            // Add metadata for highlighting and debugging
-            span.setAttribute('data-stable-index', itemIndex);
-            span.setAttribute('data-page-number', pageNumber);
-            span.setAttribute('data-original-text', item.str);
-            span.setAttribute('data-font-size', fontSize.toFixed(2));
-            span.setAttribute('data-font-name', fontName || 'unknown');
-            span.classList.add('pdf-text-item');
-
-            textLayer.appendChild(span);
-        });
-
-        console.log(`✅ Text layer created: ${items.length} elements at 1.0 scale`);
-
-        // Debug: Log some sample text to verify spacing
-        if (debugMode && items.length > 0) {
-            const sampleTexts = items.slice(0, 5).map((item, i) => `${i}: "${item.str}"`);
-            console.log('📝 Sample text items:', sampleTexts.join(' | '));
+        } catch (err) {
+            console.error('❌ Text layer setup failed:', err);
         }
-
-    } catch (err) {
-        console.error('❌ Text layer setup failed:', err);
-    }
-};
+    };
 
 
     const setupTextLayerManual = async (pageNumber, displayViewport) => {
@@ -447,7 +449,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
         if (!selectedProvenance || !renderManager.isReady || !activeQuestionId) return;
 
         const currentProvenanceId = selectedProvenance.provenance_id;
-        
+
         // Skip if we already processed this provenance
         if (lastProcessedProvenanceRef.current === currentProvenanceId) {
             console.log('⚪ PDFViewer: Same provenance, skipping auto-navigation');
@@ -457,7 +459,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
         const handleAutoNavigation = async () => {
             try {
                 console.log(`🧭 PDFViewer: Processing new provenance ${currentProvenanceId} for question ${activeQuestionId}`);
-                
+
                 const provenancePage = await getProvenancePage(selectedProvenance);
 
                 if (provenancePage && provenancePage !== renderManager.currentPage) {
@@ -468,7 +470,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                 } else {
                     console.log('⚠️ No target page found for provenance');
                 }
-                
+
                 lastProcessedProvenanceRef.current = currentProvenanceId;
             } catch (error) {
                 console.error('❌ Error in auto-navigation:', error);
@@ -838,7 +840,38 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                     <div ref={highlightLayerRef} className="pdf-highlight-layer" />
 
                     {/* Highlighter Component */}
-                   
+                    {/*}
+                    {renderManager.isReady && selectedProvenance && (
+                    <ExactMatchHighlighter
+                        pdfDocument={pdfDoc}
+                        textLayerRef={textLayerRef}
+                        highlightLayerRef={highlightLayerRef}
+                        containerRef={containerRef}
+                        currentPage={renderManager.currentPage}
+                        currentZoom={renderManager.currentZoom}
+                        documentFilename={pdfDocument?.filename || ''}
+                        highlightStyle={{
+                            backgroundColor: 'rgba(76, 175, 80, 0.4)',
+                            border: '1px solid rgba(76, 175, 80, 0.8)',
+                            borderRadius: '2px'
+                        }}
+                        className='provenance-highlight'
+                        verbose={true}
+                        />
+                    )}*/}
+                    {renderManager.isReady && selectedProvenance && (
+                        <Pylighter
+                            provenanceData={selectedProvenance}
+                            pdfDocument={pdfDocument}
+                            textLayerRef={textLayerRef}
+                            highlightLayerRef={highlightLayerRef}
+                            containerRef={containerRef}
+                            currentPage={renderManager.currentPage}
+                            documentFilename={pdfDocument?.filename}
+                            className="provenance-highlight"
+                            verbose={true}
+                        />
+                    )}
                     {/*{renderManager.isReady && selectedProvenance && (
                         <CoordinateHighlighter
                             provenanceData={selectedProvenance}
@@ -915,6 +948,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                             verbose={true} // Enable detailed logging for debugging
                         />
                     )}*/}
+                    {/*}
                     {renderManager.isReady && selectedProvenance && (
                         <NLPHighlighter
                             provenanceData={selectedProvenance}
@@ -940,7 +974,7 @@ const setupTextLayerSimple = async (pageNumber, displayViewport) => {
                             className="provenance-highlight"
                             verbose={true} // Enable detailed logging for debugging
                         />
-                    )}
+                    )} */}
                 </div>
             </div>
         </div>

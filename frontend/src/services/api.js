@@ -691,3 +691,21 @@ export const getGeneratedQuestions = async (filename) => {
     throw new Error(error.response?.data?.error || error.message);
   }
 };
+
+export const findSentenceMatches = async (targetSentence, elements) => {
+  try {
+    const response = await axios.post(`${API_URL}/find_sentence_matches`, {
+      target_sentence: targetSentence,
+      elements: elements
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error calling sentence matcher:', error);
+    // Return a structured error response like your other endpoints
+    return { 
+      success: false, 
+      error: error.response?.data?.error || error.message || 'Unknown error',
+      matches: []
+    };
+  }
+};

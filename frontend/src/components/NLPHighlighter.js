@@ -345,7 +345,7 @@ const NLPHighlighter = ({
         });
 
         // Track sentence coverage
-        const sentenceWords = sentenceText.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+        const sentenceWords = sentenceText.toLowerCase().split(/\s+/).filter(w => w.length > 0);
         const coveredWords = new Set();
         const selectedElements = [];
 

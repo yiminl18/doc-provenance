@@ -1,12 +1,20 @@
-// DirectTextHighlighter.js - Real-time text search and highlighting for PDF.js
+/**
+ * Smart Sequence Highlighter
+ * 
+ * Combines multiple strategies to achieve optimal sentence highlighting:
+ * 1. Word sequence matching with gap tolerance
+ * 2. Spatial continuity analysis
+ * 3. Content completeness verification
+ * 4. Reading order preservation
+ */
+
 import React, { useEffect, useRef } from 'react';
-import { getDocumentSentences } from '../services/api'; // You'll need this to fetch sentences JSON
-import { getDocument } from 'pdfjs-dist';
+import { getSentenceItemMappings } from '../services/api';
+import { useAppState } from '../contexts/AppStateContext';
 
 const DirectTextHighlighter = ({
     provenanceData,
-    activeQuestionId,
-    pdfDocument, // PDF.js document object
+    pdfDocument,
     textLayerRef,
     highlightLayerRef,
     containerRef,
@@ -18,606 +26,691 @@ const DirectTextHighlighter = ({
         border: '2px solid rgba(76, 175, 80, 0.8)',
         borderRadius: '3px'
     },
-    searchOptions = {
-        caseSensitive: false,
-        matchThreshold: 0.8, // Minimum similarity for fuzzy matching
-        maxGapBetweenWords: 50, // Max pixels between words to consider them part of same highlight
-        contextWindow: 5 // Number of surrounding words to include in search context
-    },
-    className = 'direct-provenance-highlight',
+    className = 'smart-sequence-highlight',
     verbose = true
 }) => {
+    const { state } = useAppState();
+    const { activeQuestionId, selectedProvenance } = state;
+    const lastProcessedQuestionRef = useRef(null);
+    const lastProcessedProvenanceRef = useRef(null);
     const activeHighlights = useRef(new Map());
-    const pageTextCache = useRef(new Map());
-    const sentencesCache = useRef(null);
+    const mappingsCache = useRef(new Map());
 
-    // Debug logging
     const log = (message, ...args) => {
         if (verbose) {
-            console.log(`[DirectTextHighlighter] ${message}`, ...args);
+            console.log(`[DirectText] ${message}`, ...args);
         }
     };
 
-    // Clear highlights when question or provenance changes
+    // Clear highlights when question changes
     useEffect(() => {
-        if (activeQuestionId || provenanceData?.provenance_ids) {
-            log(`🆔 Question or provenance changed - clearing highlights`);
+        if (lastProcessedQuestionRef.current && lastProcessedQuestionRef.current !== activeQuestionId) {
+            log('🧹 Question changed, clearing highlights');
             clearAllHighlights();
+            lastProcessedProvenanceRef.current = null;
         }
-    }, [activeQuestionId, provenanceData?.provenance_ids]);
+        lastProcessedQuestionRef.current = activeQuestionId;
+    }, [activeQuestionId]);
+
+    // Process provenance changes
+    useEffect(() => {
+        const currentProvenanceId = selectedProvenance?.provenance_id;
+        
+        if (lastProcessedProvenanceRef.current === currentProvenanceId) {
+            return;
+        }
+
+        if (activeQuestionId || selectedProvenance?.provenance_ids) {
+            log(`🎯 Processing provenance for question ${activeQuestionId}`);
+            lastProcessedProvenanceRef.current = currentProvenanceId;
+        } else {
+            clearAllHighlights();
+            lastProcessedProvenanceRef.current = null;
+        }
+    }, [activeQuestionId, selectedProvenance?.provenance_id]);
 
     // Main highlighting effect
     useEffect(() => {
-        log(`🔄 Highlighting effect triggered:`, {
-            provenanceId: provenanceData?.provenance_id,
-            provenanceIds: provenanceData?.provenance_ids,
-            provenanceText: provenanceData?.provenance?.substring(0, 100) + '...',
-            activeQuestionId,
-            currentPage,
-            documentFilename,
-            hasProvenanceData: !!provenanceData,
-            hasPdfDocument: !!pdfDocument,
-            timestamp: Date.now()
-        });
-
-        if (!provenanceData?.provenance_ids || !documentFilename || !pdfDocument) {
-            log('⏸️ Missing required data for highlighting', {
-                hasProvenanceIds: !!provenanceData?.provenance_ids,
-                hasDocumentFilename: !!documentFilename,
-                hasPdfDocument: !!pdfDocument
-            });
+        if (!selectedProvenance?.provenance_ids || !documentFilename || !pdfDocument) {
             clearAllHighlights();
             return;
         }
 
+        const sentenceIds = selectedProvenance.provenance_ids || [];
+        log(`🎯 Smart sequence highlighting for sentences:`, sentenceIds);
+
         const performHighlighting = async () => {
             try {
-                log(`🎯 Starting highlighting for provenance ${provenanceData.provenance_id} with sentence IDs:`, provenanceData.provenance_ids);
-                
-                // Clear sentences cache when provenance changes to force reload
-                if (provenanceData.provenance_id) {
-                    log('🗑️ Clearing sentences cache for new provenance');
-                    sentencesCache.current = null;
-                }
-                
-                // Get sentence data
-                const sentences = await getSentencesData(documentFilename);
-                if (!sentences) {
-                    log('❌ Failed to load sentences data');
-                    return;
-                }
-
-                // Get target sentences from provenance
-                const targetSentences = getTargetSentences(provenanceData.provenance_ids, sentences);
-                if (targetSentences.length === 0) {
-                    log('⚠️ No target sentences found for highlighting', {
-                        provenanceIds: provenanceData.provenance_ids,
-                        sentencesLength: sentences.length,
-                        sentencesType: typeof sentences,
-                        isArray: Array.isArray(sentences)
-                    });
-                    clearAllHighlights();
-                    return;
-                }
-
-                log(`🎯 Found ${targetSentences.length} target sentences to highlight:`, 
-                    targetSentences.map(s => ({ id: s.id, textPreview: s.text.substring(0, 50) + '...' }))
-                );
-
-                // Clear page text cache to ensure fresh content
-                const cacheKey = `page_${currentPage}_zoom_${currentZoom}`;
-                if (pageTextCache.current.has(cacheKey)) {
-                    log('🗑️ Clearing page text cache for fresh content');
-                    pageTextCache.current.delete(cacheKey);
-                }
-
-                // Extract and cache page text content
-                const pageTextContent = await getPageTextContent(currentPage);
-                if (!pageTextContent) {
-                    log(`❌ Failed to extract text content for page ${currentPage}`);
-                    return;
-                }
-
-                // Clear existing highlights
                 clearAllHighlights();
+                const stableMappings = await getStableMappings(sentenceIds);
 
-                // Search for each target sentence on current page
-                let totalHighlights = 0;
-                for (const sentence of targetSentences) {
-                    log(`🔍 Searching for sentence ${sentence.id} on page ${currentPage}`);
-                    const highlights = await searchAndHighlightSentence(sentence, pageTextContent);
-                    totalHighlights += highlights.length;
-                    log(`✅ Found ${highlights.length} highlights for sentence ${sentence.id}`);
+                if (!stableMappings) {
+                    log('❌ No stable mappings found');
+                    return;
                 }
 
-                log(`✅ Created ${totalHighlights} total highlights on page ${currentPage}`);
+                await createSmartSequenceHighlights(stableMappings);
 
             } catch (error) {
-                console.error('[DirectTextHighlighter] Error during highlighting:', error);
+                console.error('[SmartSequence] Error during highlighting:', error);
                 clearAllHighlights();
             }
         };
 
-        // Small delay to ensure text layer is ready
         const timeoutId = setTimeout(performHighlighting, 100);
         return () => clearTimeout(timeoutId);
 
     }, [
-        provenanceData?.provenance_id, 
-        JSON.stringify(provenanceData?.provenance_ids), // Watch the actual sentence IDs
-        provenanceData?.provenance, // Watch the provenance text too
-        currentPage, 
+        selectedProvenance?.provenance_id,
+        JSON.stringify(selectedProvenance?.provenance_ids),
+        currentPage,
         documentFilename,
-        activeQuestionId // Make sure it re-runs when question changes
+        activeQuestionId
     ]);
 
+    /**
+     * Get stable mappings for sentence IDs
+     */
+    const getStableMappings = async (sentenceIds) => {
+        if (!sentenceIds?.length || !documentFilename) return null;
 
-    // Function to get sentences data from your JSON
-    const getSentencesData = async (filename) => {
-        if (sentencesCache.current) {
-            return sentencesCache.current;
+        const cacheKey = `${documentFilename}_${sentenceIds.join(',')}_${currentPage}`;
+
+        if (mappingsCache.current.has(cacheKey)) {
+            return mappingsCache.current.get(cacheKey);
         }
 
         try {
-            log(`📄 Loading sentences data for ${filename}`);
-            
-            // This would call your API to get the sentences JSON
-            // Adjust the API call to match your backend structure
-            const response = await getDocumentSentences(filename);
+            const response = await getSentenceItemMappings(documentFilename, sentenceIds);
 
-            if (response.success && response.sentences) {
-                sentencesCache.current = response.sentences;
-                log(`✅ Loaded ${response.sentences.length} sentences`);
-                return response.sentences;
-            } else {
-                console.error('Failed to load sentences:', response);
+            if (!response?.success || !response?.sentence_mappings) {
+                log('❌ No sentence mappings in response');
                 return null;
             }
+
+            mappingsCache.current.set(cacheKey, response.sentence_mappings);
+            return response.sentence_mappings;
+
         } catch (error) {
-            console.error('Error loading sentences:', error);
+            log('❌ Error fetching stable mappings:', error);
             return null;
         }
     };
 
-    const getTargetSentences = (provenanceIds, allSentences) => {
-        const targetSentences = [];
-        
-        log(`🔍 Extracting target sentences:`, {
-            provenanceIds,
-            allSentencesType: typeof allSentences,
-            isArray: Array.isArray(allSentences),
-            allSentencesLength: Array.isArray(allSentences) ? allSentences.length : 'N/A',
-            hasNestedSentences: !!(allSentences && allSentences.sentences),
-            nestedSentencesLength: allSentences?.sentences ? allSentences.sentences.length : 'N/A'
-        });
-        
-        provenanceIds.forEach((sentenceId, index) => {
-            log(`🔍 Looking for sentence ID ${sentenceId} (index ${index})`);
-            
-            // Handle different sentence formats
-            let sentence = null;
-            
-            if (Array.isArray(allSentences)) {
-                // Simple array format - try both numeric index and direct lookup
-                sentence = allSentences[sentenceId] || allSentences[parseInt(sentenceId)];
-                log(`📄 Array lookup for ${sentenceId}:`, sentence ? 'Found' : 'Not found');
-            } else if (allSentences && allSentences.sentences) {
-                // Nested format
-                sentence = allSentences.sentences[sentenceId] || allSentences.sentences[parseInt(sentenceId)];
-                log(`📄 Nested lookup for ${sentenceId}:`, sentence ? 'Found' : 'Not found');
-            } else if (allSentences && typeof allSentences === 'object') {
-                // Direct object lookup
-                sentence = allSentences[sentenceId] || allSentences[parseInt(sentenceId)];
-                log(`📄 Object lookup for ${sentenceId}:`, sentence ? 'Found' : 'Not found');
-            }
-            
-            if (sentence) {
-                // Handle both string and object formats
-                const sentenceText = typeof sentence === 'string' ? sentence : sentence.text || sentence.content || sentence;
-                if (sentenceText && sentenceText.trim && sentenceText.trim().length > 0) {
-                    const cleanText = sentenceText.trim();
-                    targetSentences.push({
-                        id: sentenceId,
-                        text: cleanText,
-                        originalData: sentence
-                    });
-                    log(`✅ Added sentence ${sentenceId}: "${cleanText.substring(0, 100)}..."`);
-                } else {
-                    log(`⚠️ Sentence ${sentenceId} found but has no valid text:`, sentence);
-                }
-            } else {
-                log(`❌ Sentence ${sentenceId} not found in data`);
-                
-                // Debug: Show what's actually available
-                if (Array.isArray(allSentences)) {
-                    log(`🔍 Available array indices: 0-${allSentences.length - 1}`);
-                    if (allSentences.length <= 10) {
-                        log(`🔍 Sample array content:`, allSentences.map((s, i) => ({ index: i, preview: typeof s === 'string' ? s.substring(0, 50) : JSON.stringify(s).substring(0, 50) })));
-                    }
-                } else if (allSentences && typeof allSentences === 'object') {
-                    const keys = Object.keys(allSentences);
-                    log(`🔍 Available object keys:`, keys.slice(0, 10));
-                }
-            }
+    /**
+     * Main highlighting logic using smart sequence matching
+     */
+    const createSmartSequenceHighlights = async (stableMappings) => {
+        if (!highlightLayerRef?.current) {
+            log('❌ Highlight layer not available');
+            return;
+        }
+
+        // Filter for current page
+        const currentPageSentences = Object.entries(stableMappings).filter(([sentenceId, mapping]) => {
+            return mapping.found && 
+                   mapping.page_number === parseInt(currentPage) &&
+                   mapping.stable_elements?.length > 0;
         });
 
-        log(`✅ Successfully extracted ${targetSentences.length} target sentences from ${provenanceIds.length} IDs`);
-        
-        return targetSentences;
+        if (currentPageSentences.length === 0) {
+            log(`📄 No sentences found for page ${currentPage}`);
+            return;
+        }
+
+        log(`📄 Processing ${currentPageSentences.length} sentences on page ${currentPage}`);
+
+        let highlightCount = 0;
+
+        for (const [sentenceId, mapping] of currentPageSentences) {
+            log(`\n🔍 Smart sequence analysis for sentence ${sentenceId}:`);
+            log(`📝 Target: "${mapping.sentence_text}"`);
+            
+            // Find the best sequence match for this sentence
+            const sequenceMatch = findBestSequenceMatch(
+                mapping.stable_elements, 
+                mapping.sentence_text,
+                sentenceId
+            );
+
+            if (!sequenceMatch || sequenceMatch.elements.length === 0) {
+                log(`⚠️ No sequence match found for sentence ${sentenceId}`);
+                continue;
+            }
+
+            log(`✅ Found sequence match with ${sequenceMatch.elements.length} elements`);
+            log(`📊 Match quality: ${sequenceMatch.quality.toFixed(3)} | Coverage: ${(sequenceMatch.coverage * 100).toFixed(1)}%`);
+
+            // Create highlights from the sequence
+            const spatialGroups = createSpatialGroups(sequenceMatch.elements);
+            
+            for (const group of spatialGroups) {
+                const highlight = await createHighlight(group, sentenceId, mapping.sentence_text, sequenceMatch);
+                if (highlight) {
+                    highlightCount++;
+                }
+            }
+        }
+
+        log(`✅ Created ${highlightCount} smart sequence highlights on page ${currentPage}`);
     };
 
-    // Function to extract text content from current PDF page
-    const getPageTextContent = async (pageNumber) => {
-        const cacheKey = `page_${pageNumber}_zoom_${currentZoom}`;
+    /**
+     * Find the best contiguous sequence that matches the target sentence
+     */
+    const findBestSequenceMatch = (stableElements, sentenceText, sentenceId) => {
+        log(`🎯 Finding best sequence match for: "${sentenceText}"`);
+
+        // Normalize and tokenize the target sentence
+        const targetWords = normalizeAndTokenize(sentenceText);
+        log(`📝 Target words (${targetWords.length}): [${targetWords.join(', ')}]`);
+
+        // Prepare elements with normalized text and word analysis
+        const analyzedElements = analyzeElements(stableElements, targetWords);
         
-        if (pageTextCache.current.has(cacheKey)) {
-            return pageTextCache.current.get(cacheKey);
+        if (analyzedElements.length === 0) {
+            log(`❌ No elements have relevant words`);
+            return null;
         }
+
+        log(`📊 ${analyzedElements.length} elements contain relevant words`);
+
+        // Find all possible sequence candidates
+        const sequenceCandidates = findSequenceCandidates(analyzedElements, targetWords);
+        
+        if (sequenceCandidates.length === 0) {
+            log(`❌ No sequence candidates found`);
+            return null;
+        }
+
+        log(`🔍 Found ${sequenceCandidates.length} sequence candidates`);
+
+        // Evaluate and select the best sequence
+        const bestSequence = selectBestSequence(sequenceCandidates, targetWords);
+        
+        if (!bestSequence) {
+            log(`❌ No best sequence selected`);
+            return null;
+        }
+
+        log(`🏆 Best sequence selected:`);
+        log(`   Elements: ${bestSequence.elements.length}`);
+        log(`   Coverage: ${(bestSequence.coverage * 100).toFixed(1)}%`);
+        log(`   Quality: ${bestSequence.quality.toFixed(3)}`);
+        log(`   Text: "${bestSequence.elements.map(el => el.text).join(' ')}"`);
+
+        return bestSequence;
+    };
+
+    /**
+     * Normalize text and split into meaningful tokens
+     */
+    const normalizeAndTokenize = (text) => {
+        return text
+            .toLowerCase()
+            .replace(/[^\w\s\-\.]/g, ' ')  // Keep hyphens and periods
+            .split(/\s+/)
+            .filter(word => word.length > 0)
+            .map(word => word.replace(/[^\w]/g, '')); // Clean individual words
+    };
+
+    /**
+     * Analyze elements for word content and matching potential
+     */
+    const analyzeElements = (stableElements, targetWords) => {
+        const targetWordSet = new Set(targetWords);
+        
+        return stableElements
+            .map(element => {
+                const elementWords = normalizeAndTokenize(element.text || '');
+                const matchingWords = elementWords.filter(word => targetWordSet.has(word));
+                
+                if (matchingWords.length === 0) return null;
+
+                // Calculate word coverage and position information
+                const wordCoverage = matchingWords.length / targetWords.length;
+                const elementDensity = matchingWords.length / Math.max(elementWords.length, 1);
+                
+                // Find positions of matching words in target sentence
+                const wordPositions = matchingWords.map(word => {
+                    return targetWords.findIndex(targetWord => targetWord === word);
+                }).filter(pos => pos !== -1).sort((a, b) => a - b);
+
+                return {
+                    ...element,
+                    elementWords,
+                    matchingWords,
+                    wordCoverage,
+                    elementDensity,
+                    wordPositions,
+                    hasStartWord: wordPositions.includes(0),
+                    hasEndWord: wordPositions.includes(targetWords.length - 1),
+                    relevanceScore: calculateRelevanceScore(
+                        matchingWords.length,
+                        elementWords.length,
+                        targetWords.length,
+                        wordPositions
+                    )
+                };
+            })
+            .filter(element => element !== null)
+            .sort((a, b) => (a.stable_index || 0) - (b.stable_index || 0)); // Sort by reading order
+    };
+
+    /**
+     * Calculate relevance score for an element
+     */
+    const calculateRelevanceScore = (matchingWordCount, elementWordCount, targetWordCount, wordPositions) => {
+        const coverage = matchingWordCount / targetWordCount;
+        const density = matchingWordCount / Math.max(elementWordCount, 1);
+        const efficiency = Math.min(1.0, matchingWordCount / Math.max(elementWordCount, 1));
+        
+        // Bonus for positional importance (start/end words)
+        const hasKeyPositions = wordPositions.includes(0) || wordPositions.includes(targetWordCount - 1);
+        const positionBonus = hasKeyPositions ? 0.1 : 0;
+        
+        // Penalty for very verbose elements (likely false matches)
+        const verbosityPenalty = elementWordCount > 10 ? 0.1 : 0;
+        
+        return Math.min(1.0, coverage * 0.4 + density * 0.3 + efficiency * 0.2 + positionBonus - verbosityPenalty);
+    };
+
+    /**
+     * Find all possible sequence candidates using sliding window approach
+     */
+    const findSequenceCandidates = (analyzedElements, targetWords) => {
+        const candidates = [];
+        const minSequenceLength = 1;
+        const maxSequenceLength = Math.min(15, analyzedElements.length);
+        
+        // Try sequences of different lengths starting from different positions
+        for (let startIdx = 0; startIdx < analyzedElements.length; startIdx++) {
+            for (let length = minSequenceLength; length <= maxSequenceLength; length++) {
+                if (startIdx + length > analyzedElements.length) break;
+                
+                const sequence = analyzedElements.slice(startIdx, startIdx + length);
+                const candidate = evaluateSequenceCandidate(sequence, targetWords);
+                
+                if (candidate && candidate.quality >= 0.2) { // Minimum quality threshold
+                    candidates.push(candidate);
+                }
+            }
+        }
+        
+        // Also try smart growth: start with best elements and grow
+        const smartGrowthCandidates = findSmartGrowthCandidates(analyzedElements, targetWords);
+        candidates.push(...smartGrowthCandidates);
+        
+        return candidates;
+    };
+
+    /**
+     * Evaluate a sequence candidate for quality and coverage
+     */
+    const evaluateSequenceCandidate = (sequence, targetWords) => {
+        if (sequence.length === 0) return null;
+
+        // Collect all matching words from the sequence
+        const allMatchingWords = [];
+        const wordPositionsCovered = new Set();
+        
+        sequence.forEach(element => {
+            element.matchingWords.forEach(word => {
+                allMatchingWords.push(word);
+                const position = targetWords.findIndex(targetWord => targetWord === word);
+                if (position !== -1) {
+                    wordPositionsCovered.add(position);
+                }
+            });
+        });
+
+        // Calculate metrics
+        const uniqueWordsMatched = new Set(allMatchingWords).size;
+        const coverage = uniqueWordsMatched / targetWords.length;
+        const elementCount = sequence.length;
+        
+        // Calculate spatial coherence (elements should be reasonably close)
+        const spatialCoherence = calculateSpatialCoherence(sequence);
+        
+        // Calculate reading order consistency
+        const readingOrderConsistency = calculateReadingOrderConsistency(sequence);
+        
+        // Calculate word order preservation
+        const wordOrderPreservation = calculateWordOrderPreservation(sequence, targetWords);
+        
+        // Calculate completeness (prefer sequences that include start/end)
+        const hasStart = sequence.some(el => el.hasStartWord);
+        const hasEnd = sequence.some(el => el.hasEndWord);
+        const completeness = (hasStart ? 0.2 : 0) + (hasEnd ? 0.2 : 0) + (coverage * 0.6);
+        
+        // Calculate efficiency (good coverage with fewer elements is better)
+        const efficiency = coverage / Math.max(elementCount / 5, 1); // Normalize by expected element count
+        
+        // Overall quality score
+        const quality = (
+            coverage * 0.35 +
+            spatialCoherence * 0.20 +
+            readingOrderConsistency * 0.15 +
+            wordOrderPreservation * 0.15 +
+            completeness * 0.10 +
+            efficiency * 0.05
+        );
+
+        return {
+            elements: sequence,
+            coverage,
+            quality,
+            spatialCoherence,
+            readingOrderConsistency,
+            wordOrderPreservation,
+            completeness,
+            efficiency,
+            uniqueWordsMatched,
+            elementCount,
+            hasStart,
+            hasEnd,
+            matchedText: sequence.map(el => el.text).join(' ')
+        };
+    };
+
+    /**
+     * Find candidates using smart growth strategy
+     */
+    const findSmartGrowthCandidates = (analyzedElements, targetWords) => {
+        const candidates = [];
+        
+        // Start with the best individual elements
+        const sortedByRelevance = [...analyzedElements].sort((a, b) => b.relevanceScore - a.relevanceScore);
+        
+        // Try growing sequences from top elements
+        for (let i = 0; i < Math.min(3, sortedByRelevance.length); i++) {
+            const seed = sortedByRelevance[i];
+            const grownSequence = growSequenceFromSeed(seed, analyzedElements, targetWords);
+            
+            if (grownSequence) {
+                candidates.push(grownSequence);
+            }
+        }
+        
+        return candidates;
+    };
+
+    /**
+     * Grow a sequence starting from a seed element
+     */
+    const growSequenceFromSeed = (seed, allElements, targetWords) => {
+        const sequence = [seed];
+        const coveredWords = new Set(seed.matchingWords);
+        const seedIndex = allElements.findIndex(el => el.stable_index === seed.stable_index);
+        
+        if (seedIndex === -1) return null;
+        
+        // Grow in both directions
+        const maxGrowth = 8; // Limit growth to prevent over-expansion
+        
+        // Grow backwards
+        for (let i = seedIndex - 1; i >= 0 && sequence.length < maxGrowth; i--) {
+            const candidate = allElements[i];
+            if (shouldAddToSequence(candidate, sequence, coveredWords, targetWords)) {
+                sequence.unshift(candidate);
+                candidate.matchingWords.forEach(word => coveredWords.add(word));
+            } else if (sequence.length > 1) {
+                break; // Stop if we can't add consecutive elements
+            }
+        }
+        
+        // Grow forwards
+        for (let i = seedIndex + 1; i < allElements.length && sequence.length < maxGrowth; i++) {
+            const candidate = allElements[i];
+            if (shouldAddToSequence(candidate, sequence, coveredWords, targetWords)) {
+                sequence.push(candidate);
+                candidate.matchingWords.forEach(word => coveredWords.add(word));
+            } else if (sequence.length > 1) {
+                break; // Stop if we can't add consecutive elements
+            }
+        }
+        
+        return evaluateSequenceCandidate(sequence, targetWords);
+    };
+
+    /**
+     * Determine if an element should be added to a growing sequence
+     */
+    const shouldAddToSequence = (candidate, currentSequence, coveredWords, targetWords) => {
+        // Must have relevant words
+        if (candidate.matchingWords.length === 0) return false;
+        
+        // Check if it adds new coverage
+        const newWords = candidate.matchingWords.filter(word => !coveredWords.has(word));
+        if (newWords.length === 0) return false;
+        
+        // Check spatial proximity to the sequence
+        const lastElement = currentSequence[currentSequence.length - 1];
+        const firstElement = currentSequence[0];
+        
+        const distanceToLast = calculateElementDistance(candidate, lastElement);
+        const distanceToFirst = calculateElementDistance(candidate, firstElement);
+        
+        const minDistance = Math.min(distanceToLast, distanceToFirst);
+        
+        // Must be spatially reasonable (within same general area)
+        if (minDistance > 100) return false; // Adjust threshold as needed
+        
+        // Must maintain reasonable element quality
+        if (candidate.relevanceScore < 0.1) return false;
+        
+        return true;
+    };
+
+    /**
+     * Calculate spatial coherence of a sequence
+     */
+    const calculateSpatialCoherence = (sequence) => {
+        if (sequence.length <= 1) return 1.0;
+        
+        let totalDistance = 0;
+        let maxDistance = 0;
+        
+        for (let i = 1; i < sequence.length; i++) {
+            const distance = calculateElementDistance(sequence[i-1], sequence[i]);
+            totalDistance += distance;
+            maxDistance = Math.max(maxDistance, distance);
+        }
+        
+        const avgDistance = totalDistance / (sequence.length - 1);
+        
+        // Good spatial coherence means elements are close together
+        // Normalize based on typical text spacing
+        const coherenceScore = Math.max(0, 1 - (avgDistance / 50)); // 50px is reasonable spacing
+        
+        return Math.min(1.0, coherenceScore);
+    };
+
+    /**
+     * Calculate reading order consistency
+     */
+    const calculateReadingOrderConsistency = (sequence) => {
+        if (sequence.length <= 1) return 1.0;
+        
+        let consistentTransitions = 0;
+        
+        for (let i = 1; i < sequence.length; i++) {
+            const prev = sequence[i-1];
+            const curr = sequence[i];
+            
+            // Check if current element comes after previous in reading order
+            // Reading order: top-to-bottom, then left-to-right
+            const yDiff = curr.coordinates.y - prev.coordinates.y;
+            const xDiff = curr.coordinates.x - prev.coordinates.x;
+            
+            if (yDiff > 5) {
+                // Different lines - current should be below previous
+                consistentTransitions++;
+            } else if (Math.abs(yDiff) <= 5) {
+                // Same line - current should be to the right of previous
+                if (xDiff > 0) {
+                    consistentTransitions++;
+                }
+            }
+        }
+        
+        return consistentTransitions / (sequence.length - 1);
+    };
+
+    /**
+     * Calculate word order preservation
+     */
+    const calculateWordOrderPreservation = (sequence, targetWords) => {
+        // Collect word positions from sequence in element order
+        const sequenceWordPositions = [];
+        
+        sequence.forEach(element => {
+            element.wordPositions.forEach(pos => {
+                sequenceWordPositions.push(pos);
+            });
+        });
+        
+        if (sequenceWordPositions.length <= 1) return 1.0;
+        
+        // Check how many position pairs are in correct order
+        let correctOrdering = 0;
+        for (let i = 1; i < sequenceWordPositions.length; i++) {
+            if (sequenceWordPositions[i] >= sequenceWordPositions[i-1]) {
+                correctOrdering++;
+            }
+        }
+        
+        return correctOrdering / (sequenceWordPositions.length - 1);
+    };
+
+    /**
+     * Calculate distance between two elements
+     */
+    const calculateElementDistance = (element1, element2) => {
+        const coords1 = element1.coordinates;
+        const coords2 = element2.coordinates;
+        
+        const center1 = {
+            x: coords1.x + coords1.width / 2,
+            y: coords1.y + coords1.height / 2
+        };
+        const center2 = {
+            x: coords2.x + coords2.width / 2,
+            y: coords2.y + coords2.height / 2
+        };
+        
+        const dx = center1.x - center2.x;
+        const dy = center1.y - center2.y;
+        
+        return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    /**
+     * Select the best sequence from candidates
+     */
+    const selectBestSequence = (candidates, targetWords) => {
+        if (candidates.length === 0) return null;
+        
+        // Sort by quality score
+        candidates.sort((a, b) => b.quality - a.quality);
+        
+        log(`🏆 Sequence candidate rankings:`);
+        candidates.slice(0, 5).forEach((candidate, i) => {
+            log(`   ${i + 1}. Quality: ${candidate.quality.toFixed(3)} | Coverage: ${(candidate.coverage * 100).toFixed(1)}% | Elements: ${candidate.elementCount} | "${candidate.matchedText.substring(0, 60)}..."`);
+        });
+        
+        // Return the best candidate
+        return candidates[0];
+    };
+
+    /**
+     * Create spatial groups for highlighting
+     */
+    const createSpatialGroups = (elements) => {
+        if (elements.length === 0) return [];
+        
+        // Sort by reading order
+        const sortedElements = [...elements].sort((a, b) => {
+            const yDiff = a.coordinates.y - b.coordinates.y;
+            if (Math.abs(yDiff) > 5) return yDiff;
+            return a.coordinates.x - b.coordinates.x;
+        });
+        
+        const groups = [];
+        let currentGroup = { elements: [sortedElements[0]] };
+        
+        for (let i = 1; i < sortedElements.length; i++) {
+            const current = sortedElements[i];
+            const lastInGroup = currentGroup.elements[currentGroup.elements.length - 1];
+            
+            const distance = calculateElementDistance(lastInGroup, current);
+            
+            // Group elements that are close together
+            if (distance <= 60) {
+                currentGroup.elements.push(current);
+            } else {
+                groups.push(currentGroup);
+                currentGroup = { elements: [current] };
+            }
+        }
+        
+        groups.push(currentGroup);
+        return groups;
+    };
+
+    /**
+     * Create highlight from spatial group
+     */
+    const createHighlight = async (spatialGroup, sentenceId, sentenceText, sequenceMatch) => {
+        if (!containerRef?.current || spatialGroup.elements.length === 0) return null;
 
         try {
-            const page = await pdfDocument.getPage(pageNumber);
-            const textContent = await page.getTextContent();
-            const viewport = page.getViewport({ scale: 1.0 });
+            const textElements = spatialGroup.elements
+                .map(element => findTextElement(element.stable_index, element.page))
+                .filter(el => el !== null);
 
-            // Process text items with position information
-            const processedItems = textContent.items.map((item, index) => {
-                const transform = item.transform || [1, 0, 0, 1, 0, 0];
-                return {
-                    text: item.str || '',
-                    index: index,
-                    x: transform[4],
-                    y: transform[5],
-                    width: item.width || 0,
-                    height: item.height || 0,
-                    fontName: item.fontName || 'default',
-                    fontSize: item.height || 12,
-                    hasEOL: item.hasEOL || false,
-                    // Normalized text for searching
-                    normalizedText: normalizeText(item.str || '')
-                };
-            });
+            if (textElements.length === 0) return null;
 
-            const pageData = {
-                items: processedItems,
-                viewport: viewport,
-                fullText: processedItems.map(item => item.text).join(' '),
-                normalizedFullText: processedItems.map(item => item.normalizedText).join(' ')
-            };
+            const highlightElement = createHighlightFromTextElements(
+                textElements, 
+                sentenceId, 
+                sentenceText,
+                sequenceMatch
+            );
 
-            pageTextCache.current.set(cacheKey, pageData);
-            log(`📝 Cached text content for page ${pageNumber}: ${processedItems.length} items`);
-            
-            return pageData;
+            if (highlightElement) {
+                highlightLayerRef.current.appendChild(highlightElement);
+
+                const highlightKey = `smart_${sentenceId}_${spatialGroup.elements[0].stable_index}`;
+                activeHighlights.current.set(highlightKey, {
+                    element: highlightElement,
+                    sentenceId: sentenceId,
+                    spatialGroup: spatialGroup,
+                    textElements: textElements,
+                    sequenceMatch: sequenceMatch,
+                    type: 'smart_sequence'
+                });
+
+                return highlightElement;
+            }
 
         } catch (error) {
-            console.error(`Error extracting text from page ${pageNumber}:`, error);
-            return null;
-        }
-    };
-
-    // Function to search for and highlight a sentence
-    const searchAndHighlightSentence = async (targetSentence, pageTextContent) => {
-        log(`🔍 Searching for sentence ${targetSentence.id}: "${targetSentence.text.substring(0, 100)}..."`);
-
-        const searchResults = performTextSearch(targetSentence.text, pageTextContent);
-        
-        if (searchResults.length === 0) {
-            log(`❌ No matches found for sentence ${targetSentence.id}`);
-            return [];
-        }
-
-        log(`✅ Found ${searchResults.length} matches for sentence ${targetSentence.id}`);
-
-        // Create highlight elements for each match
-        const highlights = [];
-        searchResults.forEach((match, matchIndex) => {
-            const highlightElements = createHighlightElements(match, targetSentence, matchIndex);
-            highlights.push(...highlightElements);
-        });
-
-        return highlights;
-    };
-
-    // Core text search function with multiple strategies
-    const performTextSearch = (targetText, pageTextContent) => {
-        const normalizedTarget = normalizeText(targetText);
-        const targetWords = normalizedTarget.split(/\s+/).filter(word => word.length > 0);
-        
-        if (targetWords.length === 0) {
-            return [];
-        }
-
-        log(`🔎 Searching for ${targetWords.length} words in ${pageTextContent.items.length} text items`);
-
-        // Strategy 1: Direct substring search
-        let matches = findDirectSubstringMatches(normalizedTarget, pageTextContent);
-        if (matches.length > 0) {
-            log('✅ Found direct substring matches');
-            return matches;
-        }
-
-        // Strategy 2: Word sequence matching
-        matches = findWordSequenceMatches(targetWords, pageTextContent);
-        if (matches.length > 0) {
-            log('✅ Found word sequence matches');
-            return matches;
-        }
-
-        // Strategy 3: Fuzzy matching
-        matches = findFuzzyMatches(targetWords, pageTextContent);
-        if (matches.length > 0) {
-            log('✅ Found fuzzy matches');
-            return matches;
-        }
-
-        return [];
-    };
-
-    // Strategy 1: Direct substring search
-    const findDirectSubstringMatches = (normalizedTarget, pageTextContent) => {
-        const matches = [];
-        const fullText = pageTextContent.normalizedFullText;
-        
-        let startIndex = 0;
-        while (true) {
-            const foundIndex = fullText.indexOf(normalizedTarget, startIndex);
-            if (foundIndex === -1) break;
-
-            // Map back to text items
-            const itemSpan = mapTextPositionToItems(foundIndex, foundIndex + normalizedTarget.length, pageTextContent);
-            if (itemSpan.length > 0) {
-                matches.push({
-                    type: 'direct_substring',
-                    confidence: 1.0,
-                    itemSpan: itemSpan,
-                    matchedText: normalizedTarget
-                });
-            }
-
-            startIndex = foundIndex + 1;
-        }
-
-        return matches;
-    };
-
-    // Strategy 2: Word sequence matching
-    const findWordSequenceMatches = (targetWords, pageTextContent) => {
-        const matches = [];
-        const items = pageTextContent.items;
-        
-        // Sliding window approach
-        for (let startIdx = 0; startIdx < items.length; startIdx++) {
-            const match = findWordSequenceStartingAt(targetWords, items, startIdx);
-            if (match) {
-                matches.push(match);
-            }
-        }
-
-        return matches;
-    };
-
-    // Strategy 3: Fuzzy matching
-    const findFuzzyMatches = (targetWords, pageTextContent) => {
-        const matches = [];
-        const items = pageTextContent.items;
-        
-        // Score each potential span
-        for (let startIdx = 0; startIdx < items.length; startIdx++) {
-            for (let endIdx = startIdx; endIdx < Math.min(startIdx + targetWords.length * 2, items.length); endIdx++) {
-                const span = items.slice(startIdx, endIdx + 1);
-                const score = calculateFuzzyScore(targetWords, span);
-                
-                if (score >= searchOptions.matchThreshold) {
-                    matches.push({
-                        type: 'fuzzy_match',
-                        confidence: score,
-                        itemSpan: span.map(item => item.index),
-                        matchedText: span.map(item => item.text).join(' ')
-                    });
-                }
-            }
-        }
-
-        // Sort by confidence and remove overlaps
-        return deduplicateMatches(matches);
-    };
-
-    // Helper: Find word sequence starting at specific position
-    const findWordSequenceStartingAt = (targetWords, items, startIndex) => {
-        let wordIndex = 0;
-        let itemIndex = startIndex;
-        const matchedItems = [];
-        let confidence = 0;
-
-        while (wordIndex < targetWords.length && itemIndex < items.length) {
-            const item = items[itemIndex];
-            const itemWords = item.normalizedText.split(/\s+/).filter(w => w.length > 0);
-
-            let foundInItem = false;
-            for (const itemWord of itemWords) {
-                if (wordIndex < targetWords.length) {
-                    const similarity = calculateStringSimilarity(targetWords[wordIndex], itemWord);
-                    if (similarity >= 0.8) {
-                        matchedItems.push(item.index);
-                        confidence += similarity;
-                        wordIndex++;
-                        foundInItem = true;
-                    }
-                }
-            }
-
-            if (!foundInItem) {
-                // Allow some gaps, but penalize
-                confidence -= 0.1;
-            }
-
-            itemIndex++;
-
-            // Early termination if confidence too low
-            if (confidence < wordIndex * 0.5) {
-                break;
-            }
-        }
-
-        if (wordIndex >= targetWords.length * 0.8) { // Found at least 80% of words
-            return {
-                type: 'word_sequence',
-                confidence: confidence / targetWords.length,
-                itemSpan: matchedItems,
-                matchedText: matchedItems.map(idx => 
-                    items.find(item => item.index === idx)?.text || ''
-                ).join(' ')
-            };
+            log('❌ Error creating highlight:', error);
         }
 
         return null;
     };
 
-    // Helper: Calculate fuzzy score for a span
-    const calculateFuzzyScore = (targetWords, itemSpan) => {
-        const spanText = itemSpan.map(item => item.normalizedText).join(' ');
-        const spanWords = spanText.split(/\s+/).filter(w => w.length > 0);
+    /**
+     * Create highlight element from text elements
+     */
+    const createHighlightFromTextElements = (textElements, sentenceId, sentenceText, sequenceMatch) => {
+        if (!containerRef?.current) return null;
 
-        if (spanWords.length === 0) return 0;
+        const pageContainer = containerRef.current.querySelector('.pdf-page-container');
+        if (!pageContainer) return null;
 
-        let totalScore = 0;
-        let matchedWords = 0;
-
-        targetWords.forEach(targetWord => {
-            const bestMatch = spanWords.reduce((best, spanWord) => {
-                const similarity = calculateStringSimilarity(targetWord, spanWord);
-                return Math.max(best, similarity);
-            }, 0);
-
-            if (bestMatch > 0.6) {
-                totalScore += bestMatch;
-                matchedWords++;
-            }
-        });
-
-        return matchedWords > 0 ? totalScore / targetWords.length : 0;
-    };
-
-    // Helper: Map text position back to item indices
-    const mapTextPositionToItems = (startPos, endPos, pageTextContent) => {
-        const items = pageTextContent.items;
-        const fullText = pageTextContent.normalizedFullText;
-        
-        let currentPos = 0;
-        const result = [];
-
-        for (const item of items) {
-            const itemText = item.normalizedText;
-            const itemStart = currentPos;
-            const itemEnd = currentPos + itemText.length;
-
-            // Check if this item overlaps with target range
-            if (itemEnd > startPos && itemStart < endPos) {
-                result.push(item.index);
-            }
-
-            currentPos = itemEnd + 1; // +1 for space between items
-        }
-
-        return result;
-    };
-
-    // Helper: Create highlight DOM elements
-    const createHighlightElements = (match, targetSentence, matchIndex) => {
-        if (!highlightLayerRef.current || !textLayerRef.current) {
-            return [];
-        }
-
-        const highlights = [];
-        const pageContainer = containerRef.current?.querySelector('.pdf-page-container');
-        
-        if (!pageContainer) {
-            log('⚠️ Page container not found');
-            return [];
-        }
-
-        // Get text elements for each item in the span
-        const textElements = match.itemSpan.map(itemIndex => {
-            return textLayerRef.current.querySelector(
-                `[data-stable-index="${itemIndex}"][data-page-number="${currentPage}"]`
-            );
-        }).filter(el => el !== null);
-
-        if (textElements.length === 0) {
-            log(`⚠️ No text elements found for match ${matchIndex}`);
-            return [];
-        }
-
-        // Group adjacent elements into continuous highlight regions
-        const highlightRegions = groupAdjacentElements(textElements);
-
-        highlightRegions.forEach((region, regionIndex) => {
-            const highlightElement = createHighlightElement(region, pageContainer);
-            if (highlightElement) {
-                highlightLayerRef.current.appendChild(highlightElement);
-                
-                // Store reference
-                const highlightKey = `${targetSentence.id}_${matchIndex}_${regionIndex}`;
-                activeHighlights.current.set(highlightKey, {
-                    element: highlightElement,
-                    sentence: targetSentence,
-                    match: match,
-                    region: region
-                });
-
-                highlights.push(highlightElement);
-                
-                log(`✨ Created highlight region ${regionIndex + 1} with ${region.length} elements`);
-            }
-        });
-
-        return highlights;
-    };
-
-    // Helper: Group adjacent text elements
-    const groupAdjacentElements = (textElements) => {
-        if (textElements.length === 0) return [];
-        
-        const regions = [];
-        let currentRegion = [textElements[0]];
-
-        for (let i = 1; i < textElements.length; i++) {
-            const prevRect = currentRegion[currentRegion.length - 1].getBoundingClientRect();
-            const currentRect = textElements[i].getBoundingClientRect();
-
-            // Check if elements are adjacent
-            const isAdjacent = isElementsAdjacent(prevRect, currentRect);
-
-            if (isAdjacent) {
-                currentRegion.push(textElements[i]);
-            } else {
-                regions.push(currentRegion);
-                currentRegion = [textElements[i]];
-            }
-        }
-
-        regions.push(currentRegion);
-        return regions;
-    };
-
-    // Helper: Check if elements are adjacent
-    const isElementsAdjacent = (rect1, rect2) => {
-        // Check vertical alignment (same line)
-        const verticalOverlap = Math.min(rect1.bottom, rect2.bottom) - Math.max(rect1.top, rect2.top);
-        const minHeight = Math.min(rect1.height, rect2.height);
-        const overlapRatio = verticalOverlap / minHeight;
-
-        if (overlapRatio < 0.5) return false;
-
-        // Check horizontal gap
-        const horizontalGap = Math.max(0, rect2.left - rect1.right);
-        return horizontalGap <= searchOptions.maxGapBetweenWords;
-    };
-
-    // Helper: Create single highlight element
-    const createHighlightElement = (textElements, pageContainer) => {
         try {
-            // Calculate bounding box for all elements
             const rects = textElements.map(el => el.getBoundingClientRect());
             const pageRect = pageContainer.getBoundingClientRect();
 
@@ -626,25 +719,42 @@ const DirectTextHighlighter = ({
             const right = Math.max(...rects.map(r => r.right)) - pageRect.left;
             const bottom = Math.max(...rects.map(r => r.bottom)) - pageRect.top;
 
-            const highlightElement = document.createElement('div');
-            highlightElement.className = className;
+            const width = right - left;
+            const height = bottom - top;
 
-            // Apply styles
-            Object.assign(highlightElement.style, {
+            if (width <= 0 || height <= 0) return null;
+
+            // Quality-based styling
+            const styling = getQualityBasedStyling(sequenceMatch);
+
+            const highlightDiv = document.createElement('div');
+            highlightDiv.className = `${className} quality-${styling.tier}`;
+
+            Object.assign(highlightDiv.style, {
                 position: 'absolute',
                 left: `${left}px`,
                 top: `${top}px`,
-                width: `${right - left}px`,
-                height: `${bottom - top}px`,
-                backgroundColor: highlightStyle.backgroundColor,
-                border: highlightStyle.border,
+                width: `${width}px`,
+                height: `${height}px`,
+                backgroundColor: styling.backgroundColor,
+                border: styling.border,
                 borderRadius: highlightStyle.borderRadius,
                 pointerEvents: 'none',
-                zIndex: '1000',
-                opacity: '0.8'
+                zIndex: 10,
+                boxShadow: '0 0 2px rgba(0,0,0,0.2)'
             });
 
-            return highlightElement;
+            // Enhanced tooltip
+            highlightDiv.title = `
+Smart Sequence Match
+Sentence: ${sentenceId}
+Quality: ${(sequenceMatch.quality * 100).toFixed(1)}%
+Coverage: ${(sequenceMatch.coverage * 100).toFixed(1)}%
+Elements: ${sequenceMatch.elementCount}
+Text: "${sentenceText.substring(0, 80)}..."
+            `.trim();
+
+            return highlightDiv;
 
         } catch (error) {
             log('❌ Error creating highlight element:', error);
@@ -652,98 +762,79 @@ const DirectTextHighlighter = ({
         }
     };
 
-    // Utility functions
-    const normalizeText = (text) => {
-        if (!text) return '';
-        return text.toLowerCase()
-            .replace(/[^\w\s]/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
+    /**
+     * Get styling based on sequence match quality
+     */
+    const getQualityBasedStyling = (sequenceMatch) => {
+        const quality = sequenceMatch.quality;
+        
+        if (quality >= 0.7) {
+            return {
+                tier: 'high',
+                backgroundColor: 'rgba(76, 175, 80, 0.4)',   // Green
+                border: '2px solid rgba(76, 175, 80, 0.8)'
+            };
+        } else if (quality >= 0.5) {
+            return {
+                tier: 'medium',
+                backgroundColor: 'rgba(255, 193, 7, 0.4)',    // Yellow
+                border: '2px solid rgba(255, 193, 7, 0.8)'
+            };
+        } else {
+            return {
+                tier: 'low',
+                backgroundColor: 'rgba(255, 152, 0, 0.4)',    // Orange
+                border: '2px solid rgba(255, 152, 0, 0.8)'
+            };
+        }
     };
 
-    const calculateStringSimilarity = (str1, str2) => {
-        if (str1 === str2) return 1;
-        if (!str1 || !str2) return 0;
+    /**
+     * Find text element by stable index
+     */
+    const findTextElement = (stableIndex, pageNumber) => {
+        if (!textLayerRef?.current) return null;
 
-        const longer = str1.length > str2.length ? str1 : str2;
-        const shorter = str1.length > str2.length ? str2 : str1;
+        const selectors = [
+            `[data-stable-index="${stableIndex}"][data-page-number="${pageNumber}"]`,
+            `[data-stable-index="${stableIndex}"]`,
+            `.pdf-text-item[data-stable-index="${stableIndex}"]`
+        ];
 
-        if (longer.length === 0) return 1;
-
-        const distance = levenshteinDistance(longer, shorter);
-        return (longer.length - distance) / longer.length;
-    };
-
-    const levenshteinDistance = (str1, str2) => {
-        const matrix = [];
-        for (let i = 0; i <= str2.length; i++) {
-            matrix[i] = [i];
-        }
-        for (let j = 0; j <= str1.length; j++) {
-            matrix[0][j] = j;
-        }
-        for (let i = 1; i <= str2.length; i++) {
-            for (let j = 1; j <= str1.length; j++) {
-                if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-                    matrix[i][j] = matrix[i - 1][j - 1];
-                } else {
-                    matrix[i][j] = Math.min(
-                        matrix[i - 1][j - 1] + 1,
-                        matrix[i][j - 1] + 1,
-                        matrix[i - 1][j] + 1
-                    );
-                }
-            }
-        }
-        return matrix[str2.length][str1.length];
-    };
-
-    const deduplicateMatches = (matches) => {
-        // Sort by confidence, keep highest scoring non-overlapping matches
-        const sorted = matches.sort((a, b) => b.confidence - a.confidence);
-        const filtered = [];
-
-        for (const match of sorted) {
-            const overlaps = filtered.some(existing => 
-                hasOverlap(match.itemSpan, existing.itemSpan)
-            );
-            if (!overlaps) {
-                filtered.push(match);
-            }
+        for (const selector of selectors) {
+            const element = textLayerRef.current.querySelector(selector);
+            if (element) return element;
         }
 
-        return filtered;
+        return null;
     };
 
-    const hasOverlap = (span1, span2) => {
-        const set1 = new Set(span1);
-        const set2 = new Set(span2);
-        const intersection = new Set([...set1].filter(x => set2.has(x)));
-        return intersection.size > 0;
-    };
-
-    // Function to clear all highlights
+    /**
+     * Clear all highlights
+     */
     const clearAllHighlights = () => {
-        if (!highlightLayerRef.current) return;
+        if (!highlightLayerRef?.current) return;
 
-        // Remove all highlight elements
         const existingHighlights = highlightLayerRef.current.querySelectorAll(`.${className}`);
         existingHighlights.forEach(el => el.remove());
 
-        // Clear references
         activeHighlights.current.clear();
-        log('🧹 Cleared all highlights');
+        log('🧹 Cleared all smart sequence highlights');
     };
+
+    // Clear cache when document changes
+    useEffect(() => {
+        mappingsCache.current.clear();
+    }, [documentFilename]);
 
     // Cleanup on unmount
     useEffect(() => {
         return () => {
             clearAllHighlights();
-            pageTextCache.current.clear();
+            mappingsCache.current.clear();
         };
     }, []);
 
-    // This component manages highlights but doesn't render anything
     return null;
 };
 

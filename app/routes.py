@@ -10,6 +10,8 @@ import doc_provenance.base_strategies
 from  functools import wraps
 from .utils.file_finder import DocumentFileFinder, find_document_file, get_file_finder, get_document_info
 from .text_processing_manager import TextProcessingManager
+from .pdfjs_coord_helpers import create_pdfjs_debugger, format_debug_result_for_api, PDFJSCoordinateDebugger
+
 main = Blueprint('main', __name__, url_prefix='/api')
 # =============================================================================
 
@@ -33,7 +35,7 @@ ALGORITHM_CONFIGURATIONS = {
 PROCESSING_TIMEOUT = 60  # 1 minute timeout for processing
 EXPERIMENT_TOP_K = 5  # User-facing limit for this experiment
 MAX_PROVENANCE_PROCESSING = 20  # Internal limit to prevent infinite processing
-
+USE_TEST_SUITE = True
 class ProcessingTimeoutError(Exception):
     """Custom timeout exception for processing"""
     pass
@@ -47,8 +49,9 @@ STUDY_LOGS_DIR = os.path.join(os.getcwd(), 'app/study_logs')
 QUESTIONS_DIR = os.path.join(os.getcwd(), 'app/questions')
 SENTENCES_DIR = os.path.join(os.getcwd(), 'app/sentences')
 DOWNLOADS_DIR = os.path.join(os.getcwd(), 'app/gdrive_downloads')
-MAPPINGS_DIR = os.path.join(os.getcwd(), 'app/mappings')
+MAPPINGS_DIR = os.path.join(os.getcwd(), 'app/stable_mappings')
 TEST_SUITE_OUTPUT_DIR = os.path.join(os.getcwd(), 'app/test_outputs')
+CONOLIDATED_TEST_SUITE_DIR = os.path.join(os.getcwd(), 'app/consolidated_test_suite')
 
 # =============================================================================
 
@@ -581,6 +584,151 @@ def get_available_documents():
             'error': str(e)
         }), 500
     
+
+# Add these helper functions to routes.py after the existing helper functions
+
+def load_test_suite_data(filename):
+    """Load test suite data for a document"""
+    try:
+        base_name = secure_filename(filename.replace('.pdf', ''))
+        
+        # Check for test suite file in multiple locations
+        test_suite_path = os.path.join(CONOLIDATED_TEST_SUITE_DIR, f"{base_name}_test_suite.json")
+
+        if os.path.exists(test_suite_path):
+            logger.info(f"Loading test suite from: {test_suite_path}")
+            with open(test_suite_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        logger.warning(f"No test suite found for {filename}")
+        return None
+
+    except Exception as e:
+        logger.error(f"Error loading test suite for {filename}: {e}")
+        return None
+        
+    except Exception as e:
+        logger.error(f"Error loading test suite for {filename}: {e}")
+        return None
+
+def find_test_suite_question(question_id, test_suite_data, question_text = None):
+    """
+    Find the best matching question from consolidated test suite data
+    Uses simple text similarity matching
+    test_suite_data is a list of dicts
+    """
+
+    best_match = None
+
+    if not test_suite_data or not isinstance(test_suite_data, list):
+        return None
+    else:
+        # Each entry has one question ID as key
+        for question_data in test_suite_data:
+            if not isinstance(question_data, dict):
+                continue
+            if question_id == question_data.get('question_id'):
+                return {
+                    'question_id': question_data.get('question_id'),
+                    'question_data': question_data,
+                    'similarity_score': 1.0,  # Exact match
+                    'original_question': question_data.get('question', ''),
+                    'source_info': question_data.get('source_info', {})
+                }
+        
+    if question_text:
+        question_lower = question_text.lower().strip()
+        best_score = 0
+    for entry in test_suite_data:
+        if not isinstance(entry, dict):
+            continue
+            
+        # Each entry has one question ID as key
+        for question_id, question_data in entry.items():
+            if not isinstance(question_data, dict):
+                continue
+                
+            test_question = question_data.get('question', '').lower().strip()
+            
+            # Simple similarity scoring - count common words
+            question_words = set(question_lower.split())
+            test_words = set(test_question.split())
+            
+            if len(question_words) == 0 or len(test_words) == 0:
+                continue
+                
+            # Jaccard similarity
+            intersection = len(question_words.intersection(test_words))
+            union = len(question_words.union(test_words))
+            similarity = intersection / union if union > 0 else 0
+            
+            # Boost score for exact matches or very close matches
+            if question_lower == test_question:
+                similarity = 1.0
+            elif question_lower in test_question or test_question in question_lower:
+                similarity = max(similarity, 0.8)
+            
+            # Additional boost for partial phrase matches
+            if len(question_lower) > 10 and question_lower in test_question:
+                similarity = max(similarity, 0.9)
+            if len(test_question) > 10 and test_question in question_lower:
+                similarity = max(similarity, 0.9)
+            
+            if similarity > best_score:
+                best_score = similarity
+                best_match = {
+                    'question_id': question_id,
+                    'question_data': question_data,
+                    'similarity_score': similarity,
+                    'original_question': question_data.get('question', ''),
+                    'source_info': question_data.get('source_info', {})
+                }
+    
+    # Only return matches with reasonable similarity
+    if best_match and best_match['similarity_score'] > 0.2:  # Lowered threshold for better matching
+        return best_match
+    
+    return None
+
+
+def create_mock_provenance_entries(provenance_data, max_entries=EXPERIMENT_TOP_K):
+    """
+    Convert test suite provenance data to the format expected by the frontend
+    """
+    mock_entries = []
+    
+    if not provenance_data or not isinstance(provenance_data, list):
+        return []
+    
+    for i, prov in enumerate(provenance_data[:max_entries]):
+        if not isinstance(prov, dict):
+            continue
+            
+        # Convert to expected format
+        mock_entry = {
+            "provenance_id": prov.get('provenance_id', i),
+            "sentences_ids": prov.get('input_sentence_ids', prov.get('provenance_ids', [])),
+            "provenance_ids": prov.get('provenance_ids', prov.get('input_sentence_ids', [])),
+            "provenance": prov.get('provenance', ''),
+            "content": [prov.get('provenance', '')],  # Split by sentences if needed
+            "time": prov.get('time', 5.0),
+            "input_sentence_ids": prov.get('input_sentence_ids', []),
+            "input_token_size": prov.get('input_token_size', 1000),
+            "output_token_size": prov.get('output_token_size', 50),
+            "original_provenance_id": prov.get('original_provenance_id', i)
+        }
+        
+        # Split provenance text into content array if it's long
+        if mock_entry["provenance"]:
+            # Simple sentence splitting
+            sentences = [s.strip() for s in mock_entry["provenance"].split('.') if s.strip()]
+            if len(sentences) > 1:
+                mock_entry["content"] = sentences
+        
+        mock_entries.append(mock_entry)
+    
+    return mock_entries
+
+    
 @main.route('/documents/<filename>', methods=['GET'])
 def serve_document_pdf(filename):
     """Unified PDF serving using file finder helper"""
@@ -829,8 +977,9 @@ def ask_question():
     data = request.json
     question = data.get('question')
     filename = data.get('filename')
-    question_id_from_ts = data.get('question_id_from_ts')  # Optional: if from test suite to keep track of question IDs
-    
+    question_id_from_ts = data.get('question_id_from_ts') 
+    use_test_suite = data.get('use_test_suite', USE_TEST_SUITE)
+
     if not question or not filename:
         return jsonify({'error': 'Question or filename missing'}), 400
     
@@ -851,29 +1000,28 @@ def ask_question():
     
     # Extract text from PDF
     pdf_text = doc_provenance.base_strategies.extract_text_from_pdf(filepath)
+
     
-    # Create result directory with new structure: results/{safe_pdf_name}/{question_id}/
     question_dir, question_id = text_processing_manager.create_question_result_directory(filename, question)
     file_paths = text_processing_manager.get_question_file_paths(question_dir)
-    
     logger.info(f"📁 Created question directory: {question_dir}")
     logger.info(f"🆔 Question ID: {question_id}")
-    
+
     # Save question metadata
     metadata = {
         'question_id': question_id,
         'question_text': question,
         'filename': filename,
-        'pdf_filepath': filepath,
-        'created_at': time.time(),
-        'max_provenances': EXPERIMENT_TOP_K,
-        'user_provenance_count': 0,
-        'answer_delivered': False,
-        'processing_complete': False,
-        'question_dir': question_dir
-    }
-    text_processing_manager.save_question_metadata(question_dir, metadata)
+         'pdf_filepath': filepath,
+         'created_at': time.time(),
+         'max_provenances': EXPERIMENT_TOP_K,
+         'user_provenance_count': 0,
+         'answer_delivered': False,
+         'processing_complete': False,
+         'question_dir': question_dir
+     }
     
+    text_processing_manager.save_question_metadata(question_dir, metadata)
     # Initialize answer file with null answer
     initial_answer = {
         'question': question,
@@ -882,7 +1030,6 @@ def ask_question():
     }
     with open(file_paths['answer'], 'w', encoding='utf-8') as f:
         json.dump(initial_answer, f, indent=2, ensure_ascii=False)
-    
     # Initialize process logs
     logs = {
         'status': 'started',
@@ -892,6 +1039,17 @@ def ask_question():
     }
     with open(file_paths['logs'], 'w') as f:
         json.dump(logs, f)
+
+    if use_test_suite:
+
+        test_suite_data = load_test_suite_data(filename)
+        if not test_suite_data:
+            use_real_processing = True
+        else:
+            use_real_processing = False
+    else:
+        # Create result directory with new structure: results/{safe_pdf_name}/{question_id}/
+        use_real_processing = True
     
     # Start processing in a separate thread
     def process_question():
@@ -900,53 +1058,42 @@ def ask_question():
         error_message = None
 
         try:
-            # Add log entry
-            text_processing_manager.update_process_log(question_dir, f"Analyzing document with {len(pdf_text)} characters...")
-            
-            # Capture stdout to preserve the exact output format
-            stdout_buffer = StringIO()
-            stdout_backup = sys.stdout
-            sys.stdout = stdout_buffer
+            if use_real_processing:
+                # Add log entry
+                text_processing_manager.update_process_log(question_dir, f"Processing with OpenAI.... Analyzing document with {len(pdf_text)} characters...")
+                # Capture stdout to preserve the exact output format
+                stdout_buffer = StringIO()
+                stdout_backup = sys.stdout
+                sys.stdout = stdout_buffer
+                # Process the question using doc_provenance API
+                # This will handle both answer writing and progressive provenance writing
+                result_path = question_dir + os.sep
+                doc_provenance.divide_and_conquer_progressive_API(question, pdf_text, result_path)
+                # Restore stdout
+                sys.stdout = stdout_backup
 
+            else:
+                # using test suite
+                text_processing_manager.update_process_log(question_dir, f"Processing with test suite.... Analyzing document with {len(pdf_text)} characters...")
+   
+                match_result = find_test_suite_question(question_id, test_suite_data, question)
+                provenance_data = match_result['question_data'].get('provenance', [])
+                with open(file_paths['provenance'], 'w', encoding='utf-8') as f:
+                    json.dump(provenance_data, f, indent=2, ensure_ascii=False)
+                # Save answer data
+                answer_data = {
+                    'question': question,
+                    'answer': match_result['question_data'].get('answer', None),
+                    'timestamp': time.time()
+                }
+                with open(file_paths['answer'], 'w', encoding='utf-8') as f:
+                    json.dump(answer_data, f, indent=2, ensure_ascii=False)
 
-            
-            # Process the question using doc_provenance API
-            # This will handle both answer writing and progressive provenance writing
-            result_path = question_dir + os.sep
-            doc_provenance.divide_and_conquer_progressive_API(question, pdf_text, result_path)
-            
-            # Restore stdout
-            sys.stdout = stdout_backup
+                time.sleep(2)  # Simulate processing time
+
             # Mark processing as complete
             text_processing_manager.update_process_log(question_dir, "Processing completed!", status="completed")
-            
-            # CRITICAL: Update metadata to show processing is complete
-            metadata =  text_processing_manager.load_question_metadata(question_dir)
-            if metadata:
-                metadata['processing_complete'] = True
-                metadata['completed_at'] = time.time()
-                metadata['processing_time'] = time.time() - start_time
-                text_processing_manager.save_question_metadata(question_dir, metadata)
-                logger.info(f"Updated metadata for question {question_dir}")
-            else:
-                logger.error(f"Could not load metadata for question {question_dir}")
-        
-            
-            # Create a status file to indicate all processing is done
-            final_provenance_count = get_current_provenance_count(question_dir)
-            status_data = {
-                "completed": True,
-                "timestamp": time.time(),
-                "total_provenance": final_provenance_count
-            }
-
-            try:
-                with open(file_paths['status'], 'w') as f:
-                    json.dump(status_data, f)
-                logger.info(f"Created status file for question {question_dir}: {status_data}")
-            except Exception as status_error:
-                logger.error(f"Error creating status file: {status_error}")
-                
+           
         except Exception as e:
             logger.exception("Error processing question")
             text_processing_manager.update_process_log(question_dir, f"Error: {str(e)}", status="error")
@@ -960,9 +1107,8 @@ def ask_question():
                 pass
 
         finally:
-            
-            # Update metadata
-            metadata =  text_processing_manager.load_question_metadata(question_dir)
+            # CRITICAL: Update metadata to show processing is complete (for both real and test)
+            metadata = text_processing_manager.load_question_metadata(question_dir)
             if metadata:
                 metadata['processing_complete'] = True
                 metadata['completed_at'] = time.time()
@@ -970,21 +1116,52 @@ def ask_question():
 
                 if error_message:
                     metadata['error'] = error_message
-                    
+                
+                # Save metadata for both real and test processing
                 text_processing_manager.save_question_metadata(question_dir, metadata)
+                logger.info(f"✅ Updated metadata for question {question_dir} - processing_complete: True")
+            else:
+                logger.error(f"❌ Could not load metadata for question {question_dir}")
+
+            # Create a status file to indicate all processing is done
+            if use_real_processing:
+                final_provenance_count = get_current_provenance_count(question_dir)
+            else:
+                # For test suite, count the provenance items we just saved
+                try:
+                    with open(file_paths['provenance'], 'r', encoding='utf-8') as f:
+                        provenance_data = json.load(f)
+                        final_provenance_count = len(provenance_data) if isinstance(provenance_data, list) else 0
+                except:
+                    final_provenance_count = 0
+            
+            status_data = {
+                "completed": True,
+                "timestamp": time.time(),
+                "total_provenance": final_provenance_count,
+                "used_test_suite": not use_real_processing
+            }
+            
+            try:
+                with open(file_paths['status'], 'w') as f:
+                    json.dump(status_data, f)
+                logger.info(f"📄 Created status file for question {question_dir}: {status_data}")
+            except Exception as status_error:
+                logger.error(f"❌ Error creating status file: {status_error}")
 
     thread = Thread(target=process_question)
     thread.daemon = True
     thread.start()
-    
+        
     return jsonify({
         'success': True,
         'question_id': question_id,
-        'message': 'Processing started'
+        'message': 'Processing started',
+        'using_test_suite': use_test_suite
     })
 
 @main.route('/check-answer/<question_id>', methods=['GET'])
-def check_answer(question_id):
+def check_answer(question_id, filename = None):
     """Check if answer is ready for a question with improved error handling"""
     try:
         if not question_id or not question_id.strip():
@@ -992,6 +1169,33 @@ def check_answer(question_id):
                 'success': False,
                 'error': 'Invalid question ID'
             }), 400
+        
+        if USE_TEST_SUITE and filename:
+            # If using test suite, we simulate finding the answer (wait 5 seconds, then return answer)
+            test_suite_data = load_test_suite_data(filename)
+            if not test_suite_data:
+                return jsonify({
+                    'success': False,
+                    'error': 'Test suite data not found for this question ID'
+                }), 404
+            
+            # Find the question in the test suite
+            match_result = find_test_suite_question(question_id, test_suite_data)
+            if not match_result:
+                return jsonify({
+                    'success': False,
+                    'error': 'Question not found in test suite'
+                }), 404
+            # Simulate answer ready after 5 seconds
+            time.sleep(5)
+            return jsonify({
+                'success': True,
+                'ready': True,
+                'answer': match_result['question_data'].get('answer', 'No answer available'),
+                'question_id': question_id,
+                'question': match_result['question_data'].get('question', ''),
+                'source_info': match_result['question_data'].get('source_info', {})
+            })
         
         # Find the question directory using the new structure
         question_dir = find_question_directory(question_id, TEST_SUITE_OUTPUT_DIR)
@@ -1029,7 +1233,7 @@ def check_answer(question_id):
             'ready': False
         }), 500
 
-@main.route('/get-next-provenance/<question_id>', methods=['POST'])
+@main.route('/v1/get-next-provenance/<question_id>', methods=['POST'])
 def get_next_provenance_route(question_id):
     """Get the next available provenance for a question"""
     try:
@@ -1235,41 +1439,6 @@ def check_progress(question_id):
             'success': False,
             'error': f'Error reading question dir: {str(e)}'
         }), 500
-        
-@main.route('/sentences/<document>', methods=['GET'])
-def get_sentences(question_id):
-    # Get sentence IDs from query parameters
-    sentence_ids = request.args.get('ids')
-    if not sentence_ids:
-        return jsonify({'error': 'No sentence IDs provided'}), 400
-    
-    # Parse sentence IDs
-    try:
-        sentence_ids = [int(id) for id in sentence_ids.split(',')]
-    except ValueError:
-        return jsonify({'error': 'Invalid sentence IDs format'}), 400
-    
-    # Get sentences file
-    sentences_path = os.path.join(RESULTS_DIR, question_id, 'sentences.json')
-    if not os.path.exists(sentences_path):
-        return jsonify({'error': 'Sentences not found'}), 404
-    
-    # Read sentences
-    with open(sentences_path, 'r', encoding='utf-8') as f:
-        sentences = json.load(f)
-    
-    # Get requested sentences
-    result = {}
-    for id in sentence_ids:
-        if 0 <= id < len(sentences):
-            result[id] = sentences[id]
-        else:
-            result[id] = f"Sentence ID {id} out of range"
-    
-    return jsonify({
-        'success': True,
-        'sentences': result
-    })
 
 @main.route('/status/<question_id>', methods=['GET'])
 def check_status(question_id):
@@ -1798,8 +1967,8 @@ def get_all_available_pdfs():
         all_documents.extend(scan_folder_for_pdfs(uploads_dir))
 
     # Check downloads folder for batch processed documents
-    if os.path.exists(DOWNLOADS_DIR):
-        all_documents.extend(scan_batch_documents(DOWNLOADS_DIR))
+    # if os.path.exists(DOWNLOADS_DIR):
+    #     all_documents.extend(scan_batch_documents(DOWNLOADS_DIR))
 
     return all_documents
 
@@ -2122,13 +2291,806 @@ def upload_and_process_pdf():
             'success': False,
             'error': str(e)
         }), 500
+    
+# Add these endpoints to your routes.py file
 
-@main.route('/api/documents/<basename>/mappings', methods=['GET'])
-def get_document_mappings_overview(basename):
+# =============================================================================
+# ENHANCED PROVENANCE AND HIGHLIGHTING ENDPOINTS
+# =============================================================================
+
+@main.route('/get-next-provenance/<question_id>', methods=['POST'])
+def get_next_provenance_route_enhanced(question_id):
+    """Enhanced get next provenance with coordinate highlighting support"""
+    try:
+        data = request.json or {}
+        current_count = data.get('current_count', 0)
+        
+        # Find the question directory
+        question_dir = find_question_directory(question_id, TEST_SUITE_OUTPUT_DIR)
+        if not question_dir:
+            return jsonify({
+                'success': False,
+                'error': 'Question not found'
+            }), 404
+        
+        # Get the next provenance
+        result = get_next_provenance(question_dir, current_count)
+        
+        if result.get('has_more', False) and 'provenance' in result:
+            # Get the document filename from metadata
+            metadata = text_processing_manager.load_question_metadata(question_dir)
+            filename = metadata.get('filename') if metadata else None
+            
+            if filename:
+                # Try to add coordinate highlighting data
+                provenance = result['provenance']
+                sentence_ids = provenance.get('provenance_ids', provenance.get('sentences_ids', []))
+                
+                if sentence_ids:
+                    try:
+                        # Try to get coordinate highlights using file finder
+                        mapping_info = get_file_finder().find_file(filename, 'mappings')
+                        
+                        if mapping_info:
+                            # Load mapping data and add coordinate highlights
+                            with open(mapping_info['path'], 'r', encoding='utf-8') as f:
+                                mapping_data = json.load(f)
+                            
+                            coordinate_highlights = get_coordinate_highlights_from_mappings(
+                                sentence_ids, mapping_data
+                            )
+                            
+                            if coordinate_highlights:
+                                provenance['coordinate_highlights'] = coordinate_highlights
+                                provenance['hasCoordinateData'] = True
+                                logger.info(f"✅ Added coordinate highlights for {len(coordinate_highlights)} pages")
+                            else:
+                                provenance['hasCoordinateData'] = False
+                        else:
+                            provenance['hasCoordinateData'] = False
+                            
+                    except Exception as highlight_error:
+                        logger.warning(f"Could not add coordinate highlights: {highlight_error}")
+                        provenance['hasCoordinateData'] = False
+            
+            # Update metadata to track user's provenance requests
+            if metadata:
+                metadata['user_provenance_count'] = current_count + 1
+                metadata['last_provenance_request'] = time.time()
+                text_processing_manager.save_question_metadata(question_dir, metadata)
+        
+        return jsonify({
+            'success': True,
+            **result
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting next provenance for question {question_id}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+def get_coordinate_highlights_from_mappings(sentence_ids, mapping_data):
+    """Extract coordinate highlights from mapping data for given sentence IDs"""
+    try:
+        sentence_mappings = mapping_data.get('sentence_mappings', mapping_data.get('sentence_to_items', {}))
+        
+        if not sentence_mappings:
+            return None
+        
+        highlights_by_page = {}
+        
+        for sentence_id in sentence_ids:
+            sentence_key = str(sentence_id)
+            mapping = sentence_mappings.get(sentence_key, {})
+            
+            if mapping.get('found', False):
+                stable_elements = mapping.get('stable_elements', [])
+                
+                for element in stable_elements:
+                    page_key = f"page_{element.get('page', 1)}"
+                    
+                    if page_key not in highlights_by_page:
+                        highlights_by_page[page_key] = []
+                    
+                    highlights_by_page[page_key].append({
+                        'sentence_id': sentence_id,
+                        'stable_index': element.get('stable_index'),
+                        'text': element.get('text', ''),
+                        'coordinates': element.get('coordinates', {}),
+                        'confidence': element.get('combined_confidence', element.get('overlap_confidence', 0.8)),
+                        'match_source': element.get('match_source', 'mapping'),
+                        'identifiers': element.get('identifiers', {})
+                    })
+        
+        return highlights_by_page if highlights_by_page else None
+        
+    except Exception as e:
+        logger.error(f"Error extracting coordinate highlights: {e}")
+        return None
+
+@main.route('/documents/<filename>/sentence-items', methods=['GET'])
+def get_sentence_stable_items_enhanced(filename):
+    """Get stable item mappings for specific sentences - enhanced version"""
+    try:
+        sentence_ids_param = request.args.get('ids')
+        
+        if not sentence_ids_param:
+            return jsonify({
+                'success': False,
+                'error': 'sentence_ids parameter required'
+            }), 400
+        
+        sentence_ids = sentence_ids_param.split(',')
+        logger.info(f"🎯 Sentence stable item mappings requested for {filename}, sentences: {', '.join(sentence_ids)}")
+        
+        # Use file finder to locate mapping data
+        mapping_info = get_file_finder().find_file(filename, 'stable_mappings')
+        
+        if not mapping_info:
+            return jsonify({
+                'success': False,
+                'error': f'No mappings for {filename}',
+                'suggestion': 'Document may need to be processed with coordinate extraction'
+            }), 404
+        
+        # Load mapping data
+        with open(mapping_info['path'], 'r', encoding='utf-8') as f:
+            mapping_data = json.load(f)
+        
+        # Handle both old and new mapping formats
+        sentence_mappings = mapping_data.get('sentence_mappings', mapping_data.get('sentence_to_items', {}))
+        
+        if not sentence_mappings:
+            return jsonify({
+                'success': False,
+                'error': 'No sentence mappings found in mapping data'
+            }), 404
+        
+        # Filter to only the requested sentences
+        filtered_mappings = {}
+        found_count = 0
+        
+        for sentence_id in sentence_ids:
+            sentence_key = str(sentence_id).strip()
+            if sentence_key in sentence_mappings:
+                mapping = sentence_mappings[sentence_key]
+                
+                # Ensure mapping has the 'found' status
+                if mapping.get('found', True):  # Default to True for backward compatibility
+                    filtered_mappings[sentence_key] = mapping
+                    found_count += 1
+        
+        logger.info(f"✅ Returning mappings for {found_count}/{len(sentence_ids)} sentences")
+        
+        return jsonify({
+            'success': True,
+            'sentence_mappings': filtered_mappings,
+            'requested_sentences': sentence_ids,
+            'found_sentences': list(filtered_mappings.keys()),
+            'debug': {
+                'total_available_mappings': len(sentence_mappings),
+                'mapping_source': mapping_info['location']
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting sentence items for {filename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    
+# Enhanced route in routes.py for better consumption-aware mappings
+
+@main.route('/documents/<filename>/sentence-items-enhanced', methods=['GET'])
+def get_sentence_stable_items_consumption_aware(filename):
+    """
+    Get stable item mappings with enhanced consumption analysis for precise highlighting
+    """
+    try:
+        sentence_ids_param = request.args.get('ids')
+        include_consumption_analysis = request.args.get('include_consumption_analysis', 'true').lower() == 'true'
+        
+        if not sentence_ids_param:
+            return jsonify({
+                'success': False,
+                'error': 'sentence_ids parameter required'
+            }), 400
+        
+        sentence_ids = sentence_ids_param.split(',')
+        logger.info(f"🎯 Enhanced sentence mappings requested for {filename}, sentences: {', '.join(sentence_ids)}")
+        
+        # Use file finder to locate mapping data
+        mapping_info = get_file_finder().find_file(filename, 'stable_mappings')
+        
+        if not mapping_info:
+            return jsonify({
+                'success': False,
+                'error': f'No stable mappings for {filename}',
+                'suggestion': 'Document may need to be processed with coordinate extraction'
+            }), 404
+        
+        # Load mapping data
+        with open(mapping_info['path'], 'r', encoding='utf-8') as f:
+            mapping_data = json.load(f)
+        
+        sentence_mappings = mapping_data.get('sentence_mappings', {})
+        
+        if not sentence_mappings:
+            return jsonify({
+                'success': False,
+                'error': 'No sentence mappings found in mapping data'
+            }), 404
+        
+        # Process and enhance mappings
+        enhanced_mappings = {}
+        
+        for sentence_id in sentence_ids:
+            sentence_key = str(sentence_id).strip()
+            
+            if sentence_key not in sentence_mappings:
+                enhanced_mappings[sentence_key] = {
+                    'sentence_id': sentence_id,
+                    'found': False,
+                    'reason': 'sentence_not_in_mappings'
+                }
+                continue
+            
+            mapping = sentence_mappings[sentence_key]
+            
+            if not mapping.get('found', False):
+                enhanced_mappings[sentence_key] = {
+                    **mapping,
+                    'sentence_id': sentence_id,
+                    'found': False
+                }
+                continue
+            
+            # Enhance the mapping with consumption analysis
+            enhanced_mapping = enhance_mapping_with_consumption_analysis(mapping, sentence_id, include_consumption_analysis)
+            enhanced_mappings[sentence_key] = enhanced_mapping
+        
+        # Calculate overall quality metrics
+        quality_metrics = calculate_mapping_quality_metrics(enhanced_mappings)
+        
+        return jsonify({
+            'success': True,
+            'sentence_mappings': enhanced_mappings,
+            'quality_metrics': quality_metrics,
+            'metadata': {
+                'requested_sentences': sentence_ids,
+                'found_sentences': [k for k, v in enhanced_mappings.items() if v.get('found', False)],
+                'mapping_source': mapping_info['location'],
+                'total_available_mappings': len(sentence_mappings),
+                'consumption_analysis_included': include_consumption_analysis
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting enhanced sentence items for {filename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+def enhance_mapping_with_consumption_analysis(mapping, sentence_id, include_analysis=True):
+    """
+    Enhance a sentence mapping with consumption-aware analysis
+    """
+    enhanced = dict(mapping)
+    enhanced['sentence_id'] = sentence_id
+    
+    if not include_analysis or not mapping.get('stable_elements'):
+        return enhanced
+    
+    # Analyze stable elements for consumption quality
+    stable_elements = mapping['stable_elements']
+    sentence_text = mapping.get('sentence_text', '')
+    
+    # Extract sentence words for validation
+    sentence_words = set()
+    if sentence_text:
+        sentence_words = set(
+            sentence_text.lower()
+            .replace(',', ' ')
+            .replace('.', ' ')
+            .replace('!', ' ')
+            .replace('?', ' ')
+            .replace(';', ' ')
+            .replace(':', ' ')
+            .split()
+        )
+        sentence_words = {word for word in sentence_words if len(word) > 2}
+    
+    # Analyze each element
+    analyzed_elements = []
+    high_quality_count = 0
+    total_consumption = 0
+    total_relevance = 0
+    
+    for element in stable_elements:
+        analyzed_element = dict(element)
+        
+        consumption_ratio = element.get('consumption_ratio', 0)
+        words_consumed = element.get('words_consumed', [])
+        
+        # Calculate word relevance
+        if sentence_words and words_consumed:
+            relevant_words = [w for w in words_consumed if w.lower() in sentence_words]
+            word_relevance = len(relevant_words) / len(words_consumed) if words_consumed else 0
+        else:
+            word_relevance = 0.5  # Default if no data
+        
+        # Calculate quality score
+        quality_score = (consumption_ratio * 0.7) + (word_relevance * 0.3)
+        
+        # Determine quality tier
+        if quality_score >= 0.7:
+            quality_tier = 'high'
+            high_quality_count += 1
+        elif quality_score >= 0.4:
+            quality_tier = 'medium'
+        else:
+            quality_tier = 'low'
+        
+        # Add analysis to element
+        analyzed_element.update({
+            'word_relevance': word_relevance,
+            'quality_score': quality_score,
+            'quality_tier': quality_tier,
+            'relevant_words': relevant_words if sentence_words and words_consumed else [],
+            'consumption_analysis': {
+                'consumption_ratio': consumption_ratio,
+                'words_consumed_count': len(words_consumed),
+                'relevant_words_count': len(relevant_words) if sentence_words and words_consumed else 0,
+                'precision': word_relevance,
+                'is_high_quality': quality_score >= 0.7
+            }
+        })
+        
+        analyzed_elements.append(analyzed_element)
+        total_consumption += consumption_ratio
+        total_relevance += word_relevance
+    
+    # Update the mapping with analyzed elements
+    enhanced['stable_elements'] = analyzed_elements
+    
+    # Add overall analysis
+    enhanced['consumption_analysis'] = {
+        'total_elements': len(stable_elements),
+        'high_quality_elements': high_quality_count,
+        'avg_consumption_ratio': total_consumption / len(stable_elements) if stable_elements else 0,
+        'avg_word_relevance': total_relevance / len(stable_elements) if stable_elements else 0,
+        'overall_quality': calculate_overall_quality(high_quality_count, len(stable_elements), total_consumption, total_relevance),
+        'sentence_words_count': len(sentence_words),
+        'recommended_for_highlighting': high_quality_count > 0 and (total_consumption / len(stable_elements)) > 0.3
+    }
+    
+    return enhanced
+
+
+def calculate_overall_quality(high_quality_count, total_elements, total_consumption, total_relevance):
+    """Calculate overall quality score for a sentence mapping"""
+    if total_elements == 0:
+        return 0
+    
+    high_quality_ratio = high_quality_count / total_elements
+    avg_consumption = total_consumption / total_elements
+    avg_relevance = total_relevance / total_elements
+    
+    # Weighted combination
+    overall_score = (high_quality_ratio * 0.4) + (avg_consumption * 0.3) + (avg_relevance * 0.3)
+    
+    return min(1.0, max(0.0, overall_score))
+
+
+def calculate_mapping_quality_metrics(enhanced_mappings):
+    """Calculate quality metrics across all mappings"""
+    found_mappings = [m for m in enhanced_mappings.values() if m.get('found', False)]
+    
+    if not found_mappings:
+        return {
+            'total_sentences': len(enhanced_mappings),
+            'found_sentences': 0,
+            'avg_quality': 0,
+            'high_quality_sentences': 0,
+            'recommended_for_highlighting': 0
+        }
+    
+    total_quality = 0
+    high_quality_count = 0
+    recommended_count = 0
+    
+    for mapping in found_mappings:
+        analysis = mapping.get('consumption_analysis', {})
+        overall_quality = analysis.get('overall_quality', 0)
+        
+        total_quality += overall_quality
+        
+        if overall_quality >= 0.7:
+            high_quality_count += 1
+        
+        if analysis.get('recommended_for_highlighting', False):
+            recommended_count += 1
+    
+    return {
+        'total_sentences': len(enhanced_mappings),
+        'found_sentences': len(found_mappings),
+        'avg_quality': total_quality / len(found_mappings),
+        'high_quality_sentences': high_quality_count,
+        'recommended_for_highlighting': recommended_count,
+        'quality_distribution': {
+            'high': high_quality_count,
+            'medium': len([m for m in found_mappings 
+                          if 0.4 <= m.get('consumption_analysis', {}).get('overall_quality', 0) < 0.7]),
+            'low': len([m for m in found_mappings 
+                       if m.get('consumption_analysis', {}).get('overall_quality', 0) < 0.4])
+        }
+    }
+
+@main.route('/documents/<filename>/highlight-data', methods=['POST'])
+def get_highlight_data_for_sentences(filename):
+    """Get highlight data for specific sentence IDs - matches mock server functionality"""
+    try:
+        data = request.json or {}
+        sentence_ids = data.get('sentence_ids', [])
+        provenance_id = data.get('provenance_id')
+        
+        logger.info(f"🎯 Highlight data requested for {filename}, sentences: {sentence_ids}")
+        
+        if not sentence_ids or not isinstance(sentence_ids, list):
+            return jsonify({
+                'success': False,
+                'error': 'sentence_ids array is required'
+            }), 400
+        
+        # Use file finder to get mapping data
+        mapping_info = get_file_finder().find_file(filename, 'mappings')
+        
+        if not mapping_info:
+            return jsonify({
+                'success': False,
+                'error': f'No stable mappings found for {filename}',
+                'suggestion': 'Document may need to be processed with coordinate extraction'
+            }), 404
+        
+        # Load mapping data
+        with open(mapping_info['path'], 'r', encoding='utf-8') as f:
+            mapping_data = json.load(f)
+        
+        # Generate highlight data
+        highlight_data = get_highlight_data_for_sentence_ids(sentence_ids, mapping_data)
+        
+        if not highlight_data:
+            return jsonify({
+                'success': False,
+                'error': 'No highlight data could be generated',
+                'debug': {
+                    'sentence_ids': sentence_ids,
+                    'mapping_available': True,
+                    'mapping_source': mapping_info['location']
+                }
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            'highlight_data': highlight_data,
+            'metadata': {
+                'filename': filename,
+                'sentence_ids': sentence_ids,
+                'provenance_id': provenance_id,
+                'total_elements': highlight_data.get('stable_elements', []),
+                'pages_covered': len(highlight_data.get('highlights_by_page', {}))
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting highlight data for {filename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+def get_highlight_data_for_sentence_ids(sentence_ids, mapping_data):
+    """Generate highlight data structure from mapping data"""
+    try:
+        sentence_mappings = mapping_data.get('sentence_mappings', mapping_data.get('sentence_to_items', {}))
+        
+        highlight_data = {
+            'sentence_count': len(sentence_ids),
+            'highlights_by_page': {},
+            'stable_elements': [],
+            'bounding_boxes': []
+        }
+        
+        for sentence_id in sentence_ids:
+            sentence_key = str(sentence_id)
+            mapping = sentence_mappings.get(sentence_key, {})
+            
+            if not mapping.get('found', False):
+                logger.warning(f"⚠️ No mapping found for sentence {sentence_id}")
+                continue
+            
+            stable_elements = mapping.get('stable_elements', [])
+            
+            for element in stable_elements:
+                page = element.get('page', 1)
+                coordinates = element.get('coordinates', {})
+                
+                # Group by page
+                page_key = f"page_{page}"
+                if page_key not in highlight_data['highlights_by_page']:
+                    highlight_data['highlights_by_page'][page_key] = []
+                
+                highlight_data['highlights_by_page'][page_key].append({
+                    'stable_index': element.get('stable_index'),
+                    'coordinates': coordinates,
+                    'overlap_confidence': element.get('overlap_confidence', 0.8),
+                    'text_similarity': element.get('text_similarity', 0.8),
+                    'confidence': element.get('combined_confidence', element.get('overlap_confidence', 0.8)),
+                    'sentence_id': sentence_id,
+                    'text_preview': element.get('text', '')[:50] if element.get('text') else ''
+                })
+                
+                # Add to flat arrays
+                highlight_data['stable_elements'].append(element.get('stable_index'))
+                highlight_data['bounding_boxes'].append({
+                    'page': page,
+                    'x': coordinates.get('x', 0),
+                    'y': coordinates.get('y', 0),
+                    'width': coordinates.get('width', 0),
+                    'height': coordinates.get('height', 0),
+                    'sentence_id': sentence_id,
+                    'stable_index': element.get('stable_index')
+                })
+        
+        return highlight_data
+        
+    except Exception as e:
+        logger.error(f"Error generating highlight data: {e}")
+        return None
+
+@main.route('/documents/<filename>/processing-status', methods=['GET'])
+def get_document_processing_status(filename):
+    """Get processing status for coordinate extraction - matches mock server"""
+    try:
+        base_name = filename.replace('.pdf', '')
+        logger.info(f"📊 Processing status requested for {filename}")
+        
+        # Check for various processed files using file finder
+        all_files = get_file_finder().find_all_files(filename)
+        
+        files_available = {
+            'sentences': all_files.get('sentences') is not None,
+            'layout': all_files.get('layout') is not None,
+            'mappings': all_files.get('mappings') is not None
+        }
+        
+        # Check if we have a processing summary (if you implement this)
+        processing_summary_path = os.path.join(
+            current_app.config.get('UPLOAD_FOLDER', 'app/uploads'), 
+            f"{base_name}_processing_summary.json"
+        )
+        
+        has_processing_summary = os.path.exists(processing_summary_path)
+        processing_info = {}
+        
+        if has_processing_summary:
+            try:
+                with open(processing_summary_path, 'r', encoding='utf-8') as f:
+                    processing_info = json.load(f)
+            except Exception as e:
+                logger.warning(f"Could not read processing summary: {e}")
+        
+        # Determine if fully processed
+        processed = all(files_available.values())
+        
+        return jsonify({
+            'success': True,
+            'processed': processed,
+            'processing_date': processing_info.get('processing_date', 'unknown'),
+            'steps_completed': processing_info.get('steps_completed', list(files_available.keys())),
+            'files_created': {k: v for k, v in files_available.items() if v},
+            'errors': processing_info.get('errors', []),
+            'has_processing_summary': has_processing_summary,
+            'files_available': files_available
+        })
+        
+    except Exception as e:
+        logger.error(f"Error checking processing status for {filename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@main.route('/test-questions/<filename>', methods=['GET'])
+def get_test_questions_for_document(filename):
+    """Get test questions for a document - matches mock server format"""
+    try:
+        logger.info(f"🎯 Test questions requested for: {filename}")
+        
+        # Load test suite data
+        test_suite_data = load_test_suite_data(filename)
+        
+        if not test_suite_data:
+            return jsonify({
+                'success': True,
+                'questions': [],
+                'message': f'No test questions found for {filename}',
+                'document_name': filename,
+                'total_questions': 0
+            })
+        
+        # Convert test suite format to frontend-friendly format
+        quick_questions = []
+        
+        for entry in test_suite_data:
+            if not isinstance(entry, dict):
+                continue
+                
+            for question_id, question_data in entry.items():
+                if not isinstance(question_data, dict):
+                    continue
+                
+                # Extract question info
+                question_text = question_data.get('question', '')
+                answer = question_data.get('answer', '')
+                provenance_data = question_data.get('provenance', [])
+                metadata = question_data.get('metadata', {})
+                
+                # Check if has valid answer
+                has_answer = bool(answer and answer.strip() and answer.upper() != 'NULL')
+                
+                quick_questions.append({
+                    'question_id': question_id,
+                    'question_text': question_text,
+                    'has_answer': has_answer,
+                    'answer_preview': answer[:100] + '...' if len(answer) > 100 else answer,
+                    'provenance_count': len(provenance_data),
+                    'provenance_data': provenance_data,  # Include full provenance data
+                    'processing_time': metadata.get('processing_time', 0),
+                    'created_at': metadata.get('created_at', time.time()),
+                    'document_name': filename
+                })
+        
+        return jsonify({
+            'success': True,
+            'questions': quick_questions,
+            'document_name': filename,
+            'total_questions': len(quick_questions)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting test questions for {filename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 
+        
+# Add this import at the top of your routes file
+from .sentence_matcher_simple import SentenceMatcher
+
+@main.route('/find_sentence_matches', methods=['POST'])
+def find_sentence_matches():
+    """Flask endpoint to find sentence matches in elements"""
+    
+    try:
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No JSON data provided'
+            }), 400
+        
+        target_sentence = data.get('target_sentence', '')
+        elements = data.get('elements', [])
+        
+        if not target_sentence:
+            return jsonify({
+                'success': False,
+                'error': 'Missing target_sentence'
+            }), 400
+            
+        if not elements:
+            return jsonify({
+                'success': False,
+                'error': 'Missing elements'
+            }), 400
+        
+        logger.info(f"🔍 Sentence matching request: '{target_sentence}' with {len(elements)} elements")
+        
+        matcher = SentenceMatcher()
+        result = matcher.find_best_sentence_match(target_sentence, elements)
+        
+        logger.info(f"✅ Sentence matching result: {result.get('success', False)}")
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Error in find_sentence_matches endpoint: {e}", exc_info=True)  # Added exc_info for full traceback
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/debug/highlight-test/<filename>', methods=['POST'])
+def debug_highlight_test(filename):
+    """Debug highlight test endpoint - matches mock server"""
+    try:
+        data = request.json or {}
+        test_sentence_ids = data.get('test_sentence_ids', [0, 1, 2])
+        include_debug_info = data.get('include_debug_info', True)
+        
+        logger.info(f"🐛 Debug highlight test for {filename}, sentences: {test_sentence_ids}")
+        
+        # Use file finder to get mapping data
+        mapping_info = get_file_finder().find_file(filename, 'mappings')
+        
+        if not mapping_info:
+            return jsonify({
+                'success': False,
+                'error': f'No stable mappings found for {filename}'
+            }), 404
+        
+        # Load mapping data
+        with open(mapping_info['path'], 'r', encoding='utf-8') as f:
+            mapping_data = json.load(f)
+        
+        # Generate highlight data
+        highlight_data = get_highlight_data_for_sentence_ids(test_sentence_ids, mapping_data)
+        
+        debug_info = {}
+        
+        if include_debug_info:
+            try:
+                # Add debug information
+                debug_info.update({
+                    'mapping_metadata': mapping_data.get('metadata', {}),
+                    'mapping_statistics': mapping_data.get('statistics', {}),
+                    'total_sentence_mappings': len(mapping_data.get('sentence_mappings', {})),
+                    'mapping_source': mapping_info['location']
+                })
+                
+                # Load layout info if available for additional debug
+                layout_info = get_file_finder().find_file(filename, 'layout')
+                if layout_info:
+                    with open(layout_info['path'], 'r', encoding='utf-8') as f:
+                        layout_data = json.load(f)
+                    debug_info['layout_metadata'] = layout_data.get('metadata', {})
+                
+            except Exception as debug_error:
+                debug_info['debug_error'] = str(debug_error)
+        
+        return jsonify({
+            'success': True,
+            'highlight_data': highlight_data,
+            'debug_info': debug_info,
+            'test_parameters': {
+                'filename': filename,
+                'test_sentence_ids': test_sentence_ids,
+                'include_debug_info': include_debug_info
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in debug highlight test for {filename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@main.route('/documents/<filename>/mappings', methods=['GET'])
+def get_document_mappings_overview(filename):
     """Get mapping statistics and document info overview"""
     try:
-        logger.info(f"📝 Mappings overview requested for {basename}")
-        
+        logger.info(f"📝 Mappings overview requested for {filename}")
+        basename = filename.replace('.pdf', '')
         # Use file finder to locate mapping data
         mapping_info = get_file_finder().find_file(basename, 'mappings')
         
@@ -2174,458 +3136,6 @@ def get_document_mappings_overview(basename):
             'error': str(e)
         }), 500
 
-
-@main.route('/api/documents/<basename>/mappings/sentences', methods=['GET'])
-def get_document_sentence_mappings(basename):
-    """Get paginated sentence mapping data"""
-    try:
-        page = int(request.args.get('page', 1))
-        limit = int(request.args.get('limit', 20))
-        filter_type = request.args.get('filter', 'all')  # all, mapped, unmapped
-        
-        logger.info(f"📝 Sentence mappings requested for {basename} (page {page}, filter: {filter_type})")
-        
-        # Use file finder to locate mapping data
-        mapping_info = get_file_finder().find_file(basename, 'mappings')
-        
-        if not mapping_info:
-            return jsonify({
-                'success': False,
-                'error': f'No mapping data for {basename}'
-            }), 404
-        
-        # Load mapping data
-        with open(mapping_info['path'], 'r', encoding='utf-8') as f:
-            mapping_data = json.load(f)
-        
-        sentence_to_items = mapping_data.get('sentence_to_items', {})
-        
-        if not sentence_to_items:
-            return jsonify({
-                'success': False,
-                'error': f'No sentence mapping data for {basename}'
-            }), 404
-        
-        # Convert mappings to simple array
-        all_sentences = []
-        for sentence_id, mapping in sentence_to_items.items():
-            stable_matches = mapping.get('stable_matches', [])
-            has_matches = len(stable_matches) > 0
-            
-            # Apply filter
-            if filter_type == 'mapped' and not has_matches:
-                continue
-            if filter_type == 'unmapped' and has_matches:
-                continue
-            
-            sentence_text = mapping.get('text', '')
-            truncated_text = sentence_text[:200] if len(sentence_text) > 200 else sentence_text
-            
-            all_sentences.append({
-                'id': sentence_id,
-                'text': truncated_text,
-                'confidence': mapping.get('confidence', 0),
-                'strategy': mapping.get('match_strategy', 'none'),
-                'page': mapping.get('primary_page'),
-                'stable_item_count': len(stable_matches),
-                'has_matches': has_matches
-            })
-        
-        # Sort by confidence
-        all_sentences.sort(key=lambda x: x.get('confidence', 0), reverse=True)
-        
-        # Paginate
-        total = len(all_sentences)
-        start = (page - 1) * limit
-        paginated_sentences = all_sentences[start:start + limit]
-        
-        return jsonify({
-            'success': True,
-            'sentences': paginated_sentences,
-            'pagination': {
-                'page': page,
-                'limit': limit,
-                'total': total,
-                'total_pages': (total + limit - 1) // limit  # Ceiling division
-            },
-            'filter': filter_type
-        })
-        
-    except ValueError as e:
-        return jsonify({
-            'success': False,
-            'error': 'Invalid page or limit parameter'
-        }), 400
-    except Exception as e:
-        logger.error(f"Error getting sentence mappings for {basename}: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-
-@main.route('/api/documents/<basename>/sentence-items', methods=['GET'])
-def get_sentence_stable_items(basename):
-    """Get stable item mappings for specific sentences"""
-    try:
-        sentence_ids_param = request.args.get('ids')
-        
-        if not sentence_ids_param:
-            return jsonify({
-                'success': False,
-                'error': 'sentence_ids parameter required'
-            }), 400
-        
-        sentence_ids = sentence_ids_param.split(',')
-        logger.info(f"🎯 Sentence stable item mappings requested for {basename}, sentences: {', '.join(sentence_ids)}")
-        
-        # Use file finder to locate mapping data
-        mapping_info = get_file_finder().find_file(basename, 'mappings')
-        
-        if not mapping_info:
-            return jsonify({
-                'success': False,
-                'error': f'No mappings for {basename}'
-            }), 404
-        
-        # Load mapping data
-        with open(mapping_info['path'], 'r', encoding='utf-8') as f:
-            mapping_data = json.load(f)
-        
-        sentence_to_items = mapping_data.get('sentence_to_items', {})
-        
-        # Filter to only the requested sentences
-        filtered_mappings = {}
-        for sentence_id in sentence_ids:
-            sentence_key = str(sentence_id).strip()
-            if sentence_key in sentence_to_items:
-                filtered_mappings[sentence_key] = sentence_to_items[sentence_key]
-        
-        logger.info(f"✅ Returning mappings for {len(filtered_mappings)} sentences")
-        
-        return jsonify({
-            'success': True,
-            'sentence_mappings': filtered_mappings,
-            'requested_sentences': sentence_ids,
-            'found_sentences': list(filtered_mappings.keys())
-        })
-        
-    except Exception as e:
-        logger.error(f"Error getting sentence items for {basename}: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-
-@main.route('/api/mappings/list', methods=['GET'])
-def list_all_mappings():
-    """List all available mappings with basic stats"""
-    try:
-        logger.info('📋 Mappings list requested')
-        
-        mappings = []
-        
-        # Check both uploads and downloads directories for mapping files
-        search_dirs = [
-            current_app.config.get('UPLOAD_FOLDER', 'app/uploads'),
-            DOWNLOADS_DIR
-        ]
-        
-        processed_basenames = set()
-        
-        for search_dir in search_dirs:
-            if not os.path.exists(search_dir):
-                continue
-                
-            # Look for mapping files directly in the directory
-            for filename in os.listdir(search_dir):
-                if filename.endswith('_mappings.json'):
-                    basename = filename.replace('_mappings.json', '')
-                    
-                    if basename in processed_basenames:
-                        continue
-                    processed_basenames.add(basename)
-                    
-                    mapping_path = os.path.join(search_dir, filename)
-                    
-                    try:
-                        with open(mapping_path, 'r', encoding='utf-8') as f:
-                            mapping_data = json.load(f)
-                        
-                        stats = mapping_data.get('statistics', {})
-                        doc_info = mapping_data.get('document_info', {})
-                        
-                        mappings.append({
-                            'basename': basename,
-                            'filename': f"{basename}.pdf",
-                            'total_sentences': stats.get('total_sentences', 0),
-                            'mapped_sentences': stats.get('mapped_sentences', 0),
-                            'mapping_rate': stats.get('mapping_rate', 0),
-                            'total_stable_items': stats.get('total_stable_items', 0),
-                            'total_pages': doc_info.get('total_pages', 0),
-                            'has_mappings': True
-                        })
-                        
-                    except Exception as e:
-                        logger.warning(f"Error reading mapping file {mapping_path}: {e}")
-                        continue
-            
-            # Also check batch directories in downloads
-            if search_dir == DOWNLOADS_DIR:
-                for item in os.listdir(search_dir):
-                    item_path = os.path.join(search_dir, item)
-                    if os.path.isdir(item_path) and item.startswith('batch_'):
-                        for batch_file in os.listdir(item_path):
-                            if batch_file.endswith('_mappings.json'):
-                                basename = batch_file.replace('_mappings.json', '')
-                                
-                                if basename in processed_basenames:
-                                    continue
-                                processed_basenames.add(basename)
-                                
-                                mapping_path = os.path.join(item_path, batch_file)
-                                
-                                try:
-                                    with open(mapping_path, 'r', encoding='utf-8') as f:
-                                        mapping_data = json.load(f)
-                                    
-                                    stats = mapping_data.get('statistics', {})
-                                    doc_info = mapping_data.get('document_info', {})
-                                    
-                                    mappings.append({
-                                        'basename': basename,
-                                        'filename': f"{basename}.pdf",
-                                        'total_sentences': stats.get('total_sentences', 0),
-                                        'mapped_sentences': stats.get('mapped_sentences', 0),
-                                        'mapping_rate': stats.get('mapping_rate', 0),
-                                        'total_stable_items': stats.get('total_stable_items', 0),
-                                        'total_pages': doc_info.get('total_pages', 0),
-                                        'has_mappings': True
-                                    })
-                                    
-                                except Exception as e:
-                                    logger.warning(f"Error reading batch mapping file {mapping_path}: {e}")
-                                    continue
-        
-        # Sort by mapping rate (best first)
-        mappings.sort(key=lambda x: x.get('mapping_rate', 0), reverse=True)
-        
-        return jsonify({
-            'success': True,
-            'mappings': mappings
-        })
-        
-    except Exception as e:
-        logger.error(f"Error listing mappings: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-
-@main.route('/pdf-processing-status/<pdf_name>', methods=['GET'])
-def check_pdf_processing_status(pdf_name):
-    """
-    Check if a PDF has been processed (sentences and layout files exist)
-    
-    Returns:
-    {
-        "success": true,
-        "processed": true,
-        "files_exist": {
-            "sentences": true,
-            "layout": true
-        },
-        "file_paths": {
-            "sentences": "/path/to/file_sentences.json",
-            "layout": "/path/to/file_layout.json"
-        },
-        "last_modified": {
-            "sentences": "2024-01-15T10:30:00Z",
-            "layout": "2024-01-15T10:30:00Z"
-        }
-    }
-    """
-    try:
-        # Determine file paths (assuming files are in uploads directory)
-        upload_dir = current_app.config.get('UPLOAD_FOLDER', 'uploads')
-        base_name = os.path.splitext(pdf_name)[0]
-        
-        sentences_file = os.path.join(upload_dir, f"{base_name}_sentences.json")
-        layout_file = os.path.join(upload_dir, f"{base_name}_layout.json")
-        
-        sentences_exists = os.path.exists(sentences_file)
-        layout_exists = os.path.exists(layout_file)
-        
-        processed = sentences_exists and layout_exists
-        
-        # Get last modified times if files exist
-        last_modified = {}
-        if sentences_exists:
-            last_modified['sentences'] = time.ctime(os.path.getmtime(sentences_file))
-        if layout_exists:
-            last_modified['layout'] = time.ctime(os.path.getmtime(layout_file))
-        
-        return jsonify({
-            "success": True,
-            "processed": processed,
-            "files_exist": {
-                "sentences": sentences_exists,
-                "layout": layout_exists
-            },
-            "file_paths": {
-                "sentences": sentences_file if sentences_exists else None,
-                "layout": layout_file if layout_exists else None
-            },
-            "last_modified": last_modified
-        })
-        
-    except Exception as e:
-        logger.error(f"Error checking PDF processing status: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": f"Failed to check status: {str(e)}"
-        }), 500
-    
-@main.route('/bulk-process-pdfs', methods=['POST'])
-def bulk_process_pdfs():
-    """
-    Process multiple PDFs in a directory
-    
-    Expected JSON payload:
-    {
-        "pdf_directory": "/path/to/pdfs/",
-        "force_reprocess": false,
-        "max_files": 10  // Optional: limit number of files to process
-    }
-    
-    Returns:
-    {
-        "success": true,
-        "message": "Processed 5 PDFs",
-        "results": [
-            {
-                "pdf_name": "document1.pdf",
-                "success": true,
-                "processing_time": 12.5,
-                "statistics": {...}
-            }
-        ],
-        "summary": {
-            "total_found": 8,
-            "total_processed": 5,
-            "total_skipped": 2,
-            "total_failed": 1,
-            "total_time": 45.2
-        }
-    }
-    """
-    try:
-        data = request.get_json()
-        
-        if not data or 'pdf_directory' not in data:
-            return jsonify({
-                "success": False,
-                "error": "pdf_directory is required"
-            }), 400
-        
-        pdf_directory = data['pdf_directory']
-        force_reprocess = data.get('force_reprocess', False)
-        max_files = data.get('max_files', None)
-        
-        if not os.path.exists(pdf_directory):
-            return jsonify({
-                "success": False,
-                "error": f"Directory not found: {pdf_directory}"
-            }), 404
-        
-        # Find all PDF files
-        pdf_files = [f for f in os.listdir(pdf_directory) if f.lower().endswith('.pdf')]
-        
-        if max_files:
-            pdf_files = pdf_files[:max_files]
-        
-        logger.info(f"Found {len(pdf_files)} PDF files to process")
-        
-        results = []
-        total_start_time = time.time()
-        processed_count = 0
-        skipped_count = 0
-        failed_count = 0
-        
-        for pdf_file in pdf_files:
-            pdf_path = os.path.join(pdf_directory, pdf_file)
-            file_start_time = time.time()
-            
-            try:
-                base_name = os.path.splitext(pdf_file)[0]
-                sentences_file = os.path.join(pdf_directory, f"{base_name}_sentences.json")
-                layout_file = os.path.join(pdf_directory, f"{base_name}_layout.json")
-                
-                # Check if already processed
-                if not force_reprocess and os.path.exists(sentences_file) and os.path.exists(layout_file):
-                    skipped_count += 1
-                    results.append({
-                        "pdf_name": pdf_file,
-                        "success": True,
-                        "skipped": True,
-                        "message": "Already processed"
-                    })
-                    continue
-                
-                # Process the PDF
-                sentences_file_path, layout_file_path, stats = save_compatible_sentence_data(
-                    pdf_path, 
-                    pdf_directory
-                )
-                
-                processing_time = time.time() - file_start_time
-                processed_count += 1
-                
-                results.append({
-                    "pdf_name": pdf_file,
-                    "success": True,
-                    "processing_time": processing_time,
-                    "statistics": stats,
-                    "files": {
-                        "sentences": sentences_file_path,
-                        "layout": layout_file_path
-                    }
-                })
-                
-                logger.info(f"Processed {pdf_file} in {processing_time:.2f}s")
-                
-            except Exception as e:
-                failed_count += 1
-                results.append({
-                    "pdf_name": pdf_file,
-                    "success": False,
-                    "error": str(e)
-                })
-                logger.error(f"Failed to process {pdf_file}: {e}")
-        
-        total_time = time.time() - total_start_time
-        
-        return jsonify({
-            "success": True,
-            "message": f"Processed {processed_count} PDFs",
-            "results": results,
-            "summary": {
-                "total_found": len(pdf_files),
-                "total_processed": processed_count,
-                "total_skipped": skipped_count,
-                "total_failed": failed_count,
-                "total_time": total_time
-            }
-        })
-        
-    except Exception as e:
-        logger.error(f"Error in bulk processing: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": f"Bulk processing failed: {str(e)}"
-        }), 500
     
 @main.route('/drive/test', methods=['GET'])
 def test_drive_simple():
@@ -2670,337 +3180,292 @@ def debug_routes():
             'success': False,
             'error': str(e)
         })
+  
+# Create global debugger instance (or inject via config)
+debugger = create_pdfjs_debugger({
+    'pdfjs_cache_dir': 'pdfjs_cache',
+    'sentence_mappings_dir': 'sentence_page_mappings', 
+    'sentences_dir': 'sentences'
+})
+
+@main.route('/debug/documents', methods=['GET'])
+def get_debug_documents():
+    """Get list of documents available for debugging"""
+    try:
+        documents = debugger.get_available_documents()
+        return jsonify({
+            'success': True,
+            'documents': documents,
+            'count': len(documents)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/debug/documents/<document_basename>/sentences', methods=['GET'])
+def get_debug_document_sentences(document_basename):
+    """Get sentences from a document for testing"""
+    try:
+        limit = request.args.get('limit', type=int)
+        sentences = debugger.get_document_sentences(document_basename, limit=limit)
+        
+        return jsonify({
+            'success': True,
+            'document': document_basename,
+            'sentences': sentences,
+            'count': len(sentences)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/debug/documents/<document_basename>/test-sentence', methods=['POST'])
+def debug_test_sentence(document_basename):
+    """
+    Test mapping a specific sentence to PDF.js elements
     
-@main.route('/documents/<filename>/layout', methods=['GET'])
-def get_document_layout(filename):
-    """Get layout data with enhanced precision features"""
+    POST body:
+    {
+        "sentence": "Note: This form must be received by IRS within 120 days of the signature date.",
+        "sentence_id": 38,  // optional
+        "reset_consumption": false  // optional
+    }
+    """
     try:
-        logger.info(f"🎨 Enhanced layout data requested for: {filename}")
+        data = request.get_json()
+        sentence_text = data.get('sentence')
+        sentence_id = data.get('sentence_id')
+        reset_consumption = data.get('reset_consumption', False)
         
-        # Use helper to find layout
-        layout_info = get_file_finder().find_file(filename, 'layout')
-        
-        if not layout_info:
-            # Check if we have basic sentences for backward compatibility
-            sentences_info = get_file_finder().find_file(filename, 'sentences')
-            
+        if not sentence_text:
             return jsonify({
                 'success': False,
-                'error': 'No layout data available for this document',
-                'has_basic_sentences': sentences_info is not None,
-                'filename': filename,
-                'suggestion': 'Try processing the PDF with enhanced layout extraction'
-            }), 404
+                'error': 'sentence parameter required'
+            }), 400
         
-        # Load layout data
-        with open(layout_info['path'], 'r', encoding='utf-8') as f:
-            layout_data = json.load(f)
-        
-        # Extract enhancement statistics if available
-        enhancement_stats = layout_data.get('enhancement_stats', {})
-        metadata = layout_data.get('metadata', {})
-        
-        # Calculate some quick stats for the frontend
-        sentences = layout_data.get('sentences', [])
-        total_boxes = sum(len(sent.get('bounding_boxes', [])) for sent in sentences)
-        
-        # Count precision types
-        sub_element_boxes = 0
-        character_level_boxes = 0
-        for sent in sentences:
-            for box in sent.get('bounding_boxes', []):
-                match_type = box.get('match_type', '')
-                if 'precise' in match_type or 'sub_element' in match_type:
-                    sub_element_boxes += 1
-                if 'character' in match_type:
-                    character_level_boxes += 1
-        
-        # Sample some sentences for preview
-        sample_sentences = []
-        for i, sent in enumerate(sentences[:5]):  # First 5 sentences as preview
-            boxes = sent.get('bounding_boxes', [])
-            enhanced_features = sent.get('enhanced_features', {})
-            
-            sample_sentences.append({
-                'sentence_id': sent.get('sentence_id', i),
-                'text': sent.get('text', '')[:100] + ('...' if len(sent.get('text', '')) > 100 else ''),
-                'box_count': len(boxes),
-                'precision_level': enhanced_features.get('precision_level', 'element'),
-                'has_sub_element_precision': enhanced_features.get('has_sub_element_precision', False),
-                'highest_confidence': max([box.get('confidence', 0) for box in boxes], default=0),
-                'primary_page': sent.get('primary_page', 1)
-            })
-        
-        logger.info(f"✅ Enhanced layout data loaded for {filename} from {layout_info['location']}")
+        # Test the sentence mapping
+        result = debugger.test_sentence_mapping(
+            document_basename, 
+            sentence_text, 
+            sentence_id=sentence_id,
+            reset_consumption=reset_consumption
+        )
         
         return jsonify({
             'success': True,
-            'layout_data': layout_data,
-            'filename': filename,
-            'layout_available': True,
-            'source_location': layout_info['location'],
-            'enhancement_info': {
-                'is_enhanced': metadata.get('layout_mapping_version', '').startswith('2.0'),
-                'precision_level': metadata.get('precision_level', 'element'),
-                'method': metadata.get('method', 'standard'),
-                'total_sentences': len(sentences),
-                'total_boxes': total_boxes,
-                'sub_element_boxes': sub_element_boxes,
-                'character_level_boxes': character_level_boxes,
-                'enhancement_rate': enhancement_stats.get('enhancement_rate', 0)
-            },
-            'sample_sentences': sample_sentences,
-            'metadata': metadata
+            'result': format_debug_result_for_api(result)
         })
         
     except Exception as e:
-        logger.error(f"Error getting enhanced layout for {filename}: {e}")
+        logger.error(f"Error testing sentence for {document_basename}: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
         }), 500
 
-@main.route('/documents/<filename>/layout/test-precision', methods=['GET'])
-def test_layout_precision(filename):
+@main.route('/debug/documents/<document_basename>/test-multiple', methods=['POST'])
+def debug_test_multiple_sentences(document_basename):
     """
-    Test endpoint to see how precise the layout mapping is
-    Returns sample sentences with their bounding boxes for visual inspection
+    Test mapping multiple sentences
+    
+    POST body:
+    {
+        "sentences": ["First sentence", "Second sentence"],
+        "reset_consumption_between": false  // optional
+    }
     """
     try:
-        logger.info(f"🧪 Testing layout precision for: {filename}")
+        data = request.get_json()
+        sentences = data.get('sentences', [])
+        reset_consumption_between = data.get('reset_consumption_between', False)
         
-        # Find layout file
-        layout_info = get_file_finder().find_file(filename, 'layout')
-        
-        if not layout_info:
+        if not sentences:
             return jsonify({
                 'success': False,
-                'error': 'No layout data available for testing'
-            }), 404
+                'error': 'sentences parameter required'
+            }), 400
         
-        # Load layout data
-        with open(layout_info['path'], 'r', encoding='utf-8') as f:
-            layout_data = json.load(f)
+        # Test multiple sentences
+        results = debugger.test_multiple_sentences(
+            document_basename, 
+            sentences,
+            reset_consumption_between=reset_consumption_between
+        )
         
-        sentences = layout_data.get('sentences', [])
+        formatted_results = [format_debug_result_for_api(result) for result in results]
         
-        # Find sentences with high-quality matches for testing
-        test_sentences = []
+        # Calculate summary stats
+        successful_results = [r for r in results if r.success]
+        summary = {
+            'total_sentences': len(results),
+            'successful_mappings': len(successful_results),
+            'success_rate': len(successful_results) / len(results) if results else 0,
+            'avg_confidence': sum(r.confidence for r in successful_results) / len(successful_results) if successful_results else 0,
+            'avg_word_coverage': sum(r.word_coverage for r in successful_results) / len(successful_results) if successful_results else 0,
+            'methods_used': {}
+        }
         
-        for sent in sentences:
-            boxes = sent.get('bounding_boxes', [])
-            enhanced_features = sent.get('enhanced_features', {})
-            
-            # Look for sentences with good precision
-            high_conf_boxes = [box for box in boxes if box.get('confidence', 0) > 0.8]
-            precise_boxes = [box for box in boxes if 'precise' in box.get('match_type', '')]
-            
-            if len(high_conf_boxes) > 0 or len(precise_boxes) > 0:
-                test_sentences.append({
-                    'sentence_id': sent.get('sentence_id'),
-                    'text': sent.get('text', ''),
-                    'primary_page': sent.get('primary_page', 1),
-                    'bounding_boxes': boxes,
-                    'enhanced_features': enhanced_features,
-                    'quality_metrics': {
-                        'total_boxes': len(boxes),
-                        'high_confidence_boxes': len(high_conf_boxes),
-                        'precise_boxes': len(precise_boxes),
-                        'avg_confidence': sum(box.get('confidence', 0) for box in boxes) / len(boxes) if boxes else 0,
-                        'has_sub_element': any('sub_element' in box.get('match_type', '') for box in boxes)
+        # Count methods used
+        for result in successful_results:
+            method = result.method_used
+            summary['methods_used'][method] = summary['methods_used'].get(method, 0) + 1
+        
+        return jsonify({
+            'success': True,
+            'results': formatted_results,
+            'summary': summary
+        })
+        
+    except Exception as e:
+        logger.error(f"Error testing multiple sentences for {document_basename}: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/debug/documents/<document_basename>/consumption-stats', methods=['GET'])
+def get_debug_consumption_stats(document_basename):
+    """Get current element consumption statistics"""
+    try:
+        stats = debugger.get_element_consumption_stats(document_basename)
+        
+        return jsonify({
+            'success': True,
+            'document': document_basename,
+            'consumption_stats': stats
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/debug/documents/<document_basename>/reset-consumption', methods=['POST'])
+def debug_reset_consumption(document_basename):
+    """Reset element consumption for a document"""
+    try:
+        success = debugger.reset_document_consumption(document_basename)
+        
+        return jsonify({
+            'success': success,
+            'message': f'Consumption reset for {document_basename}' if success else 'Failed to reset consumption'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Enhanced version of your existing endpoint
+@main.route('/documents/<filename>/sentence-items-debug', methods=['GET'])
+def get_sentence_stable_items_debug(filename):
+    """
+    Enhanced version of your existing endpoint with real-time debugging
+    """
+    try:
+        sentence_ids_param = request.args.get('ids')
+        include_debug = request.args.get('include_debug', 'false').lower() == 'true'
+        reset_consumption = request.args.get('reset_consumption', 'false').lower() == 'true'
+        
+        if not sentence_ids_param:
+            return jsonify({
+                'success': False,
+                'error': 'sentence_ids parameter required'
+            }), 400
+        
+        sentence_ids = sentence_ids_param.split(',')
+        document_basename = filename.replace('.pdf', '')
+        
+        # Load document data  
+        doc_data = debugger.load_document_data(document_basename)
+        sentences = doc_data['sentences']
+        
+        if reset_consumption:
+            debugger.reset_document_consumption(document_basename)
+        
+        # Test each requested sentence
+        debug_results = {}
+        enhanced_mappings = {}
+        
+        for sentence_id_str in sentence_ids:
+            try:
+                sentence_id = int(sentence_id_str.strip())
+                
+                if sentence_id >= len(sentences):
+                    enhanced_mappings[sentence_id_str] = {
+                        'sentence_id': sentence_id,
+                        'found': False,
+                        'reason': 'sentence_id_out_of_range'
                     }
-                })
-            
-            # Limit to 10 test cases
-            if len(test_sentences) >= 10:
-                break
+                    continue
+                
+                sentence_text = sentences[sentence_id]
+                
+                # Test with debugger
+                if include_debug:
+                    debug_result = debugger.test_sentence_mapping(
+                        document_basename, 
+                        sentence_text, 
+                        sentence_id=sentence_id
+                    )
+                    debug_results[sentence_id_str] = format_debug_result_for_api(debug_result)
+                
+                # Use your existing enhance_mapping_with_consumption_analysis if available
+                # Or create a basic mapping from debug result
+                if include_debug and debug_result.success:
+                    enhanced_mappings[sentence_id_str] = {
+                        'sentence_id': sentence_id,
+                        'sentence_text': sentence_text,
+                        'found': True,
+                        'method': debug_result.method_used,
+                        'confidence': debug_result.confidence,
+                        'word_coverage': debug_result.word_coverage,
+                        'stable_elements': debug_result.matched_elements,
+                        'bounding_box': debug_result.bounding_box,
+                        'debug_info': debug_result.debug_info
+                    }
+                else:
+                    enhanced_mappings[sentence_id_str] = {
+                        'sentence_id': sentence_id,
+                        'sentence_text': sentence_text,
+                        'found': False,
+                        'reason': 'debug_mapping_failed'
+                    }
+                    
+            except ValueError:
+                enhanced_mappings[sentence_id_str] = {
+                    'sentence_id': sentence_id_str,
+                    'found': False,
+                    'reason': 'invalid_sentence_id'
+                }
         
-        return jsonify({
+        response_data = {
             'success': True,
-            'filename': filename,
-            'test_sentences': test_sentences,
-            'total_test_cases': len(test_sentences),
-            'layout_info': {
-                'total_sentences': len(sentences),
-                'method': layout_data.get('metadata', {}).get('method', 'unknown'),
-                'precision_level': layout_data.get('metadata', {}).get('precision_level', 'unknown')
+            'sentence_mappings': enhanced_mappings,
+            'metadata': {
+                'requested_sentences': sentence_ids,
+                'found_sentences': [k for k, v in enhanced_mappings.items() if v.get('found', False)],
+                'document_basename': document_basename,
+                'total_document_sentences': len(sentences),
+                'debug_mode': include_debug,
+                'consumption_reset': reset_consumption
             }
-        })
+        }
+        
+        if include_debug:
+            response_data['debug_results'] = debug_results
+            response_data['consumption_stats'] = debugger.get_element_consumption_stats(document_basename)
+        
+        return jsonify(response_data)
         
     except Exception as e:
-        logger.error(f"Error testing layout precision for {filename}: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-@main.route('/documents/<filename>/layout/sentence/<int:sentence_id>', methods=['GET'])
-def get_sentence_layout_detail(filename, sentence_id):
-    """
-    Get detailed layout information for a specific sentence
-    Useful for debugging and testing individual sentence mappings
-    """
-    try:
-        logger.info(f"🔍 Getting detailed layout for sentence {sentence_id} in {filename}")
-        
-        # Find layout file
-        layout_info = get_file_finder().find_file(filename, 'layout')
-        
-        if not layout_info:
-            return jsonify({
-                'success': False,
-                'error': 'No layout data available'
-            }), 404
-        
-        # Load layout data
-        with open(layout_info['path'], 'r', encoding='utf-8') as f:
-            layout_data = json.load(f)
-        
-        sentences = layout_data.get('sentences', [])
-        
-        # Find the specific sentence
-        target_sentence = None
-        for sent in sentences:
-            if sent.get('sentence_id') == sentence_id:
-                target_sentence = sent
-                break
-        
-        if not target_sentence:
-            return jsonify({
-                'success': False,
-                'error': f'Sentence {sentence_id} not found'
-            }), 404
-        
-        # Get pages layout for context
-        pages_layout = layout_data.get('pages_layout', [])
-        primary_page = target_sentence.get('primary_page', 1)
-        
-        # Find the page layout
-        page_elements = []
-        for page in pages_layout:
-            if page.get('page_num') == primary_page:
-                page_elements = page.get('elements', [])
-                break
-        
-        return jsonify({
-            'success': True,
-            'sentence': target_sentence,
-            'sentence_id': sentence_id,
-            'filename': filename,
-            'page_context': {
-                'primary_page': primary_page,
-                'total_page_elements': len(page_elements),
-                'sample_page_elements': page_elements[:5]  # First 5 for context
-            },
-            'analysis': {
-                'text_length': len(target_sentence.get('text', '')),
-                'total_boxes': len(target_sentence.get('bounding_boxes', [])),
-                'page_spans': target_sentence.get('page_spans', []),
-                'enhanced_features': target_sentence.get('enhanced_features', {}),
-                'match_types': list(set(box.get('match_type', 'unknown') 
-                                      for box in target_sentence.get('bounding_boxes', [])))
-            }
-        })
-        
-    except Exception as e:
-        logger.error(f"Error getting sentence layout detail: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-
-@main.route('/documents/<filename>/sentences', methods=['GET'])
-def get_document_sentences_enhanced(filename):
-    """Get sentences using file finder helper"""
-    try:
-        logger.info(f"📄 Sentences requested for: {filename}")
-        
-        # Use helper to find sentences
-        sentences_info = get_file_finder().find_file(filename, 'sentences')
-        
-        if not sentences_info:
-            return jsonify({
-                'success': False,
-                'error': 'Document sentences not found',
-                'filename': filename
-            }), 404
-        
-        # Load sentences
-        with open(sentences_info['path'], 'r', encoding='utf-8') as f:
-            sentences_data = json.load(f)
-        
-        # Check if layout is available
-        layout_info = get_file_finder().find_file(filename, 'layout')
-        
-        return jsonify({
-            'success': True,
-            'sentences': sentences_data,
-            'has_layout_data': layout_info is not None,
-            'layout_available': layout_info is not None,
-            'filename': filename,
-            'source_location': sentences_info['location'],
-            'total_sentences': len(sentences_data) if isinstance(sentences_data, (list, dict)) else 0
-        })
-        
-    except Exception as e:
-        logger.error(f"Error getting sentences for {filename}: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-
-# Optional: Helper function to generate layout data if it doesn't exist
-@main.route('/documents/<filename>/generate-layout', methods=['POST'])
-def generate_document_layout(filename):
-    """Generate layout data for a document that doesn't have it"""
-    try:
-        logging.info(f"🔧 Generating layout data for: {filename}")
-        
-        base_name = filename.replace('.pdf', '')
-        
-        # Find the PDF file
-        pdf_paths = [
-            os.path.join(current_app.config.get('UPLOAD_FOLDER', 'app/uploads'), filename),
-        ]
-        
-        pdf_path = None
-        for path in pdf_paths:
-            if os.path.exists(path):
-                pdf_path = path
-                break
-        
-        if not pdf_path:
-            return jsonify({
-                'success': False,
-                'error': f'PDF file not found: {filename}'
-            }), 404
-        
-        # Generate layout data using your preprocessing function
-        try:
-            output_dir = os.path.dirname(pdf_path)
-            sentences_file, layout_file, stats = save_compatible_sentence_data(pdf_path, output_dir)
-            
-            logging.info(f"✅ Generated layout data for {filename}")
-            
-            return jsonify({
-                'success': True,
-                'message': f'Layout data generated for {filename}',
-                'layout_file': layout_file,
-                'sentences_file': sentences_file,
-                'stats': stats
-            })
-            
-        except Exception as e:
-            logging.error(f"Failed to generate layout data for {filename}: {e}")
-            return jsonify({
-                'success': False,
-                'error': f'Failed to generate layout data: {str(e)}'
-            }), 500
-            
-    except Exception as e:
-        logging.error(f"Error in generate_document_layout for {filename}: {e}")
+        logger.error(f"Error in debug sentence items for {filename}: {e}")
         return jsonify({
             'success': False,
             'error': str(e)

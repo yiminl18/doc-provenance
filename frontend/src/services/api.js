@@ -629,6 +629,8 @@ export const getDriveFiles = async (county, agency) => {
   }
 };
 
+// Add these new functions to your api.js file
+
 // Initialize the provisional case sampler
 export const initProvisionalSampler = async () => {
   try {
@@ -675,8 +677,8 @@ export const sampleProvisionalDocuments = async (params = {}) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        target_count: params.target_count || 5,
-        max_attempts: params.max_attempts || 20,
+        target_count: params.target_count || 30,
+        max_attempts: params.max_attempts || 100,
         prefer_diverse_cases: params.prefer_diverse_cases !== false,
         min_pages: params.min_pages || 2,
         ...params
@@ -869,12 +871,10 @@ export const getPvcSampleFiles = async (countyName, agencyName) => {
   }
 };
 
-// Download/select a sampled file (this might just return the local path)
+// Download/select a sampled file (this returns the file info with proper serving URLs)
 export const downloadPvcSampleFile = async (fileId) => {
   try {
-    // For sampled files, we might just need to return the local file info
-    // since they're already downloaded. This depends on your backend implementation.
-    
+    // For sampled files, we need to return the file info with the correct serving URL
     const summary = await getSampledDocumentsSummary();
     
     if (!summary.success) {
@@ -898,12 +898,17 @@ export const downloadPvcSampleFile = async (fileId) => {
       return { success: false, error: 'File not found in sampled documents' };
     }
     
+    // Create the proper serving URL for PVC sample files
+    const pdfUrl = `/api/documents/pvc-sample/${targetCase}/${targetFile.filename}`;
+    
     return {
       success: true,
       filename: targetFile.filename,
       local_path: targetFile.full_path,
       provisional_case_name: targetCase,
-      metadata: targetFile.metadata
+      metadata: targetFile.metadata,
+      pdf_url: pdfUrl,  // Add the serving URL
+      source: 'pvc-sample'
     };
     
   } catch (error) {

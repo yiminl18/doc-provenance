@@ -342,7 +342,7 @@ Text: "${sentenceText.substring(0, 80)}..."
         existingHighlights.forEach(el => el.remove());
 
         activeHighlights.current.clear();
-        log('🧹 Cleared all Python-backed highlights');
+        log(`🧹 Cleared all ${className} highlights`);
     };
 
     // Clear cache when document changes

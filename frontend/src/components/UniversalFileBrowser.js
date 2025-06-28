@@ -11,11 +11,6 @@ import {
 import {
   getDocuments,
   getGeneratedQuestions,
-  // Remove old drive functions, replace with new ones:
-  // getDriveCounties, 
-  // getDriveAgencies, 
-  // getDriveFiles, 
-  // downloadDriveFile, 
   getPvcSampleCounties,
   getPvcSampleAgencies,
   getPvcSampleFiles,
@@ -49,24 +44,6 @@ const UnifiedFileBrowser = ({
   const [files, setFiles] = useState([]);
   const [sampling, setSampling] = useState(false);
   const [downloadingFile, setDownloadingFile] = useState(null);
-
-  // Reset state when mode changes
-  useEffect(() => {
-    if (isOpen) {
-      setError(null);
-      setLoading(false);
-
-      if (mode === 'available') {
-        loadDocuments();
-      } else if (mode === 'drive') {
-        setCurrentView('counties');
-        setSelectedCounty(null);
-        setSelectedAgency(null);
-        // Initialize the sampler and fetch counties
-        initializePvcSampler();
-      }
-    }
-  }, [isOpen, mode]);
 
   // =============================================================================
   // Available Documents Functions
@@ -192,151 +169,241 @@ const UnifiedFileBrowser = ({
   // Drive Browser Functions
   // =============================================================================
 
-  const handleSmartSampling = async () => {
-    setSampling(true);
-    setError(null);
-    try {
-      // Use the updated sampling function
-      const result = await sampleExtractableDocuments({
-        target_count: 5,
-        prefer_diverse_cases: true,
-        min_pages: 0
-      });
 
-      if (result.success && result.documents && result.documents.length > 0) {
-        alert(`Successfully sampled ${result.documents.length} documents from ${result.stats.cases_represented} different cases!`);
-
-        // Refresh the counties view to show newly sampled files
-        if (currentView === 'counties') {
-          fetchCounties();
+const handleSmartSampling = async () => {
+  setSampling(true);
+  setError(null);
+  try {
+    // Use the updated sampling function
+    const result = await sampleExtractableDocuments({
+      target_count: 30,
+      prefer_diverse_cases: true,
+      min_pages: 2, 
+      allow_duplicates: false  // New parameter to prevent duplicates
+    });
+    
+    if (result.success) {
+      const stats = result.stats || {};
+      const newCount = stats.achieved_count || 0;
+      const existingCount = stats.existing_count || 0;
+      const totalCount = stats.total_count || 0;
+      const duplicatesSkipped = stats.duplicates_skipped || 0;
+      
+      if (newCount > 0) {
+        let message = `Successfully sampled ${newCount} new documents!`;
+        if (existingCount > 0) {
+          message += ` You now have ${totalCount} total documents.`;
         }
-
+        if (duplicatesSkipped > 0) {
+          message += ` (${duplicatesSkipped} duplicates were skipped)`;
+        }
+        
+        alert(message);
+      } else if (stats.all_candidates_were_duplicates) {
+        alert(`All available documents have already been sampled. You have ${existingCount} documents in your collection.`);
       } else {
-        setError(`Sampling completed but only found ${result.documents?.length || 0} documents.`);
+        alert(`No new documents were sampled. You have ${existingCount} existing documents.`);
       }
-    } catch (error) {
-      console.error('Sampling failed:', error);
-      setError('Sampling failed. Please try again.');
-    } finally {
-      setSampling(false);
+      
+      // Refresh the counties view to show newly sampled files
+      if (currentView === 'counties') {
+        fetchCounties();
+      }
+      
+    } else {
+      setError(`Sampling failed: ${result.error || 'Unknown error'}`);
     }
-  };
+  } catch (error) {
+    console.error('Sampling failed:', error);
+    setError('Sampling failed. Please try again.');
+  } finally {
+    setSampling(false);
+  }
+};
 
-  const fetchCounties = async () => {
-    setLoading(true);
+const fetchCounties = async () => {
+  setLoading(true);
+  setError(null);
+  try {
+    console.log('🔄 Fetching PVC sample counties...');
+    
+    // Use the new PVC sampling API
+    const data = await getPvcSampleCounties();
+    
+    console.log('📋 Counties API response:', data);
+    
+    if (data.success) {
+      console.log('✅ Setting counties:', data.counties);
+      setCounties(data.counties);
+    } else {
+      console.error('❌ Counties API returned error:', data.error);
+      setError('Failed to load sampled document counties: ' + (data.error || 'Unknown error'));
+    }
+  } catch (error) {
+    console.error('❌ Exception in fetchCounties:', error);
+    setError('Error fetching counties: ' + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const fetchAgencies = async (countyName) => {
+  setLoading(true);
+  setError(null);
+  try {
+    // Use the new PVC sampling API
+    const data = await getPvcSampleAgencies(countyName);
+    if (data.success) {
+      setAgencies(data.agencies);
+      setSelectedCounty(countyName);
+      setCurrentView('agencies');
+    } else {
+      setError('Failed to load document sources');
+    }
+  } catch (error) {
+    console.error('Error fetching agencies:', error);
+    setError(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const fetchFiles = async (county, agency) => {
+  setLoading(true);
+  setError(null);
+  try {
+    // Use the new PVC sampling API
+    const data = await getPvcSampleFiles(county, agency);
+    if (data.success) {
+      const enhancedFiles = data.files.map(file => ({
+        ...file,
+        truncatedId: file.file_id && file.file_id.length > 8 
+          ? '...' + file.file_id.slice(-8) 
+          : file.file_id || 'local'
+      }));
+      
+      setFiles(enhancedFiles);
+      setSelectedAgency(agency);
+      setCurrentView('files');
+    } else {
+      setError('Failed to load documents');
+    }
+  } catch (error) {
+    console.error('Error fetching files:', error);
+    setError(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleDriveFileSelect = async (file) => {
+  if (!file.file_id && !file.gdrive_id) {
+    // This might be a local file, try to use it directly
+    if (file.path || file.full_path) {
+      // For PVC sample files, we need to provide the correct serving URL
+      const pdfUrl = file.provisional_case_name ? 
+        `/api/documents/pvc-sample/${file.provisional_case_name}/${file.name || file.displayName}` :
+        `/api/documents/${file.name || file.displayName}?source=pvc-sample`;
+      
+      onDocumentSelect({
+        success: true,
+        filename: file.name || file.displayName,
+        local_path: file.path || file.full_path,
+        provisional_case_name: file.provisional_case_name,
+        county: file.county,
+        agency: file.agency,
+        metadata: file.metadata,
+        pdf_url: pdfUrl,
+        source: 'pvc-sample'
+      });
+      onClose();
+      return;
+    } else {
+      setError('File missing ID and path');
+      return;
+    }
+  }
+
+  setDownloadingFile(file.path || file.name);
+  setError(null);
+  try {
+    // Use the new PVC sampling download API
+    const data = await downloadPvcSampleFile(file.file_id || file.gdrive_id);
+
+    if (data.success) {
+      onDocumentSelect({
+        ...data,
+        provisional_case_name: file.provisional_case_name,
+        county: file.county,
+        agency: file.agency
+      });
+      onClose();
+    } else {
+      setError(`Failed to access file: ${data.error}`);
+    }
+  } catch (error) {
+    console.error('Error accessing file:', error);
+    setError('Error accessing file');
+  } finally {
+    setDownloadingFile(null);
+  }
+};
+
+// Update the initialization logic in useEffect
+useEffect(() => {
+  if (isOpen) {
     setError(null);
+    setLoading(false);
+    
+    if (mode === 'available') {
+      loadDocuments();
+    } else if (mode === 'drive') {
+      setCurrentView('counties');
+      setSelectedCounty(null);
+      setSelectedAgency(null);
+      // Initialize the sampler and fetch counties
+      initializePvcSampler();
+    }
+  }
+}, [isOpen, mode]);
+
+// Add this new function to initialize the PVC sampler
+const initializePvcSampler = async () => {
+  setLoading(true);
+  try {
+    // Try to initialize the sampler (this might already be done)
+    await initProvisionalSampler();
+    // Fetch counties after initialization
+    await fetchCounties();
+  } catch (error) {
+    console.warn('Sampler initialization warning:', error);
+    // Still try to fetch counties in case sampler is already initialized
     try {
-      // Use the new PVC sampling API
-      const data = await getPvcSampleCounties();
-      if (data.success) {
-        setCounties(data.counties);
-      } else {
-        setError('Failed to load sampled document counties');
-      }
-    } catch (error) {
-      console.error('Error fetching counties:', error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
+      await fetchCounties();
+    } catch (fetchError) {
+      setError('No sampled documents available. Try sampling some documents first.');
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const fetchAgencies = async (countyName) => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Use the new PVC sampling API
-      const data = await getPvcSampleAgencies(countyName);
-      if (data.success) {
-        setAgencies(data.agencies);
-        setSelectedCounty(countyName);
-        setCurrentView('agencies');
-      } else {
-        setError('Failed to load document sources');
-      }
-    } catch (error) {
-      console.error('Error fetching agencies:', error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+// Update the getDisplayCountyName function to handle the new county structure
+const getDisplayCountyName = (countyName) => {
+  const county = counties.find(c => c.name === countyName || c.originalName === countyName);
+  return county ? county.displayName : countyName;
+};
 
-  const fetchFiles = async (county, agency) => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Use the new PVC sampling API
-      const data = await getPvcSampleFiles(county, agency);
-      if (data.success) {
-        const enhancedFiles = data.files.map(file => ({
-          ...file,
-          truncatedId: file.file_id && file.file_id.length > 8
-            ? '...' + file.file_id.slice(-8)
-            : file.file_id || 'local'
-        }));
-
-        setFiles(enhancedFiles);
-        setSelectedAgency(agency);
-        setCurrentView('files');
-      } else {
-        setError('Failed to load documents');
-      }
-    } catch (error) {
-      console.error('Error fetching files:', error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  const handleDriveFileSelect = async (file) => {
-    if (!file.file_id && !file.gdrive_id) {
-      // This might be a local file, try to use it directly
-      if (file.path || file.full_path) {
-        onDocumentSelect({
-          success: true,
-          filename: file.name || file.displayName,
-          local_path: file.path || file.full_path,
-          provisional_case_name: file.provisional_case_name,
-          county: file.county,
-          agency: file.agency,
-          metadata: file.metadata
-        });
-        onClose();
-        return;
-      } else {
-        setError('File missing ID and path');
-        return;
-      }
-    }
-
-    setDownloadingFile(file.path || file.name);
-    setError(null);
-    try {
-      // Use the new PVC sampling download API
-      const data = await downloadPvcSampleFile(file.file_id || file.gdrive_id);
-
-      if (data.success) {
-        onDocumentSelect({
-          ...data,
-          provisional_case_name: file.provisional_case_name,
-          county: file.county,
-          agency: file.agency
-        });
-        onClose();
-      } else {
-        setError(`Failed to access file: ${data.error}`);
-      }
-    } catch (error) {
-      console.error('Error accessing file:', error);
-      setError('Error accessing file');
-    } finally {
-      setDownloadingFile(null);
-    }
-  };
-
+const getTitle = () => {
+  if (mode === 'available') {
+    return `${documents.length} Available Documents`;
+  } else if (mode === 'drive') {
+    if (currentView === 'counties') return 'Sampled Documents';
+    if (currentView === 'agencies') return `${getDisplayCountyName(selectedCounty)} Sources`;
+    if (currentView === 'files') return `${selectedAgency} Documents`;
+  }
+  return 'Document Browser';
+};
 
   const goBack = () => {
     setError(null);
@@ -348,27 +415,6 @@ const UnifiedFileBrowser = ({
       setCurrentView('counties');
       setSelectedCounty(null);
       setAgencies([]);
-    }
-  };
-
-  // Add this new function to initialize the PVC sampler
-  const initializePvcSampler = async () => {
-    setLoading(true);
-    try {
-      // Try to initialize the sampler (this might already be done)
-      await initProvisionalSampler();
-      // Fetch counties after initialization
-      await fetchCounties();
-    } catch (error) {
-      console.warn('Sampler initialization warning:', error);
-      // Still try to fetch counties in case sampler is already initialized
-      try {
-        await fetchCounties();
-      } catch (fetchError) {
-        setError('No sampled documents available. Try sampling some documents first.');
-      }
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -386,11 +432,6 @@ const UnifiedFileBrowser = ({
   const handleDocumentClick = (doc) => {
     onDocumentSelect(doc);
     onClose();
-  };
-
-  const getDisplayCountyName = (countyName) => {
-    const county = counties.find(c => c.name === countyName || c.originalName === countyName);
-    return county ? county.displayName : countyName;
   };
 
   const retryCurrentAction = () => {
@@ -414,16 +455,6 @@ const UnifiedFileBrowser = ({
 
   if (!isOpen) return null;
 
-  const getTitle = () => {
-    if (mode === 'available') {
-      return `${documents.length} Available Documents`;
-    } else if (mode === 'drive') {
-      if (currentView === 'counties') return 'Sampled Documents';
-      if (currentView === 'agencies') return `${getDisplayCountyName(selectedCounty)} Sources`;
-      if (currentView === 'files') return `${selectedAgency} Documents`;
-    }
-    return 'Document Browser';
-  };
   const getIcon = () => {
     return mode === 'available' ? faBookOpen : faCloud;
   };

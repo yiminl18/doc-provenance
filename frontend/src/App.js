@@ -790,7 +790,7 @@ function App() {
         <FeedbackModal
           pdfDocument={activeDocument}
           question={selectedQuestionForFeedback}
-          allProvenances={selectedQuestionForFeedback.provenanceSources || []}
+          provenances={selectedQuestionForFeedback.provenanceSources || []}
           onSubmit={handleFeedbackSubmit}
           onClose={async () => {
             //await logUserInteraction('close_feedback_modal', 'feedback_modal');

@@ -629,25 +629,345 @@ export const getDriveFiles = async (county, agency) => {
   }
 };
 
-// In api.js - Update the function
-export const downloadDriveFile = async (fileId) => {
+// Initialize the provisional case sampler
+export const initProvisionalSampler = async () => {
   try {
-    console.log('🔄 Downloading file:', fileId);
+    const response = await fetch('/api/drive/pvc-sample/init', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error initializing provisional sampler:', error);
+    throw error;
+  }
+};
+
+// Get available provisional cases (for debugging/stats, not for UI display)
+export const getProvisionalCases = async () => {
+  try {
+    const response = await fetch('/api/drive/pvc-sample/cases');
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error getting provisional cases:', error);
+    throw error;
+  }
+};
+
+// Sample documents from provisional cases
+export const sampleProvisionalDocuments = async (params = {}) => {
+  try {
+    const response = await fetch('/api/drive/pvc-sample/get-documents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        target_count: params.target_count || 5,
+        max_attempts: params.max_attempts || 20,
+        prefer_diverse_cases: params.prefer_diverse_cases !== false,
+        min_pages: params.min_pages || 2,
+        ...params
+      }),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error sampling provisional documents:', error);
+    throw error;
+  }
+};
+
+// Get summary of downloaded files organized by county/agency
+// This will need a new backend endpoint - see below
+export const getSampledDocumentsSummary = async () => {
+  try {
+    const response = await fetch('/api/drive/pvc-sample/downloaded-summary');
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error getting sampled documents summary:', error);
+    throw error;
+  }
+};
+
+// Updated function to replace the old drive browser calls
+// This organizes sampled documents by county for the UI
+export const getPvcSampleCounties = async () => {
+  try {
+    const summary = await getSampledDocumentsSummary();
+    
+    if (!summary.success) {
+      return { success: false, error: summary.error };
+    }
+    
+    // Group sampled documents by county
+    const countiesByName = {};
+    
+    Object.entries(summary.cases || {}).forEach(([provisional_case, caseData]) => {
+      caseData.files.forEach(file => {
+        const county = file.metadata?.county || 'Unknown County';
+        
+        if (!countiesByName[county]) {
+          countiesByName[county] = {
+            name: county,
+            originalName: county,
+            displayName: county,
+            pdf_count: 0,
+            provisional_cases: new Set(),
+            files: []
+          };
+        }
+        
+        countiesByName[county].pdf_count += 1;
+        countiesByName[county].provisional_cases.add(provisional_case);
+        countiesByName[county].files.push({
+          ...file,
+          provisional_case_name: provisional_case
+        });
+      });
+    });
+    
+    // Convert to array and calculate avg_pages
+    const counties = Object.values(countiesByName).map(county => ({
+      ...county,
+      provisional_cases: Array.from(county.provisional_cases),
+      avg_pages: county.files.reduce((sum, file) => sum + (file.metadata?.page_count || 0), 0) / county.files.length
+    }));
+    
+    return {
+      success: true,
+      counties: counties.sort((a, b) => a.displayName.localeCompare(b.displayName))
+    };
+  } catch (error) {
+    console.error('Error getting PVC sample counties:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Get agencies for a specific county from sampled documents
+export const getPvcSampleAgencies = async (countyName) => {
+  try {
+    const summary = await getSampledDocumentsSummary();
+    
+    if (!summary.success) {
+      return { success: false, error: summary.error };
+    }
+    
+    // Group files by agency within the specified county
+    const agenciesByName = {};
+    
+    Object.entries(summary.cases || {}).forEach(([provisional_case, caseData]) => {
+      caseData.files.forEach(file => {
+        const fileCounty = file.metadata?.county || 'Unknown County';
+        
+        if (fileCounty === countyName) {
+          const agency = file.metadata?.agency || 'Unknown Agency';
+          
+          if (!agenciesByName[agency]) {
+            agenciesByName[agency] = {
+              name: agency,
+              pdf_count: 0,
+              subject_count: new Set(),
+              files: []
+            };
+          }
+          
+          agenciesByName[agency].pdf_count += 1;
+          if (file.metadata?.subject) {
+            agenciesByName[agency].subject_count.add(file.metadata.subject);
+          }
+          agenciesByName[agency].files.push({
+            ...file,
+            provisional_case_name: provisional_case
+          });
+        }
+      });
+    });
+    
+    // Convert to array
+    const agencies = Object.values(agenciesByName).map(agency => ({
+      ...agency,
+      subject_count: agency.subject_count.size
+    }));
+    
+    return {
+      success: true,
+      agencies: agencies.sort((a, b) => a.name.localeCompare(b.name))
+    };
+  } catch (error) {
+    console.error('Error getting PVC sample agencies:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Get files for a specific county/agency from sampled documents
+export const getPvcSampleFiles = async (countyName, agencyName) => {
+  try {
+    const summary = await getSampledDocumentsSummary();
+    
+    if (!summary.success) {
+      return { success: false, error: summary.error };
+    }
+    
+    const files = [];
+    
+    Object.entries(summary.cases || {}).forEach(([provisional_case, caseData]) => {
+      caseData.files.forEach(file => {
+        const fileCounty = file.metadata?.county || 'Unknown County';
+        const fileAgency = file.metadata?.agency || 'Unknown Agency';
+        
+        if (fileCounty === countyName && fileAgency === agencyName) {
+          files.push({
+            ...file,
+            provisional_case_name: provisional_case,
+            // Map the fields to match the expected format
+            name: file.filename,
+            displayName: file.filename,
+            file_id: file.gdrive_id,
+            fullId: file.gdrive_id,
+            path: file.full_path,
+            page_num: file.metadata?.page_count || 0,
+            estimated_size_kb: Math.round(file.size_bytes / 1024),
+            subject: file.metadata?.subject || 'Unknown',
+            incident_date: file.metadata?.incident_date,
+            case_numbers: file.metadata?.case_numbers,
+            county: fileCounty,
+            agency: fileAgency
+          });
+        }
+      });
+    });
+    
+    return {
+      success: true,
+      files: files.sort((a, b) => a.displayName.localeCompare(b.displayName))
+    };
+  } catch (error) {
+    console.error('Error getting PVC sample files:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Download/select a sampled file (this might just return the local path)
+export const downloadPvcSampleFile = async (fileId) => {
+  try {
+    // For sampled files, we might just need to return the local file info
+    // since they're already downloaded. This depends on your backend implementation.
+    
+    const summary = await getSampledDocumentsSummary();
+    
+    if (!summary.success) {
+      return { success: false, error: summary.error };
+    }
+    
+    // Find the file in the summary
+    let targetFile = null;
+    let targetCase = null;
+    
+    Object.entries(summary.cases || {}).forEach(([provisional_case, caseData]) => {
+      caseData.files.forEach(file => {
+        if (file.gdrive_id === fileId) {
+          targetFile = file;
+          targetCase = provisional_case;
+        }
+      });
+    });
+    
+    if (!targetFile) {
+      return { success: false, error: 'File not found in sampled documents' };
+    }
+    
+    return {
+      success: true,
+      filename: targetFile.filename,
+      local_path: targetFile.full_path,
+      provisional_case_name: targetCase,
+      metadata: targetFile.metadata
+    };
+    
+  } catch (error) {
+    console.error('Error downloading PVC sample file:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Update the existing sampleExtractableDocuments function to use the new endpoint
+export const sampleExtractableDocuments = async (params = {}) => {
+  // First, ensure the sampler is initialized
+  try {
+    const initResult = await initProvisionalSampler();
+    if (!initResult.success) {
+      throw new Error('Failed to initialize sampler: ' + initResult.error);
+    }
+  } catch (error) {
+    // If init fails, still try to sample (maybe it's already initialized)
+    console.warn('Sampler initialization warning:', error);
+  }
+  
+  // Now sample documents
+  return await sampleProvisionalDocuments(params);
+};
+
+export const getDriveStatus = async () => {
+  try {
+    const response = await fetch('/api/drive/status');
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching drive status:', error);
+    throw error;
+  }
+};
+
+export const downloadDriveFile = async (fileId, provisionalCaseContext = null) => {
+  try {
+    console.log('🔄 Downloading file with context:', fileId, provisionalCaseContext);
+    
+    const payload = { file_id: fileId };
+    if (provisionalCaseContext) {
+      payload.context = provisionalCaseContext;
+    }
     
     const response = await fetch('/api/drive/download', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ file_id: fileId })
+      body: JSON.stringify(payload)
     });
     
     console.log('📡 Response status:', response.status);
     
     const responseText = await response.text();
-    console.log('📡 Response text:', responseText.substring(0, 300));
+    console.log('📡 Response text preview:', responseText.substring(0, 300));
     
     const data = JSON.parse(responseText);
+    
+    // Enhance response with provisional case info if available
+    if (provisionalCaseContext) {
+      data.provisional_case_context = provisionalCaseContext;
+    }
+    
     return data;
   } catch (error) {
     console.error('Error downloading Drive file:', error);
@@ -655,31 +975,25 @@ export const downloadDriveFile = async (fileId) => {
   }
 };
 
-// sample extractable docs from google drive
-export const sampleExtractableDocuments = async (maxDocuments = 5) => {
+// Utility function to check if the new provisional case endpoints are available
+export const checkProvisionalCaseSupport = async () => {
   try {
-    console.log('🎲 Sampling extractable documents...');
-    
-    const response = await fetch('/api/drive/sample-documents', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        max_documents: maxDocuments,
-        max_attempts: 20 
-      })
-    });
-    
+    const response = await fetch('/api/drive/status');
     const data = await response.json();
-    console.log('📊 Sampling result:', data);
     
-    return data;
+    return {
+      available: data.drive_services_available || false,
+      provisional_cases_found: data.target_cases_found || 0,
+      total_files: data.total_files_in_target_cases || 0
+    };
   } catch (error) {
-    console.error('Error sampling documents:', error);
-    throw error;
+    console.warn('Provisional case support check failed:', error);
+    return { available: false, error: error.message };
   }
 };
+
+
+
 
 // Get pre-generated questions for a document
 export const getGeneratedQuestions = async (filename) => {

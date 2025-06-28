@@ -31,7 +31,7 @@ export const calculateProvenanceCost = (inputTokens, outputTokens, model = 'gpt-
 
 export const formatCost = (cost) => {
   if (cost < 0.001) {
-    return `$${(cost * 1000).toFixed(3)}k`; // Show in thousandths for very small costs
+    return `$${(cost).toFixed(5)}`; // Show in thousandths for very small costs
   } else if (cost < 0.01) {
     return `$${cost.toFixed(4)}`;
   } else if (cost < 1) {

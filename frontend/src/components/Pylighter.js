@@ -20,7 +20,7 @@ const Pylighter = ({
         border: '2px solid rgba(76, 175, 80, 0.8)',
         borderRadius: '3px'
     },
-    className = 'python-backed-highlight',
+    className = 'provenance-highlight',
     verbose = true
 }) => {
     const { state } = useAppState();
@@ -30,7 +30,7 @@ const Pylighter = ({
 
     const log = (message, ...args) => {
         if (verbose) {
-            console.log(`[PythonBacked] ${message}`, ...args);
+            console.log(`[Pylight] ${message}`, ...args);
         }
     };
 

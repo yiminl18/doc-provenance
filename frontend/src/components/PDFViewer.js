@@ -21,6 +21,7 @@ import Pylighter from './Pylighter';
 import SpatialConsumptionHighlighter from './SpatialConsumptionHighlighter';
 import NewWordOrderHighlighter from './NewWordOrderHighlighter';
 import NLPHighlighter from './NLPHighlighter';
+import { calculateProvenanceCost, formatCost } from '../utils/ProvenanceOutputsFormatting';
 
 const PDFViewer = ({
     pdfDocument,
@@ -718,8 +719,22 @@ const PDFViewer = ({
                 <div className="pdf-title">
                     <FontAwesomeIcon icon={faFileAlt} />
                     <span>{pdfDocument.filename}</span>
-
-
+                    </div>
+                <div className="pdf-controls">
+                        {/* Provenance info */}
+                        {selectedProvenance && selectedProvenance.input_token_size && selectedProvenance.output_token_size && (
+                            <div className="layout-info">
+                                <div className="provenance-meta">
+                                    <span><strong>Time Elapsed:</strong> {selectedProvenance.time?.toFixed(2) || 'N/A'}s</span>
+                                    | <span className="cost-estimate">
+                                        <strong>Cost Estimate:</strong> {calculateProvenanceCost(
+                                            selectedProvenance.input_token_size,
+                                            selectedProvenance.output_token_size
+                                        ).formattedCost}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     {/* Unified status indicator - prioritizes provenance over rendering */}
                     {isProvenanceProcessing ? (
                         <div className="status-indicator-pdf provenance">
@@ -839,26 +854,7 @@ const PDFViewer = ({
                     <div ref={textLayerRef} className="pdf-text-layer" />
                     <div ref={highlightLayerRef} className="pdf-highlight-layer" />
 
-                    {/* Highlighter Component */}
-                    {/*}
-                    {renderManager.isReady && selectedProvenance && (
-                    <ExactMatchHighlighter
-                        pdfDocument={pdfDoc}
-                        textLayerRef={textLayerRef}
-                        highlightLayerRef={highlightLayerRef}
-                        containerRef={containerRef}
-                        currentPage={renderManager.currentPage}
-                        currentZoom={renderManager.currentZoom}
-                        documentFilename={pdfDocument?.filename || ''}
-                        highlightStyle={{
-                            backgroundColor: 'rgba(76, 175, 80, 0.4)',
-                            border: '1px solid rgba(76, 175, 80, 0.8)',
-                            borderRadius: '2px'
-                        }}
-                        className='provenance-highlight'
-                        verbose={true}
-                        />
-                    )}*/}
+                    {/* Highlighter Component */}              
                     {renderManager.isReady && selectedProvenance && (
                         <Pylighter
                             provenanceData={selectedProvenance}
@@ -872,109 +868,6 @@ const PDFViewer = ({
                             verbose={true}
                         />
                     )}
-                    {/*{renderManager.isReady && selectedProvenance && (
-                        <CoordinateHighlighter
-                            provenanceData={selectedProvenance}
-                            activeQuestionId={activeQuestionId}
-                            pdfDocument={pdfDoc}
-                            textLayerRef={textLayerRef}
-                            highlightLayerRef={highlightLayerRef}
-                            containerRef={containerRef}
-                            currentPage={renderManager.currentPage}
-                            currentZoom={renderManager.currentZoom}
-                            documentFilename={pdfDocument?.filename || ''}
-                            highlightStyle={{
-                                backgroundColor: 'rgba(76, 175, 80, 0.4)',
-                                border: '1px solid rgba(76, 175, 80, 0.8)',
-                                borderRadius: '2px'
-                            }}
-                            searchOptions={{
-                                caseSensitive: false,
-                                matchThreshold: 0.75, // Slightly lower for better recall
-                                maxGapBetweenWords: 30, // Pixels between words to group
-                                contextWindow: 3 // Words of context
-                            }}
-                            className="direct-provenance-highlight"
-                            verbose={true} // Enable detailed logging for debugging
-                        />
-                        {renderManager.isReady && selectedProvenance && (
-                        <HybridCoordinateHighlighter
-                            provenanceData={selectedProvenance}
-                            activeQuestionId={activeQuestionId}
-                            pdfDocument={pdfDoc}
-                            textLayerRef={textLayerRef}
-                            highlightLayerRef={highlightLayerRef}
-                            containerRef={containerRef}
-                            currentPage={renderManager.currentPage}
-                            currentZoom={renderManager.currentZoom}
-                            documentFilename={pdfDocument?.filename || ''}
-                            highlightStyle={{
-                                backgroundColor: 'rgba(76, 175, 80, 0.4)',
-                                border: '1px solid rgba(76, 175, 80, 0.8)',
-                                borderRadius: '2px'
-                            }}
-                            searchOptions={{
-                                caseSensitive: false,
-                                matchThreshold: 0.75, // Slightly lower for better recall
-                                maxGapBetweenWords: 30, // Pixels between words to group
-                                contextWindow: 3 // Words of context
-                            }}
-                            className="direct-provenance-highlight"
-                            verbose={true} // Enable detailed logging for debugging
-                        />
-                        {renderManager.isReady && selectedProvenance && (
-                        <SpatialConsumptionHighlighter
-                            provenanceData={selectedProvenance}
-                            activeQuestionId={activeQuestionId}
-                            pdfDocument={pdfDoc}
-                            textLayerRef={textLayerRef}
-                            highlightLayerRef={highlightLayerRef}
-                            containerRef={containerRef}
-                            currentPage={renderManager.currentPage}
-                            currentZoom={renderManager.currentZoom}
-                            documentFilename={pdfDocument?.filename || ''}
-                            highlightStyle={{
-                                backgroundColor: 'rgba(76, 175, 80, 0.4)',
-                                border: '1px solid rgba(76, 175, 80, 0.8)',
-                                borderRadius: '2px'
-                            }}
-                            searchOptions={{
-                                caseSensitive: false,
-                                matchThreshold: 0.75, // Slightly lower for better recall
-                                maxGapBetweenWords: 30, // Pixels between words to group
-                                contextWindow: 3 // Words of context
-                            }}
-                            className="direct-provenance-highlight"
-                            verbose={true} // Enable detailed logging for debugging
-                        />
-                    )}*/}
-                    {/*}
-                    {renderManager.isReady && selectedProvenance && (
-                        <NLPHighlighter
-                            provenanceData={selectedProvenance}
-                            //activeQuestionId={activeQuestionId}
-                            pdfDocument={pdfDoc}
-                            textLayerRef={textLayerRef}
-                            highlightLayerRef={highlightLayerRef}
-                            containerRef={containerRef}
-                            currentPage={renderManager.currentPage}
-                            currentZoom={renderManager.currentZoom}
-                            documentFilename={pdfDocument?.filename || ''}
-                            highlightStyle={{
-                                backgroundColor: 'rgba(76, 175, 80, 0.4)',
-                                border: '1px solid rgba(76, 175, 80, 0.8)',
-                                borderRadius: '2px'
-                            }}
-                            searchOptions={{
-                                caseSensitive: false,
-                                matchThreshold: 0.75, // Slightly lower for better recall
-                                maxGapBetweenWords: 30, // Pixels between words to group
-                                contextWindow: 3 // Words of context
-                            }}
-                            className="provenance-highlight"
-                            verbose={true} // Enable detailed logging for debugging
-                        />
-                    )} */}
                 </div>
             </div>
         </div>

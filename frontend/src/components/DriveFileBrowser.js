@@ -1,12 +1,13 @@
-// DriveInventoryBrowser.js
+// DriveFileBrowser.js - Updated with DocumentSelectionModal styling
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCloud, faDownload, faDice, faSpinner, faFileAlt, faFolder,
-  faArrowLeft, faBuilding, faMapMarkerAlt, faUser, faCalendar
+  faCloud, faDownload, faDice, faSpinner, faFileText, faFolder,
+  faArrowLeft, faBuilding, faMapMarkerAlt, faUser, faCalendar, faIdCard,
+  faTimes, faExclamationTriangle, faHashtag, faAlignLeft, faInfoCircle
 } from '@fortawesome/free-solid-svg-icons';
 
-import { getDriveCounties, getDriveAgencies, getDriveFiles, downloadDriveFile, sampleExtractableDocuments } from '../services/api'; // Adjust the import path as needed
+import { getDriveCounties, getDriveAgencies, getDriveFiles, downloadDriveFile, sampleExtractableDocuments } from '../services/api';
 
 const DriveFileBrowser = ({ isOpen, onClose, onFileSelect }) => {
   const [currentView, setCurrentView] = useState('counties'); // counties -> agencies -> files
@@ -18,9 +19,9 @@ const DriveFileBrowser = ({ isOpen, onClose, onFileSelect }) => {
   const [files, setFiles] = useState([]);
 
   const [sampling, setSampling] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [downloadingFile, setDownloadingFile] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (isOpen && currentView === 'counties') {
@@ -29,54 +30,79 @@ const DriveFileBrowser = ({ isOpen, onClose, onFileSelect }) => {
   }, [isOpen, currentView]);
 
   const handleSmartSampling = async () => {
-  setSampling(true);
-  try {
-    const result = await sampleExtractableDocuments(5);
-    
-    if (result.success && result.documents.length > 0) {
-      // Show success modal or notification
-      alert(`Successfully found ${result.documents.length} extractable PDFs! Check your document list.`);
+    setSampling(true);
+    setError(null);
+    try {
+      const result = await sampleExtractableDocuments({
+        max_documents: 5,
+        prefer_diverse_cases: true,
+        min_pages: 2
+      });
       
-      // Close the browser since documents are now available
-      onClose();
-      
-    } else {
-      alert(`Sampling completed but only found ${result.documents?.length || 0} extractable PDFs.`);
+      if (result.success && result.documents.length > 0) {
+        // Show success and refresh
+        alert(`Successfully sampled ${result.documents.length} documents from ${result.stats.cases_represented} different cases!`);
+        
+        // Refresh the counties view to show newly sampled files
+        if (currentView === 'counties') {
+          fetchCounties();
+        }
+        
+        // Close the browser since documents are now available
+        onClose();
+        
+      } else {
+        setError(`Sampling completed but only found ${result.documents?.length || 0} extractable PDFs.`);
+      }
+    } catch (error) {
+      console.error('Sampling failed:', error);
+      setError('Sampling failed. Please try again.');
+    } finally {
+      setSampling(false);
     }
-  } catch (error) {
-    console.error('Sampling failed:', error);
-    alert('Sampling failed. Please try again.');
-  } finally {
-    setSampling(false);
-  }
-};
+  };
 
-  // Replace the fetch calls with:
   const fetchCounties = async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await getDriveCounties();
       if (data.success) {
-        setCounties(data.counties);
+        // Filter and enhance counties data for provisional cases
+        const enhancedCounties = data.counties.map(county => ({
+          ...county,
+          displayName: county.name.replace(/^\d+-/, ''), // Remove timestamp prefix for display
+          originalName: county.name,
+          isProvisionalCase: true
+        })).sort((a, b) => a.displayName.localeCompare(b.displayName));
+        
+        setCounties(enhancedCounties);
+      } else {
+        setError('Failed to load document cases');
       }
     } catch (error) {
       console.error('Error fetching counties:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchAgencies = async (county) => {
+  const fetchAgencies = async (countyOriginalName) => {
     setLoading(true);
+    setError(null);
     try {
-      const data = await getDriveAgencies(county);
+      const data = await getDriveAgencies(countyOriginalName);
       if (data.success) {
         setAgencies(data.agencies);
-        setSelectedCounty(county);
+        setSelectedCounty(countyOriginalName);
         setCurrentView('agencies');
+      } else {
+        setError('Failed to load document sources');
       }
     } catch (error) {
       console.error('Error fetching agencies:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -84,47 +110,74 @@ const DriveFileBrowser = ({ isOpen, onClose, onFileSelect }) => {
 
   const fetchFiles = async (county, agency) => {
     setLoading(true);
+    setError(null);
     try {
       const data = await getDriveFiles(county, agency);
       if (data.success) {
-        setFiles(data.files);
+        // Enhance files with display information
+        const enhancedFiles = data.files.map(file => {
+          // Extract truncated gdrive_id for display (last 8 characters)
+          let truncatedId = '';
+          if (file.file_id) {
+            truncatedId = file.file_id.length > 8 
+              ? '...' + file.file_id.slice(-8) 
+              : file.file_id;
+          }
+          
+          return {
+            ...file,
+            displayName: file.name,
+            truncatedId,
+            fullId: file.file_id
+          };
+        }).sort((a, b) => a.displayName.localeCompare(b.displayName));
+        
+        setFiles(enhancedFiles);
         setSelectedAgency(agency);
         setCurrentView('files');
+      } else {
+        setError('Failed to load documents');
       }
     } catch (error) {
       console.error('Error fetching files:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleFileSelect = async (file) => {
-    if (!file.id) {
-      console.error('File missing Drive ID');
+    if (!file.fullId) {
+      setError('File missing Drive ID');
       return;
     }
 
     setDownloadingFile(file.path);
+    setError(null);
     try {
-      const data = await downloadDriveFile(file.id);
+      const data = await downloadDriveFile(file.fullId);
 
       if (data.success) {
-        onFileSelect(data);
+        onFileSelect({
+          ...data,
+          provisional_case_name: selectedCounty,
+          county: file.county,
+          agency: file.agency
+        });
         onClose();
       } else {
-        console.error('Failed to download file:', data.error);
-        alert(`Failed to download file: ${data.error}`);
+        setError(`Failed to download file: ${data.error}`);
       }
     } catch (error) {
       console.error('Error downloading file:', error);
-      alert('Error downloading file');
+      setError('Error downloading file');
     } finally {
       setDownloadingFile(null);
     }
   };
 
-
   const goBack = () => {
+    setError(null);
     if (currentView === 'files') {
       setCurrentView('agencies');
       setSelectedAgency(null);
@@ -136,171 +189,286 @@ const DriveFileBrowser = ({ isOpen, onClose, onFileSelect }) => {
     }
   };
 
-  const resetBrowser = () => {
-    setCurrentView('counties');
-    setSelectedCounty(null);
-    setSelectedAgency(null);
-    setCounties([]);
-    setAgencies([]);
-    setFiles([]);
+  const getDisplayCountyName = (originalName) => {
+    const county = counties.find(c => c.originalName === originalName);
+    return county ? county.displayName : originalName;
+  };
+
+  const formatNumber = (num) => {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'k';
+    }
+    return num.toString();
+  };
+
+  const retryCurrentAction = () => {
+    setError(null);
+    if (currentView === 'counties') {
+      fetchCounties();
+    } else if (currentView === 'agencies' && selectedCounty) {
+      fetchAgencies(selectedCounty);
+    } else if (currentView === 'files' && selectedCounty && selectedAgency) {
+      fetchFiles(selectedCounty, selectedAgency);
+    }
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="preloaded-modal">
+      <div className="modal-container document-selection">
         <div className="modal-header">
           <div className="header-content">
+            <FontAwesomeIcon icon={faCloud} />
             <h3>
-              <FontAwesomeIcon icon={faCloud} /> Drive Document Browser
+              {currentView === 'counties' && 'Document Browser'}
+              {currentView === 'agencies' && `${getDisplayCountyName(selectedCounty)} Sources`}
+              {currentView === 'files' && `${selectedAgency} Documents`}
             </h3>
-            <div className="breadcrumb">
-              {currentView === 'agencies' && selectedCounty && (
-                <span><FontAwesomeIcon icon={faMapMarkerAlt} /> {selectedCounty}</span>
-              )}
-              {currentView === 'files' && selectedCounty && selectedAgency && (
-                <span>
-                  <FontAwesomeIcon icon={faMapMarkerAlt} /> {selectedCounty} /
-                  <FontAwesomeIcon icon={faBuilding} /> {selectedAgency}
-                </span>
-              )}
-            </div>
+            {(currentView === 'agencies' || currentView === 'files') && (
+              <div className="breadcrumb">
+                {currentView === 'agencies' && (
+                  <span>
+                    <FontAwesomeIcon icon={faFolder} /> {getDisplayCountyName(selectedCounty)}
+                  </span>
+                )}
+                {currentView === 'files' && (
+                  <span>
+                    <FontAwesomeIcon icon={faFolder} /> {getDisplayCountyName(selectedCounty)} /
+                    <FontAwesomeIcon icon={faBuilding} /> {selectedAgency}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           <div className="header-actions">
             {currentView !== 'counties' && (
-              <button className="back-btn" onClick={goBack}>
+              <button className="win95-btn" onClick={goBack}>
                 <FontAwesomeIcon icon={faArrowLeft} /> Back
               </button>
             )}
-            <button className="close-btn" onClick={onClose}>✕</button>
+            <button className="win95-btn close" onClick={onClose}>
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
           </div>
         </div>
 
         <div className="modal-body">
           {loading ? (
             <div className="loading-state">
-              <FontAwesomeIcon icon={faSpinner} spin />
-              <p>Loading...</p>
+              <FontAwesomeIcon icon={faSpinner} spin size="2x" />
+              <p>Loading document collection...</p>
+            </div>
+          ) : error ? (
+            <div className="error-state">
+              <FontAwesomeIcon icon={faExclamationTriangle} />
+              <p>Error: {error}</p>
+              <button className="retry-btn" onClick={retryCurrentAction}>
+                Try Again
+              </button>
             </div>
           ) : (
             <>
-              {/* Counties View */}
+              {/* Counties View - now showing provisional cases */}
               {currentView === 'counties' && (
                 <>
-                  <p>Select a county to browse documents, or:</p>
-
                   {/* Smart Sampling Section */}
                   <div className="sampling-section">
                     <div className="sampling-card">
-                      <h4>🎲 Smart Document Sampling</h4>
-                      <p>Automatically find and download 5 random PDFs with extractable text</p>
+                      <div className="sampling-info">
+                        <FontAwesomeIcon icon={faDice} />
+                        <div>
+                          <h4>Sample New Documents</h4>
+                          <p>Automatically discover and download 5 diverse PDFs with extractable text</p>
+                        </div>
+                      </div>
                       <button
-                        className="sample-btn"
+                        className={`win95-btn primary ${sampling ? 'disabled' : ''}`}
                         onClick={handleSmartSampling}
+                        disabled={sampling}
                       >
-        
+                        {sampling ? (
+                          <>
+                            <FontAwesomeIcon icon={faSpinner} spin />
+                            Sampling...
+                          </>
+                        ) : (
+                          <>
+                            <FontAwesomeIcon icon={faDice} />
+                            Sample Documents
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
-                  <div className="browser-grid">
-                    {counties.map(county => (
-                      <button
-                        key={county.name}
-                        className="browser-card county-card"
-                        onClick={() => fetchAgencies(county.name)}
-                      >
-                        <div className="card-icon">
-                          <FontAwesomeIcon icon={faMapMarkerAlt} />
+
+                  {/* Available Cases */}
+                  {counties.length > 0 ? (
+                    <div className="modal-grid document-selection">
+                      {counties.map(county => (
+                        <div key={county.originalName} className="document-card-container">
+                          <button
+                            className="document-card"
+                            onClick={() => fetchAgencies(county.originalName)}
+                          >
+                            <div className="document-main-info">
+                              <div className="doc-icon">
+                                <FontAwesomeIcon icon={faFolder} />
+                              </div>
+                              
+                              <div className="doc-details">
+                                <h4 className="doc-title">{county.displayName}</h4>
+                                
+                                <div className="doc-basic-stats">
+                                  <span className="stat">
+                                    <FontAwesomeIcon icon={faFileText} />
+                                    {county.pdf_count} documents
+                                  </span>
+                                  {county.avg_pages && (
+                                    <span className="stat">
+                                      <FontAwesomeIcon icon={faAlignLeft} />
+                                      ~{Math.round(county.avg_pages)} pages avg
+                                    </span>
+                                  )}
+                                </div>
+                                
+                                <div className="case-id-info">
+                                  <FontAwesomeIcon icon={faIdCard} />
+                                  <small>Case: {county.originalName}</small>
+                                </div>
+                              </div>
+                            </div>
+                          </button>
                         </div>
-                        <div className="card-info">
-                          <h4>{county.name}</h4>
-                          <div className="card-stats">
-                            <span>{county.pdf_count} PDFs</span>
-                            <span>{county.agency_count} agencies</span>
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <FontAwesomeIcon icon={faFileText} size="3x" />
+                      <h4>No Documents Available</h4>
+                      <p>No document cases are currently available in the system.</p>
+                      <p className="empty-subtitle">
+                        Use the sampling feature above to discover and download documents from the collection.
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
 
               {/* Agencies View */}
               {currentView === 'agencies' && (
-                <>
-                  <p>Select an agency in {selectedCounty}:</p>
-                  <div className="browser-grid">
-                    {agencies.map(agency => (
+                <div className="modal-grid document-selection">
+                  {agencies.map(agency => (
+                    <div key={agency.name} className="document-card-container">
                       <button
-                        key={agency.name}
-                        className="browser-card agency-card"
+                        className="document-card"
                         onClick={() => fetchFiles(selectedCounty, agency.name)}
                       >
-                        <div className="card-icon">
-                          <FontAwesomeIcon icon={faBuilding} />
-                        </div>
-                        <div className="card-info">
-                          <h4>{agency.name}</h4>
-                          <div className="card-stats">
-                            <span>{agency.pdf_count} PDFs</span>
-                            <span>{agency.subject_count} subjects</span>
+                        <div className="document-main-info">
+                          <div className="doc-icon">
+                            <FontAwesomeIcon icon={faBuilding} />
+                          </div>
+                          
+                          <div className="doc-details">
+                            <h4 className="doc-title">{agency.name}</h4>
+                            
+                            <div className="doc-basic-stats">
+                              <span className="stat">
+                                <FontAwesomeIcon icon={faFileText} />
+                                {agency.pdf_count} documents
+                              </span>
+                              <span className="stat">
+                                <FontAwesomeIcon icon={faUser} />
+                                {agency.subject_count} subjects
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </button>
-                    ))}
-                  </div>
-                </>
+                    </div>
+                  ))}
+                </div>
               )}
 
               {/* Files View */}
               {currentView === 'files' && (
-                <>
-                  <p>Select a document from {selectedAgency}:</p>
-                  <div className="browser-grid files-grid">
-                    {files.map(file => (
+                <div className="modal-grid document-selection">
+                  {files.map(file => (
+                    <div key={file.path || file.fullId} className="document-card-container">
                       <button
-                        key={file.path}
-                        className="browser-card file-card"
+                        className="document-card"
                         onClick={() => handleFileSelect(file)}
-                        disabled={downloadingFile === file.path || !file.path}
+                        disabled={downloadingFile === file.path || !file.fullId}
                       >
-                        <div className="card-icon">
-                          {downloadingFile === file.path ? (
-                            <FontAwesomeIcon icon={faSpinner} spin />
-                          ) : (
-                            <FontAwesomeIcon icon={faFileAlt} />
-                          )}
-                        </div>
-                        <div className="card-info">
-                          <h4 title={file.name}>{file.name}</h4>
-                          <div className="card-metadata">
-                            {file.subject && file.subject !== 'Unknown' && (
-                              <div className="meta-item">
-                                <FontAwesomeIcon icon={faUser} />
-                                <span>{file.subject}</span>
-                              </div>
+                        <div className="document-main-info">
+                          <div className="doc-icon">
+                            {downloadingFile === file.path ? (
+                              <FontAwesomeIcon icon={faSpinner} spin />
+                            ) : (
+                              <FontAwesomeIcon icon={faFileText} />
                             )}
-                            {file.incident_date && (
-                              <div className="meta-item">
-                                <FontAwesomeIcon icon={faCalendar} />
-                                <span>{file.incident_date}</span>
-                              </div>
-                            )}
-                            {file.case_numbers && (
-                              <div className="meta-item">
-                                <span className="case-badge">{file.case_numbers}</span>
+                          </div>
+                          
+                          <div className="doc-details">
+                            <h4 className="doc-title" title={file.displayName}>
+                              {file.displayName}
+                            </h4>
+                            
+                            <div className="doc-basic-stats">
+                              {file.page_num > 0 && (
+                                <span className="stat">
+                                  <FontAwesomeIcon icon={faAlignLeft} />
+                                  {file.page_num} pages
+                                </span>
+                              )}
+                              {file.estimated_size_kb > 0 && (
+                                <span className="stat">
+                                  <FontAwesomeIcon icon={faHashtag} />
+                                  {formatNumber(file.estimated_size_kb)} KB
+                                </span>
+                              )}
+                            </div>
+                            
+                            {/* File ID for disambiguation */}
+                            {file.truncatedId && (
+                              <div className="case-id-info">
+                                <FontAwesomeIcon icon={faIdCard} />
+                                <small>ID: {file.truncatedId}</small>
                               </div>
                             )}
                           </div>
-                          {!file.id && (
-                            <div className="error-badge">No Drive ID</div>
+                        </div>
+                        
+                        {/* File metadata section */}
+                        <div className="file-metadata-section">
+                          {file.subject && file.subject !== 'Unknown' && (
+                            <div className="metadata-item">
+                              <FontAwesomeIcon icon={faUser} />
+                              <small>{file.subject}</small>
+                            </div>
+                          )}
+                          {file.incident_date && (
+                            <div className="metadata-item">
+                              <FontAwesomeIcon icon={faCalendar} />
+                              <small>{file.incident_date}</small>
+                            </div>
+                          )}
+                          {file.case_numbers && (
+                            <div className="metadata-item">
+                              <span className="case-badge">{file.case_numbers}</span>
+                            </div>
+                          )}
+                          {!file.fullId && (
+                            <div className="metadata-item error">
+                              <FontAwesomeIcon icon={faExclamationTriangle} />
+                              <small>No Drive ID</small>
+                            </div>
                           )}
                         </div>
                       </button>
-                    ))}
-                  </div>
-                </>
+                    </div>
+                  ))}
+                </div>
               )}
             </>
           )}

@@ -10,6 +10,8 @@ import {
     faUserSecret,
     faComment
 } from '@fortawesome/free-solid-svg-icons';
+import { calculateProvenanceCost, formatCost } from '../utils/ProvenanceOutputsFormatting';
+
 
 const ProvenanceDisplay = ({ 
     question,
@@ -138,6 +140,12 @@ const ProvenanceDisplay = ({
                                 {selectedProvenance.sentences_ids && (
                                     <span>Sentences: {selectedProvenance.sentences_ids.length}</span>
                                 )}
+                                 <span className="cost-estimate">
+                                        <strong>Cost Estimate:</strong> {calculateProvenanceCost(
+                                            selectedProvenance.input_token_size,
+                                            selectedProvenance.output_token_size
+                                        ).formattedCost}
+                                    </span>
                             </div>
                             <div className="provenance-text">
                                 {selectedProvenance.content?.map((sentence, idx) => (

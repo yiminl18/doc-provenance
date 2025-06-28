@@ -2,17 +2,13 @@ import { useAppState } from './contexts/AppStateContext';
 import React, { useState, useEffect, useCallback } from 'react';
 import './styles/brutalist-design.css';
 import './styles/layout.css';
-//import HistorySidebar from './components/HistorySidebar';
+
 import Header from './components/Header';
 import FeedbackModal from './components/FeedbackModal';
 import DocumentSelector from './components/DocumentSelector';
 import ProvenanceQA from './components/ProvenanceQA';
-import QuestionHistory from './components/QuestionHistory';
 import PDFViewer from './components/PDFViewer';
-//import ReactPDFViewer from './components/ReactPDFViewer';
-import DocumentSelectionModal from './components/DocumentSelectionModal';
-//import LayoutBasedPDFViewer from './components/LayoutBasedPDFViewer';
-import DriveFileBrowser from './components/DriveFileBrowser';
+import UnifiedFileBrowser from './components/UniversalFileBrowser';
 import QuestionSuggestionsModal from './components/QuestionSuggestionsModal';
 import {
   uploadFile,
@@ -48,22 +44,16 @@ function App() {
   // documents state
   const [documents, setDocuments] = useState(new Map());
   const [activeDocumentId, setActiveDocumentId] = useState(null);
-  //const [selectedProvenance, setSelectedProvenance] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(null);
-
-  // Questions history state (for history sidebar)
-  //const [questionsHistory, setQuestionsHistory] = useState(new Map());
-  //const [activeQuestionId, setActiveQuestionId] = useState(null);
 
   // Modal state
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [selectedQuestionForFeedback, setSelectedQuestionForFeedback] = useState(null);
-  const [showPreloadedModal, setShowPreloadedModal] = useState(false);
-  const [preloadedDocuments, setPreloadedDocuments] = useState([]);
-  const [loadingPreloaded, setLoadingPreloaded] = useState(false);
-  const [showDriveModal, setShowDriveModal] = useState(false);
   const [showQuestionSuggestions, setShowQuestionSuggestions] = useState(false);
-  //const [navigationTrigger, setNavigationTrigger] = useState(null);
+
+  // Unified modal state
+  const [documentBrowserOpen, setDocumentBrowserOpen] = useState(false);
+  const [documentBrowserMode, setDocumentBrowserMode] = useState('available'); // 'available' | 'drive'
 
   // Get active document
   const activeDocument = activeDocumentId ? documents.get(activeDocumentId) : null;
@@ -145,7 +135,7 @@ function App() {
   const handleDocumentSelect = async (doc_obj) => {
 
     try {
-      setLoadingPreloaded(true);
+      //setLoadingPreloaded(true);
       //console.log('🔄 Loading document:', doc_obj);
 
       // Log document selection
@@ -156,8 +146,8 @@ function App() {
       //);
 
       // Create the frontend document object
-      const docId = createNewDocument(doc_obj.filename || false, {
-        document_id: doc_obj.document_id,
+      const docId = createNewDocument(doc_obj.filename || doc_obj.original_name || false, {
+        document_id: doc_obj.document_id || doc_obj.gdrive_id,
         text_length: doc_obj.text_length || 0,
         sentence_count: doc_obj.sentence_count || 0
       });
@@ -174,30 +164,36 @@ function App() {
         const newDocs = new Map(prev);
         const doc = newDocs.get(docId);
         if (doc) {
-          doc.isSessionDocument = true;
-          doc.backendDocumentId = doc_obj.document_id;
+          // Handle both available documents and drive documents
+          if (doc_obj.provisional_case_name) {
+            // This is a drive document
+            doc.isDriveDocument = true;
+            doc.provisional_case_name = doc_obj.provisional_case_name;
+            doc.county = doc_obj.county;
+            doc.agency = doc_obj.agency;
+            doc.source = 'google_drive';
+          } else {
+            // This is an available document
+            doc.isSessionDocument = true;
+            doc.source = 'session';
+          }
+          
           doc.textLength = doc_obj.text_length || 0;
           doc.sentenceCount = doc_obj.sentence_count || 0;
-          doc.sourceFolder = doc_obj.source_folder || 'session';
           doc.sentencesLoaded = doc_obj.sentences_available || false;
-          // Add session document metadata
-          doc.processedAt = document.processed_at;
+          doc.processedAt = doc_obj.processed_at || Date.now();
 
           newDocs.set(docId, doc);
         }
         return newDocs;
       });
 
-      // Close modal and show success
-      if (showPreloadedModal) {
-        setShowPreloadedModal(false);
-      }
+      // Close the browser modal
+      setDocumentBrowserOpen(false);
 
     } catch (error) {
-      console.error('❌ Error loading session document:', error);
+      console.error('❌ Error loading document:', error);
       alert(`Error loading document: ${error.message}`);
-    } finally {
-      setLoadingPreloaded(false);
     }
   };
 
@@ -269,36 +265,6 @@ function App() {
     }
   }, [activeDocumentId, documents]);
 
-
-
-  const handleHistoryQuestionSelect = async (questionId) => {
-    //await logUserInteraction('question_select', 'history_sidebar', { question_id: questionId });
-    //setActiveQuestionId(questionId);
-    dispatch({ type: 'SET_ACTIVE_QUESTION', payload: questionId });
-
-    // Also tell the ProvenanceQA component about this selection
-    if (window.integratedQARef && window.integratedQARef.selectQuestion) {
-      window.integratedQARef.selectQuestion(questionId);
-    }
-  };
-
-  /*const handleHistoryQuestionDelete = async (questionId) => {
-    if (window.confirm('Are you sure you want to delete this question from history?')) {
-      //await logUserInteraction('question_delete', 'history_sidebar', { question_id: questionId });
-
-      setQuestionsHistory(prev => {
-        const newHistory = new Map(prev);
-        newHistory.delete(questionId);
-
-        // If we deleted the active question, clear active state
-        if (questionId === activeQuestionId) {
-          setActiveQuestionId(null);
-        }
-
-        return newHistory;
-      });
-    }
-  };*/
 
   const handleShowQuestionSuggestions = async () => {
     //await logUserInteraction('question_suggestions_click', 'header');
@@ -561,14 +527,20 @@ function App() {
   };
 
 
-  // handle gdrive modal
-  const handleShowDrive = async () => {
-    //await logUserInteraction('browse_drive_click', 'document_selector');
-    setShowDriveModal(true);
+   const handleShowAvailableDocuments = () => {
+    setDocumentBrowserMode('available');
+    setDocumentBrowserOpen(true);
   };
 
+  const handleShowDriveDocuments = () => {
+    setDocumentBrowserMode('drive');
+    setDocumentBrowserOpen(true);
+  };
+
+  
+
   // Add Drive file selection handler
-  const handleDriveFileSelect = async (fileData) => {
+  /*const handleDriveFileSelect = async (fileData) => {
     try {
       // Create document using your existing logic
       const docId = createNewDocument(fileData.filename, fileData.filename);
@@ -598,7 +570,7 @@ function App() {
     } catch (error) {
       console.error('Error selecting Drive file:', error);
     }
-  };
+  };*/
 
 
   // Handle feedback
@@ -622,7 +594,7 @@ function App() {
     setFeedbackModalOpen(true);
   };
 
-  const handleShowDocuments = async () => {
+  /*const handleShowDocuments = async () => {
 
     setLoadingPreloaded(true);
     try {
@@ -641,7 +613,7 @@ function App() {
     } finally {
       setLoadingPreloaded(false);
     }
-  };
+  };*/
 
 
   // Add user interaction logging for various UI elements
@@ -716,12 +688,12 @@ function App() {
         {/* Header */}
         <Header
           activeDocument={activeDocument}
-          onShowPreloaded={handleShowDocuments}
+          onShowPreloaded={handleShowAvailableDocuments}
           onUploadDocument={async () => {
             //await logUserInteraction('upload_button_click', 'header');
             handleUploadNewDocument();
           }}
-          onShowDrive={handleShowDrive}
+          onShowDrive={handleShowDriveDocuments}
           onShowQuestionSuggestions={handleShowQuestionSuggestions}
         />
         {/* Left Sidebar */}
@@ -773,8 +745,8 @@ function App() {
                 <div className="pdf-empty-actions">
                   <DocumentSelector
                     onDocumentUpload={handleDocumentUpload}
-                    onShowPreloaded={handleShowDocuments}
-                    onShowDrive={handleShowDrive}
+                    onShowPreloaded={handleShowAvailableDocuments}
+                    onShowDrive={handleShowDriveDocuments}
                     uploadProgress={uploadProgress}
                     compactMode={false}
                   />
@@ -803,12 +775,15 @@ function App() {
           />
         </div>
       </div>
-      <DriveFileBrowser
-        isOpen={showDriveModal}
-        onClose={() => setShowDriveModal(false)}
-        onFileSelect={handleDriveFileSelect}
+     
+      {/* UNIFIED FILE BROWSER */}
+      <UnifiedFileBrowser
+        isOpen={documentBrowserOpen}
+        onClose={() => setDocumentBrowserOpen(false)}
+        onDocumentSelect={handleDocumentSelect}
+        mode={documentBrowserMode} // 'available' or 'drive'
+        showProvenanceStats={true}
       />
-
 
       {/* Enhanced Feedback Modal */}
       {feedbackModalOpen && selectedQuestionForFeedback && (
@@ -824,7 +799,7 @@ function App() {
         />
       )}
 
-      {/* Preloaded Documents Modal */}
+      {/* Preloaded Documents Modal 
       {showPreloadedModal && (
         <DocumentSelectionModal
           isOpen={showPreloadedModal}
@@ -832,7 +807,7 @@ function App() {
           onDocumentSelect={handleDocumentSelect}
           showProvenanceStats={true}
         />
-      )}
+      )}*/}
 
       {/* Question Suggestions Modal - NEW */}
       {showQuestionSuggestions && (

@@ -875,12 +875,13 @@ p {
 
 /* Main Modal Container */
 .modal-container {
-  position: relative;
+  position: absolute;
   background-color: var(--bg-paper);
   border: var(--border-medium) solid var(--win95-border-dark);
   box-shadow: var(--shadow-raised);
   top: var(--header-height);
-  left: 10vh;
+  left: 30vh;
+  width: 60vw;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -1385,7 +1386,7 @@ p {
   border: var(--border-thick) solid var(--win95-border-dark);
   box-shadow: var(--shadow-raised);
   width: 100%;
-  max-width: 700px;
+  max-width: 800px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;

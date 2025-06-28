@@ -9,6 +9,8 @@ from werkzeug.utils import secure_filename
 import doc_provenance.base_strategies
 from  functools import wraps
 from .utils.file_finder import DocumentFileFinder, find_document_file, get_file_finder, get_document_info
+from .google_drive_manager import GoogleDriveManager
+from .google_provisional_sampler import GoogleDriveProvisionalSampler
 from .text_processing_manager import TextProcessingManager
 from .pdfjs_coord_helpers import create_pdfjs_debugger, format_debug_result_for_api, PDFJSCoordinateDebugger
 
@@ -17,6 +19,8 @@ main = Blueprint('main', __name__, url_prefix='/api')
 
 sufficient_provenance_strategy_pool = ['raw','LLM_vanilla', 'embedding_sufficient_top_down','embedding_sufficient_bottem_up','LLM_score_sufficient_bottem_up','LLM_score_sufficient_top_down', 'divide_and_conquer_sufficient'] 
 minimal_provenance_strategy_pool = ['null', 'exponential_greedy','sequential_greedy'] 
+
+provisional_sampler = None
 
 # Algorithm configurations - combination of sufficient anmd minimal strategy pools; 
 # sufficient == raw -> only minimal strategies are used
@@ -36,6 +40,7 @@ PROCESSING_TIMEOUT = 60  # 1 minute timeout for processing
 EXPERIMENT_TOP_K = 5  # User-facing limit for this experiment
 MAX_PROVENANCE_PROCESSING = 20  # Internal limit to prevent infinite processing
 USE_TEST_SUITE = True
+
 class ProcessingTimeoutError(Exception):
     """Custom timeout exception for processing"""
     pass
@@ -59,6 +64,7 @@ CONOLIDATED_TEST_SUITE_DIR = os.path.join(os.getcwd(), 'app/consolidated_test_su
 for directory in [RESULTS_DIR, UPLOADS_DIR, STUDY_LOGS_DIR, QUESTIONS_DIR, SENTENCES_DIR, TEST_SUITE_OUTPUT_DIR]:
     os.makedirs(directory, exist_ok=True)
 
+#google_drive_manager = GoogleDriveManager(DOWNLOADS_DIR)
 text_processing_manager = TextProcessingManager(SENTENCES_DIR, TEST_SUITE_OUTPUT_DIR)
 
 # In routes.py - Add this at the top to debug routing
@@ -3136,21 +3142,316 @@ def get_document_mappings_overview(filename):
             'error': str(e)
         }), 500
 
-    
-@main.route('/drive/test', methods=['GET'])
-def test_drive_simple():
-    """Simple test endpoint"""
-    return jsonify({
-        'success': True,
-        'message': 'Drive test endpoint working',
-        'timestamp': time.time(),
-        'globals': {
-            'drive_services_available': globals().get('drive_services_available', 'undefined'),
-            'drive_inventory_df_exists': drive_inventory_df is not None,
-            'drive_inventory_df_length': len(drive_inventory_df) if drive_inventory_df is not None else 0
-        }
-    })
 
+@main.route('/drive/init', methods=['POST'])
+def init_drive_services():
+    """Manually initialize drive services"""
+    try:
+        success = google_drive_manager.initialize_drive_services()
+        if success:
+            inventory_size = len(google_drive_manager.drive_inventory_df) if google_drive_manager.drive_inventory_df is not None else 0
+        else:
+            inventory_size = 0
+            
+        return jsonify({
+            'success': success,
+            'message': 'Drive services initialized successfully' if success else 'Failed to initialize drive services',
+            'inventory_size': inventory_size
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/drive/status', methods=['GET'])
+def drive_status():
+    """Check drive services status"""
+    status = google_drive_manager.get_status()
+    return jsonify(status)
+
+@main.route('/drive/counties', methods=['GET'])
+def get_drive_counties():
+    """Get counties with PDF statistics"""
+    try:
+        if not google_drive_manager.drive_services_available:
+            if not google_drive_manager.initialize_drive_services():
+                return jsonify({
+                    'success': False,
+                    'error': 'Google Drive services not available. Please check configuration.',
+                    'need_init': True
+                }), 503
+        
+        counties = google_drive_manager.get_counties()
+        return jsonify({
+            'success': True,
+            'counties': counties
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Error in get_drive_counties: {e}")
+        return jsonify({
+            'success': False, 
+            'error': str(e)
+        }), 500
+
+@main.route('/drive/agencies/<county>', methods=['GET'])
+def get_drive_agencies_by_county(county):
+    """Get agencies within a county"""
+    try:
+        agencies = google_drive_manager.get_agencies_by_county(county)
+        return jsonify({
+            'success': True,
+            'agencies': agencies
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@main.route('/drive/files/<county>/<agency>', methods=['GET'])
+def get_drive_files_by_agency(county, agency):
+    """Get PDF files for a specific agency"""
+    try:
+        files = google_drive_manager.get_files_by_agency(county, agency)
+        return jsonify({
+            'success': True,
+            'files': files
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@main.route('/drive/download', methods=['POST'])
+def download_and_process_drive_file():
+    """Download PDF from Drive and process it"""
+    try:
+        data = request.get_json()
+        if not data or 'file_id' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'file_id is required in request body'
+            }), 400
+            
+        file_id = data['file_id']
+        
+        # Download and validate the file
+        download_result = google_drive_manager.download_and_process_file(file_id)
+        
+        if not download_result['success']:
+            return jsonify(download_result), 400 if 'not extractable' in download_result.get('error', '') else 500
+        
+        # Process the downloaded PDF
+        try:
+            filepath = download_result['filepath']
+            pdf_text, sentences = text_processing_manager.extract_pdf_text_and_sentences(filepath)
+            sentences_saved = text_processing_manager.save_document_sentences(download_result['safe_filename'], sentences)
+            
+            logger.info(f"✅ Successfully processed {download_result['safe_filename']}")
+            
+            return jsonify({
+                'success': True,
+                'filename': download_result['safe_filename'],
+                'path_hash': download_result['path_hash'],
+                'original_path': download_result['original_path'],
+                'message': f'Successfully downloaded and processed {download_result["original_filename"]}',
+                'metadata': {
+                    'sentence_count': len(sentences),
+                    'text_length': len(pdf_text),
+                    'sentences_available': sentences_saved,
+                    'source': 'google_drive',
+                    **download_result['metadata']
+                }
+            })
+            
+        except Exception as process_error:
+            # Clean up the file if processing failed
+            try:
+                os.remove(download_result['filepath'])
+            except:
+                pass
+            logger.error(f"❌ Processing failed: {process_error}")
+            return jsonify({
+                'success': False,
+                'error': f'Failed to process PDF: {str(process_error)}'
+            }), 500
+        
+    except Exception as e:
+        logger.error(f"❌ Unexpected error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Server error: {str(e)}'
+        }), 500
+
+@main.route('/drive/sample-documents', methods=['POST'])
+def sample_extractable_documents():
+    """Sample random PDFs, find extractable ones, and fully process them"""
+    try:
+        data = request.get_json() or {}
+        max_documents = data.get('max_documents', 5)
+        max_attempts = data.get('max_attempts', 20)
+        
+        result = google_drive_manager.sample_extractable_documents(max_documents, max_attempts)
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"❌ Error in sampling: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Sampling failed: {str(e)}'
+        }), 500
+    
+def get_sampler():
+    """Get the global provisional case sampler instance"""
+    global provisional_sampler
+    if provisional_sampler is None:
+        provisional_sampler = GoogleDriveProvisionalSampler(DOWNLOADS_DIR)
+    return provisional_sampler
+
+@main.route('/drive/pvc-sample/init', methods=['POST'])
+def init_provisional_sampler():
+        """Initialize the provisional case sampler"""
+        try:
+            sampler = get_sampler()
+            success = sampler.initialize_drive_services()
+            
+            if success:
+                return jsonify({
+                    'success': True,
+                    'message': 'Provisional case sampler initialized',
+                    'status': sampler.get_status()
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': 'Failed to initialize sampler'
+                }), 503
+                
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'error': str(e)
+            }), 500
+    
+@main.route('/drive/pvc-sample/cases', methods=['GET'])
+def get_provisional_cases():
+    """Get available provisional cases"""
+    try:
+        sampler = get_sampler()
+        return jsonify(sampler.get_available_provisional_cases())
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/drive/pvc-sample/get-documents', methods=['POST'])
+def sample_provisional_documents():
+    """Sample documents from provisional cases"""
+    try:
+        data = request.get_json() or {}
+        target_count = data.get('target_count', 5)
+        max_attempts = data.get('max_attempts', 20)
+        prefer_diverse_cases = data.get('prefer_diverse_cases', True)
+        min_pages = data.get('min_pages', 0)
+        
+        sampler = get_sampler()
+        result = sampler.sample_documents(
+            target_count=target_count,
+            max_attempts=max_attempts,
+            prefer_diverse_cases=prefer_diverse_cases,
+            min_pages=min_pages
+        )
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    
+@main.route('/drive/pvc-sample/downloaded-summary', methods=['GET'])
+def get_downloaded_summary():
+    """Get summary of downloaded files organized by provisional case"""
+    try:
+        sampler = get_sampler()
+        
+        # Get the raw file summary
+        summary = sampler.get_downloaded_files_summary()
+        
+        if not summary['success']:
+            return jsonify(summary)
+        
+        # Enhance the summary with metadata from the original inventory
+        # This assumes you want to add county/agency info to each file
+        enhanced_summary = enhance_file_summary_with_metadata(sampler, summary)
+        
+        return jsonify(enhanced_summary)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+def enhance_file_summary_with_metadata(sampler, summary):
+    """Enhance file summary with metadata from the drive inventory"""
+    try:
+        if not sampler.drive_services_available or sampler.drive_inventory_df is None:
+            # Return basic summary without enhancement
+            return summary
+        
+        # Create a lookup dictionary from the inventory
+        inventory_lookup = {}
+        for _, row in sampler.drive_inventory_df.iterrows():
+            file_id = row.get('extracted_file_id')
+            if file_id:
+                inventory_lookup[file_id] = {
+                    'county': row.get('county', 'Unknown'),
+                    'agency': row.get('agency', 'Unknown'), 
+                    'subject': row.get('subject', 'Unknown'),
+                    'incident_date': row.get('incident_date'),
+                    'case_numbers': row.get('case_numbers'),
+                    'page_count': int(row.get('page_num', 0))
+                }
+        
+        # Enhance each file with metadata
+        enhanced_cases = {}
+        for case_name, case_data in summary.get('cases', {}).items():
+            enhanced_files = []
+            
+            for file_info in case_data['files']:
+                gdrive_id = file_info['gdrive_id']
+                
+                # Look up metadata from inventory
+                metadata = inventory_lookup.get(gdrive_id, {
+                    'county': 'Unknown',
+                    'agency': 'Unknown',
+                    'subject': 'Unknown',
+                    'incident_date': None,
+                    'case_numbers': None,
+                    'page_count': 0
+                })
+                
+                enhanced_file = {
+                    **file_info,
+                    'metadata': metadata
+                }
+                enhanced_files.append(enhanced_file)
+            
+            enhanced_cases[case_name] = {
+                **case_data,
+                'files': enhanced_files
+            }
+        
+        return {
+            **summary,
+            'cases': enhanced_cases
+        }
+        
+    except Exception as e:
+        # If enhancement fails, return the original summary
+        print(f"Warning: Failed to enhance summary with metadata: {e}")
+        return summary
+    
 # Add this near the end of routes.py, after all route definitions
 @main.route('/debug/routes', methods=['GET'])
 def debug_routes():

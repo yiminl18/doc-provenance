@@ -19,6 +19,21 @@ sys.path.append(current_file_directory)
 from doc_provenance.model import model 
 model_name = 'gpt_4o_mini_azure'
 
+def setup_model_name(model_name_input):
+    """
+    Set up the model name for use throughout the base_strategies module.
+    
+    Args:
+        model_name_input (str): The name of the model to use (e.g., 'gpt_4o_mini_azure', 'gpt_4o', etc.)
+        
+    Returns:
+        str: The model name that was set
+    """
+    global model_name
+    model_name = model_name_input
+    return model_name
+
+
 def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path)
 
@@ -89,8 +104,13 @@ def write_json_to_file(filename, data):
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(data, file, indent=4, ensure_ascii=False)
 
+import os
+
+def get_folder_path(file_path):
+    return os.path.abspath(os.path.dirname(file_path))
+
 def create_data_folder(path):
-    data_path = path.replace('data','out').replace('.pdf','')
+    data_path = get_folder_path(path)
     os.makedirs(data_path, exist_ok=True)
     return data_path
 
@@ -567,6 +587,9 @@ def write_intermediate_provenance(out_status, provenance_ids, sentences, input_t
     provenance_object['time'] = time + new_time 
     print('provenance_ids', provenance_ids)
     print('provenance size ratio', provenance_object['provenance_size']/provenance_object['doc_size'])
+    if not os.path.exists(intermediate_path):
+        folder = os.path.dirname(intermediate_path)
+        create_data_folder(folder)
     write_json_to_file(intermediate_path, provenance_object)
 
 def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, result_path, intermediate_path, doc_size, metric = 'string'):
@@ -636,7 +659,7 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
         if eval_result:
             #write the provenance to the file
             out_status = (intermediate_path, doc_size, sum_input_tokens, sum_output_tokens, time.time() - st)
-            write_intermediate_provenance(out_status, current_ids, sentences, input_token, output_token, time.time() - st)
+            write_intermediate_provenance(out_status, current_ids, sentences, 0, 0, time.time() - st)
 
 
         tuple_current_ids = tuple(current_ids)

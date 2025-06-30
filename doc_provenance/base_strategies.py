@@ -16,8 +16,8 @@ nltk.download("punkt")
 current_file_directory = os.path.dirname(os.path.abspath(__file__))
 parent_directory = os.path.dirname(current_file_directory)
 sys.path.append(current_file_directory)
-from model import model 
-model_name = 'gpt4omini'
+from doc_provenance.model import model 
+model_name = 'gpt_4o_mini_azure'
 
 def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path)
@@ -106,6 +106,7 @@ def QA(question, context):
     if len(context) == 0:
         return ['NULL'], 0, 0
     prompt = (question[0] + question[1], context)
+    print('model_name', model_name)
     response = model(model_name, prompt)
     # print('Prompt is:', prompt[0])
     # print('QA response is:', response)
@@ -239,18 +240,18 @@ def LLM_vanilla(question, context, title, path):
     write_json_to_file(path, out)
     return out
 
-def sequential_greedy(question, context, title, path, metric = 'string'):
-    st = time.time()
-    answers = QA(question, context)
-    sentences = extract_sentences_from_pdf(context)
-    out = sequential_greedy_core(question, answers, sentences, title, metric = metric)
-    et = time.time()
-    out['time'] = et-st
-    out['path'] = path
-    out['context_size'] = count_tokens(context)
-    write_json_to_file(path, out)
+# def sequential_greedy(question, context, title, path, metric = 'string'):
+#     st = time.time()
+#     answers = QA(question, context)
+#     sentences = extract_sentences_from_pdf(context)
+#     out = sequential_greedy_core(question, answers, sentences, title, metric = metric)
+#     et = time.time()
+#     out['time'] = et-st
+#     out['path'] = path
+#     out['context_size'] = count_tokens(context)
+#     write_json_to_file(path, out)
 
-    return out 
+#     return out 
 
 def enumerate_skip_ids(cur_ids):
     new_len = len(cur_ids) * 2
@@ -261,13 +262,22 @@ def enumerate_skip_ids(cur_ids):
         st_id += 1
     return new_ids
 
-def exponential_greedy_core(question, answers, sentences, sorted_idx = [], metric = 'string'):
+def get_provenance_ids(sorted_idx, removed_sentences):
+    provenance_ids = []
+    for i in sorted_idx:
+        if i in removed_sentences:
+            continue
+        provenance_ids.append(i)
+    return provenance_ids
+
+def exponential_greedy_core(question, answers, sentences, out_status, sorted_idx = [], metric = 'string'):
     out = {}
     out['question'] = question
     out['answers'] = answers
     removed_sentences = []
     input_tokens = 0
     output_tokens = 0
+    st = time.time()
 
     if len(sorted_idx) == 0:
         sorted_idx = list(range(len(sentences)))
@@ -301,6 +311,7 @@ def exponential_greedy_core(question, answers, sentences, sorted_idx = [], metri
 
         if eval_result == True:#if removing this sentence does not change the final answers, then these sentences can be removed 
             removed_sentences += skip_ids
+            write_intermediate_provenance(out_status, get_provenance_ids(sorted_idx, removed_sentences), sentences, input_tokens, output_tokens, time.time() - st)
             #get an exponential large skip_ids
             skip_ids = enumerate_skip_ids(skip_ids)
         else: #sentences in current skip ids cannot be removed 
@@ -325,26 +336,27 @@ def exponential_greedy_core(question, answers, sentences, sorted_idx = [], metri
 
     return out 
 
-def raw_exponential_greedy(question, text, title, result_path, metric = 'string'):
-    answers, input_tokens, output_tokens = QA(question,text)
-    sentences = extract_sentences_from_pdf(text)
-    #print(len(sentences))
-    st = time.time()
-    out['title'] = title
-    out['context_size'] = count_tokens(text)
-    out = exponential_greedy_core(question, answers, sentences, metric = metric)
-    et = time.time()
-    out['time'] = et-st
-    write_json_to_file(result_path, out)
-    return out 
+# def raw_exponential_greedy(question, text, title, result_path, metric = 'string'):
+#     answers, input_tokens, output_tokens = QA(question,text)
+#     sentences = extract_sentences_from_pdf(text)
+#     #print(len(sentences))
+#     st = time.time()
+#     out['title'] = title
+#     out['context_size'] = count_tokens(text)
+#     out = exponential_greedy_core(question, answers, sentences, metric = metric)
+#     et = time.time()
+#     out['time'] = et-st
+#     write_json_to_file(result_path, out)
+#     return out 
 
 
 
-def sequential_greedy_core(question, answers, sentences, title, sorted_idx = [], metric = 'string'):
+def sequential_greedy_core(question, answers, sentences, title, out_status, sorted_idx = [], metric = 'string'):
     out = {}
     out['title'] = title
     out['question'] = question
     out['answers'] = answers
+    st = time.time()
     
     #print('Number of sentences:', len(sentences)) 
     removed_sentences = []
@@ -375,6 +387,7 @@ def sequential_greedy_core(question, answers, sentences, title, sorted_idx = [],
         output_tokens += output_token
         if eval_result == True:#if removing this sentence does not change the final answers, then this sentence can be removed 
             removed_sentences.append(i) 
+            write_intermediate_provenance(out_status, get_provenance_ids(sorted_idx, removed_sentences), sentences, input_tokens, output_tokens, time.time() - st)
             #print('Sentence ',i, ' is removed!')
     provenance = []
     provenance_id = []
@@ -448,11 +461,12 @@ def block_labeler(sentences, question, answers, blk_num):
 
 
 
-def divide_and_conquer_progressive_API(raw_question, text, result_path, k=5, stop_sentence_length = 5, metric = 'string'):
+def divide_and_conquer_progressive_API(raw_question, text, result_path, intermediate_path, k=5, stop_sentence_length = 5, metric = 'string'):
     print('model', model_name)
     instruction = 'Only return answers. Do not add explanations. If answers are not found in the given context, return NULL. Context: '
     question = (raw_question, instruction)
     answers, input_tokens, output_tokens = QA(question,text)
+    doc_size = count_tokens(text)
     #print('Answers:',answers)
     sentences = extract_sentences_from_pdf(text)
     # answer_path = result_path.replace('.json', '_answer.json')  
@@ -480,7 +494,7 @@ def divide_and_conquer_progressive_API(raw_question, text, result_path, k=5, sto
         ids.append(i)
     
     print('starting topk...')
-    divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, provenance_path, metric = metric)
+    divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, provenance_path, intermediate_path, doc_size, metric = metric)
 
 
 def block_decider(left_ids, right_ids, block_scores, blocks_sentences_id):
@@ -537,10 +551,25 @@ def block_decider(left_ids, right_ids, block_scores, blocks_sentences_id):
 
 provenance_topk_results = []
 
-def store_provenance():
-    a=0
+def write_intermediate_provenance(out_status, provenance_ids, sentences, input_token_size, output_token_size, new_time):
+    #out_status = (intermediate_path, doc_size, sum_input_tokens, sum_output_tokens, time.time() - st)
+    intermediate_path, doc_size, sum_input_tokens, sum_output_tokens, time = out_status
+    provenance_object = {}
+    provenance_object['provenance_ids'] = provenance_ids
+    provenance_context = ''
+    for id in provenance_ids:
+        provenance_context += sentences[id]
+    provenance_object['provenance'] = provenance_context
+    provenance_object['doc_size'] = doc_size
+    provenance_object['provenance_size'] = count_tokens(provenance_context)
+    provenance_object['input_token_size'] = sum_input_tokens + input_token_size
+    provenance_object['output_token_size'] = sum_output_tokens + output_token_size
+    provenance_object['time'] = time + new_time 
+    print('provenance_ids', provenance_ids)
+    print('provenance size ratio', provenance_object['provenance_size']/provenance_object['doc_size'])
+    write_json_to_file(intermediate_path, provenance_object)
 
-def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, result_path, metric = 'string'):
+def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, sentences, block_scores, blocks_sentences_id, k, stop_sentence_length, result_path, intermediate_path, doc_size, metric = 'string'):
     """
     Attempt to find a smaller subset of `sentences` that returns True for H,
     using a divide-and-conquer approach but in a non-recursive (queue-based) way.
@@ -585,7 +614,6 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
     set_cached(ids, True) 
 
     # current_ids has alredy been runed, set its status 
-    #set_cached(ids, True)
     print('topk_provenance_id',topk_provenance_id)
 
     while stack:
@@ -605,6 +633,12 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
         print(current_ids, eval_result)
         # If the entire set doesn't yield True, no need to proceed
 
+        if eval_result:
+            #write the provenance to the file
+            out_status = (intermediate_path, doc_size, sum_input_tokens, sum_output_tokens, time.time() - st)
+            write_intermediate_provenance(out_status, current_ids, sentences, input_token, output_token, time.time() - st)
+
+
         tuple_current_ids = tuple(current_ids)
         if not eval_result:
             if tuple_current_ids in rib and tuple_current_ids in father:
@@ -619,7 +653,8 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
                     #print('Starting exponential_greedy_core...')
                     # if len(list(father_node)) >= 20:
                     #     continue
-                    out = exponential_greedy_core(question, answers, sentences, sorted_idx = list(father_node))
+                    out_status = (intermediate_path, doc_size, sum_input_tokens, sum_output_tokens, time.time() - st)
+                    out = exponential_greedy_core(question, answers, sentences, out_status, sorted_idx = list(father_node))
                     provenance_ids = out['provenance_ids']
                     print('Top-'+ str(topk_provenance_id),' provenance:',provenance_ids)
                     provenance_context = ''
@@ -650,7 +685,7 @@ def divide_and_conquer_iterative_with_cache_progressive(answers, question, ids, 
             continue
         if eval_result and len(current_ids) <= stop_sentence_length: #k is the length of sentences in the interval to stop iteration 
             # send current ids to another operator to produce MP 
-            out = sequential_greedy_core(question, answers, sentences, '', sorted_idx = current_ids)
+            out = sequential_greedy_core(question, answers, sentences, '', out_status, sorted_idx = current_ids)
 
             provenance_ids = out['provenance_ids']
             print('Top-'+ str(topk_provenance_id),' provenance:',provenance_ids)
@@ -877,25 +912,25 @@ def heuristic_topk(question, text, title, result_path, embedding_path, metric = 
 
     
 
-def heuristic_greedy(question, text, title, result_path, embedding_path, metric = 'string'):
-    print(embedding_path)
-    print(result_path)
-    answers = QA(question, text)
-    st = time.time()
-    sorted_indices, similarity_scores = sort_sentences_by_similarity(question, answers, text, embedding_path)
-    k, extra_input_tokens, extra_output_tokens = pick_k_binary(question, text, sorted_indices, metric = metric)
-    #print(k, len(sorted_indices))
-    sentences = extract_sentences_from_pdf(text)
-    out = sequential_greedy_core(question, answers, sentences, title, sorted_idx = sorted_indices[:k])
-    et = time.time()
-    out['time'] = et-st
-    out['k'] = k 
-    out['context_size'] = count_tokens(text)
-    (input_tokens, output_tokens) = out['tokens']
-    out['tokens'] = (input_tokens + extra_input_tokens, output_tokens + extra_output_tokens)
+# def heuristic_greedy(question, text, title, result_path, embedding_path, metric = 'string'):
+#     print(embedding_path)
+#     print(result_path)
+#     answers = QA(question, text)
+#     st = time.time()
+#     sorted_indices, similarity_scores = sort_sentences_by_similarity(question, answers, text, embedding_path)
+#     k, extra_input_tokens, extra_output_tokens = pick_k_binary(question, text, sorted_indices, metric = metric)
+#     #print(k, len(sorted_indices))
+#     sentences = extract_sentences_from_pdf(text)
+#     out = sequential_greedy_core(question, answers, sentences, title, sorted_idx = sorted_indices[:k])
+#     et = time.time()
+#     out['time'] = et-st
+#     out['k'] = k 
+#     out['context_size'] = count_tokens(text)
+#     (input_tokens, output_tokens) = out['tokens']
+#     out['tokens'] = (input_tokens + extra_input_tokens, output_tokens + extra_output_tokens)
 
-    write_json_to_file(result_path, out)
-    return out
+#     write_json_to_file(result_path, out)
+#     return out
 
 
 

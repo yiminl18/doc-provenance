@@ -7,6 +7,8 @@ import {
   faTimes, faExclamationTriangle, faHashtag, faAlignLeft, faInfoCircle,
   faQuestionCircle, faClock, faChartBar, faDatabase
 } from '@fortawesome/free-solid-svg-icons';
+import { Tiktoken } from 'js-tiktoken/lite';
+import cl100k_base from "js-tiktoken/ranks/cl100k_base";
 
 import {
   getDocuments,
@@ -29,6 +31,9 @@ const UnifiedFileBrowser = ({
   // Common state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Initialize Tiktoken for token counting
+  const enc = new Tiktoken(cl100k_base);
 
   // Available documents state
   const [documents, setDocuments] = useState([]);
@@ -93,6 +98,7 @@ const UnifiedFileBrowser = ({
           total_questions: 0,
           total_provenances: 0,
           total_sentences: 0,
+          total_tokens: 0,
           avg_provenances_per_question: 0,
           error: true
         }));
@@ -114,7 +120,7 @@ const UnifiedFileBrowser = ({
         total_questions: 0,
         total_provenances: 0,
         total_sentences: 0,
-        total_characters: 0,
+        total_tokens: 0,
         avg_provenances_per_question: 0,
         avg_sentences_per_question: 0,
         quality_score: 0
@@ -123,31 +129,35 @@ const UnifiedFileBrowser = ({
 
     let totalProvenances = 0;
     let totalSentences = 0;
-    let totalCharacters = 0;
+    let totalTokens = 0;
     let questionsWithProvenances = 0;
 
     questions.forEach(question => {
       if (question.provenance_data && question.provenance_data.length > 0) {
         questionsWithProvenances++;
         totalProvenances += question.provenance_data.length;
-
+        
         question.provenance_data.forEach(prov => {
+          // Calculate per-provenance totals using TikToken
+          const provenanceText = prov.provenance || '';
+          const tokenCount = enc.encode(provenanceText).length;
           const sentenceCount = prov.provenance_ids ? prov.provenance_ids.length : 0;
-          const characterCount = prov.output_token_size || 0;
-
+          
           totalSentences += sentenceCount;
-          totalCharacters += characterCount;
+          totalTokens += tokenCount;
         });
       }
     });
 
+    // Calculate quality score (0-100) based on coverage and completeness
     const coverageScore = (questionsWithProvenances / questions.length) * 100;
     const avgProvenancesPerQuestion = questions.length > 0 ? totalProvenances / questions.length : 0;
     const avgSentencesPerQuestion = questions.length > 0 ? totalSentences / questions.length : 0;
-
+    
+    // Quality factors: good coverage, reasonable provenance count, meaningful sentence count
     const qualityScore = Math.min(100, (
-      (coverageScore * 0.4) +
-      (Math.min(avgProvenancesPerQuestion / 3, 1) * 30) +
+      (coverageScore * 0.4) + 
+      (Math.min(avgProvenancesPerQuestion / 3, 1) * 30) + 
       (Math.min(avgSentencesPerQuestion / 10, 1) * 30)
     ));
 
@@ -155,7 +165,7 @@ const UnifiedFileBrowser = ({
       total_questions: questions.length,
       total_provenances: totalProvenances,
       total_sentences: totalSentences,
-      total_characters: totalCharacters,
+      total_tokens: totalTokens,
       questions_with_provenances: questionsWithProvenances,
       coverage_percentage: Math.round(coverageScore),
       avg_provenances_per_question: Math.round(avgProvenancesPerQuestion * 10) / 10,
@@ -298,9 +308,7 @@ const fetchFiles = async (county, agency) => {
 
 const handleDriveFileSelect = async (file) => {
   if (!file.file_id && !file.gdrive_id) {
-    // This might be a local file, try to use it directly
     if (file.path || file.full_path) {
-      // For PVC sample files, we need to provide the correct serving URL
       const pdfUrl = file.provisional_case_name ? 
         `/api/documents/pvc-sample/${file.provisional_case_name}/${file.name || file.displayName}` :
         `/api/documents/${file.name || file.displayName}?source=pvc-sample`;
@@ -543,11 +551,11 @@ const getTitle = () => {
                                   <div className="doc-basic-stats">
                                     <span className="stat">
                                       <FontAwesomeIcon icon={faAlignLeft} />
-                                      {formatNumber(doc.text_length || 0)} chars
+                                      {formatNumber(stats?.total_tokens || 0)} tokens
                                     </span>
                                     <span className="stat">
                                       <FontAwesomeIcon icon={faHashtag} />
-                                      {doc.sentence_count || 0} sentences
+                                      {formatNumber(stats?.total_sentences || 0)} sentences
                                     </span>
                                   </div>
                                 </div>

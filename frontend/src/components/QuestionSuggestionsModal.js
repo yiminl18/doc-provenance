@@ -16,6 +16,8 @@ import {
   faInfoCircle
 } from '@fortawesome/free-solid-svg-icons';
 import { getGeneratedQuestions } from '../services/api';
+import { Tiktoken } from 'js-tiktoken/lite';
+import cl100k_base from "js-tiktoken/ranks/cl100k_base";
 
 const QuestionSuggestionsModal = ({
   isOpen,
@@ -26,7 +28,9 @@ const QuestionSuggestionsModal = ({
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showProvenanceDetails, setShowProvenanceDetails] = useState(false);
+
+  // Initialize Tiktoken for token counting
+  const enc = new Tiktoken(cl100k_base);
 
   useEffect(() => {
     if (isOpen && filename) {
@@ -42,7 +46,6 @@ const QuestionSuggestionsModal = ({
       const response = await getGeneratedQuestions(filename);
 
       if (response.success) {
-        //console.log('Loaded questions:', response.questions);
         setQuestions(response.questions || []);
       } else {
         setError('Failed to load questions');
@@ -59,7 +62,6 @@ const QuestionSuggestionsModal = ({
     onClose();
   };
 
-
   const formatNumber = (num) => {
     if (num >= 1000) {
       return (num / 1000).toFixed(1) + 'k';
@@ -67,6 +69,17 @@ const QuestionSuggestionsModal = ({
     return num.toString();
   };
 
+  // Calculate per-provenance totals
+  const calculateProvenanceStats = (provenance) => {
+    if (!provenance || !provenance.provenance) {
+      return { totalTokens: 0, totalSentences: 0 };
+    }
+
+    const totalTokens = enc.encode(provenance.provenance).length;
+    const totalSentences = provenance.provenance_ids ? provenance.provenance_ids.length : 0;
+
+    return { totalTokens, totalSentences };
+  };
 
   if (!isOpen) return null;
 
@@ -112,39 +125,42 @@ const QuestionSuggestionsModal = ({
                         <div className="provenance-summary-bar">
                           {question.provenance_data && question.provenance_data.length > 0 ? (
                             <div className="provenance-stats">
-                              {question.provenance_data.map((prov, idx) => (
-                                <div key={`${question.question_id}_${prov.provenance_id}`}
-                                  className="stat-item"
-                                >
-                                  {/* Sentences metric */}
-                                  <div className="metric-row">
-                                    <FontAwesomeIcon icon={faHashtag} className="metric-icon" />
-                                    <span className="metric-value">{prov.provenance_ids ? prov.provenance_ids.length : 0}</span>
-                                   <div className="metric-label">sentences</div>
-                                  </div>
-                                 
+                              {question.provenance_data.map((prov, idx) => {
+                                const stats = calculateProvenanceStats(prov);
+                                return (
+                                  <div key={`${question.question_id}_${prov.provenance_id}`}
+                                    className="stat-item"
+                                  >
+                                    {/* Provenance ID indicator */}
+                                    <div className="provenance-header">
+                                      <span className="provenance-label">Provenance {prov.provenance_id || idx + 1}</span>
+                                    </div>
 
-                                  {/* Tokens metric */}
-                                  <div className="metric-row">
-                                    <FontAwesomeIcon icon={faAlignLeft} className="metric-icon" />
-                                    <span className="metric-value">{formatNumber(prov.output_token_size || 0)}</span>
-                                  <div className="metric-label">tokens</div>
-                                  </div>
-                                  
+                                    {/* Sentences metric */}
+                                    <div className="metric-row">
+                                      <FontAwesomeIcon icon={faHashtag} className="metric-icon" />
+                                      <span className="metric-value">{stats.totalSentences}</span>
+                                      <div className="metric-label">sentences</div>
+                                    </div>
 
-                                  {/* Processing time metric (optional) */}
-                                  {prov.time && (
-                                    <>
+                                    {/* Tokens metric */}
+                                    <div className="metric-row">
+                                      <FontAwesomeIcon icon={faAlignLeft} className="metric-icon" />
+                                      <span className="metric-value">{formatNumber(stats.totalTokens)}</span>
+                                      <div className="metric-label">tokens</div>
+                                    </div>
+
+                                    {/* Processing time metric (optional) */}
+                                    {prov.time && (
                                       <div className="metric-row">
                                         <FontAwesomeIcon icon={faClock} className="metric-icon" />
                                         <span className="metric-value">{prov.time.toFixed(1)}</span>
-                                       <div className="metric-label">seconds</div>
+                                        <div className="metric-label">seconds</div>
                                       </div>
-                                     
-                                    </>
-                                  )}
-                                </div>
-                              ))}
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           ) : (
                             <div className="no-provenance">
@@ -154,11 +170,7 @@ const QuestionSuggestionsModal = ({
                           )}
                         </div>
                       </div>
-
-                    
                     </button>
-
-   
                   </div>
                 ))}
               </div>
@@ -175,7 +187,7 @@ const QuestionSuggestionsModal = ({
         </div>
       </div>
     </div>
-  )
+  );
 };
 
 export default QuestionSuggestionsModal;

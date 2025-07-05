@@ -42,10 +42,8 @@ const DocumentSelectionModal = ({
       const response = await getDocuments();
       
       if (response.success && response.documents) {
-        //console.log('📚 Documents loaded:', response.documents);
         setDocuments(response.documents);
         
-        // Load provenance stats for each document if enabled
         if (showProvenanceStats) {
           loadProvenanceStatsForDocuments(response.documents);
         }
@@ -63,9 +61,7 @@ const DocumentSelectionModal = ({
   };
 
   const loadProvenanceStatsForDocuments = async (docs) => {
-    //console.log('📊 Loading provenance stats for documents...');
     
-    // Load stats for each document in parallel
     const statsPromises = docs.map(async (doc) => {
       try {
         setLoadingStats(prev => new Set(prev).add(doc.filename));
@@ -78,7 +74,6 @@ const DocumentSelectionModal = ({
         }
       } catch (error) {
         console.warn(`Failed to load stats for ${doc.filename}:`, error);
-        // Set empty stats so we don't keep trying
         setDocumentStats(prev => new Map(prev).set(doc.filename, {
           total_questions: 0,
           total_provenances: 0,
@@ -96,7 +91,6 @@ const DocumentSelectionModal = ({
     });
 
     await Promise.allSettled(statsPromises);
-    //console.log('✅ Provenance stats loading completed');
   };
 
   const calculateDocumentStats = (questions, metadata) => {
@@ -114,7 +108,7 @@ const DocumentSelectionModal = ({
 
     let totalProvenances = 0;
     let totalSentences = 0;
-    let totalCharacters = 0;
+    let totalTokens = 0;
     let questionsWithProvenances = 0;
 
     questions.forEach(question => {
@@ -124,10 +118,10 @@ const DocumentSelectionModal = ({
         
         question.provenance_data.forEach(prov => {
           const sentenceCount = prov.provenance_ids ? prov.provenance_ids.length : 0;
-          const characterCount = prov.output_token_size || 0; // Using token size as proxy
+          const tokenCount = prov.output_token_size || 0; 
           
           totalSentences += sentenceCount;
-          totalCharacters += characterCount;
+          totalTokens += tokenCount;
         });
       }
     });
@@ -148,7 +142,7 @@ const DocumentSelectionModal = ({
       total_questions: questions.length,
       total_provenances: totalProvenances,
       total_sentences: totalSentences,
-      total_characters: totalCharacters,
+      total_tokens: totalTokens,
       questions_with_provenances: questionsWithProvenances,
       coverage_percentage: Math.round(coverageScore),
       avg_provenances_per_question: Math.round(avgProvenancesPerQuestion * 10) / 10,
@@ -165,12 +159,6 @@ const DocumentSelectionModal = ({
     return num.toString();
   };
 
-  const getQualityColor = (score) => {
-    if (score >= 80) return '#4CAF50'; // Green
-    if (score >= 60) return '#FF9800'; // Orange
-    if (score >= 40) return '#FFC107'; // Yellow
-    return '#F44336'; // Red
-  };
 
   const handleDocumentClick = (doc) => {
     onDocumentSelect(doc);
@@ -233,11 +221,11 @@ const DocumentSelectionModal = ({
                             <div className="doc-basic-stats">
                               <span className="stat">
                                 <FontAwesomeIcon icon={faAlignLeft} />
-                                {formatNumber(doc.text_length || 0)} chars
+                                {formatNumber(doc.total_tokens || 0)} tokens
                               </span>
                               <span className="stat">
                                 <FontAwesomeIcon icon={faHashtag} />
-                                {doc.sentence_count || 0} sentences
+                                {doc.total_sentences || 0} sentences
                               </span>
                             </div>
                           </div>

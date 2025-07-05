@@ -1,0 +1,33 @@
+{
+  "base_name": "Attachment_16_Redacted_sk_done_Redacted",
+  "questions": [
+    "Who authored the investigation report?",
+    "What is the case number associated with the investigation?",
+    "On what date did Investigator Callori conduct interviews and follow-up communications?",
+    "Who approved the investigation report?",
+    "When were the detailed entries in CATS made from September 18, 2019, to what date?",
+    "How does the report emphasize the importance of compliance with nursing standards?",
+    "What activities were included in the investigation process according to the report?",
+    "In what ways did Investigator Callori ensure thoroughness in the investigation?",
+    "What were the main reasons for Investigator Callori's requests for additional hours?",
+    "How did the investigation process address the confidentiality of personnel records?"
+  ],
+  "metadata": {
+    "base_name": "Attachment_16_Redacted_sk_done_Redacted",
+    "generated_at_iso": "2025-06-11 10:57:04",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 14560,
+    "processed_text_length": 3088,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty",
+    "has_difficulty_levels": true,
+    "source_file": "Attachment_16_Redacted_sk_done_Redacted_questions_by_difficulty.json",
+    "total_questions": 10
+  }
+}

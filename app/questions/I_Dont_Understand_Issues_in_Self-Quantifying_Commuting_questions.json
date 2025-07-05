@@ -1,0 +1,33 @@
+{
+  "base_name": "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting",
+  "questions": [
+    "Who authored the document 'I Don’t Understand…'?",
+    "What is the main objective of the study presented in the document?",
+    "Where were the authors of the document affiliated?",
+    "Who participated in the study mentioned in the document?",
+    "What did participant P7 note about the commuting cost calculations?",
+    "How do participants' perceptions of the eco-calculator model's results compare to their understanding of sustainable practices?",
+    "What limitations of current self-tracking models are highlighted in the document?",
+    "What were the phases involved in the study's methodology?",
+    "How does the study suggest self-tracking tools can influence behavior change?",
+    "What discrepancies did participants find in the commuting data models?"
+  ],
+  "metadata": {
+    "base_name": "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting",
+    "generated_at_iso": "2025-06-11 10:52:38",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 27365,
+    "processed_text_length": 4051,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty",
+    "has_difficulty_levels": true,
+    "source_file": "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting_questions_by_difficulty.json",
+    "total_questions": 10
+  }
+}

@@ -8,9 +8,10 @@ import json
 import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+from werkzeug.utils import secure_filename
 
 # Import our new modules
-from pdfminer_coordinate_extractor import CoordinateAwareSentenceExtractor, extract_and_save_coordinate_data
+from pdfminer_coord_extraction import EnhancedCoordinateExtractor, extract_and_save_coordinate_data
 from pdfjs_coordinate_mapper import PDFJSCoordinateMapper, create_stable_mappings_for_document
 
 class CompletePDFProcessor:
@@ -24,10 +25,10 @@ class CompletePDFProcessor:
         # Define directory structure
         self.directories = {
             'uploads': os.path.join(self.base_dir, 'uploads'),
-            'sentences': os.path.join(self.base_dir, 'sentences'),
+            'sentences': os.path.join(self.base_dir, 'layouts'),
             'pdfminer_coordinate_regions': os.path.join(self.base_dir, 'pdfminer_coordinate_regions'),
             'pdfjs_cache': os.path.join(self.base_dir, 'pdfjs_cache'),
-            'stable_mappings': os.path.join(self.base_dir, 'stable_mappings'),
+            'stable_mappings': os.path.join(self.base_dir, 'stable_mappings2'),
             'processed_pdfs': os.path.join(self.base_dir, 'processed_pdfs')
         }
         
@@ -72,8 +73,9 @@ class CompletePDFProcessor:
                 print(f"   Expected location: {pdfjs_cache_dir}")
                 print("   Please ensure PDF.js extraction has been run for this document")
                 processing_result['errors'].append('pdfjs_cache_missing')
+                pdfjs_cache_dir = os.path.join(self.directories['pdfjs_cache'], secure_filename(pdf_basename))
                 # Continue without stable mapping
-            else:
+            if os.path.exists(pdfjs_cache_dir):
                 print(f"✅ PDF.js cache found: {pdfjs_cache_dir}")
                 
                 # Step 3: Create stable element mappings
@@ -87,7 +89,7 @@ class CompletePDFProcessor:
             
             # Step 4: Create processing summary
             print("📊 Step 4: Creating processing summary...")
-            summary_file = self._create_processing_summary(pdf_basename, processing_result)
+            summary_file = self._create_processing_summary(secure_filename(pdf_basename), processing_result)
             processing_result['files_created']['summary'] = summary_file
             processing_result['steps_completed'].append('summary_creation')
             
@@ -132,7 +134,7 @@ class CompletePDFProcessor:
         """Create stable element mappings"""
         stable_mappings_file = os.path.join(
             self.directories['stable_mappings'], 
-            f"{pdf_basename}_stable_mappings.json"
+            f"{secure_filename(pdf_basename)}_stable_mappings.json"
         )
         
         # Check if we need to reprocess

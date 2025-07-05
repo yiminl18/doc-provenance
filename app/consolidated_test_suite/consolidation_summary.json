@@ -1,0 +1,318 @@
+{
+  "consolidation_info": {
+    "created_at": "2025-06-17T16:48:52.962061",
+    "input_directories": [
+      "test_outputs",
+      "test_outputs_prev",
+      "test_outputs_prev1"
+    ],
+    "output_directory": "consolidated_test_suite",
+    "total_documents": 21,
+    "total_questions": 795,
+    "unique_provenances_assigned": 999,
+    "consolidation_strategy": "shortest_provenance_preferred"
+  },
+  "selection_statistics": {
+    "shorter_provenance": 732,
+    "default": 63
+  },
+  "documents": [
+    {
+      "document_name": "12000010_3_NCSO_Redacted-jw",
+      "filename": "12000010_3_NCSO_Redacted-jw_test_suite.json",
+      "question_count": 45,
+      "total_provenances": 40,
+      "total_sentences": 771,
+      "avg_sentences_per_question": 17.13,
+      "source_distribution": {
+        "test_outputs_prev": 10,
+        "test_outputs_prev1": 15,
+        "test_outputs": 20
+      },
+      "file_size_kb": 832.62
+    },
+    {
+      "document_name": "2020-0061_Exhibits_2-S_Training_20",
+      "filename": "2020-0061_Exhibits_2-S_Training_20_test_suite.json",
+      "question_count": 43,
+      "total_provenances": 53,
+      "total_sentences": 1795,
+      "avg_sentences_per_question": 41.74,
+      "source_distribution": {
+        "test_outputs_prev": 9,
+        "test_outputs": 20,
+        "test_outputs_prev1": 14
+      },
+      "file_size_kb": 567.34
+    },
+    {
+      "document_name": "2021-0002_Exh_2_Training_Records_6",
+      "filename": "2021-0002_Exh_2_Training_Records_6_test_suite.json",
+      "question_count": 45,
+      "total_provenances": 47,
+      "total_sentences": 185,
+      "avg_sentences_per_question": 4.11,
+      "source_distribution": {
+        "test_outputs": 20,
+        "test_outputs_prev": 10,
+        "test_outputs_prev1": 15
+      },
+      "file_size_kb": 127.14
+    },
+    {
+      "document_name": "31cfr285-05-06-98",
+      "filename": "31cfr285-05-06-98_test_suite.json",
+      "question_count": 30,
+      "total_provenances": 46,
+      "total_sentences": 3359,
+      "avg_sentences_per_question": 111.97,
+      "source_distribution": {
+        "test_outputs_prev1": 10,
+        "test_outputs": 20
+      },
+      "file_size_kb": 478.62
+    },
+    {
+      "document_name": "Attachment_16_Redacted_sk_done_Redacted",
+      "filename": "Attachment_16_Redacted_sk_done_Redacted_test_suite.json",
+      "question_count": 45,
+      "total_provenances": 58,
+      "total_sentences": 1246,
+      "avg_sentences_per_question": 27.69,
+      "source_distribution": {
+        "test_outputs_prev1": 15,
+        "test_outputs": 20,
+        "test_outputs_prev": 10
+      },
+      "file_size_kb": 324.25
+    },
+    {
+      "document_name": "database_design_article",
+      "filename": "database_design_article_test_suite.json",
+      "question_count": 43,
+      "total_provenances": 57,
+      "total_sentences": 3924,
+      "avg_sentences_per_question": 91.26,
+      "source_distribution": {
+        "test_outputs_prev1": 16,
+        "test_outputs_prev": 8,
+        "test_outputs": 19
+      },
+      "file_size_kb": 493.14
+    },
+    {
+      "document_name": "Email",
+      "filename": "Email_test_suite.json",
+      "question_count": 42,
+      "total_provenances": 42,
+      "total_sentences": 298,
+      "avg_sentences_per_question": 7.1,
+      "source_distribution": {
+        "test_outputs_prev": 7,
+        "test_outputs": 20,
+        "test_outputs_prev1": 15
+      },
+      "file_size_kb": 74.15
+    },
+    {
+      "document_name": "f4506",
+      "filename": "f4506_test_suite.json",
+      "question_count": 30,
+      "total_provenances": 36,
+      "total_sentences": 1300,
+      "avg_sentences_per_question": 43.33,
+      "source_distribution": {
+        "test_outputs_prev1": 10,
+        "test_outputs": 20
+      },
+      "file_size_kb": 135.56
+    },
+    {
+      "document_name": "f4868",
+      "filename": "f4868_test_suite.json",
+      "question_count": 29,
+      "total_provenances": 46,
+      "total_sentences": 2511,
+      "avg_sentences_per_question": 86.59,
+      "source_distribution": {
+        "test_outputs": 19,
+        "test_outputs_prev1": 10
+      },
+      "file_size_kb": 232.07
+    },
+    {
+      "document_name": "Internal_Affairs_Investigation_1426_Redacted",
+      "filename": "Internal_Affairs_Investigation_1426_Redacted_test_suite.json",
+      "question_count": 43,
+      "total_provenances": 61,
+      "total_sentences": 7730,
+      "avg_sentences_per_question": 179.77,
+      "source_distribution": {
+        "test_outputs": 20,
+        "test_outputs_prev1": 13,
+        "test_outputs_prev": 10
+      },
+      "file_size_kb": 763.73
+    },
+    {
+      "document_name": "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting",
+      "filename": "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting_test_suite.json",
+      "question_count": 45,
+      "total_provenances": 52,
+      "total_sentences": 5158,
+      "avg_sentences_per_question": 114.62,
+      "source_distribution": {
+        "test_outputs_prev": 9,
+        "test_outputs": 20,
+        "test_outputs_prev1": 16
+      },
+      "file_size_kb": 695.41
+    },
+    {
+      "document_name": "p1",
+      "filename": "p1_test_suite.json",
+      "question_count": 30,
+      "total_provenances": 33,
+      "total_sentences": 1020,
+      "avg_sentences_per_question": 34.0,
+      "source_distribution": {
+        "test_outputs": 20,
+        "test_outputs_prev1": 10
+      },
+      "file_size_kb": 150.46
+    },
+    {
+      "document_name": "p5",
+      "filename": "p5_test_suite.json",
+      "question_count": 30,
+      "total_provenances": 35,
+      "total_sentences": 2452,
+      "avg_sentences_per_question": 81.73,
+      "source_distribution": {
+        "test_outputs": 20,
+        "test_outputs_prev1": 10
+      },
+      "file_size_kb": 306.8
+    },
+    {
+      "document_name": "paper",
+      "filename": "paper_test_suite.json",
+      "question_count": 44,
+      "total_provenances": 65,
+      "total_sentences": 7925,
+      "avg_sentences_per_question": 180.11,
+      "source_distribution": {
+        "test_outputs_prev1": 14,
+        "test_outputs_prev": 10,
+        "test_outputs": 20
+      },
+      "file_size_kb": 981.26
+    },
+    {
+      "document_name": "Ramic_US_Bankruptcy_Court_Voluntary_Petition",
+      "filename": "Ramic_US_Bankruptcy_Court_Voluntary_Petition_test_suite.json",
+      "question_count": 10,
+      "total_provenances": 12,
+      "total_sentences": 1720,
+      "avg_sentences_per_question": 172.0,
+      "source_distribution": {
+        "test_outputs_prev1": 10
+      },
+      "file_size_kb": 246.0
+    },
+    {
+      "document_name": "research_database",
+      "filename": "research_database_test_suite.json",
+      "question_count": 43,
+      "total_provenances": 43,
+      "total_sentences": 4947,
+      "avg_sentences_per_question": 115.05,
+      "source_distribution": {
+        "test_outputs": 20,
+        "test_outputs_prev1": 15,
+        "test_outputs_prev": 8
+      },
+      "file_size_kb": 812.71
+    },
+    {
+      "document_name": "R_-_Lt_Press_Interview_Transcript",
+      "filename": "R_-_Lt_Press_Interview_Transcript_test_suite.json",
+      "question_count": 45,
+      "total_provenances": 67,
+      "total_sentences": 4888,
+      "avg_sentences_per_question": 108.62,
+      "source_distribution": {
+        "test_outputs_prev1": 15,
+        "test_outputs": 20,
+        "test_outputs_prev": 10
+      },
+      "file_size_kb": 879.8
+    },
+    {
+      "document_name": "SF329",
+      "filename": "SF329_test_suite.json",
+      "question_count": 30,
+      "total_provenances": 39,
+      "total_sentences": 2056,
+      "avg_sentences_per_question": 68.53,
+      "source_distribution": {
+        "test_outputs": 20,
+        "test_outputs_prev1": 10
+      },
+      "file_size_kb": 245.4
+    },
+    {
+      "document_name": "shc-cpj-04",
+      "filename": "shc-cpj-04_test_suite.json",
+      "question_count": 29,
+      "total_provenances": 36,
+      "total_sentences": 3382,
+      "avg_sentences_per_question": 116.62,
+      "source_distribution": {
+        "test_outputs_prev1": 10,
+        "test_outputs": 19
+      },
+      "file_size_kb": 328.56
+    },
+    {
+      "document_name": "US-Bankruptcy-Court-Complaint",
+      "filename": "US-Bankruptcy-Court-Complaint_test_suite.json",
+      "question_count": 29,
+      "total_provenances": 39,
+      "total_sentences": 570,
+      "avg_sentences_per_question": 19.66,
+      "source_distribution": {
+        "test_outputs": 20,
+        "test_outputs_prev1": 9
+      },
+      "file_size_kb": 90.05
+    },
+    {
+      "document_name": "USCOURTS-cacb-6_14-bk-16714-0",
+      "filename": "USCOURTS-cacb-6_14-bk-16714-0_test_suite.json",
+      "question_count": 30,
+      "total_provenances": 61,
+      "total_sentences": 6075,
+      "avg_sentences_per_question": 202.5,
+      "source_distribution": {
+        "test_outputs": 20,
+        "test_outputs_prev1": 10
+      },
+      "file_size_kb": 776.02
+    },
+    {
+      "document_name": "whatgoesaround-sigmodrec2024",
+      "filename": "whatgoesaround-sigmodrec2024_test_suite.json",
+      "question_count": 45,
+      "total_provenances": 43,
+      "total_sentences": 13612,
+      "avg_sentences_per_question": 302.49,
+      "source_distribution": {
+        "test_outputs": 20,
+        "test_outputs_prev1": 16,
+        "test_outputs_prev": 9
+      },
+      "file_size_kb": 1434.22
+    }
+  ]
+}

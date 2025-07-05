@@ -7,10 +7,7 @@ import {
   faTimes, faExclamationTriangle, faHashtag, faAlignLeft, faInfoCircle,
   faQuestionCircle, faClock, faChartBar, faDatabase
 } from '@fortawesome/free-solid-svg-icons';
-import { Tiktoken } from 'js-tiktoken/lite';
-import cl100k_base from "js-tiktoken/ranks/cl100k_base";
 
-import { filterDocuments, getFilteringStats, DEFAULT_THRESHOLDS, isGoodDocument } from '../utils/filteringUtils';
 
 import {
   getDocuments,
@@ -20,8 +17,12 @@ import {
   getPvcSampleFiles,
   downloadPvcSampleFile,
   sampleExtractableDocuments,
-  initProvisionalSampler
+  initProvisionalSampler,
+  getFilteringAnalysis
 } from '../services/api';
+
+import { Tiktoken } from 'js-tiktoken/lite';
+import cl100k_base from 'js-tiktoken/ranks/cl100k_base';
 
 const UnifiedFileBrowser = ({
   isOpen,
@@ -36,22 +37,11 @@ const UnifiedFileBrowser = ({
 
   const [showOnlyGoodDocuments, setShowOnlyGoodDocuments] = useState(false);
   const [filteringStats, setFilteringStats] = useState(null);
+  const [backendAnalysis, setBackendAnalysis] = useState(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
 
-  // Add this function to calculate stats when documents change:
-  const calculateFilteringStats = (docs) => {
-    if (!docs || docs.length === 0) return null;
-
-    // Convert your document format to the expected format
-    const documentsWithQuestions = docs.map(doc => ({
-      ...doc,
-      questions: documentStats.get(doc.filename)?.questions || []
-    }));
-
-    return getFilteringStats(documentsWithQuestions);
-  };
 
   // Initialize Tiktoken for token counting
-  const enc = new Tiktoken(cl100k_base);
 
   // Available documents state
   const [documents, setDocuments] = useState([]);
@@ -68,6 +58,7 @@ const UnifiedFileBrowser = ({
   const [sampling, setSampling] = useState(false);
   const [downloadingFile, setDownloadingFile] = useState(null);
 
+  const enc = new Tiktoken(cl100k_base);
   // =============================================================================
   // Available Documents Functions
   // =============================================================================
@@ -86,7 +77,7 @@ const UnifiedFileBrowser = ({
         if (showProvenanceStats) {
           await loadProvenanceStatsForDocuments(response.documents);
           // Calculate filtering stats after loading provenance data
-          setFilteringStats(calculateFilteringStats(response.documents));
+          //setFilteringStats(calculateFilteringStats(response.documents));
         }
       } else {
         setDocuments([]);
@@ -101,19 +92,36 @@ const UnifiedFileBrowser = ({
     }
   };
 
+  const loadFilteringAnalysis = async (docs) => {
+    if (!docs || docs.length === 0) return;
+
+    setAnalysisLoading(true);
+    try {
+      // Prepare documents with their questions for backend
+      const documentsWithQuestions = docs.map(doc => {
+        const stats = documentStats.get(doc.filename);
+        return {
+          filename: doc.filename,
+          questions: stats?.questions || []
+        };
+      });
+
+      const analysis = await getFilteringAnalysis(documentsWithQuestions);
+      setBackendAnalysis(analysis);
+      setFilteringStats(analysis.stats);
+    } catch (error) {
+      console.error('Error loading filtering analysis:', error);
+    } finally {
+      setAnalysisLoading(false);
+    }
+  };
+
   const getDisplayDocuments = () => {
-    if (!showOnlyGoodDocuments) return documents;
+    if (!showOnlyGoodDocuments || !backendAnalysis) return documents;
 
     return documents.filter(doc => {
-      const stats = documentStats.get(doc.filename);
-      if (!stats || !stats.questions) return false;
-
-      const docWithQuestions = {
-        ...doc,
-        questions: stats.questions
-      };
-
-      return isGoodDocument(docWithQuestions);
+      const analysis = backendAnalysis.analysis[doc.filename];
+      return analysis?.isGoodDocument || false;
     });
   };
 
@@ -148,6 +156,8 @@ const UnifiedFileBrowser = ({
     });
 
     await Promise.allSettled(statsPromises);
+
+    await loadFilteringAnalysis(docs);
   };
 
   const calculateDocumentStats = (questions, metadata) => {
@@ -523,8 +533,9 @@ const UnifiedFileBrowser = ({
                       type="checkbox"
                       checked={showOnlyGoodDocuments}
                       onChange={(e) => setShowOnlyGoodDocuments(e.target.checked)}
+                      disabled={analysisLoading}
                     />
-                    <FontAwesomeIcon icon={faFilter} />
+                    <FontAwesomeIcon icon={analysisLoading ? faSpinner : faFilter} spin={analysisLoading} />
                     Show Quality Docs Only
                     <span className="filter-stats">
                       ({filteringStats.goodDocuments}/{filteringStats.totalDocuments})
@@ -593,7 +604,7 @@ const UnifiedFileBrowser = ({
 
                         // Add quality indicator
                         const docWithQuestions = stats?.questions ? { ...doc, questions: stats.questions } : doc;
-                        const isHighQuality = isGoodDocument(docWithQuestions);
+                        const isHighQuality = backendAnalysis?.analysis[doc.filename]?.isGoodDocument || false;
 
                         return (
                           <div key={doc.filename} className={`document-card-container ${isHighQuality ? 'high-quality' : ''}`}>

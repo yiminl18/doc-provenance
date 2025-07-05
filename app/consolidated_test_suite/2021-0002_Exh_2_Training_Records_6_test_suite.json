@@ -1,0 +1,2219 @@
+[
+  {
+    "0040fcab": {
+      "question": "What subject was completed with a training time of 03:00 on 03/10/2020?",
+      "answer": "First Aid/CPR/AED Refresher",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            2
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 2.5457096099853516,
+          "input_token_size": 1697,
+          "output_token_size": 11,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_0040fcab",
+        "created_at": 1750196643.9239533,
+        "processing_time": 3.5949370861053467,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.364032"
+      }
+    }
+  },
+  {
+    "0b42e14e": {
+      "question": "What subject did Daniel P. Eldred complete on 11/28/2018?",
+      "answer": "Crisis Intervention Training",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            3
+          ],
+          "provenance": "Grade Score Tng. Time\n03:00\n\nP\n\nTotals For Training Completed in: 2019\n\nCompleted 1 of 1 Modules\n\n03:00\n\nTMS #\n-  1-6853\n\nEnded\n11/28/2018\n\nSubject\nCrisis Intervention Training\n\nCompl. Grade Score Tng.",
+          "time": 1.914024829864502,
+          "input_token_size": 863,
+          "output_token_size": 4,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_0b42e14e",
+        "created_at": 1750196675.2781875,
+        "processing_time": 3.299949884414673,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.364032"
+      }
+    }
+  },
+  {
+    "0cf2978d": {
+      "question": "When did Daniel P. Eldred complete the Firearms/Tactical Rifle 1st Responder course?",
+      "answer": "02/10/2021",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.Grade Score Tng. Time\n03:00\n\nP\n\nTotals For Training Completed in: 2019\n\nCompleted 1 of 1 Modules\n\n03:00\n\nTMS #\n-  1-6853\n\nEnded\n11/28/2018\n\nSubject\nCrisis Intervention Training\n\nCompl. Grade Score Tng.Time\n40:00\n\nP\n\n-  1-7236\n\n10/04/2018\n\n-  1-7100\n\n08/02/2018\n\nFirearms Qualifications 2018 3rd\nTrimester\nFirearms Training 2018 2nd Trimester *** None ***\n\n-  1-6965\n\n04/11/2018\n\nDUI Detection-Field Sobriety\n\n-  1-6896\n\n04/03/2018\n\nFirearms Training 2018 1st Trimester *** None ***\n\nTotals For Training Completed in: 2018\n\nCompleted 5 of 5 Modules\n\nScheduled Training In:\n\n 2017\n\nTMS #\n-  1-6803\n\nEnded\n12/22/2017\n\nSubject\nDriving (PSP)\n\n-  1-6803\n\n12/21/2017\n\nFirst Aid/Cpr Refresher\n\n-  1-6803\n\n12/20/2017\n\nElectronic Weapons\n\n-  1-6803\n\n12/20/2017\n\nOC Baton Training\n\n-  1-6803\n\n12/19/2017\n\nMAC TAC\n\n-  1-6803\n\n12/15/2017\n\nBuilding Searches\n\n-  1-6742\n\n12/14/2017\n\n-  1-6803\n\n12/14/2017\n\nFirearms Qualifications 2017 3rd\nTrimester\nLess Lethal Weapons\n\n-  1-6803\n\n12/14/2017\n\nArrest & Control\n\n-  1-6803\n\n12/13/2017\n\nFirearms/Tactical Handgun\n\nCertification\nCA-POST\n1520-20801-18004\n*** None ***\n\nCA-POST\n1520-20290-17004\n\nCertification\nCA-POST\n1520-29502-17009\nCA-POST\n1520-21798-17041\nCA-POST\n1520-23090-17005\nCA-POST\n1520-21275-17005\nCA-POST\n1520-24180-17006\nCA-POST\n-     -17\n*** None ***\n\nCA-POST\n1520-30995-17005\nCA-POST\n1520-21025-17005\nCA-POST\n1520-32095-17005\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n03:00\n\n03:00\n\n30:00\n\n03:00\n\n79:00\n\n08:00\n\n04:00\n\n04:00\n\n08:00\n\n04:00\n\n03:00\n\n04:00\n\n05:00\n\n05:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2017\n\nEldred, Daniel P.\n\nTMS #\n-  1-6517\n\nEnded\n05/26/2017\n\nSubject\nNew Officers Firearms Orientation\n\nCertification\n*** None ***\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nTotals For Training Completed in: 2017\n\nCompleted 11 of 11 Modules\n\nTotals For: Eldred, Daniel P.\n\nCompleted 26 of 26 Modules\n\nPage 3 of 3 pages\n\n(Continued)\n\n(Continued)\n\n61:00\n\n232:00",
+          "time": 5.135242938995361,
+          "input_token_size": 1695,
+          "output_token_size": 7,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_0cf2978d",
+        "created_at": 1749664925.6033874,
+        "processing_time": 6.531856060028076,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.364032"
+      }
+    }
+  },
+  {
+    "13258213": {
+      "question": "Who completed training on 12/05/2019?",
+      "answer": "Eldred, Daniel P.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            2
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 1.5446913242340088,
+          "input_token_size": 820,
+          "output_token_size": 7,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_13258213",
+        "created_at": 1749869326.3062086,
+        "processing_time": 2.8837907314300537,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.364032"
+      }
+    }
+  },
+  {
+    "13b31511": {
+      "question": "On what date is the report criteria based?",
+      "answer": "Wednesday, April 14, 2021",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 1.6574583053588867,
+          "input_token_size": 817,
+          "output_token_size": 9,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_13b31511",
+        "created_at": 1750196568.6545985,
+        "processing_time": 2.761723756790161,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.364032"
+      }
+    }
+  },
+  {
+    "1752726c": {
+      "question": "What training subjects did Daniel P. Eldred complete in 2018?",
+      "answer": "Crisis Intervention Training, Firearms Qualifications 2018 3rd Trimester, Firearms Training 2018 2nd Trimester, DUI Detection-Field Sobriety, Firearms Training 2018 1st Trimester.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            0,
+            2,
+            3,
+            4
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.Grade Score Tng. Time\n03:00\n\nP\n\nTotals For Training Completed in: 2019\n\nCompleted 1 of 1 Modules\n\n03:00\n\nTMS #\n-  1-6853\n\nEnded\n11/28/2018\n\nSubject\nCrisis Intervention Training\n\nCompl. Grade Score Tng.Time\n40:00\n\nP\n\n-  1-7236\n\n10/04/2018\n\n-  1-7100\n\n08/02/2018\n\nFirearms Qualifications 2018 3rd\nTrimester\nFirearms Training 2018 2nd Trimester *** None ***\n\n-  1-6965\n\n04/11/2018\n\nDUI Detection-Field Sobriety\n\n-  1-6896\n\n04/03/2018\n\nFirearms Training 2018 1st Trimester *** None ***\n\nTotals For Training Completed in: 2018\n\nCompleted 5 of 5 Modules\n\nScheduled Training In:\n\n 2017\n\nTMS #\n-  1-6803\n\nEnded\n12/22/2017\n\nSubject\nDriving (PSP)\n\n-  1-6803\n\n12/21/2017\n\nFirst Aid/Cpr Refresher\n\n-  1-6803\n\n12/20/2017\n\nElectronic Weapons\n\n-  1-6803\n\n12/20/2017\n\nOC Baton Training\n\n-  1-6803\n\n12/19/2017\n\nMAC TAC\n\n-  1-6803\n\n12/15/2017\n\nBuilding Searches\n\n-  1-6742\n\n12/14/2017\n\n-  1-6803\n\n12/14/2017\n\nFirearms Qualifications 2017 3rd\nTrimester\nLess Lethal Weapons\n\n-  1-6803\n\n12/14/2017\n\nArrest & Control\n\n-  1-6803\n\n12/13/2017\n\nFirearms/Tactical Handgun\n\nCertification\nCA-POST\n1520-20801-18004\n*** None ***\n\nCA-POST\n1520-20290-17004\n\nCertification\nCA-POST\n1520-29502-17009\nCA-POST\n1520-21798-17041\nCA-POST\n1520-23090-17005\nCA-POST\n1520-21275-17005\nCA-POST\n1520-24180-17006\nCA-POST\n-     -17\n*** None ***\n\nCA-POST\n1520-30995-17005\nCA-POST\n1520-21025-17005\nCA-POST\n1520-32095-17005\n\nCompl.",
+          "time": 13.529935121536255,
+          "input_token_size": 1683,
+          "output_token_size": 51,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_1752726c",
+        "created_at": 1749766502.4746325,
+        "processing_time": 15.656352043151855,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.364032"
+      }
+    }
+  },
+  {
+    "1f344260": {
+      "question": "What rank and work unit is Daniel P. Eldred associated with?",
+      "answer": "Rank: Police Officer  \nWork Unit: Central District, Watch III",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 2.5874099731445312,
+          "input_token_size": 822,
+          "output_token_size": 13,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_1f344260",
+        "created_at": 1749626953.937906,
+        "processing_time": 3.905540943145752,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.366693"
+      }
+    }
+  },
+  {
+    "2098546c": {
+      "question": "What is the station of Daniel P. Eldred?",
+      "answer": "Central District, Watch III",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 1.498164176940918,
+          "input_token_size": 819,
+          "output_token_size": 5,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_2098546c",
+        "created_at": 1749869332.6428258,
+        "processing_time": 2.872380495071411,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.366693"
+      }
+    }
+  },
+  {
+    "27e80eed": {
+      "question": "What is the ID number associated with Daniel P. Eldred?",
+      "answer": "C65-A32",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 1.5076444149017334,
+          "input_token_size": 821,
+          "output_token_size": 4,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_27e80eed",
+        "created_at": 1750196618.871367,
+        "processing_time": 2.8879082202911377,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.367595"
+      }
+    }
+  },
+  {
+    "285c7b1f": {
+      "question": "What certifications were obtained by Daniel P. Eldred in 2017?",
+      "answer": "CA-POST 1520-20801-18004  \nCA-POST 1520-20290-17004  \nCA-POST 1520-29502-17009  \nCA-POST 1520-21798-17041  \nCA-POST 1520-23090-17005  \nCA-POST 1520-21275-17005  \nCA-POST 1520-24180-17006  \nCA-POST 1520-30995-17005  \nCA-POST 1520-21025-17005  \nCA-POST 1520-32095-17005",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            2,
+            4,
+            5
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.Time\n40:00\n\nP\n\n-  1-7236\n\n10/04/2018\n\n-  1-7100\n\n08/02/2018\n\nFirearms Qualifications 2018 3rd\nTrimester\nFirearms Training 2018 2nd Trimester *** None ***\n\n-  1-6965\n\n04/11/2018\n\nDUI Detection-Field Sobriety\n\n-  1-6896\n\n04/03/2018\n\nFirearms Training 2018 1st Trimester *** None ***\n\nTotals For Training Completed in: 2018\n\nCompleted 5 of 5 Modules\n\nScheduled Training In:\n\n 2017\n\nTMS #\n-  1-6803\n\nEnded\n12/22/2017\n\nSubject\nDriving (PSP)\n\n-  1-6803\n\n12/21/2017\n\nFirst Aid/Cpr Refresher\n\n-  1-6803\n\n12/20/2017\n\nElectronic Weapons\n\n-  1-6803\n\n12/20/2017\n\nOC Baton Training\n\n-  1-6803\n\n12/19/2017\n\nMAC TAC\n\n-  1-6803\n\n12/15/2017\n\nBuilding Searches\n\n-  1-6742\n\n12/14/2017\n\n-  1-6803\n\n12/14/2017\n\nFirearms Qualifications 2017 3rd\nTrimester\nLess Lethal Weapons\n\n-  1-6803\n\n12/14/2017\n\nArrest & Control\n\n-  1-6803\n\n12/13/2017\n\nFirearms/Tactical Handgun\n\nCertification\nCA-POST\n1520-20801-18004\n*** None ***\n\nCA-POST\n1520-20290-17004\n\nCertification\nCA-POST\n1520-29502-17009\nCA-POST\n1520-21798-17041\nCA-POST\n1520-23090-17005\nCA-POST\n1520-21275-17005\nCA-POST\n1520-24180-17006\nCA-POST\n-     -17\n*** None ***\n\nCA-POST\n1520-30995-17005\nCA-POST\n1520-21025-17005\nCA-POST\n1520-32095-17005\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n03:00\n\n03:00\n\n30:00\n\n03:00\n\n79:00\n\n08:00\n\n04:00\n\n04:00\n\n08:00\n\n04:00\n\n03:00\n\n04:00\n\n05:00\n\n05:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2017\n\nEldred, Daniel P.\n\nTMS #\n-  1-6517\n\nEnded\n05/26/2017\n\nSubject\nNew Officers Firearms Orientation\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 21.580379962921143,
+          "input_token_size": 1683,
+          "output_token_size": 46,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_285c7b1f",
+        "created_at": 1749766515.0381744,
+        "processing_time": 25.054407119750977,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.368599"
+      }
+    }
+  },
+  {
+    "2a20dcef": {
+      "question": "On what date did the Striker Fired Transition Course end?",
+      "answer": "08/14/2020",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0,
+            1
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.",
+          "time": 2.1193482875823975,
+          "input_token_size": 1677,
+          "output_token_size": 7,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_2a20dcef",
+        "created_at": 1750196631.317919,
+        "processing_time": 3.1181254386901855,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.368599"
+      }
+    }
+  },
+  {
+    "2c90f527": {
+      "question": "Which district does Daniel P. Eldred work in?",
+      "answer": "Central District, Watch III",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 1.8440213203430176,
+          "input_token_size": 819,
+          "output_token_size": 5,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_2c90f527",
+        "created_at": 1750196593.6516116,
+        "processing_time": 3.119417428970337,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.369598"
+      }
+    }
+  },
+  {
+    "2f7dcc2a": {
+      "question": "What is the employment status of Daniel P. Eldred?",
+      "answer": "Active",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 1.7153913974761963,
+          "input_token_size": 820,
+          "output_token_size": 1,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_2f7dcc2a",
+        "created_at": 1749664919.354556,
+        "processing_time": 3.478100299835205,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.370598"
+      }
+    }
+  },
+  {
+    "39b974e8": {
+      "question": "What was the total training time for modules completed in 2018?",
+      "answer": "43:00",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.Grade Score Tng. Time\n03:00\n\nP\n\nTotals For Training Completed in: 2019\n\nCompleted 1 of 1 Modules\n\n03:00\n\nTMS #\n-  1-6853\n\nEnded\n11/28/2018\n\nSubject\nCrisis Intervention Training\n\nCompl. Grade Score Tng.Time\n40:00\n\nP\n\n-  1-7236\n\n10/04/2018\n\n-  1-7100\n\n08/02/2018\n\nFirearms Qualifications 2018 3rd\nTrimester\nFirearms Training 2018 2nd Trimester *** None ***\n\n-  1-6965\n\n04/11/2018\n\nDUI Detection-Field Sobriety\n\n-  1-6896\n\n04/03/2018\n\nFirearms Training 2018 1st Trimester *** None ***\n\nTotals For Training Completed in: 2018\n\nCompleted 5 of 5 Modules\n\nScheduled Training In:\n\n 2017\n\nTMS #\n-  1-6803\n\nEnded\n12/22/2017\n\nSubject\nDriving (PSP)\n\n-  1-6803\n\n12/21/2017\n\nFirst Aid/Cpr Refresher\n\n-  1-6803\n\n12/20/2017\n\nElectronic Weapons\n\n-  1-6803\n\n12/20/2017\n\nOC Baton Training\n\n-  1-6803\n\n12/19/2017\n\nMAC TAC\n\n-  1-6803\n\n12/15/2017\n\nBuilding Searches\n\n-  1-6742\n\n12/14/2017\n\n-  1-6803\n\n12/14/2017\n\nFirearms Qualifications 2017 3rd\nTrimester\nLess Lethal Weapons\n\n-  1-6803\n\n12/14/2017\n\nArrest & Control\n\n-  1-6803\n\n12/13/2017\n\nFirearms/Tactical Handgun\n\nCertification\nCA-POST\n1520-20801-18004\n*** None ***\n\nCA-POST\n1520-20290-17004\n\nCertification\nCA-POST\n1520-29502-17009\nCA-POST\n1520-21798-17041\nCA-POST\n1520-23090-17005\nCA-POST\n1520-21275-17005\nCA-POST\n1520-24180-17006\nCA-POST\n-     -17\n*** None ***\n\nCA-POST\n1520-30995-17005\nCA-POST\n1520-21025-17005\nCA-POST\n1520-32095-17005\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n03:00\n\n03:00\n\n30:00\n\n03:00\n\n79:00\n\n08:00\n\n04:00\n\n04:00\n\n08:00\n\n04:00\n\n03:00\n\n04:00\n\n05:00\n\n05:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2017\n\nEldred, Daniel P.\n\nTMS #\n-  1-6517\n\nEnded\n05/26/2017\n\nSubject\nNew Officers Firearms Orientation\n\nCertification\n*** None ***\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nTotals For Training Completed in: 2017\n\nCompleted 11 of 11 Modules\n\nTotals For: Eldred, Daniel P.\n\nCompleted 26 of 26 Modules\n\nPage 3 of 3 pages\n\n(Continued)\n\n(Continued)\n\n61:00\n\n232:00",
+          "time": 4.097707748413086,
+          "input_token_size": 1681,
+          "output_token_size": 2,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_39b974e8",
+        "created_at": 1750196656.5075922,
+        "processing_time": 5.144505739212036,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.371598"
+      }
+    }
+  },
+  {
+    "3df3a28f": {
+      "question": "What is the rank of Daniel P. Eldred?",
+      "answer": "Police Officer",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 1.5206224918365479,
+          "input_token_size": 819,
+          "output_token_size": 2,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_3df3a28f",
+        "created_at": 1749869313.8551447,
+        "processing_time": 2.7642581462860107,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.371598"
+      }
+    }
+  },
+  {
+    "3f10c063": {
+      "question": "How does Eldred's scheduled training in 2018 compare to his schedule in 2019?",
+      "answer": "In 2018, Eldred completed 5 modules totaling 61:00 hours of training. In 2019, he completed 1 module totaling 3:00 hours of training.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.Grade Score Tng. Time\n03:00\n\nP\n\nTotals For Training Completed in: 2019\n\nCompleted 1 of 1 Modules\n\n03:00\n\nTMS #\n-  1-6853\n\nEnded\n11/28/2018\n\nSubject\nCrisis Intervention Training\n\nCompl. Grade Score Tng.Time\n40:00\n\nP\n\n-  1-7236\n\n10/04/2018\n\n-  1-7100\n\n08/02/2018\n\nFirearms Qualifications 2018 3rd\nTrimester\nFirearms Training 2018 2nd Trimester *** None ***\n\n-  1-6965\n\n04/11/2018\n\nDUI Detection-Field Sobriety\n\n-  1-6896\n\n04/03/2018\n\nFirearms Training 2018 1st Trimester *** None ***\n\nTotals For Training Completed in: 2018\n\nCompleted 5 of 5 Modules\n\nScheduled Training In:\n\n 2017\n\nTMS #\n-  1-6803\n\nEnded\n12/22/2017\n\nSubject\nDriving (PSP)\n\n-  1-6803\n\n12/21/2017\n\nFirst Aid/Cpr Refresher\n\n-  1-6803\n\n12/20/2017\n\nElectronic Weapons\n\n-  1-6803\n\n12/20/2017\n\nOC Baton Training\n\n-  1-6803\n\n12/19/2017\n\nMAC TAC\n\n-  1-6803\n\n12/15/2017\n\nBuilding Searches\n\n-  1-6742\n\n12/14/2017\n\n-  1-6803\n\n12/14/2017\n\nFirearms Qualifications 2017 3rd\nTrimester\nLess Lethal Weapons\n\n-  1-6803\n\n12/14/2017\n\nArrest & Control\n\n-  1-6803\n\n12/13/2017\n\nFirearms/Tactical Handgun\n\nCertification\nCA-POST\n1520-20801-18004\n*** None ***\n\nCA-POST\n1520-20290-17004\n\nCertification\nCA-POST\n1520-29502-17009\nCA-POST\n1520-21798-17041\nCA-POST\n1520-23090-17005\nCA-POST\n1520-21275-17005\nCA-POST\n1520-24180-17006\nCA-POST\n-     -17\n*** None ***\n\nCA-POST\n1520-30995-17005\nCA-POST\n1520-21025-17005\nCA-POST\n1520-32095-17005\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n03:00\n\n03:00\n\n30:00\n\n03:00\n\n79:00\n\n08:00\n\n04:00\n\n04:00\n\n08:00\n\n04:00\n\n03:00\n\n04:00\n\n05:00\n\n05:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2017\n\nEldred, Daniel P.\n\nTMS #\n-  1-6517\n\nEnded\n05/26/2017\n\nSubject\nNew Officers Firearms Orientation\n\nCertification\n*** None ***\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nTotals For Training Completed in: 2017\n\nCompleted 11 of 11 Modules\n\nTotals For: Eldred, Daniel P.\n\nCompleted 26 of 26 Modules\n\nPage 3 of 3 pages\n\n(Continued)\n\n(Continued)\n\n61:00\n\n232:00",
+          "time": 6.101710796356201,
+          "input_token_size": 1693,
+          "output_token_size": 27,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_3f10c063",
+        "created_at": 1749869377.2459803,
+        "processing_time": 7.565335035324097,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.372598"
+      }
+    }
+  },
+  {
+    "4149ffbc": {
+      "question": "What certification is associated with the Driving (PSP) training?",
+      "answer": "CA-POST",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            4,
+            5,
+            6
+          ],
+          "provenance": "Time\n40:00\n\nP\n\n-  1-7236\n\n10/04/2018\n\n-  1-7100\n\n08/02/2018\n\nFirearms Qualifications 2018 3rd\nTrimester\nFirearms Training 2018 2nd Trimester *** None ***\n\n-  1-6965\n\n04/11/2018\n\nDUI Detection-Field Sobriety\n\n-  1-6896\n\n04/03/2018\n\nFirearms Training 2018 1st Trimester *** None ***\n\nTotals For Training Completed in: 2018\n\nCompleted 5 of 5 Modules\n\nScheduled Training In:\n\n 2017\n\nTMS #\n-  1-6803\n\nEnded\n12/22/2017\n\nSubject\nDriving (PSP)\n\n-  1-6803\n\n12/21/2017\n\nFirst Aid/Cpr Refresher\n\n-  1-6803\n\n12/20/2017\n\nElectronic Weapons\n\n-  1-6803\n\n12/20/2017\n\nOC Baton Training\n\n-  1-6803\n\n12/19/2017\n\nMAC TAC\n\n-  1-6803\n\n12/15/2017\n\nBuilding Searches\n\n-  1-6742\n\n12/14/2017\n\n-  1-6803\n\n12/14/2017\n\nFirearms Qualifications 2017 3rd\nTrimester\nLess Lethal Weapons\n\n-  1-6803\n\n12/14/2017\n\nArrest & Control\n\n-  1-6803\n\n12/13/2017\n\nFirearms/Tactical Handgun\n\nCertification\nCA-POST\n1520-20801-18004\n*** None ***\n\nCA-POST\n1520-20290-17004\n\nCertification\nCA-POST\n1520-29502-17009\nCA-POST\n1520-21798-17041\nCA-POST\n1520-23090-17005\nCA-POST\n1520-21275-17005\nCA-POST\n1520-24180-17006\nCA-POST\n-     -17\n*** None ***\n\nCA-POST\n1520-30995-17005\nCA-POST\n1520-21025-17005\nCA-POST\n1520-32095-17005\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n03:00\n\n03:00\n\n30:00\n\n03:00\n\n79:00\n\n08:00\n\n04:00\n\n04:00\n\n08:00\n\n04:00\n\n03:00\n\n04:00\n\n05:00\n\n05:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2017\n\nEldred, Daniel P.\n\nTMS #\n-  1-6517\n\nEnded\n05/26/2017\n\nSubject\nNew Officers Firearms Orientation\n\nCertification\n*** None ***\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nTotals For Training Completed in: 2017\n\nCompleted 11 of 11 Modules\n\nTotals For: Eldred, Daniel P.\n\nCompleted 26 of 26 Modules\n\nPage 3 of 3 pages\n\n(Continued)\n\n(Continued)\n\n61:00\n\n232:00",
+          "time": 2.4185426235198975,
+          "input_token_size": 858,
+          "output_token_size": 3,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_4149ffbc",
+        "created_at": 1750196681.6837366,
+        "processing_time": 3.7879817485809326,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.372598"
+      }
+    }
+  },
+  {
+    "43219b6c": {
+      "question": "When did Eldred complete the Striker Fired Transition Course?",
+      "answer": "08/14/2020",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0,
+            1
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.",
+          "time": 3.4671685695648193,
+          "input_token_size": 1677,
+          "output_token_size": 7,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_43219b6c",
+        "created_at": 1749869320.0782015,
+        "processing_time": 5.423998594284058,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.372598"
+      }
+    }
+  },
+  {
+    "432367c8": {
+      "question": "How long was the training time for the Firearms/Tactical Rifle 1st Responder course?",
+      "answer": "16:00",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0,
+            1
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.",
+          "time": 2.7337238788604736,
+          "input_token_size": 1693,
+          "output_token_size": 4,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_432367c8",
+        "created_at": 1750196612.5887916,
+        "processing_time": 3.455977439880371,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.372598"
+      }
+    }
+  },
+  {
+    "4982e2e4": {
+      "question": "What is Daniel P. Eldred's duty status?",
+      "answer": "Full Duty",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 1.8056824207305908,
+          "input_token_size": 819,
+          "output_token_size": 2,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_4982e2e4",
+        "created_at": 1750196587.4458947,
+        "processing_time": 3.8232669830322266,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.372598"
+      }
+    }
+  },
+  {
+    "4ed253a3": {
+      "question": "What subject did Daniel P. Eldred complete on 02/01/2021?",
+      "answer": "PEPPERBALL PROJECTILE SYSTEM CLASS",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.",
+          "time": 2.502091646194458,
+          "input_token_size": 1689,
+          "output_token_size": 8,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_4ed253a3",
+        "created_at": 1749664938.086379,
+        "processing_time": 3.7387771606445312,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.372598"
+      }
+    }
+  },
+  {
+    "5fcd510b": {
+      "question": "Where is the Fresno Police Department Regional Training Center located?",
+      "answer": "Answer is not found.",
+      "provenance": [],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_5fcd510b",
+        "created_at": 1749664931.8610997,
+        "processing_time": 0.5830907821655273,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "default",
+        "sentence_count": 999999,
+        "provenance_count": 0,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 999999,
+            "provenance_count": 0,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 999999,
+            "provenance_count": 0,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.372598"
+      }
+    }
+  },
+  {
+    "66952ee1": {
+      "question": "What rank does Daniel P. Eldred hold?",
+      "answer": "Police Officer",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 1.3478326797485352,
+          "input_token_size": 818,
+          "output_token_size": 2,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_66952ee1",
+        "created_at": 1750196625.0977402,
+        "processing_time": 2.4859204292297363,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.372598"
+      }
+    }
+  },
+  {
+    "7218b344": {
+      "question": "How do the training hours in 2018 compare to those in 2017 for Daniel P. Eldred?",
+      "answer": "Training hours in 2018: 61:00  \nTraining hours in 2017: 232:00  \nComparison: 2018 had 171 fewer hours than 2017.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            0,
+            3,
+            4,
+            6
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.Grade Score Tng. Time\n03:00\n\nP\n\nTotals For Training Completed in: 2019\n\nCompleted 1 of 1 Modules\n\n03:00\n\nTMS #\n-  1-6853\n\nEnded\n11/28/2018\n\nSubject\nCrisis Intervention Training\n\nCompl. Grade Score Tng.Time\n40:00\n\nP\n\n-  1-7236\n\n10/04/2018\n\n-  1-7100\n\n08/02/2018\n\nFirearms Qualifications 2018 3rd\nTrimester\nFirearms Training 2018 2nd Trimester *** None ***\n\n-  1-6965\n\n04/11/2018\n\nDUI Detection-Field Sobriety\n\n-  1-6896\n\n04/03/2018\n\nFirearms Training 2018 1st Trimester *** None ***\n\nTotals For Training Completed in: 2018\n\nCompleted 5 of 5 Modules\n\nScheduled Training In:\n\n 2017\n\nTMS #\n-  1-6803\n\nEnded\n12/22/2017\n\nSubject\nDriving (PSP)\n\n-  1-6803\n\n12/21/2017\n\nFirst Aid/Cpr Refresher\n\n-  1-6803\n\n12/20/2017\n\nElectronic Weapons\n\n-  1-6803\n\n12/20/2017\n\nOC Baton Training\n\n-  1-6803\n\n12/19/2017\n\nMAC TAC\n\n-  1-6803\n\n12/15/2017\n\nBuilding Searches\n\n-  1-6742\n\n12/14/2017\n\n-  1-6803\n\n12/14/2017\n\nFirearms Qualifications 2017 3rd\nTrimester\nLess Lethal Weapons\n\n-  1-6803\n\n12/14/2017\n\nArrest & Control\n\n-  1-6803\n\n12/13/2017\n\nFirearms/Tactical Handgun\n\nCertification\nCA-POST\n1520-20801-18004\n*** None ***\n\nCA-POST\n1520-20290-17004\n\nCertification\nCA-POST\n1520-29502-17009\nCA-POST\n1520-21798-17041\nCA-POST\n1520-23090-17005\nCA-POST\n1520-21275-17005\nCA-POST\n1520-24180-17006\nCA-POST\n-     -17\n*** None ***\n\nCA-POST\n1520-30995-17005\nCA-POST\n1520-21025-17005\nCA-POST\n1520-32095-17005\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nTotals For Training Completed in: 2017\n\nCompleted 11 of 11 Modules\n\nTotals For: Eldred, Daniel P.\n\nCompleted 26 of 26 Modules\n\nPage 3 of 3 pages\n\n(Continued)\n\n(Continued)\n\n61:00\n\n232:00",
+          "time": 10.994765043258667,
+          "input_token_size": 1699,
+          "output_token_size": 36,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_7218b344",
+        "created_at": 1749766528.3665738,
+        "processing_time": 12.852009057998657,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.372598"
+      }
+    }
+  },
+  {
+    "79845e72": {
+      "question": "What is the primary purpose of the Fresno Police Department Regional Training Center?",
+      "answer": "Answer is not found.",
+      "provenance": [],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_79845e72",
+        "created_at": 1749626928.8653126,
+        "processing_time": 0.4520912170410156,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "default",
+        "sentence_count": 999999,
+        "provenance_count": 0,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 999999,
+            "provenance_count": 0,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.372598"
+      }
+    }
+  },
+  {
+    "7e9304d8": {
+      "question": "Which department does Daniel P. Eldred belong to?",
+      "answer": "Fresno Police Department",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 3.531327486038208,
+          "input_token_size": 819,
+          "output_token_size": 5,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_7e9304d8",
+        "created_at": 1749626947.615197,
+        "processing_time": 5.442514419555664,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.378621"
+      }
+    }
+  },
+  {
+    "7ea9ad4b": {
+      "question": "Who is the main subject of the training activity report?",
+      "answer": "Eldred, Daniel P.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            6
+          ],
+          "provenance": "Grade Score Tng. Time\n08:00\n\nP\n\nTotals For Training Completed in: 2017\n\nCompleted 11 of 11 Modules\n\nTotals For: Eldred, Daniel P.\n\nCompleted 26 of 26 Modules\n\nPage 3 of 3 pages\n\n(Continued)\n\n(Continued)\n\n61:00\n\n232:00",
+          "time": 2.6704399585723877,
+          "input_token_size": 856,
+          "output_token_size": 7,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            2
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 4.5799336433410645,
+          "input_token_size": 1675,
+          "output_token_size": 14,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_7ea9ad4b",
+        "created_at": 1749626935.1051426,
+        "processing_time": 6.387857913970947,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 7,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.379626"
+      }
+    }
+  },
+  {
+    "82eb4b08": {
+      "question": "What is the last name of the instructor mentioned in the document?",
+      "answer": "Eldred",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 1.596031904220581,
+          "input_token_size": 821,
+          "output_token_size": 3,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            6
+          ],
+          "provenance": "Grade Score Tng. Time\n08:00\n\nP\n\nTotals For Training Completed in: 2017\n\nCompleted 11 of 11 Modules\n\nTotals For: Eldred, Daniel P.\n\nCompleted 26 of 26 Modules\n\nPage 3 of 3 pages\n\n(Continued)\n\n(Continued)\n\n61:00\n\n232:00",
+          "time": 3.5257837772369385,
+          "input_token_size": 1679,
+          "output_token_size": 6,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_82eb4b08",
+        "created_at": 1750196562.3994336,
+        "processing_time": 4.591846466064453,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 7,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.379626"
+      }
+    }
+  },
+  {
+    "90674784": {
+      "question": "What subjects did Eldred train in during 2021?",
+      "answer": "Firearms/Tactical Rifle 1st Responder CA-POST, PEPPERBALL PROJECTILE SYSTEM CLASS, Response To Critical Incident Training",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0,
+            1
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.",
+          "time": 2.7515575885772705,
+          "input_token_size": 820,
+          "output_token_size": 27,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_90674784",
+        "created_at": 1749869357.6402354,
+        "processing_time": 4.322566747665405,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.380627"
+      }
+    }
+  },
+  {
+    "96b2700d": {
+      "question": "What were the total training hours completed by Eldred in 2020?",
+      "answer": "66:00",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            2
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 1.4433777332305908,
+          "input_token_size": 1683,
+          "output_token_size": 4,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_96b2700d",
+        "created_at": 1749869345.1744688,
+        "processing_time": 2.2526285648345947,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.380627"
+      }
+    }
+  },
+  {
+    "96dba5b3": {
+      "question": "Compare the number of modules Eldred completed in 2019 and 2020.",
+      "answer": "2019: 1  \n2020: 6",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            2,
+            3,
+            6
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.Grade Score Tng. Time\n03:00\n\nP\n\nTotals For Training Completed in: 2019\n\nCompleted 1 of 1 Modules\n\n03:00\n\nTMS #\n-  1-6853\n\nEnded\n11/28/2018\n\nSubject\nCrisis Intervention Training\n\nCompl. Grade Score Tng.Grade Score Tng. Time\n08:00\n\nP\n\nTotals For Training Completed in: 2017\n\nCompleted 11 of 11 Modules\n\nTotals For: Eldred, Daniel P.\n\nCompleted 26 of 26 Modules\n\nPage 3 of 3 pages\n\n(Continued)\n\n(Continued)\n\n61:00\n\n232:00",
+          "time": 8.015838384628296,
+          "input_token_size": 1687,
+          "output_token_size": 20,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_96dba5b3",
+        "created_at": 1749869351.4129837,
+        "processing_time": 9.11340618133545,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.380627"
+      }
+    }
+  },
+  {
+    "96e343ec": {
+      "question": "Summarize the types of training Eldred completed in 2017.",
+      "answer": "1. Driving (PSP)\n2. First Aid/CPR Refresher\n3. Electronic Weapons\n4. OC Baton Training\n5. MAC TAC\n6. Building Searches\n7. Firearms Qualifications 2017 3rd Trimester\n8. Less Lethal Weapons\n9. Arrest & Control\n10. Firearms/Tactical Handgun\n11. New Officers Firearms Orientation",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            2,
+            4,
+            5
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.Time\n40:00\n\nP\n\n-  1-7236\n\n10/04/2018\n\n-  1-7100\n\n08/02/2018\n\nFirearms Qualifications 2018 3rd\nTrimester\nFirearms Training 2018 2nd Trimester *** None ***\n\n-  1-6965\n\n04/11/2018\n\nDUI Detection-Field Sobriety\n\n-  1-6896\n\n04/03/2018\n\nFirearms Training 2018 1st Trimester *** None ***\n\nTotals For Training Completed in: 2018\n\nCompleted 5 of 5 Modules\n\nScheduled Training In:\n\n 2017\n\nTMS #\n-  1-6803\n\nEnded\n12/22/2017\n\nSubject\nDriving (PSP)\n\n-  1-6803\n\n12/21/2017\n\nFirst Aid/Cpr Refresher\n\n-  1-6803\n\n12/20/2017\n\nElectronic Weapons\n\n-  1-6803\n\n12/20/2017\n\nOC Baton Training\n\n-  1-6803\n\n12/19/2017\n\nMAC TAC\n\n-  1-6803\n\n12/15/2017\n\nBuilding Searches\n\n-  1-6742\n\n12/14/2017\n\n-  1-6803\n\n12/14/2017\n\nFirearms Qualifications 2017 3rd\nTrimester\nLess Lethal Weapons\n\n-  1-6803\n\n12/14/2017\n\nArrest & Control\n\n-  1-6803\n\n12/13/2017\n\nFirearms/Tactical Handgun\n\nCertification\nCA-POST\n1520-20801-18004\n*** None ***\n\nCA-POST\n1520-20290-17004\n\nCertification\nCA-POST\n1520-29502-17009\nCA-POST\n1520-21798-17041\nCA-POST\n1520-23090-17005\nCA-POST\n1520-21275-17005\nCA-POST\n1520-24180-17006\nCA-POST\n-     -17\n*** None ***\n\nCA-POST\n1520-30995-17005\nCA-POST\n1520-21025-17005\nCA-POST\n1520-32095-17005\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n03:00\n\n03:00\n\n30:00\n\n03:00\n\n79:00\n\n08:00\n\n04:00\n\n04:00\n\n08:00\n\n04:00\n\n03:00\n\n04:00\n\n05:00\n\n05:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2017\n\nEldred, Daniel P.\n\nTMS #\n-  1-6517\n\nEnded\n05/26/2017\n\nSubject\nNew Officers Firearms Orientation\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 12.655942440032959,
+          "input_token_size": 1683,
+          "output_token_size": 74,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_96e343ec",
+        "created_at": 1749869363.8429024,
+        "processing_time": 16.5712251663208,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.380627"
+      }
+    }
+  },
+  {
+    "989bd315": {
+      "question": "What was the subject of training held on 12/05/2019?",
+      "answer": "Firearms Qualifications 2019 3rd Trimester",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            2
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 2.170794725418091,
+          "input_token_size": 1685,
+          "output_token_size": 12,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_989bd315",
+        "created_at": 1750196662.787068,
+        "processing_time": 3.2307634353637695,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.380627"
+      }
+    }
+  },
+  {
+    "99cfe0f2": {
+      "question": "What is the first name of the person mentioned in the document?",
+      "answer": "Daniel",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            6
+          ],
+          "provenance": "Grade Score Tng. Time\n08:00\n\nP\n\nTotals For Training Completed in: 2017\n\nCompleted 11 of 11 Modules\n\nTotals For: Eldred, Daniel P.\n\nCompleted 26 of 26 Modules\n\nPage 3 of 3 pages\n\n(Continued)\n\n(Continued)\n\n61:00\n\n232:00",
+          "time": 1.5794579982757568,
+          "input_token_size": 858,
+          "output_token_size": 1,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1,
+            2
+          ],
+          "provenance": "Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 2.8463525772094727,
+          "input_token_size": 1679,
+          "output_token_size": 2,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_99cfe0f2",
+        "created_at": 1750196581.1686966,
+        "processing_time": 3.63352370262146,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 7,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.380627"
+      }
+    }
+  },
+  {
+    "a080284d": {
+      "question": "What certification is associated with the First Aid/CPR/AED Refresher?",
+      "answer": "CA-POST",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1,
+            2
+          ],
+          "provenance": "Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 2.1966183185577393,
+          "input_token_size": 1687,
+          "output_token_size": 4,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_a080284d",
+        "created_at": 1750196650.2469847,
+        "processing_time": 3.162482976913452,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.383130"
+      }
+    }
+  },
+  {
+    "ae10b700": {
+      "question": "What department is associated with the Regional Training Center?",
+      "answer": "Fresno Police Department",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            2
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 1.2860889434814453,
+          "input_token_size": 818,
+          "output_token_size": 5,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            5
+          ],
+          "provenance": "Grade Score Tng. Time\n08:00\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n03:00\n\n03:00\n\n30:00\n\n03:00\n\n79:00\n\n08:00\n\n04:00\n\n04:00\n\n08:00\n\n04:00\n\n03:00\n\n04:00\n\n05:00\n\n05:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2017\n\nEldred, Daniel P.\n\nTMS #\n-  1-6517\n\nEnded\n05/26/2017\n\nSubject\nNew Officers Firearms Orientation\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 3.003263235092163,
+          "input_token_size": 1673,
+          "output_token_size": 10,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_ae10b700",
+        "created_at": 1750196574.9422119,
+        "processing_time": 4.615556478500366,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 7,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.383130"
+      }
+    }
+  },
+  {
+    "c3fa924d": {
+      "question": "How many modules were completed in 2019?",
+      "answer": "1",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            3
+          ],
+          "provenance": "Grade Score Tng. Time\n03:00\n\nP\n\nTotals For Training Completed in: 2019\n\nCompleted 1 of 1 Modules\n\n03:00\n\nTMS #\n-  1-6853\n\nEnded\n11/28/2018\n\nSubject\nCrisis Intervention Training\n\nCompl. Grade Score Tng.",
+          "time": 1.93229079246521,
+          "input_token_size": 855,
+          "output_token_size": 1,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_c3fa924d",
+        "created_at": 1750196669.0352535,
+        "processing_time": 3.579989433288574,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.383130"
+      }
+    }
+  },
+  {
+    "d0c173d7": {
+      "question": "How many training modules did Daniel P. Eldred complete in 2020?",
+      "answer": "6",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            2
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 1.139927864074707,
+          "input_token_size": 824,
+          "output_token_size": 1,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_d0c173d7",
+        "created_at": 1749766496.2640872,
+        "processing_time": 2.6393938064575195,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.383130"
+      }
+    }
+  },
+  {
+    "eb8d504e": {
+      "question": "How many modules were completed in 2020?",
+      "answer": "6",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            2
+          ],
+          "provenance": "Time\n24:00\n\nP\n\n-  1-7986\n\n03/12/2020\n\nPOST Perishable Skills\n\n-  1-7986\n\n03/10/2020\n\nFirst Aid/CPR/AED Refresher\n\n-  1-8068\n\n02/12/2020\n\n2020 Critical Legal Issues Update:\nUse of Force and more with Missy\nO'Linn\n\n-  1-8018\n\n02/06/2020\n\nFirearms Training 2020 1st Trimester *** None ***\n\n-  1-7935\n\n01/15/2020\n\nSearch Warrant Execution\n\nCertification\nCA-POST\n1520-29480-20009\nCA-POST\n1520-29509-19034\nCA-POST\n1520-21797-19037\nCA-POST\n1520-28000-19002\n\nCA-POST\n1520-24270-19003\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n04:00\n\n03:00\n\n23:00\n\n16:00\n\n08:00\n\n07:00\n\n03:00\n\n08:00\n\nTotals For Training Completed in: 2020\n\nCompleted 6 of 6 Modules\n\n66:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nEldred, Daniel P.\n\nPage 2 of 3 pages\n\n(Continued)\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2019\n\nTMS #\n-  1-7879\n\nEnded\n12/05/2019\n\nScheduled Training In:\n\n 2018\n\nSubject\nFirearms Qualifications 2019 3rd\nTrimester\n\nCertification\n*** None ***\n\nCompl.",
+          "time": 1.6474573612213135,
+          "input_token_size": 1673,
+          "output_token_size": 2,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_eb8d504e",
+        "created_at": 1750196637.6655066,
+        "processing_time": 2.619959592819214,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.383130"
+      }
+    }
+  },
+  {
+    "efc47cb0": {
+      "question": "Who is the instructor mentioned in the document?",
+      "answer": "Eldred, Daniel P.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 3.2972230911254883,
+          "input_token_size": 817,
+          "output_token_size": 7,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_efc47cb0",
+        "created_at": 1749664913.02195,
+        "processing_time": 4.692886114120483,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.383130"
+      }
+    }
+  },
+  {
+    "f0fd74ea": {
+      "question": "What subject was covered in the training on 02/24/2021?",
+      "answer": "Firearms/Tactical Rifle 1st Responder CA-POST",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 3.5945394039154053,
+          "input_token_size": 1685,
+          "output_token_size": 14,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_f0fd74ea",
+        "created_at": 1750196606.2971654,
+        "processing_time": 4.656408786773682,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.385135"
+      }
+    }
+  },
+  {
+    "f23c5be3": {
+      "question": "When did Eldred complete the Crisis Intervention Training?",
+      "answer": "11/28/2018",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            3
+          ],
+          "provenance": "Grade Score Tng. Time\n03:00\n\nP\n\nTotals For Training Completed in: 2019\n\nCompleted 1 of 1 Modules\n\n03:00\n\nTMS #\n-  1-6853\n\nEnded\n11/28/2018\n\nSubject\nCrisis Intervention Training\n\nCompl. Grade Score Tng.",
+          "time": 2.646425724029541,
+          "input_token_size": 855,
+          "output_token_size": 6,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_f23c5be3",
+        "created_at": 1749869338.9406111,
+        "processing_time": 4.3001978397369385,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.385135"
+      }
+    }
+  },
+  {
+    "f2fb30c7": {
+      "question": "What are the criteria for selecting persons or employees in this report?",
+      "answer": "1. Last Name Contains \"Eldred\"\n2. First Name Begins With \"Daniel\"",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.",
+          "time": 3.289637804031372,
+          "input_token_size": 821,
+          "output_token_size": 19,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_f2fb30c7",
+        "created_at": 1749626941.3369968,
+        "processing_time": 5.05541205406189,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.385135"
+      }
+    }
+  },
+  {
+    "f6a5ba46": {
+      "question": "How does the total training time compare between 2019 and 2021 for Daniel P. Eldred?",
+      "answer": "Total training time in 2019: 3:00  \nTotal training time in 2021: 16:00  \nComparison: 16:00 (2021) vs 3:00 (2019)",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance": "Fresno Police Department Regional Training Center\n\nIndividual Training Activity\n\nReport Criteria\n\nWednesday, April 14, 2021\n\nCriteria Page 1\n\nPersons/Employees/Instructors Criteria\n1\n\nLast Name Contains \"Eldred\"\n\n2\n\nFirst Name Begins With \"Daniel\"\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nPersonal\n\nAgency:\nID #:\n\nEmployment\nProperty\nActive Status:\nDuty Status:\nTime Status:\nRank:\nWork Unit:\nStation:\nDivision:\n\nEldred, Daniel P.\n\nFresno Police Department\nC65-A32\n\nValue\nActive\nFull Duty\nFull Time\nPolice Officer\nCentral District, Watch III\n\nPage 1 of 3 pages\n\nFrom\n11/23/2016\n11/23/2016\n11/23/2016\n06/12/2017\n06/12/2017\n  /  /\n  /  /\n\nThrough\n\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n  /  /\n\nScheduled Training In:\n\n 2021\n\nTMS #\n-  1-8316\n\nEnded\n02/24/2021\n\nSubject\nFirearms/Tactical Rifle 1st Responder CA-POST\n\nCertification\n\nCompl.Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.Grade Score Tng. Time\n03:00\n\nP\n\nTotals For Training Completed in: 2019\n\nCompleted 1 of 1 Modules\n\n03:00\n\nTMS #\n-  1-6853\n\nEnded\n11/28/2018\n\nSubject\nCrisis Intervention Training\n\nCompl. Grade Score Tng.Time\n40:00\n\nP\n\n-  1-7236\n\n10/04/2018\n\n-  1-7100\n\n08/02/2018\n\nFirearms Qualifications 2018 3rd\nTrimester\nFirearms Training 2018 2nd Trimester *** None ***\n\n-  1-6965\n\n04/11/2018\n\nDUI Detection-Field Sobriety\n\n-  1-6896\n\n04/03/2018\n\nFirearms Training 2018 1st Trimester *** None ***\n\nTotals For Training Completed in: 2018\n\nCompleted 5 of 5 Modules\n\nScheduled Training In:\n\n 2017\n\nTMS #\n-  1-6803\n\nEnded\n12/22/2017\n\nSubject\nDriving (PSP)\n\n-  1-6803\n\n12/21/2017\n\nFirst Aid/Cpr Refresher\n\n-  1-6803\n\n12/20/2017\n\nElectronic Weapons\n\n-  1-6803\n\n12/20/2017\n\nOC Baton Training\n\n-  1-6803\n\n12/19/2017\n\nMAC TAC\n\n-  1-6803\n\n12/15/2017\n\nBuilding Searches\n\n-  1-6742\n\n12/14/2017\n\n-  1-6803\n\n12/14/2017\n\nFirearms Qualifications 2017 3rd\nTrimester\nLess Lethal Weapons\n\n-  1-6803\n\n12/14/2017\n\nArrest & Control\n\n-  1-6803\n\n12/13/2017\n\nFirearms/Tactical Handgun\n\nCertification\nCA-POST\n1520-20801-18004\n*** None ***\n\nCA-POST\n1520-20290-17004\n\nCertification\nCA-POST\n1520-29502-17009\nCA-POST\n1520-21798-17041\nCA-POST\n1520-23090-17005\nCA-POST\n1520-21275-17005\nCA-POST\n1520-24180-17006\nCA-POST\n-     -17\n*** None ***\n\nCA-POST\n1520-30995-17005\nCA-POST\n1520-21025-17005\nCA-POST\n1520-32095-17005\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\nP\n\n03:00\n\n03:00\n\n30:00\n\n03:00\n\n79:00\n\n08:00\n\n04:00\n\n04:00\n\n08:00\n\n04:00\n\n03:00\n\n04:00\n\n05:00\n\n05:00\n\n\fFresno Police Department Regional Training Center\n\nIndividual Training Activity\n\n04/14/2021\n\nPerson:\n\nScheduled Training In:\n\n 2017\n\nEldred, Daniel P.\n\nTMS #\n-  1-6517\n\nEnded\n05/26/2017\n\nSubject\nNew Officers Firearms Orientation\n\nCertification\n*** None ***\n\nCompl.Grade Score Tng. Time\n08:00\n\nP\n\nTotals For Training Completed in: 2017\n\nCompleted 11 of 11 Modules\n\nTotals For: Eldred, Daniel P.\n\nCompleted 26 of 26 Modules\n\nPage 3 of 3 pages\n\n(Continued)\n\n(Continued)\n\n61:00\n\n232:00",
+          "time": 8.46614408493042,
+          "input_token_size": 1697,
+          "output_token_size": 65,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_f6a5ba46",
+        "created_at": 1749766508.8305082,
+        "processing_time": 10.500513553619385,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.385135"
+      }
+    }
+  },
+  {
+    "fa161b22": {
+      "question": "How many modules did Daniel P. Eldred complete in 2021?",
+      "answer": "3",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "Grade Score Tng. Time\n16:00\n\nP\n\n1520-32175-20003\n\n-  1-8420\n\n02/10/2021\n\n-  1-8520\n\n02/01/2021\n\nPEPPERBALL PROJECTILE\nSYSTEM CLASS\nResponse To Critical Incident Training *** None ***\n\n*** None ***\n\nTotals For Training Completed in: 2021\n\nCompleted 3 of 3 Modules\n\nScheduled Training In:\n\n 2020\n\nTMS #\n-  1-8209\n\nEnded\n08/14/2020\n\nSubject\nStriker Fired Transition Course\n\nCompl. Grade Score Tng.",
+          "time": 1.5164403915405273,
+          "input_token_size": 823,
+          "output_token_size": 1,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "2021-0002_Exh_2_Training_Records_6_fa161b22",
+        "created_at": 1750196600.0678728,
+        "processing_time": 2.9728715419769287,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.385135"
+      }
+    }
+  }
+]

@@ -1,0 +1,33 @@
+{
+  "base_name": "database_design_article",
+  "questions": [
+    "Who authored the article 'Artificial Intelligence Research: The Utility and Design of a Relational Database System'?",
+    "What is the main topic of the article published in Advances in Radiation Oncology in 2020?",
+    "When was the concept of relational databases first introduced?",
+    "What is the name of the database system discussed in the article?",
+    "Where was the article 'Artificial Intelligence Research: The Utility and Design of a Relational Database System' published?",
+    "How do relational database systems compare with spreadsheets in managing clinical data?",
+    "What are the limitations of using spreadsheets for complex clinical data management?",
+    "What advantages do relational databases offer for AI research in radiation oncology?",
+    "How does the article describe the implementation example of a relational database system?",
+    "What is the role of SQL in relational database systems according to the document?"
+  ],
+  "metadata": {
+    "base_name": "database_design_article",
+    "generated_at_iso": "2025-06-11 10:52:17",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 24882,
+    "processed_text_length": 4937,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty",
+    "has_difficulty_levels": true,
+    "source_file": "database_design_article_questions_by_difficulty.json",
+    "total_questions": 10
+  }
+}

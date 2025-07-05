@@ -1,0 +1,2084 @@
+[
+  {
+    "03b91187": {
+      "question": "When did the Debtors file a voluntary petition under Chapter 11?",
+      "answer": "December 31, 2019",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            21,
+            22,
+            23,
+            24
+          ],
+          "provenance_ids": [
+            21
+          ],
+          "provenance": "On  December  31,  2019  (the  “Petition  Date”),  each  of  the  Debtors  filed  a \n\nvoluntary petition with this Court under Chapter 11 of the Bankruptcy Code.2\n\n2 All references to the “Bankruptcy Code” herein refer to Title 11 of the United States Code.",
+          "time": 4.580247402191162,
+          "input_token_size": 3021,
+          "output_token_size": 28,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_03b91187",
+        "created_at": 1750199781.532743,
+        "processing_time": 8.216427326202393,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.617106"
+      }
+    }
+  },
+  {
+    "1ba7aa83": {
+      "question": "What amount was transferred to JPMorgan Chase on June 4, 2018?",
+      "answer": "$10,000.00",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance_ids": [
+            61,
+            62,
+            66,
+            67
+          ],
+          "provenance": "WHEREFORE, the Trustee respectfully requests that this Court enter judgment in \n\nfavor of the Trustee and against Defendant and order the Defendant to return the Loans \n\nin  the  amount  of  $600,000.00  plus  interest  to  the  Trustee,  and  such  other  and  further \n\nrelief that the Court deems just and proper.6 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 7 of 16\n\nDated: July 7, 2022 \n\nRespectfully submitted, \n\n/s/ Gary M. Freedman \nGary M. Freedman \nFlorida Bar No., Debtors. United States Bankruptcy Court - Case No.19-61608 (Jointly Administered)\nAmericore Health, LLC - Transfers to James Biden\nPeriod Analyzed from 12/01/16 through 08/31/18\n\nSource:  Debtor's bank records\n\nBank ID\n\nTransaction \nDate\n01/12/18\n03/01/18\n06/04/18\n\nPNC-5328\nPNC-5328\nST-9958\nTotal Cash Disbursements\n\nClear Date\n\nCash Disbursements\n\n01/12/18\n03/01/18\n06/04/18\n\n$             \n              \n                \n$              \n\n400,000.00\n200,000.00\n10,000.00\n610,000.00\n\nB. Riley Advisory Services\n\n Page 1 of 1\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 10 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 11 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 12 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 13 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 14 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 15 of 16\n\nExhibit “B” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 16 of 16",
+          "time": 5.7223875522613525,
+          "input_token_size": 5460,
+          "output_token_size": 24,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "provenance_ids": [
+            31
+          ],
+          "provenance": "On June 4, 2018, Americore Health wire transferred the sum of $10,000.00 to \n\nDefendant’s bank account at JPMorgan Chase bank, located in New York, New York.",
+          "time": 10.042203426361084,
+          "input_token_size": 9643,
+          "output_token_size": 50,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_1ba7aa83",
+        "created_at": 1750199827.9947634,
+        "processing_time": 13.430665254592896,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 14,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 14,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.617106"
+      }
+    }
+  },
+  {
+    "2245c53d": {
+      "question": "Who filed the complaint against James Biden?",
+      "answer": "Carol Fox, Chapter 11 Trustee of Americore Health, LLC.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "19-61608 \n\nCAROL FOX, CHAPTER 11 TRUSTEE OF \nAMERICORE HEALTH, LLC \n\nAdversary No.",
+          "time": 4.41350245475769,
+          "input_token_size": 3185,
+          "output_token_size": 59,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_2245c53d",
+        "created_at": 1750199794.7719579,
+        "processing_time": 7.438133239746094,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "2c4f9b8a": {
+      "question": "What was the sum of the wire transfer on January 12, 2018?",
+      "answer": "$400,000.00",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            25,
+            26,
+            27,
+            28
+          ],
+          "provenance_ids": [
+            27
+          ],
+          "provenance": "On  January  12,  2018,  Americore  Health  wire  transferred  the  sum  of \n\n$400,000.00  to  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia, \n\nPennsylvania.",
+          "time": 3.260998249053955,
+          "input_token_size": 2990,
+          "output_token_size": 24,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_2c4f9b8a",
+        "created_at": 1750199755.1168134,
+        "processing_time": 7.2515339851379395,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "332b4bde": {
+      "question": "Who is the Chapter 11 Trustee of Americore Health, LLC?",
+      "answer": "Carol Fox",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            1,
+            2,
+            3
+          ],
+          "provenance": "19-61608 \n\nCAROL FOX, CHAPTER 11 TRUSTEE OF \nAMERICORE HEALTH, LLC \n\nAdversary No.22 _____ -  \n\nDebtors. Plaintiff, \n\nDefendant.v. \n\nJAMES BIDEN, \n\nCOMPLAINT TO RECOVER FRAUDULENT \nTRANSFER AND FOR TURNOVER \n\nCarol L. Fox, the Chapter 11 Trustee (“Ms.",
+          "time": 2.946579694747925,
+          "input_token_size": 3213,
+          "output_token_size": 8,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_332b4bde",
+        "created_at": 1750199735.4078808,
+        "processing_time": 7.607264280319214,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "3a1c0bf5": {
+      "question": "What type of proceeding is this document related to?",
+      "answer": "Adversary proceeding in a bankruptcy case.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            10,
+            11,
+            15,
+            16,
+            50,
+            51,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance": "Case 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 1 of 16\n\nUNITED STATES BANKRUPTCY COURT  \nEASTERN DISTRICT OF KENTUCKY  \nLONDON DIVISION \n\nIN RE: \n\nAMERICORE HOLDINGS, LLC, et al.1\n\nChapter 11 \nJointly administered \nCase No.19-61608 \n\nCAROL FOX, CHAPTER 11 TRUSTEE OF \nAMERICORE HEALTH, LLC \n\nAdversary No.Enters., Inc. (In re Nat'l Century Fin.Enters., \n\nInc.), 423 F.3d 567, 573 (6th Cir.28 U.S.C. § 157(b)(2). 2. 3. 4.Pursuant  to  Bankruptcy  Rules  7008  and  9027(a)  of  the  Federal  Rules  of \n\nBankruptcy  Procedure,  Trustee  consents  to  entry  of  final  orders  by  this  Court  in  this \n\nadversary proceeding.WHEREFORE, the Plaintiff respectfully requests the Court to enter a Judgment:\n\na. \n\nb. \n\nc. \n\nd. \n\nDeclaring the Transfers to have been fraudulent transfers pursuant \nto Section 548(a)(1)(B) of the Bankruptcy Code; \n\nAvoiding  the  Transfers  made  to  the  Defendant  as  fraudulent \ntransfers under Section 548(a)(1)(B) of the Bankruptcy Code; \n\nDisallowing  any  claim  that  the  Defendant  may  have  against  the \nDebtor; \n\nRequiring  Defendant  to  repay  the  Transfers  to  the  Plaintiff,  plus \ninterest; and \n\ne. \n\nGranting such other and further relief as may be just and proper.5 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 6 of 16\n\nCOUNT II \n(Turnover of Property of the Estate – 11 U.S.C.906263 \nfrank.terzo@nelsonmullins.com\n100 S.E.3rd Avenue, Suite 2700 \nFt. Lauderdale, FL 33394 \nTelephone: (954) 764-7060  \nFacsimile: (954) 761-8135 \n\nAttorneys for Plaintiff/Trustee\n\n7 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 8 of 16\n\nExhibit “A” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 9 of 16\n\nAmericore Holdings, et al., Debtors. United States Bankruptcy Court - Case No.19-61608 (Jointly Administered)\nAmericore Health, LLC - Transfers to James Biden\nPeriod Analyzed from 12/01/16 through 08/31/18\n\nSource:  Debtor's bank records\n\nBank ID\n\nTransaction \nDate\n01/12/18\n03/01/18\n06/04/18\n\nPNC-5328\nPNC-5328\nST-9958\nTotal Cash Disbursements\n\nClear Date\n\nCash Disbursements\n\n01/12/18\n03/01/18\n06/04/18\n\n$             \n              \n                \n$              \n\n400,000.00\n200,000.00\n10,000.00\n610,000.00\n\nB. Riley Advisory Services\n\n Page 1 of 1\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 10 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 11 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 12 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 13 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 14 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 15 of 16\n\nExhibit “B” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 16 of 16",
+          "time": 20.015029430389404,
+          "input_token_size": 3598,
+          "output_token_size": 7,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_3a1c0bf5",
+        "created_at": 1750199774.9103146,
+        "processing_time": 22.525776624679565,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 68,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 68,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "47d27407": {
+      "question": "What is the name of the hospital corporation mentioned?",
+      "answer": "St. Alexius Hospital Corporation #1",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            5,
+            6,
+            9,
+            10,
+            11,
+            13
+          ],
+          "provenance": "Case 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 1 of 16\n\nUNITED STATES BANKRUPTCY COURT  \nEASTERN DISTRICT OF KENTUCKY  \nLONDON DIVISION \n\nIN RE: \n\nAMERICORE HOLDINGS, LLC, et al.1\n\nChapter 11 \nJointly administered \nCase No.19-61608 \n\nCAROL FOX, CHAPTER 11 TRUSTEE OF \nAMERICORE HEALTH, LLC \n\nAdversary No.22 _____ -  \n\nDebtors. Plaintiff, \n\nDefendant.v. \n\nJAMES BIDEN, \n\nCOMPLAINT TO RECOVER FRAUDULENT \nTRANSFER AND FOR TURNOVER \n\nCarol L. Fox, the Chapter 11 Trustee (“Ms.19-61607) in the Chapter 11 cases being \n\njointly  administered  under  the  lead  case  of  In  re  Americore  Holdings,  LLC  (Americore \n\nHealth, individually, the “Debtor” and collectively with the jointly administered cases, the \n\n“Debtors”), files this Complaint against James Biden (the “Defendant”), stating as follows: \n\n1 The Debtors in these Chapter 11 cases are (with the last four digits of their federal tax identification numbers \nin  parentheses):  Americore  Holdings,  LLC  (0115);  Americore  Health,  LLC  (6554);  Americore  Health \nEnterprises, LLC (3887); Ellwood Medical Center, LLC (1900); Ellwood Medical Center Real Estate, LLC \n(8799); Ellwood Medical Center Operations, LLC (5283); Pineville Medical Center, LLC (9435); Izard County \nMedical Center, LLC(3388); Success Healthcare 2, LLC (8861); St. Alexius Properties, LLC (4610); and St. \nAlexius Hospital Corporation #1 (2766).Case 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 2 of 16\n\nI.Amedisys, Inc., et al. v. Nat'l Century Fin.Enters., Inc. (In re Nat'l Century Fin.Enters., \n\nInc.), 423 F.3d 567, 573 (6th Cir.Venue is proper pursuant to 28 U.S.C.",
+          "time": 8.875651836395264,
+          "input_token_size": 3234,
+          "output_token_size": 23,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_47d27407",
+        "created_at": 1750199801.3954058,
+        "processing_time": 12.805484056472778,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 17,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 17,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "4cb3f628": {
+      "question": "Who is the Defendant in the complaint?",
+      "answer": "James Biden",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            3
+          ],
+          "provenance": "v. \n\nJAMES BIDEN, \n\nCOMPLAINT TO RECOVER FRAUDULENT \nTRANSFER AND FOR TURNOVER \n\nCarol L. Fox, the Chapter 11 Trustee (“Ms.",
+          "time": 3.3677282333374023,
+          "input_token_size": 3185,
+          "output_token_size": 10,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "provenance_ids": [
+            5
+          ],
+          "provenance": "19-61607) in the Chapter 11 cases being \n\njointly  administered  under  the  lead  case  of  In  re  Americore  Holdings,  LLC  (Americore \n\nHealth, individually, the “Debtor” and collectively with the jointly administered cases, the \n\n“Debtors”), files this Complaint against James Biden (the “Defendant”), stating as follows: \n\n1 The Debtors in these Chapter 11 cases are (with the last four digits of their federal tax identification numbers \nin  parentheses):  Americore  Holdings,  LLC  (0115);  Americore  Health,  LLC  (6554);  Americore  Health \nEnterprises, LLC (3887); Ellwood Medical Center, LLC (1900); Ellwood Medical Center Real Estate, LLC \n(8799); Ellwood Medical Center Operations, LLC (5283); Pineville Medical Center, LLC (9435); Izard County \nMedical Center, LLC(3388); Success Healthcare 2, LLC (8861); St. Alexius Properties, LLC (4610); and St. \nAlexius Hospital Corporation #1 (2766).",
+          "time": 4.980337142944336,
+          "input_token_size": 3592,
+          "output_token_size": 12,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_4cb3f628",
+        "created_at": 1750199768.3120618,
+        "processing_time": 7.846185207366943,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 8,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 8,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "4eecddd0": {
+      "question": "Where is James Biden's bank account located?",
+      "answer": "James Biden's bank account is located at PNC Bank in Philadelphia, Pennsylvania, and at JPMorgan Chase bank in New York, New York.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "provenance_ids": [
+            26,
+            27,
+            31
+          ],
+          "provenance": "No. 269). III. TRANSFERS \n\n11.On  January  12,  2018,  Americore  Health  wire  transferred  the  sum  of \n\n$400,000.00  to  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia, \n\nPennsylvania.On June 4, 2018, Americore Health wire transferred the sum of $10,000.00 to \n\nDefendant’s bank account at JPMorgan Chase bank, located in New York, New York.",
+          "time": 18.876334190368652,
+          "input_token_size": 5196,
+          "output_token_size": 32,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_4eecddd0",
+        "created_at": 1750199761.7164228,
+        "processing_time": 21.22624969482422,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 34,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 34,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "71a06ca6": {
+      "question": "What legal actions does the Trustee seek against James Biden in the complaint?",
+      "answer": "1. Declaring the Transfers to have been fraudulent transfers pursuant to Section 548(a)(1)(B) of the Bankruptcy Code.  \n2. Avoiding the Transfers made to the Defendant as fraudulent transfers under Section 548(a)(1)(B) of the Bankruptcy Code.  \n3. Disallowing any claim that the Defendant may have against the Debtor.  \n4. Requiring Defendant to repay the Transfers to the Plaintiff, plus interest.  \n5. Ordering the Defendant to return the Loans in the amount of $600,000.00 plus interest to the Trustee.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance_ids": [
+            50,
+            55,
+            56,
+            60,
+            61
+          ],
+          "provenance": "WHEREFORE, the Plaintiff respectfully requests the Court to enter a Judgment:\n\na. \n\nb. \n\nc. \n\nd. \n\nDeclaring the Transfers to have been fraudulent transfers pursuant \nto Section 548(a)(1)(B) of the Bankruptcy Code; \n\nAvoiding  the  Transfers  made  to  the  Defendant  as  fraudulent \ntransfers under Section 548(a)(1)(B) of the Bankruptcy Code; \n\nDisallowing  any  claim  that  the  Defendant  may  have  against  the \nDebtor; \n\nRequiring  Defendant  to  repay  the  Transfers  to  the  Plaintiff,  plus \ninterest; and \n\ne. \n\nGranting such other and further relief as may be just and proper.$600,000.00  of  the  Transfers  were  characterized  as  “Loans”  when  the \n\n$600,000.00 was transferred from Americore Health to Biden.28. The $600,000.00 is property of the estate pursuant to 11 U.S.C.The Defendant is required to turn over the Loans to the Trustee pursuant to \n\n11 U.S.C. § 542 of the Bankruptcy Code.WHEREFORE, the Trustee respectfully requests that this Court enter judgment in \n\nfavor of the Trustee and against Defendant and order the Defendant to return the Loans \n\nin  the  amount  of  $600,000.00  plus  interest  to  the  Trustee,  and  such  other  and  further \n\nrelief that the Court deems just and proper.",
+          "time": 48.59302353858948,
+          "input_token_size": 4107,
+          "output_token_size": 221,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_71a06ca6",
+        "created_at": 1749878144.01326,
+        "processing_time": 53.242979764938354,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 34,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 34,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "72a51fc7": {
+      "question": "When did Americore Health transfer $10,000.00?",
+      "answer": "June 4, 2018",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "provenance_ids": [
+            31
+          ],
+          "provenance": "On June 4, 2018, Americore Health wire transferred the sum of $10,000.00 to \n\nDefendant’s bank account at JPMorgan Chase bank, located in New York, New York.",
+          "time": 5.075908899307251,
+          "input_token_size": 5136,
+          "output_token_size": 33,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_72a51fc7",
+        "created_at": 1750199808.007089,
+        "processing_time": 8.897829294204712,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "767a13c9": {
+      "question": "How did James Biden allegedly use his political connections in relation to the loans?",
+      "answer": "James Biden allegedly used his political connections to procure the $600,000.00 in loans from Americore Health based on representations that his last name, \"Biden,\" could \"open doors\" and that he could obtain a large investment from the Middle East.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance_ids": [
+            4,
+            5,
+            20,
+            21,
+            22,
+            26,
+            35,
+            36,
+            37,
+            65,
+            66,
+            67
+          ],
+          "provenance": "Fox” or “Trustee”) of Americore Health, \n\nLLC (“Americore Health”), a debtor (Case No.19-61607) in the Chapter 11 cases being \n\njointly  administered  under  the  lead  case  of  In  re  Americore  Holdings,  LLC  (Americore \n\nHealth, individually, the “Debtor” and collectively with the jointly administered cases, the \n\n“Debtors”), files this Complaint against James Biden (the “Defendant”), stating as follows: \n\n1 The Debtors in these Chapter 11 cases are (with the last four digits of their federal tax identification numbers \nin  parentheses):  Americore  Holdings,  LLC  (0115);  Americore  Health,  LLC  (6554);  Americore  Health \nEnterprises, LLC (3887); Ellwood Medical Center, LLC (1900); Ellwood Medical Center Real Estate, LLC \n(8799); Ellwood Medical Center Operations, LLC (5283); Pineville Medical Center, LLC (9435); Izard County \nMedical Center, LLC(3388); Success Healthcare 2, LLC (8861); St. Alexius Properties, LLC (4610); and St. \nAlexius Hospital Corporation #1 (2766).7. Upon  information  and  belief,  the  Defendant  is  an  individual  and  a \n\nPennsylvania resident. 8.On  December  31,  2019  (the  “Petition  Date”),  each  of  the  Debtors  filed  a \n\nvoluntary petition with this Court under Chapter 11 of the Bankruptcy Code.2\n\n2 All references to the “Bankruptcy Code” herein refer to Title 11 of the United States Code.2 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 3 of 16\n\n9.No. 269). III. TRANSFERS \n\n11.By information and belief, Defendant procured the $600,000.00 in loans from \n\nAmericore  Health  (the  “Loans”)  based  upon  representations  that  his  last  name,  “Biden,” \n\ncould “open doors” and that he could obtain a large investment from the Middle East based \n\non his political connections.16. Debtors even provided Defendant with business cards reflecting his position \n\nas a “Principal” with Americore Health to assist his financing efforts.A redacted copy of the \n\nDefendant’s  business  card  is  attached  as  Exhibit  B.3rd Avenue, Suite 2700 \nFt. Lauderdale, FL 33394 \nTelephone: (954) 764-7060  \nFacsimile: (954) 761-8135 \n\nAttorneys for Plaintiff/Trustee\n\n7 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 8 of 16\n\nExhibit “A” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 9 of 16\n\nAmericore Holdings, et al., Debtors. United States Bankruptcy Court - Case No.19-61608 (Jointly Administered)\nAmericore Health, LLC - Transfers to James Biden\nPeriod Analyzed from 12/01/16 through 08/31/18\n\nSource:  Debtor's bank records\n\nBank ID\n\nTransaction \nDate\n01/12/18\n03/01/18\n06/04/18\n\nPNC-5328\nPNC-5328\nST-9958\nTotal Cash Disbursements\n\nClear Date\n\nCash Disbursements\n\n01/12/18\n03/01/18\n06/04/18\n\n$             \n              \n                \n$              \n\n400,000.00\n200,000.00\n10,000.00\n610,000.00\n\nB. Riley Advisory Services\n\n Page 1 of 1\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 10 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 11 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 12 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 13 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 14 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 15 of 16\n\nExhibit “B” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 16 of 16",
+          "time": 66.0795886516571,
+          "input_token_size": 3608,
+          "output_token_size": 54,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_767a13c9",
+        "created_at": 1749878130.6630871,
+        "processing_time": 68.89694738388062,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 68,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 68,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "7d7704c5": {
+      "question": "What is the case number of the bankruptcy filing?",
+      "answer": "19-61608",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "19-61608 \n\nCAROL FOX, CHAPTER 11 TRUSTEE OF \nAMERICORE HEALTH, LLC \n\nAdversary No.",
+          "time": 3.374359607696533,
+          "input_token_size": 3193,
+          "output_token_size": 16,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance_ids": [
+            64,
+            66,
+            67
+          ],
+          "provenance": "906263 \nfrank.terzo@nelsonmullins.com\n100 S.E., Debtors. United States Bankruptcy Court - Case No.19-61608 (Jointly Administered)\nAmericore Health, LLC - Transfers to James Biden\nPeriod Analyzed from 12/01/16 through 08/31/18\n\nSource:  Debtor's bank records\n\nBank ID\n\nTransaction \nDate\n01/12/18\n03/01/18\n06/04/18\n\nPNC-5328\nPNC-5328\nST-9958\nTotal Cash Disbursements\n\nClear Date\n\nCash Disbursements\n\n01/12/18\n03/01/18\n06/04/18\n\n$             \n              \n                \n$              \n\n400,000.00\n200,000.00\n10,000.00\n610,000.00\n\nB. Riley Advisory Services\n\n Page 1 of 1\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 10 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 11 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 12 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 13 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 14 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 15 of 16\n\nExhibit “B” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 16 of 16",
+          "time": 11.845999002456665,
+          "input_token_size": 8741,
+          "output_token_size": 38,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_7d7704c5",
+        "created_at": 1749878123.9888048,
+        "processing_time": 13.68725872039795,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 38,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 38,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "7f58b4fe": {
+      "question": "How does the complaint establish jurisdiction and venue for the legal claims?",
+      "answer": "1. This Court has jurisdiction over this adversary proceeding pursuant to 28 U.S.C. §§ 157(a) and 1334(b).\n2. Venue is proper pursuant to 28 U.S.C. §§ 1408 and 1409.\n3. This matter is a core proceeding. 28 U.S.C. § 157(b)(2).",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance": "Case 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 1 of 16\n\nUNITED STATES BANKRUPTCY COURT  \nEASTERN DISTRICT OF KENTUCKY  \nLONDON DIVISION \n\nIN RE: \n\nAMERICORE HOLDINGS, LLC, et al.1\n\nChapter 11 \nJointly administered \nCase No.19-61608 \n\nCAROL FOX, CHAPTER 11 TRUSTEE OF \nAMERICORE HEALTH, LLC \n\nAdversary No.22 _____ -  \n\nDebtors. Plaintiff, \n\nDefendant.v. \n\nJAMES BIDEN, \n\nCOMPLAINT TO RECOVER FRAUDULENT \nTRANSFER AND FOR TURNOVER \n\nCarol L. Fox, the Chapter 11 Trustee (“Ms.Fox” or “Trustee”) of Americore Health, \n\nLLC (“Americore Health”), a debtor (Case No.19-61607) in the Chapter 11 cases being \n\njointly  administered  under  the  lead  case  of  In  re  Americore  Holdings,  LLC  (Americore \n\nHealth, individually, the “Debtor” and collectively with the jointly administered cases, the \n\n“Debtors”), files this Complaint against James Biden (the “Defendant”), stating as follows: \n\n1 The Debtors in these Chapter 11 cases are (with the last four digits of their federal tax identification numbers \nin  parentheses):  Americore  Holdings,  LLC  (0115);  Americore  Health,  LLC  (6554);  Americore  Health \nEnterprises, LLC (3887); Ellwood Medical Center, LLC (1900); Ellwood Medical Center Real Estate, LLC \n(8799); Ellwood Medical Center Operations, LLC (5283); Pineville Medical Center, LLC (9435); Izard County \nMedical Center, LLC(3388); Success Healthcare 2, LLC (8861); St. Alexius Properties, LLC (4610); and St. \nAlexius Hospital Corporation #1 (2766).Case 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 2 of 16\n\nI.JURISDICTION AND VENUE\n\n1. This  Court  has  jurisdiction  over  this  adversary  proceeding  pursuant  to  28 \n\nU.S.C. §§ 157(a) and 1334(b).Further,  pursuant to Local  Rule  83.12,  all matters arising \n\nunder or arising in or related to cases arising under title 11 are referred to the Bankruptcy \n\nCourt.Amedisys, Inc., et al. v. Nat'l Century Fin.Enters., Inc. (In re Nat'l Century Fin.Enters., \n\nInc.), 423 F.3d 567, 573 (6th Cir.2005) (district courts may refer title 11 cases and related \n\ncases to bankruptcy courts).Venue is proper pursuant to 28 U.S.C.§§ 1408 and 1409. This matter is a core proceeding.28 U.S.C. § 157(b)(2). 2. 3. 4.Pursuant  to  Bankruptcy  Rules  7008  and  9027(a)  of  the  Federal  Rules  of \n\nBankruptcy  Procedure,  Trustee  consents  to  entry  of  final  orders  by  this  Court  in  this \n\nadversary proceeding.Delaware. II. PARTIES AND PROCEDURAL BACKGROUND \n\n5.The Debtor is a for-profit business corporation organized under the laws of \n\n6.The  Debtor  never  had  direct  ownership  interest  the  rural  hospital  Debtors, \n\nincluding St. Alexius Hospital, Ellwood City Hospital, Izard Medical Center, Pineville Medical \n\nCenter or the non-Debtor hospital, including Lee County Medical Center.7. Upon  information  and  belief,  the  Defendant  is  an  individual  and  a \n\nPennsylvania resident. 8.On  December  31,  2019  (the  “Petition  Date”),  each  of  the  Debtors  filed  a \n\nvoluntary petition with this Court under Chapter 11 of the Bankruptcy Code.2\n\n2 All references to the “Bankruptcy Code” herein refer to Title 11 of the United States Code.2 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 3 of 16\n\n9.On February 20, 2020, the Court entered an agreed order for the appointment \n\nof  a  Chapter  11  Trustee  and  directing  the  United  States  Trustee  (“UST”)  to  immediately \n\nappoint a Chapter 11 Trustee in the Debtors’ jointly administered cases.(Doc. No. 258). 10. On February 21, 2020, the UST filed a Notice of Appointment of Ms. Fox as \n\nChapter 11 Trustee (Doc.No. 260), and on February 24, 2020 Ms. Fox Filed her Notice of \n\nAcceptance of the Appointment as Trustee (Doc.No. 269). III. TRANSFERS \n\n11.On  January  12,  2018,  Americore  Health  wire  transferred  the  sum  of \n\n$400,000.00  to  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia, \n\nPennsylvania.The  documentation  evidencing  the  foregoing  wire  transfer  prepared  by \n\nAmericore Health references the transfer as a “LOAN.” \n\n12.On March 1, 2018, Americore Health wire transferred the sum of $200,000.00 \n\nto  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia,  Pennsylvania.The \n\ndocumentation  evidencing  the  foregoing  wire  transfer  prepared  by  Americore  Health \n\nreferences the transfer as a “LOAN.” \n\n13.On June 4, 2018, Americore Health wire transferred the sum of $10,000.00 to \n\nDefendant’s bank account at JPMorgan Chase bank, located in New York, New York.The \n\ndocumentation  evidencing  the  foregoing  wire  transfer  prepared  by  Americore  Health \n\nreferences the transfer for “Consulting & Marketing – May 2018.”  \n\n14.A summary of the foregoing transfers (the “Transfers”) is as follows: \n\n3 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 4 of 16\n\nTrue and correct copies of the documents evidencing the Transfers are attached hereto \n\nas Composite Exhibit A. \n\nIV.DEFENDANT’S RELATIONSHIP WITH DEBTORS\n\n15.By information and belief, Defendant procured the $600,000.00 in loans from \n\nAmericore  Health  (the  “Loans”)  based  upon  representations  that  his  last  name,  “Biden,” \n\ncould “open doors” and that he could obtain a large investment from the Middle East based \n\non his political connections.16. Debtors even provided Defendant with business cards reflecting his position \n\nas a “Principal” with Americore Health to assist his financing efforts.A redacted copy of the \n\nDefendant’s  business  card  is  attached  as  Exhibit  B.As  a  result,  Defendant  became  a \n\nfiduciary to Americore Health. 17.Instead,  of  complying  with  his  fiduciary  responsibilities,  Defendant  helped \n\nDebtors procure an ill-advised bridge loan from a hedge fund that had a deleterious impact \n\non the financial affairs of the Debtor and ultimately forced Debtors into bankruptcy, as he \n\nnever delivered the promised the large investment from the Middle East.18. And worse, Defendant never repaid the Loans to Americore Health, including \n\nduring the time that Debtors were strapped for cash.19. Despite Trustee’s demand, Defendant has still failed and refused to return the \n\nTransfers to the Trustee.COUNT I \n(Fraudulent Transfers pursuant to \nSection 548(a)(1)(B) of the Bankruptcy Code) \n\n20.Trustee incorporates the allegations in paragraphs 1 - 19 as if set forth fully \n\nherein.4 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 5 of 16\n\n21.Within two years of the Petition Date, that is between January 12, 2018 and \n\nJune 4, 2018, Americore Health made the Transfers to Defendant.22. The Transfers constituted the transfer of an interest of Americore Health in \n\nproperty. 23.Americore  Health  received  less  than  reasonably  equivalent  value  in \n\nexchange for each of the Transfers, and: \n\na.Was  insolvent  on  the  dates  that  such  transfers  were  made,  or \n\nbecame insolvent as a result of such transfers; \n\nb.Was engaged in business or a transaction or was about to engage \n\nin  business or  a transaction for  which  any  property  remaining  with \n\nAmericore Health was an unreasonably small capital; or \n\nc. \n\nAmericore Health intended to incur, or believed that it would incur, \n\ndebts that would be beyond its ability to pay as such debts matured.WHEREFORE, the Plaintiff respectfully requests the Court to enter a Judgment:\n\na. \n\nb. \n\nc. \n\nd. \n\nDeclaring the Transfers to have been fraudulent transfers pursuant \nto Section 548(a)(1)(B) of the Bankruptcy Code; \n\nAvoiding  the  Transfers  made  to  the  Defendant  as  fraudulent \ntransfers under Section 548(a)(1)(B) of the Bankruptcy Code; \n\nDisallowing  any  claim  that  the  Defendant  may  have  against  the \nDebtor; \n\nRequiring  Defendant  to  repay  the  Transfers  to  the  Plaintiff,  plus \ninterest; and \n\ne. \n\nGranting such other and further relief as may be just and proper.5 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 6 of 16\n\nCOUNT II \n(Turnover of Property of the Estate – 11 U.S.C.§ 542) \n\n24. Trustee incorporates the allegations in prior paragraphs 1 - 19 as if set forth \n\n25.The Transfers constituted the transfer of an interest of Americore Health in \n\n26.Defendant  received  the  Transfers  totaling  $610,000.00  from  Americore \n\nfully herein. property. Health. 27.$600,000.00  of  the  Transfers  were  characterized  as  “Loans”  when  the \n\n$600,000.00 was transferred from Americore Health to Biden.28. The $600,000.00 is property of the estate pursuant to 11 U.S.C.§ 541 of \n\nthe Bankruptcy Code.§ 363 of the Bankruptcy Code. 29.The Debtor is entitled the return of $600,000.00 in Loans under 11 U.S.C. 30.The Defendant is required to turn over the Loans to the Trustee pursuant to \n\n11 U.S.C. § 542 of the Bankruptcy Code.WHEREFORE, the Trustee respectfully requests that this Court enter judgment in \n\nfavor of the Trustee and against Defendant and order the Defendant to return the Loans \n\nin  the  amount  of  $600,000.00  plus  interest  to  the  Trustee,  and  such  other  and  further \n\nrelief that the Court deems just and proper.6 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 7 of 16\n\nDated: July 7, 2022 \n\nRespectfully submitted, \n\n/s/ Gary M. Freedman \nGary M. Freedman \nFlorida Bar No.: 727260 \ngary.freedman@nelsonmullins.com\nNELSON MULLINS RILEY & SCARBOROUGH LLP\n2 South Biscayne Blvd., 21st Floor \nMiami, FL 33131 \nTelephone: 305.373.9449 \nFacsimile: 305-995-6393 \n\nand \n\nFrank P. Terzo \nFlorida Bar No.906263 \nfrank.terzo@nelsonmullins.com\n100 S.E.3rd Avenue, Suite 2700 \nFt. Lauderdale, FL 33394 \nTelephone: (954) 764-7060  \nFacsimile: (954) 761-8135 \n\nAttorneys for Plaintiff/Trustee\n\n7 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 8 of 16\n\nExhibit “A” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 9 of 16\n\nAmericore Holdings, et al., Debtors. United States Bankruptcy Court - Case No.19-61608 (Jointly Administered)\nAmericore Health, LLC - Transfers to James Biden\nPeriod Analyzed from 12/01/16 through 08/31/18\n\nSource:  Debtor's bank records\n\nBank ID\n\nTransaction \nDate\n01/12/18\n03/01/18\n06/04/18\n\nPNC-5328\nPNC-5328\nST-9958\nTotal Cash Disbursements\n\nClear Date\n\nCash Disbursements\n\n01/12/18\n03/01/18\n06/04/18\n\n$             \n              \n                \n$              \n\n400,000.00\n200,000.00\n10,000.00\n610,000.00\n\nB. Riley Advisory Services\n\n Page 1 of 1\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 10 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 11 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 12 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 13 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 14 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 15 of 16\n\nExhibit “B” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 16 of 16",
+          "time": 81.75789070129395,
+          "input_token_size": 3604,
+          "output_token_size": 53,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_7f58b4fe",
+        "created_at": 1749878171.246598,
+        "processing_time": 84.0245635509491,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 68,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 68,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "85d735b0": {
+      "question": "What are the reasons given for characterizing the transfers to James Biden as fraudulent?",
+      "answer": "1. Americore Health received less than reasonably equivalent value in exchange for each of the Transfers.\n2. Americore Health was insolvent on the dates that such transfers were made, or became insolvent as a result of such transfers.\n3. Americore Health was engaged in business or a transaction for which any property remaining with Americore Health was an unreasonably small capital.\n4. Americore Health intended to incur, or believed that it would incur, debts that would be beyond its ability to pay as such debts matured.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          "provenance_ids": [
+            47,
+            48,
+            49
+          ],
+          "provenance": "Americore  Health  received  less  than  reasonably  equivalent  value  in \n\nexchange for each of the Transfers, and: \n\na.Was  insolvent  on  the  dates  that  such  transfers  were  made,  or \n\nbecame insolvent as a result of such transfers; \n\nb.Was engaged in business or a transaction or was about to engage \n\nin  business or  a transaction for  which  any  property  remaining  with \n\nAmericore Health was an unreasonably small capital; or \n\nc. \n\nAmericore Health intended to incur, or believed that it would incur, \n\ndebts that would be beyond its ability to pay as such debts matured.",
+          "time": 18.808825254440308,
+          "input_token_size": 3717,
+          "output_token_size": 484,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_85d735b0",
+        "created_at": 1749878157.5458276,
+        "processing_time": 25.357170343399048,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "884600a3": {
+      "question": "Where is the United States Bankruptcy Court located?",
+      "answer": "EASTERN DISTRICT OF KENTUCKY, LONDON DIVISION",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Case 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 1 of 16\n\nUNITED STATES BANKRUPTCY COURT  \nEASTERN DISTRICT OF KENTUCKY  \nLONDON DIVISION \n\nIN RE: \n\nAMERICORE HOLDINGS, LLC, et al.1\n\nChapter 11 \nJointly administered \nCase No.",
+          "time": 4.356855630874634,
+          "input_token_size": 3189,
+          "output_token_size": 60,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_884600a3",
+        "created_at": 1750199841.2798488,
+        "processing_time": 7.150519371032715,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "8af22a10": {
+      "question": "What is the case number for Americore Holdings, LLC?",
+      "answer": "19-61608",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "19-61608 \n\nCAROL FOX, CHAPTER 11 TRUSTEE OF \nAMERICORE HEALTH, LLC \n\nAdversary No.",
+          "time": 2.952808141708374,
+          "input_token_size": 3205,
+          "output_token_size": 16,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance_ids": [
+            67
+          ],
+          "provenance": "19-61608 (Jointly Administered)\nAmericore Health, LLC - Transfers to James Biden\nPeriod Analyzed from 12/01/16 through 08/31/18\n\nSource:  Debtor's bank records\n\nBank ID\n\nTransaction \nDate\n01/12/18\n03/01/18\n06/04/18\n\nPNC-5328\nPNC-5328\nST-9958\nTotal Cash Disbursements\n\nClear Date\n\nCash Disbursements\n\n01/12/18\n03/01/18\n06/04/18\n\n$             \n              \n                \n$              \n\n400,000.00\n200,000.00\n10,000.00\n610,000.00\n\nB. Riley Advisory Services\n\n Page 1 of 1\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 10 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 11 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 12 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 13 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 14 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 15 of 16\n\nExhibit “B” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 16 of 16",
+          "time": 7.209566831588745,
+          "input_token_size": 9855,
+          "output_token_size": 47,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_8af22a10",
+        "created_at": 1750199741.9236026,
+        "processing_time": 9.578293085098267,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 9,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 9,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "9018a232": {
+      "question": "Which court has jurisdiction over this case?",
+      "answer": "UNITED STATES BANKRUPTCY COURT EASTERN DISTRICT OF KENTUCKY LONDON DIVISION",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            0,
+            3
+          ],
+          "provenance": "Case 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 1 of 16\n\nUNITED STATES BANKRUPTCY COURT  \nEASTERN DISTRICT OF KENTUCKY  \nLONDON DIVISION \n\nIN RE: \n\nAMERICORE HOLDINGS, LLC, et al.1\n\nChapter 11 \nJointly administered \nCase No.v. \n\nJAMES BIDEN, \n\nCOMPLAINT TO RECOVER FRAUDULENT \nTRANSFER AND FOR TURNOVER \n\nCarol L. Fox, the Chapter 11 Trustee (“Ms.",
+          "time": 5.699496030807495,
+          "input_token_size": 3185,
+          "output_token_size": 92,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_9018a232",
+        "created_at": 1750199854.7374475,
+        "processing_time": 10.726126670837402,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "966fa3e4": {
+      "question": "Where were the wire transfers to James Biden made from?",
+      "answer": "1. PNC Bank, Philadelphia, Pennsylvania  \n2. PNC Bank, Philadelphia, Pennsylvania  \n3. JPMorgan Chase Bank, New York, New York",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance_ids": [
+            5,
+            20,
+            21,
+            22,
+            27,
+            29,
+            31,
+            63,
+            65,
+            66
+          ],
+          "provenance": "19-61607) in the Chapter 11 cases being \n\njointly  administered  under  the  lead  case  of  In  re  Americore  Holdings,  LLC  (Americore \n\nHealth, individually, the “Debtor” and collectively with the jointly administered cases, the \n\n“Debtors”), files this Complaint against James Biden (the “Defendant”), stating as follows: \n\n1 The Debtors in these Chapter 11 cases are (with the last four digits of their federal tax identification numbers \nin  parentheses):  Americore  Holdings,  LLC  (0115);  Americore  Health,  LLC  (6554);  Americore  Health \nEnterprises, LLC (3887); Ellwood Medical Center, LLC (1900); Ellwood Medical Center Real Estate, LLC \n(8799); Ellwood Medical Center Operations, LLC (5283); Pineville Medical Center, LLC (9435); Izard County \nMedical Center, LLC(3388); Success Healthcare 2, LLC (8861); St. Alexius Properties, LLC (4610); and St. \nAlexius Hospital Corporation #1 (2766).7. Upon  information  and  belief,  the  Defendant  is  an  individual  and  a \n\nPennsylvania resident. 8.On  December  31,  2019  (the  “Petition  Date”),  each  of  the  Debtors  filed  a \n\nvoluntary petition with this Court under Chapter 11 of the Bankruptcy Code.2\n\n2 All references to the “Bankruptcy Code” herein refer to Title 11 of the United States Code.2 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 3 of 16\n\n9.On  January  12,  2018,  Americore  Health  wire  transferred  the  sum  of \n\n$400,000.00  to  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia, \n\nPennsylvania.On March 1, 2018, Americore Health wire transferred the sum of $200,000.00 \n\nto  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia,  Pennsylvania.On June 4, 2018, Americore Health wire transferred the sum of $10,000.00 to \n\nDefendant’s bank account at JPMorgan Chase bank, located in New York, New York.: 727260 \ngary.freedman@nelsonmullins.com\nNELSON MULLINS RILEY & SCARBOROUGH LLP\n2 South Biscayne Blvd., 21st Floor \nMiami, FL 33131 \nTelephone: 305.373.9449 \nFacsimile: 305-995-6393 \n\nand \n\nFrank P. Terzo \nFlorida Bar No.3rd Avenue, Suite 2700 \nFt. Lauderdale, FL 33394 \nTelephone: (954) 764-7060  \nFacsimile: (954) 761-8135 \n\nAttorneys for Plaintiff/Trustee\n\n7 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 8 of 16\n\nExhibit “A” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 9 of 16\n\nAmericore Holdings, et al., Debtors. United States Bankruptcy Court - Case No.",
+          "time": 38.936256885528564,
+          "input_token_size": 3600,
+          "output_token_size": 9,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_966fa3e4",
+        "created_at": 1749878117.3641171,
+        "processing_time": 41.02133631706238,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 68,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 68,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.619090"
+      }
+    }
+  },
+  {
+    "a0e36e69": {
+      "question": "When was Carol Fox appointed as the Chapter 11 Trustee?",
+      "answer": "February 21, 2020",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            21,
+            22,
+            23,
+            24
+          ],
+          "provenance_ids": [
+            24
+          ],
+          "provenance": "(Doc. No. 258). 10. On February 21, 2020, the UST filed a Notice of Appointment of Ms. Fox as \n\nChapter 11 Trustee (Doc.",
+          "time": 3.294426441192627,
+          "input_token_size": 3013,
+          "output_token_size": 28,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_a0e36e69",
+        "created_at": 1749878110.6804621,
+        "processing_time": 6.197311639785767,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.628652"
+      }
+    }
+  },
+  {
+    "a87e469e": {
+      "question": "What is the total amount involved in the transfers?",
+      "answer": "$610,000.00",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            51,
+            52,
+            53,
+            54
+          ],
+          "provenance_ids": [
+            54
+          ],
+          "provenance": "Defendant  received  the  Transfers  totaling  $610,000.00  from  Americore \n\nfully herein. property. Health. 27.",
+          "time": 2.919858694076538,
+          "input_token_size": 3855,
+          "output_token_size": 30,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "provenance_ids": [
+            27,
+            29,
+            31
+          ],
+          "provenance": "On  January  12,  2018,  Americore  Health  wire  transferred  the  sum  of \n\n$400,000.00  to  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia, \n\nPennsylvania.On March 1, 2018, Americore Health wire transferred the sum of $200,000.00 \n\nto  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia,  Pennsylvania.On June 4, 2018, Americore Health wire transferred the sum of $10,000.00 to \n\nDefendant’s bank account at JPMorgan Chase bank, located in New York, New York.",
+          "time": 12.78858470916748,
+          "input_token_size": 8954,
+          "output_token_size": 74,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_a87e469e",
+        "created_at": 1750199861.3379962,
+        "processing_time": 15.566985607147217,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 13,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 13,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.628652"
+      }
+    }
+  },
+  {
+    "ab1d50d8": {
+      "question": "What impact did the bridge loan facilitated by Biden have on the Debtors' financial situation?",
+      "answer": "The bridge loan facilitated by Biden had a deleterious impact on the financial affairs of the Debtor and ultimately forced Debtors into bankruptcy.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            38,
+            39,
+            40,
+            41
+          ],
+          "provenance_ids": [
+            39
+          ],
+          "provenance": "Instead,  of  complying  with  his  fiduciary  responsibilities,  Defendant  helped \n\nDebtors procure an ill-advised bridge loan from a hedge fund that had a deleterious impact \n\non the financial affairs of the Debtor and ultimately forced Debtors into bankruptcy, as he \n\nnever delivered the promised the large investment from the Middle East.",
+          "time": 7.072652101516724,
+          "input_token_size": 3878,
+          "output_token_size": 110,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_ab1d50d8",
+        "created_at": 1749878137.3092892,
+        "processing_time": 9.91656231880188,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.629659"
+      }
+    }
+  },
+  {
+    "ac210ba0": {
+      "question": "To which bank was the $200,000.00 transferred on March 1, 2018?",
+      "answer": "PNC Bank",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "provenance_ids": [
+            29
+          ],
+          "provenance": "On March 1, 2018, Americore Health wire transferred the sum of $200,000.00 \n\nto  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia,  Pennsylvania.",
+          "time": 3.9629454612731934,
+          "input_token_size": 3130,
+          "output_token_size": 12,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_ac210ba0",
+        "created_at": 1750199814.7017436,
+        "processing_time": 7.468240022659302,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.629659"
+      }
+    }
+  },
+  {
+    "b9d37ce1": {
+      "question": "What is the purpose of the complaint filed?",
+      "answer": "The purpose of the complaint filed is to recover fraudulent transfers and for turnover.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            1,
+            3
+          ],
+          "provenance": "19-61608 \n\nCAROL FOX, CHAPTER 11 TRUSTEE OF \nAMERICORE HEALTH, LLC \n\nAdversary No.v. \n\nJAMES BIDEN, \n\nCOMPLAINT TO RECOVER FRAUDULENT \nTRANSFER AND FOR TURNOVER \n\nCarol L. Fox, the Chapter 11 Trustee (“Ms.",
+          "time": 4.893882751464844,
+          "input_token_size": 5218,
+          "output_token_size": 117,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_b9d37ce1",
+        "created_at": 1750199847.9307158,
+        "processing_time": 8.016862630844116,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.629659"
+      }
+    }
+  },
+  {
+    "ba93b3fe": {
+      "question": "What is the total amount of money transferred to James Biden?",
+      "answer": "$610,000.00",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            51,
+            52,
+            53,
+            54
+          ],
+          "provenance_ids": [
+            53,
+            54
+          ],
+          "provenance": "The Transfers constituted the transfer of an interest of Americore Health in \n\n26.Defendant  received  the  Transfers  totaling  $610,000.00  from  Americore \n\nfully herein. property. Health. 27.",
+          "time": 4.386101722717285,
+          "input_token_size": 4662,
+          "output_token_size": 31,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "provenance_ids": [
+            27,
+            29,
+            31
+          ],
+          "provenance": "On  January  12,  2018,  Americore  Health  wire  transferred  the  sum  of \n\n$400,000.00  to  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia, \n\nPennsylvania.On March 1, 2018, Americore Health wire transferred the sum of $200,000.00 \n\nto  Defendant’s  bank  account  at  PNC  Bank,  located  in  Philadelphia,  Pennsylvania.On June 4, 2018, Americore Health wire transferred the sum of $10,000.00 to \n\nDefendant’s bank account at JPMorgan Chase bank, located in New York, New York.",
+          "time": 12.975937604904175,
+          "input_token_size": 8978,
+          "output_token_size": 66,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_ba93b3fe",
+        "created_at": 1749878104.0786083,
+        "processing_time": 15.30855131149292,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 13,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 13,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.630658"
+      }
+    }
+  },
+  {
+    "c3b21f6e": {
+      "question": "When was the document filed?",
+      "answer": "07/07/22",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Case 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 1 of 16\n\nUNITED STATES BANKRUPTCY COURT  \nEASTERN DISTRICT OF KENTUCKY  \nLONDON DIVISION \n\nIN RE: \n\nAMERICORE HOLDINGS, LLC, et al.1\n\nChapter 11 \nJointly administered \nCase No.",
+          "time": 4.717678546905518,
+          "input_token_size": 3177,
+          "output_token_size": 20,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            4,
+            5,
+            6,
+            7
+          ],
+          "provenance_ids": [
+            6
+          ],
+          "provenance": "Case 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 2 of 16\n\nI.",
+          "time": 7.233432292938232,
+          "input_token_size": 3582,
+          "output_token_size": 25,
+          "original_provenance_id": 1
+        },
+        {
+          "provenance_id": 2,
+          "input_sentence_ids": [
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24
+          ],
+          "provenance_ids": [
+            22
+          ],
+          "provenance": "2 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 3 of 16\n\n9.",
+          "time": 13.767084121704102,
+          "input_token_size": 5844,
+          "output_token_size": 51,
+          "original_provenance_id": 2
+        },
+        {
+          "provenance_id": 3,
+          "input_sentence_ids": [
+            63,
+            64,
+            65,
+            66,
+            67
+          ],
+          "provenance_ids": [
+            67
+          ],
+          "provenance": "19-61608 (Jointly Administered)\nAmericore Health, LLC - Transfers to James Biden\nPeriod Analyzed from 12/01/16 through 08/31/18\n\nSource:  Debtor's bank records\n\nBank ID\n\nTransaction \nDate\n01/12/18\n03/01/18\n06/04/18\n\nPNC-5328\nPNC-5328\nST-9958\nTotal Cash Disbursements\n\nClear Date\n\nCash Disbursements\n\n01/12/18\n03/01/18\n06/04/18\n\n$             \n              \n                \n$              \n\n400,000.00\n200,000.00\n10,000.00\n610,000.00\n\nB. Riley Advisory Services\n\n Page 1 of 1\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 10 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 11 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 12 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 13 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 14 of 16\n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 15 of 16\n\nExhibit “B” \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 16 of 16",
+          "time": 16.96116328239441,
+          "input_token_size": 11004,
+          "output_token_size": 71,
+          "original_provenance_id": 3
+        },
+        {
+          "provenance_id": 4,
+          "input_sentence_ids": [
+            59,
+            60,
+            61,
+            62
+          ],
+          "provenance_ids": [
+            62
+          ],
+          "provenance": "6 \n\n\fCase 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 7 of 16\n\nDated: July 7, 2022 \n\nRespectfully submitted, \n\n/s/ Gary M. Freedman \nGary M. Freedman \nFlorida Bar No.",
+          "time": 18.60288691520691,
+          "input_token_size": 11249,
+          "output_token_size": 76,
+          "original_provenance_id": 4
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_c3b21f6e",
+        "created_at": 1750199748.5201142,
+        "processing_time": 20.92168879508972,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 25,
+        "provenance_count": 5,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 25,
+            "provenance_count": 5,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.630658"
+      }
+    }
+  },
+  {
+    "c4be0702": {
+      "question": "Who was appointed as Chapter 11 Trustee on February 21, 2020?",
+      "answer": "Carol L. Fox",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33
+          ],
+          "provenance_ids": [
+            3
+          ],
+          "provenance": "v. \n\nJAMES BIDEN, \n\nCOMPLAINT TO RECOVER FRAUDULENT \nTRANSFER AND FOR TURNOVER \n\nCarol L. Fox, the Chapter 11 Trustee (“Ms.",
+          "time": 4.495080232620239,
+          "input_token_size": 3191,
+          "output_token_size": 8,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_c4be0702",
+        "created_at": 1750199834.6246965,
+        "processing_time": 6.588814973831177,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 34,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 34,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.630658"
+      }
+    }
+  },
+  {
+    "d42da8a6": {
+      "question": "What is the jurisdiction of this case?",
+      "answer": "United States Bankruptcy Court, Eastern District of Kentucky, London Division.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Case 22-06032-grs    Doc 1    Filed 07/07/22    Entered 07/07/22 12:58:00    Desc Main\nDocument      Page 1 of 16\n\nUNITED STATES BANKRUPTCY COURT  \nEASTERN DISTRICT OF KENTUCKY  \nLONDON DIVISION \n\nIN RE: \n\nAMERICORE HOLDINGS, LLC, et al.1\n\nChapter 11 \nJointly administered \nCase No.",
+          "time": 3.508843421936035,
+          "input_token_size": 3185,
+          "output_token_size": 50,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_d42da8a6",
+        "created_at": 1750199788.1539602,
+        "processing_time": 7.320120573043823,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.630658"
+      }
+    }
+  },
+  {
+    "de7635f0": {
+      "question": "Who are the Plaintiffs in this document?",
+      "answer": "Carol Fox, Chapter 11 Trustee of Americore Health, LLC",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "19-61608 \n\nCAROL FOX, CHAPTER 11 TRUSTEE OF \nAMERICORE HEALTH, LLC \n\nAdversary No.",
+          "time": 4.4295594692230225,
+          "input_token_size": 3189,
+          "output_token_size": 56,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "US-Bankruptcy-Court-Complaint_de7635f0",
+        "created_at": 1750199821.3565886,
+        "processing_time": 7.817554235458374,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.631657"
+      }
+    }
+  }
+]

@@ -1,0 +1,33 @@
+{
+  "base_name": "R_-_Lt_Press_Interview_Transcript",
+  "questions": [
+    "Who conducted the interview involving Lieutenant Press?",
+    "What section of the Elk Grove Police Department's policy was under review?",
+    "When did the incident involving Officer Schmidt take place?",
+    "Who was the subject involved in the incident with Officer Schmidt?",
+    "What did the CAD report indicate about the presence of weapons?",
+    "How did MP view the kick to Mendoza's head by Officer Schmidt?",
+    "What were MP's concerns about Officer Schmidt's assumptions regarding Mendoza?",
+    "How did Officer Schmidt's actions deviate from standard procedures?",
+    "What were the communication issues identified by MP during the incident?",
+    "How does the document emphasize the importance of factual information in use of force situations?"
+  ],
+  "metadata": {
+    "base_name": "R_-_Lt_Press_Interview_Transcript",
+    "generated_at_iso": "2025-06-11 10:57:54",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 41054,
+    "processed_text_length": 4342,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty",
+    "has_difficulty_levels": true,
+    "source_file": "R_-_Lt_Press_Interview_Transcript_questions_by_difficulty.json",
+    "total_questions": 10
+  }
+}

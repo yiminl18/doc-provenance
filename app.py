@@ -16,4 +16,4 @@ def serve(path):
     return send_from_directory('frontend/build', 'index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=False, use_reloader=False, threaded=True, processes=1) 

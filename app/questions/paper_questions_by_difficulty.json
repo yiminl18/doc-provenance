@@ -1,0 +1,82 @@
+{
+  "document": "paper",
+  "generated_at": "2025-06-11T10:53:19.738994",
+  "questions_by_difficulty": {
+    "easy": {
+      "description": "Easy questions - direct extraction",
+      "questions": [
+        {
+          "id": "easy_1",
+          "question": "What is the name of the tool designed for automated proof optimization?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_2",
+          "question": "Which formal proof verification system does ImProver work with?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_3",
+          "question": "What is the main goal of the ImProver tool?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_4",
+          "question": "Which language model is mentioned as a baseline comparison for ImProver?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_5",
+          "question": "In which datasets was ImProver's performance tested?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "medium": {
+      "description": "Medium questions - simple synthesis",
+      "questions": [
+        {
+          "id": "medium_1",
+          "question": "How does ImProver's performance in length optimization compare to GPT-4o?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_2",
+          "question": "What challenges are associated with using large language models for proof optimization?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_3",
+          "question": "What are the key components of the Chain-of-States technique used by ImProver?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_4",
+          "question": "How does the complexity of datasets affect ImProver's performance?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_5",
+          "question": "What are the limitations of ImProver mentioned in the document?",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "base_name": "paper",
+    "generated_at_iso": "2025-06-11 10:53:19",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 61570,
+    "processed_text_length": 4436,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty"
+  },
+  "total_questions": 10
+}

@@ -410,9 +410,22 @@ def get_primary_page_for_sentence(layout_blocks):
         
     page_weights = {}
     for block in layout_blocks:
-        page = block['page']
-        # Weight by confidence and content length
-        weight = block.get('match_confidence', 0.5) * len(block['text'])
+        page = block.get('page', 1)
+        
+        # Handle different ways text might be stored or missing
+        text_content = ''
+        if 'text' in block:
+            text_content = block['text']
+        elif 'original_element_text' in block:
+            text_content = block['original_element_text']
+        elif 'target_text' in block:
+            text_content = block['target_text']
+        
+        # Weight by confidence and content length (fallback to confidence only if no text)
+        confidence = block.get('match_confidence', 0.5)
+        text_length = len(text_content) if text_content else 1  # Minimum weight of 1
+        
+        weight = confidence * text_length
         page_weights[page] = page_weights.get(page, 0) + weight
     
     if not page_weights:
@@ -445,7 +458,7 @@ def extract_sentences_with_compatible_layout(pdf_path):
     
     return original_sentences, enhanced_sentences, pages_layout
 
-def save_compatible_sentence_data(pdf_path, output_dir=None):
+def save_compatible_sentence_data(pdf_path, output_dir='layouts'):
     """
     Process a PDF and save both traditional sentences and enhanced layout data
     GUARANTEES sentence index compatibility with your existing system
@@ -600,3 +613,18 @@ def full_pdf_preprocess(pdf_directory, pdf_file, output_directory):
     else:
         print("\n❌ FAILURE: Sentence extraction differs from original")
         print("This method would break compatibility with existing provenance data.")
+
+if __name__ == "__main__":
+
+    pdf_director = UPLOADS_DIR
+
+    pdf_files = [f for f in os.listdir(pdf_director) if f.endswith('.pdf')]
+
+    for pdf_file in pdf_files:
+        print(f"\n🔍 Processing PDF: {pdf_file}")
+        try:
+            full_pdf_preprocess(pdf_director, pdf_file, 'layouts')
+        except Exception as e:
+            print(f"❌ Error processing {pdf_file}: {e}")
+            import traceback
+            traceback.print_exc()

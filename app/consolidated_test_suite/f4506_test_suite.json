@@ -1,0 +1,3119 @@
+[
+  {
+    "07c16d1e": {
+      "question": "When must the IRS receive the signed form?",
+      "answer": "The IRS must receive the signed form within 120 days of the signature date.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52
+          ],
+          "provenance_ids": [
+            38
+          ],
+          "provenance": "Note: This form must be received by IRS within 120 days of the signature date.",
+          "time": 10.648309707641602,
+          "input_token_size": 3323,
+          "output_token_size": 40,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_07c16d1e",
+        "created_at": 1749877389.9512787,
+        "processing_time": 13.658452272415161,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 27,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 27,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.714347"
+      }
+    }
+  },
+  {
+    "0836a036": {
+      "question": "Which government department issues Form 4506?",
+      "answer": "Internal Revenue Service",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "provenance_ids": [
+            0,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ],
+          "provenance": "Form  4506\n\n(September 2024)\n\nDepartment of the Treasury  \nInternal Revenue Service \n\nRequest for Copy of Tax Return\n\n▶ Do not sign this form unless all applicable lines have been completed.1a  Name shown on tax return. If a joint return, enter the name shown first.1b  First social security number on tax return, \n\nindividual taxpayer identification number, or \nemployer identification number (see instructions) \n\n2a  If a joint return, enter spouse’s name shown on tax return.2b  Second social security number or individual \n\ntaxpayer identification number if joint tax return \n\n3   Current name, address (including apt., room, or suite no.), city, state, and ZIP code (see instructions).4   Previous address shown on the last return filed if different from line 3 (see instructions).5   If the tax return is to be mailed to a third party (such as a mortgage company), enter the third party’s name, address, and telephone number.6 \n\n7 \n\n8 \n\nCaution: If the tax return is being sent to the third party, ensure that lines 5 through 7 are completed before signing.",
+          "time": 8.518877267837524,
+          "input_token_size": 3791,
+          "output_token_size": 14,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            102,
+            103
+          ],
+          "provenance": "If you have comments concerning the accuracy of \n\nthese time estimates or suggestions for making \nForm 4506 simpler, we would be happy to hear from \nyou.You can write to: \n\nInternal Revenue Service                                    \nTax Forms and Publications Division                        \n1111 Constitution Ave. NW, IR-6526    \nWashington, DC 20224.",
+          "time": 12.506485223770142,
+          "input_token_size": 8361,
+          "output_token_size": 36,
+          "original_provenance_id": 1
+        },
+        {
+          "provenance_id": 2,
+          "input_sentence_ids": [
+            56,
+            57,
+            58
+          ],
+          "provenance_ids": [
+            56,
+            58
+          ],
+          "provenance": "Box 9941  \nMail Stop 6734  \nOgden, UT 84409\n\nMail to: \n\nInternal Revenue Service \nRAIVS Team \nStop 6705 S-2 \nKansas City, MO \n64999\n\nInternal Revenue Service \nRAIVS Team \nP.O.or \nF.P.O. address\n\nSpecific Instructions \nLine 1b.",
+          "time": 18.153276205062866,
+          "input_token_size": 12818,
+          "output_token_size": 63,
+          "original_provenance_id": 2
+        },
+        {
+          "provenance_id": 3,
+          "input_sentence_ids": [
+            53,
+            54,
+            55
+          ],
+          "provenance_ids": [
+            55
+          ],
+          "provenance": "address\n\nConnecticut, Delaware, \nDistrict of Columbia, \nIllinois, Indiana, Iowa, \nKentucky, Maine, \nMaryland, \nMassachusetts, \nMinnesota, Missouri, \nNew Hampshire, New \nJersey, New York, \nPennsylvania, Rhode \nIsland, Vermont, Virginia, \nWest Virginia, Wisconsin\n\nAlaska, California, \nColorado, Hawaii, Idaho, \nKansas, Michigan, \nMontana, Nebraska, \nNevada, North Dakota, \nOhio, Oregon, South \nDakota, Utah, \nWashington, Wyoming\n\nInternal Revenue Service \nRAIVS Team \nStop 6716 AUSC \nAustin, TX 73301\n\nInternal Revenue Service \nRAIVS Team \nStop 6705 S-2 \nKansas City, MO 64999\n\nInternal Revenue Service \nRAIVS Team \nP.O.",
+          "time": 19.199973106384277,
+          "input_token_size": 13178,
+          "output_token_size": 66,
+          "original_provenance_id": 3
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_0836a036",
+        "created_at": 1750197490.4765298,
+        "processing_time": 21.02235174179077,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 23,
+        "provenance_count": 4,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 23,
+            "provenance_count": 4,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.714347"
+      }
+    }
+  },
+  {
+    "103c7a70": {
+      "question": "What are the steps required if a tax return is to be sent to a third party?",
+      "answer": "1. Complete all applicable lines on Form 4506.\n2. Enter the third party’s name, address, and telephone number on line 5.\n3. Ensure lines 5 through 7 are completed before signing.\n4. Sign and date the form.\n5. Include payment of the $30 fee.\n6. Mail Form 4506 to the appropriate address based on the state of residence when the return was filed.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            11,
+            12,
+            13,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            31,
+            34,
+            50,
+            51,
+            53,
+            71,
+            73,
+            74,
+            77,
+            78,
+            80,
+            81,
+            82,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance": "Form  4506\n\n(September 2024)\n\nDepartment of the Treasury  \nInternal Revenue Service \n\nRequest for Copy of Tax Return\n\n▶ Do not sign this form unless all applicable lines have been completed.▶ Request may be rejected if the form is incomplete or illegible.▶ For more information about Form 4506, visit www.irs.gov/form4506. OMB No.1545-0429\n\nTip: Get faster service: Online at www.irs.gov, Get Your Tax Record (Get Transcript) or by calling 1-800-908-9946 for specialized assistance.Note:  Taxpayers  may  register  to  use  Get  Transcript  to  view,  print,  or  download  the  following  transcript  types:  Tax \nReturn Transcript (shows most line items including Adjusted Gross Income (AGI) from your original Form 1040-series tax return as filed, along with \nany forms and schedules), Tax Account Transcript (shows basic data such as return type, marital status, AGI, taxable income and all payment types), \nRecord  of  Account  Transcript  (combines  the  tax  return  and  tax  account  transcripts  into  one  complete  transcript),  Wage  and  Income  Transcript \n(shows  data  from  information  returns  we  receive  such  as  Forms  W-2,  1099,  1098  and  Form  5498),  and  Verification  of  Non-filing  Letter  (provides \nproof that the IRS has no record of a filed Form 1040-series tax return for the year you request).1a  Name shown on tax return. If a joint return, enter the name shown first.1b  First social security number on tax return, \n\nindividual taxpayer identification number, or \nemployer identification number (see instructions) \n\n2a  If a joint return, enter spouse’s name shown on tax return.2b  Second social security number or individual \n\ntaxpayer identification number if joint tax return \n\n3   Current name, address (including apt., room, or suite no.), city, state, and ZIP code (see instructions).5   If the tax return is to be mailed to a third party (such as a mortgage company), enter the third party’s name, address, and telephone number.6 \n\n7 \n\n8 \n\nCaution: If the tax return is being sent to the third party, ensure that lines 5 through 7 are completed before signing.(see instructions). Tax  return  requested.and  all  attachments  as  originally  submitted  to  the  IRS,  including  Form(s)  W-2, \nschedules,  or  amended  returns.Copies  of  Forms  1040,  1040A,  and  1040EZ  are  generally  available  for  7  years  from  filing  before  they  are \ndestroyed by law.Other returns may be available for a longer period of time. Enter only one return number.If you need more than one \ntype of return, you must complete another Form 4506.▶\n\nNote: If the copies must be certified for court or administrative proceedings, check here  .. . . . . . . . . . . . . . Year or period requested.Enter the ending date of the tax year or period using the mm/dd/yyyy format (see instructions)./ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\nFee.There is a $30 fee for each return requested.Full payment must be included with your request or it will \nbe rejected.Make your check or money order payable to “United States Treasury.” Enter your SSN, ITIN, \nor EIN and “Form 4506 request” on your check or money order\n\n.a  Cost for each return \n. b  Number of returns requested on line 7  .. c  Total cost. Multiply line 8a by line 8b \n\n. . .. . . . . . . . . . . . . . . .Caution: Do not sign this form unless all applicable lines have been complete\nSignature of taxpayer(s).How long will it take? It may take up to 75  \ncalendar days for us to process your request. Where to file.Attach payment and mail Form 4506 \nto the address below for the state you lived in, or the \nstate your business was in, when that return was \nfiled.If you are requesting a return for more than one \n\nyear or period and the chart below shows two \ndifferent addresses, send your request based on the \naddress of your most recent return.Ensure that all applicable lines, including lines 5 \nthrough 7, are completed before signing. ▲!The form will not be \n\nCAUTION\nprocessed and returned to you if the box is \nunchecked.Page  2 \n\nIndividuals. Copies of jointly filed tax returns may \nbe furnished to either spouse.If you changed your \nname, also sign your current name. Corporations.Generally, Form 4506 can be \n\nsigned by: (1) an officer having legal authority to bind \nthe corporation, (2) any person designated by the \nboard of directors or other governing body, or (3) \nany officer or employee on written request by any \nprincipal officer and attested to by the secretary or  \nother officer.Partnerships. Generally, Form 4506 can be  \nsigned by any person who was a member of the \npartnership during any part of the tax period \nrequested on line 7. All others.See section 6103(e) if the taxpayer has \n\ndied, is insolvent, is a dissolved corporation, or if a \ntrustee, guardian, executor, receiver, or \nadministrator is acting for the taxpayer.Note: If you are Heir at law, Next of kin, or \nBeneficiary you must be able to establish a material \ninterest in the estate or trust.For \nexample, this could be the letter from the principal \nofficer authorizing an employee of the corporation or \nthe letters testamentary authorizing an individual to \nact for an estate.Signature by a representative.A representative \ncan sign Form 4506 for a taxpayer only if this \nauthority has been specifically delegated to the \nrepresentative on Form 2848, line 5a.Form 2848 \nshowing the delegation must be attached to Form \n4506.Privacy Act and Paperwork Reduction Act  \nNotice.We ask for the information on this form to \nestablish your right to gain access to the requested \nreturn(s) under the Internal Revenue Code.We need \nthis information to properly identify the return(s) and \nrespond to your request.If you request a copy of a \ntax return, sections 6103 and 6109 require you to \nprovide this information, including your SSN or EIN, \nto process your request.If you do not provide this \ninformation, we may not be able to process your \nrequest.Providing false or fraudulent information \nmay subject you to penalties.Routine uses of this information include giving it to \n\nthe Department of Justice for civil and criminal \nlitigation, and cities, states, the District of Columbia, \nand U.S. commonwealths and possessions for use \nin administering their tax laws.We may also  \ndisclose this information to other countries under a \ntax treaty, to federal and state agencies to enforce \nfederal nontax criminal laws, or to federal law \nenforcement and intelligence agencies to combat \nterrorism.You are not required to provide the information \nrequested on a form that is subject to the Paperwork \nReduction Act unless the form displays a valid OMB \ncontrol number.Books or records relating to a form  \nor its instructions must be retained as long as their \ncontents may become material in the administration \nof any Internal Revenue law.Generally, tax returns \nand return information are confidential, as required \nby section 6103.The time needed to complete and file Form 4506 \nwill vary depending on individual circumstances.The \nestimated average time is: Learning about the law \nor the form, 10 min.; Preparing the form, 16 min. ; \nand Copying, assembling, and sending the form  \nto the IRS, 20 min.If you have comments concerning the accuracy of \n\nthese time estimates or suggestions for making \nForm 4506 simpler, we would be happy to hear from \nyou.You can write to: \n\nInternal Revenue Service                                    \nTax Forms and Publications Division                        \n1111 Constitution Ave. NW, IR-6526    \nWashington, DC 20224.Do not send the form to this address.Instead, see \n\nWhere to file on this page.",
+          "time": 184.2043206691742,
+          "input_token_size": 3630,
+          "output_token_size": 278,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_103c7a70",
+        "created_at": 1749877408.9721813,
+        "processing_time": 187.347642660141,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 106,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 106,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.714347"
+      }
+    }
+  },
+  {
+    "2dd7762a": {
+      "question": "What is the purpose of Form 4506?",
+      "answer": "Use Form 4506 to request a copy of your tax return. You can also designate a third party to receive the tax return.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            30,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            41,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            56,
+            57,
+            58,
+            60,
+            61,
+            66,
+            67,
+            68,
+            70,
+            74,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            93,
+            95,
+            96,
+            97,
+            98,
+            99,
+            103,
+            104
+          ],
+          "provenance": "▶ Request may be rejected if the form is incomplete or illegible.▶ For more information about Form 4506, visit www.irs.gov/form4506. OMB No.1545-0429\n\nTip: Get faster service: Online at www.irs.gov, Get Your Tax Record (Get Transcript) or by calling 1-800-908-9946 for specialized assistance.We \nhave  teams  available  to  assist.Note:  Taxpayers  may  register  to  use  Get  Transcript  to  view,  print,  or  download  the  following  transcript  types:  Tax \nReturn Transcript (shows most line items including Adjusted Gross Income (AGI) from your original Form 1040-series tax return as filed, along with \nany forms and schedules), Tax Account Transcript (shows basic data such as return type, marital status, AGI, taxable income and all payment types), \nRecord  of  Account  Transcript  (combines  the  tax  return  and  tax  account  transcripts  into  one  complete  transcript),  Wage  and  Income  Transcript \n(shows  data  from  information  returns  we  receive  such  as  Forms  W-2,  1099,  1098  and  Form  5498),  and  Verification  of  Non-filing  Letter  (provides \nproof that the IRS has no record of a filed Form 1040-series tax return for the year you request).1a  Name shown on tax return. If a joint return, enter the name shown first.1b  First social security number on tax return, \n\nindividual taxpayer identification number, or \nemployer identification number (see instructions) \n\n2a  If a joint return, enter spouse’s name shown on tax return.), city, state, and ZIP code (see instructions).4   Previous address shown on the last return filed if different from line 3 (see instructions).5   If the tax return is to be mailed to a third party (such as a mortgage company), enter the third party’s name, address, and telephone number.6 \n\n7 \n\n8 \n\nCaution: If the tax return is being sent to the third party, ensure that lines 5 through 7 are completed before signing.(see instructions). Tax  return  requested.Form  1040,  1120,  941,  etc.. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .. . . . . . . . . . . . $ \n\n. . . . 9 \n\n$ \n\n. . . .Caution: Do not sign this form unless all applicable lines have been complete\nSignature of taxpayer(s).I declare that I am either the taxpayer whose name is shown on line 1a or 2a, or a person authorized to obtain the tax return \nrequested.If the request applies to a joint return, at least one spouse must sign.If signed by a corporate officer, 1 percent or more shareholder, partner, \nmanaging member, guardian, tax matters partner, executor, receiver, administrator, trustee, or party other than the taxpayer, I certify that I have the authority to \nexecute Form 4506 on behalf of the taxpayer.Cat. No. 41721E \n\nForm 4506 (Rev. 9-2024) \n\n\fForm 4506 (Rev.Internal \nRevenue Code, Section 6103(c), limits disclosure \nand use of return information received pursuant to \nthe taxpayer’s consent and holds the recipient \nsubject to penalties for any unauthorized access, \nother use, or redisclosure without the taxpayer’s \nexpress permission or request. Taxpayer Notification.Internal Revenue Code, \nSection 6103(c), limits disclosure and use of return \ninformation provided pursuant to your consent and \nholds the recipient subject to penalties, brought by \nprivate right of action, for any unauthorized access, \nother use, or redisclosure without your express \npermission or request.Purpose of form. Use Form 4506 to request a copy \nof your tax return.You can also designate (on line 5) \na third party to receive the tax return.How long will it take? It may take up to 75  \ncalendar days for us to process your request. Where to file.Attach payment and mail Form 4506 \nto the address below for the state you lived in, or the \nstate your business was in, when that return was \nfiled.There are two address charts: one for \nindividual returns (Form 1040 series) and one for all \nother returns.Box 9941  \nMail Stop 6734  \nOgden, UT 84409\n\nMail to: \n\nInternal Revenue Service \nRAIVS Team \nStop 6705 S-2 \nKansas City, MO \n64999\n\nInternal Revenue Service \nRAIVS Team \nP.O.Box 9941 \nMail Stop 6734 \nOgden, UT 84409\n\nFor returns not in \nForm 1040 series, \nif the address on \nthe return was in:\n\nConnecticut, Delaware, \nDistrict of Columbia, \nGeorgia, Illinois, Indiana, \nKentucky, Maine, \nMaryland, \nMassachusetts, \nMichigan, New \nHampshire, New Jersey, \nNew York, North \nCarolina, Ohio, \nPennsylvania, Rhode \nIsland, South Carolina, \nTennessee, Vermont, \nVirginia, West Virginia, \nWisconsin\n\nAlabama, Alaska, \nArizona, Arkansas, \nCalifornia, Colorado, \nFlorida, Hawaii, Idaho, \nIowa, Kansas, Louisiana, \nMinnesota, Mississippi, \nMissouri, Montana, \nNebraska, Nevada, New \nMexico, North Dakota, \nOklahoma, Oregon, \nSouth Dakota, Texas, \nUtah, Washington, \nWyoming, a foreign \ncountry, American \nSamoa, Puerto Rico, \nGuam, the \nCommonwealth of the \nNorthern Mariana \nIslands, the U.S. Virgin \nIslands, or A.P.O.or \nF.P.O. address\n\nSpecific Instructions \nLine 1b.For example, if you are requesting Form \n1040 that includes Schedule C (Form 1040), enter \nyour SSN.Line 3. Enter your current address. If you use a P.O.This may be a \ncalendar year, fiscal year or quarter.Enter each \nquarter requested for quarterly returns.Example: \nEnter 12/31/2018 for a calendar year 2018 Form \n1040 return, or 03/31/2017 for a first quarter Form \n941 return.The \nIRS must receive Form 4506 within 120 days of the \ndate signed by the taxpayer or it will be rejected.Page  2 \n\nIndividuals. Copies of jointly filed tax returns may \nbe furnished to either spouse.If you changed your \nname, also sign your current name. Corporations.Generally, Form 4506 can be \n\nsigned by: (1) an officer having legal authority to bind \nthe corporation, (2) any person designated by the \nboard of directors or other governing body, or (3) \nany officer or employee on written request by any \nprincipal officer and attested to by the secretary or  \nother officer.A bona fide shareholder of record \nowning 1 percent or more of the outstanding stock \nof the corporation may submit a Form 4506 but must \nprovide documentation to support the requester's \nright to receive the information.Partnerships. Generally, Form 4506 can be  \nsigned by any person who was a member of the \npartnership during any part of the tax period \nrequested on line 7. All others.See section 6103(e) if the taxpayer has \n\ndied, is insolvent, is a dissolved corporation, or if a \ntrustee, guardian, executor, receiver, or \nadministrator is acting for the taxpayer.Note: If you are Heir at law, Next of kin, or \nBeneficiary you must be able to establish a material \ninterest in the estate or trust.Documentation. For entities other than individuals, \nyou must attach the authorization document.For \nexample, this could be the letter from the principal \nofficer authorizing an employee of the corporation or \nthe letters testamentary authorizing an individual to \nact for an estate.Signature by a representative.A representative \ncan sign Form 4506 for a taxpayer only if this \nauthority has been specifically delegated to the \nrepresentative on Form 2848, line 5a.Form 2848 \nshowing the delegation must be attached to Form \n4506.Privacy Act and Paperwork Reduction Act  \nNotice.Providing false or fraudulent information \nmay subject you to penalties.We may also  \ndisclose this information to other countries under a \ntax treaty, to federal and state agencies to enforce \nfederal nontax criminal laws, or to federal law \nenforcement and intelligence agencies to combat \nterrorism.You are not required to provide the information \nrequested on a form that is subject to the Paperwork \nReduction Act unless the form displays a valid OMB \ncontrol number.Books or records relating to a form  \nor its instructions must be retained as long as their \ncontents may become material in the administration \nof any Internal Revenue law.Generally, tax returns \nand return information are confidential, as required \nby section 6103.The time needed to complete and file Form 4506 \nwill vary depending on individual circumstances.You can write to: \n\nInternal Revenue Service                                    \nTax Forms and Publications Division                        \n1111 Constitution Ave. NW, IR-6526    \nWashington, DC 20224.Do not send the form to this address.",
+          "time": 73.61168050765991,
+          "input_token_size": 3614,
+          "output_token_size": 31,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_2dd7762a",
+        "created_at": 1750197484.0327616,
+        "processing_time": 75.4826443195343,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 106,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 106,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.714347"
+      }
+    }
+  },
+  {
+    "3706323a": {
+      "question": "Who can sign Form 4506 for a corporation?",
+      "answer": "1. An officer having legal authority to bind the corporation  \n2. Any person designated by the board of directors or other governing body  \n3. Any officer or employee on written request by any principal officer and attested to by the secretary or other officer  \n4. A bona fide shareholder of record owning 1 percent or more of the outstanding stock of the corporation",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            67,
+            70,
+            71,
+            72,
+            78,
+            79,
+            82
+          ],
+          "provenance": "Enter each \nquarter requested for quarterly returns.The \nIRS must receive Form 4506 within 120 days of the \ndate signed by the taxpayer or it will be rejected.Ensure that all applicable lines, including lines 5 \nthrough 7, are completed before signing. ▲!You must check the box in the \nsignature area to acknowledge you \nhave the authority to sign and request \nthe information.Generally, Form 4506 can be \n\nsigned by: (1) an officer having legal authority to bind \nthe corporation, (2) any person designated by the \nboard of directors or other governing body, or (3) \nany officer or employee on written request by any \nprincipal officer and attested to by the secretary or  \nother officer.A bona fide shareholder of record \nowning 1 percent or more of the outstanding stock \nof the corporation may submit a Form 4506 but must \nprovide documentation to support the requester's \nright to receive the information.Note: If you are Heir at law, Next of kin, or \nBeneficiary you must be able to establish a material \ninterest in the estate or trust.",
+          "time": 53.49790573120117,
+          "input_token_size": 5595,
+          "output_token_size": 190,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_3706323a",
+        "created_at": 1750197592.6002362,
+        "processing_time": 56.247040033340454,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 53,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 53,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.722055"
+      }
+    }
+  },
+  {
+    "42b6cb43": {
+      "question": "How do the requirements differ for individuals and partnerships when completing the form?",
+      "answer": "Individuals require only one signature on Form 4506, while partnerships can be signed by any member of the partnership during the tax period requested.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            5,
+            37,
+            38,
+            39,
+            47,
+            48,
+            49,
+            50,
+            54,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            67,
+            69,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            103,
+            104
+          ],
+          "provenance": "Note:  Taxpayers  may  register  to  use  Get  Transcript  to  view,  print,  or  download  the  following  transcript  types:  Tax \nReturn Transcript (shows most line items including Adjusted Gross Income (AGI) from your original Form 1040-series tax return as filed, along with \nany forms and schedules), Tax Account Transcript (shows basic data such as return type, marital status, AGI, taxable income and all payment types), \nRecord  of  Account  Transcript  (combines  the  tax  return  and  tax  account  transcripts  into  one  complete  transcript),  Wage  and  Income  Transcript \n(shows  data  from  information  returns  we  receive  such  as  Forms  W-2,  1099,  1098  and  Form  5498),  and  Verification  of  Non-filing  Letter  (provides \nproof that the IRS has no record of a filed Form 1040-series tax return for the year you request).If signed by a corporate officer, 1 percent or more shareholder, partner, \nmanaging member, guardian, tax matters partner, executor, receiver, administrator, trustee, or party other than the taxpayer, I certify that I have the authority to \nexecute Form 4506 on behalf of the taxpayer.Note: This form must be received by IRS within 120 days of the signature date.Signatory attests that he/she has read the attestation clause and upon so reading \ndeclares that he/she has the authority to sign the Form 4506.Internal Revenue Code, \nSection 6103(c), limits disclosure and use of return \ninformation provided pursuant to your consent and \nholds the recipient subject to penalties, brought by \nprivate right of action, for any unauthorized access, \nother use, or redisclosure without your express \npermission or request.Purpose of form. Use Form 4506 to request a copy \nof your tax return.You can also designate (on line 5) \na third party to receive the tax return.How long will it take? It may take up to 75  \ncalendar days for us to process your request. Where to file.Chart for individual returns    \n(Form 1040 series) \nIf you filed an  \nindividual return  \nand lived in: \n\nMail to: \n\nAlabama, Arizona, \nArkansas, Florida, \nGeorgia, Louisiana, \nMississippi, New Mexico, \nNorth Carolina, \nOklahoma, South \nCarolina, Tennessee, \nTexas, a foreign country, \nAmerican Samoa, Puerto \nRico, Guam, the \nCommonwealth of the \nNorthern Mariana Islands, \nthe U.S. Virgin Islands, or \nA.P.O. or F.P.O.Box 9941 \nMail Stop 6734 \nOgden, UT 84409\n\nFor returns not in \nForm 1040 series, \nif the address on \nthe return was in:\n\nConnecticut, Delaware, \nDistrict of Columbia, \nGeorgia, Illinois, Indiana, \nKentucky, Maine, \nMaryland, \nMassachusetts, \nMichigan, New \nHampshire, New Jersey, \nNew York, North \nCarolina, Ohio, \nPennsylvania, Rhode \nIsland, South Carolina, \nTennessee, Vermont, \nVirginia, West Virginia, \nWisconsin\n\nAlabama, Alaska, \nArizona, Arkansas, \nCalifornia, Colorado, \nFlorida, Hawaii, Idaho, \nIowa, Kansas, Louisiana, \nMinnesota, Mississippi, \nMissouri, Montana, \nNebraska, Nevada, New \nMexico, North Dakota, \nOklahoma, Oregon, \nSouth Dakota, Texas, \nUtah, Washington, \nWyoming, a foreign \ncountry, American \nSamoa, Puerto Rico, \nGuam, the \nCommonwealth of the \nNorthern Mariana \nIslands, the U.S. Virgin \nIslands, or A.P.O.or \nF.P.O. address\n\nSpecific Instructions \nLine 1b.Enter the social security number (SSN) or \nindividual taxpayer identification number (ITIN) for \nthe individual listed on line 1a, or enter the employer \nidentification number (EIN) for the business listed on \nline 1a.For example, if you are requesting Form \n1040 that includes Schedule C (Form 1040), enter \nyour SSN.Line 3. Enter your current address. If you use a P.O.box, please include it on this line 3. Line 4.Enter each \nquarter requested for quarterly returns.Signature and date. Form 4506 must be signed and \ndated by the taxpayer listed on line 1a or 2a.You must check the box in the \nsignature area to acknowledge you \nhave the authority to sign and request \nthe information.The form will not be \n\nCAUTION\nprocessed and returned to you if the box is \nunchecked.Page  2 \n\nIndividuals. Copies of jointly filed tax returns may \nbe furnished to either spouse.Only one signature is \nrequired.Sign Form 4506 exactly as your name \nappeared on the original return.If you changed your \nname, also sign your current name. Corporations.Generally, Form 4506 can be \n\nsigned by: (1) an officer having legal authority to bind \nthe corporation, (2) any person designated by the \nboard of directors or other governing body, or (3) \nany officer or employee on written request by any \nprincipal officer and attested to by the secretary or  \nother officer.A bona fide shareholder of record \nowning 1 percent or more of the outstanding stock \nof the corporation may submit a Form 4506 but must \nprovide documentation to support the requester's \nright to receive the information.Partnerships. Generally, Form 4506 can be  \nsigned by any person who was a member of the \npartnership during any part of the tax period \nrequested on line 7. All others.You can write to: \n\nInternal Revenue Service                                    \nTax Forms and Publications Division                        \n1111 Constitution Ave. NW, IR-6526    \nWashington, DC 20224.Do not send the form to this address.",
+          "time": 87.49798250198364,
+          "input_token_size": 3622,
+          "output_token_size": 97,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_42b6cb43",
+        "created_at": 1749877421.7842684,
+        "processing_time": 89.06007623672485,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 106,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 106,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.722055"
+      }
+    }
+  },
+  {
+    "44f39e98": {
+      "question": "What additional form is needed if a representative signs Form 4506?",
+      "answer": "Form 2848",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            85,
+            86,
+            87
+          ],
+          "provenance_ids": [
+            87
+          ],
+          "provenance": "Form 2848 \nshowing the delegation must be attached to Form \n4506.",
+          "time": 3.7506251335144043,
+          "input_token_size": 3825,
+          "output_token_size": 24,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_44f39e98",
+        "created_at": 1750197560.680573,
+        "processing_time": 6.550961017608643,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.722055"
+      }
+    }
+  },
+  {
+    "4ed1f0d5": {
+      "question": "How can taxpayers ensure faster service when requesting a transcript?",
+      "answer": "Get faster service: Online at www.irs.gov, Get Your Tax Record (Get Transcript) or by calling 1-800-908-9946 for specialized assistance.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5
+          ],
+          "provenance_ids": [
+            3
+          ],
+          "provenance": "1545-0429\n\nTip: Get faster service: Online at www.irs.gov, Get Your Tax Record (Get Transcript) or by calling 1-800-908-9946 for specialized assistance.",
+          "time": 6.1063807010650635,
+          "input_token_size": 3886,
+          "output_token_size": 155,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_4ed1f0d5",
+        "created_at": 1749877402.6745074,
+        "processing_time": 13.433153867721558,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.722055"
+      }
+    }
+  },
+  {
+    "5c11aaf7": {
+      "question": "What is the OMB number for the form?",
+      "answer": "OMB No. 1545-0429",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52
+          ],
+          "provenance_ids": [
+            2,
+            3,
+            27,
+            33,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          "provenance": "▶ For more information about Form 4506, visit www.irs.gov/form4506. OMB No.1545-0429\n\nTip: Get faster service: Online at www.irs.gov, Get Your Tax Record (Get Transcript) or by calling 1-800-908-9946 for specialized assistance.. c  Total cost. Multiply line 8a by line 8b \n\n. . .. . . . . . . . . . . . $ \n\n. . . . 9 \n\n$ \n\n. . . .If signed by a corporate officer, 1 percent or more shareholder, partner, \nmanaging member, guardian, tax matters partner, executor, receiver, administrator, trustee, or party other than the taxpayer, I certify that I have the authority to \nexecute Form 4506 on behalf of the taxpayer.Note: This form must be received by IRS within 120 days of the signature date.Signatory attests that he/she has read the attestation clause and upon so reading \ndeclares that he/she has the authority to sign the Form 4506.See instructions \n\nPhone number of taxpayer on line \n1a or 2a \n\n/ \n\n/ \n\n/ \n\nSign  \nHere \n\n▲ Signature (see instructions) \n▲ Print/Type name\n▲ Spouse’s signature \n▲\n\nPrint/Type name\n\nTitle (if line 1a above is a corporation, partnership, estate, or trust) \n\nDate \n\nDate \n\nFor Privacy Act and Paperwork Reduction Act Notice, see page 2.Cat. No. 41721E \n\nForm 4506 (Rev. 9-2024) \n\n\fForm 4506 (Rev.9-2024) \n\nSection references are to the Internal Revenue Code \nunless otherwise noted.General Instructions \nCaution: Do not sign this form unless all applicable \nlines, including lines 5 through 7, have been \ncompleted.Designated Recipient Notification.Internal \nRevenue Code, Section 6103(c), limits disclosure \nand use of return information received pursuant to \nthe taxpayer’s consent and holds the recipient \nsubject to penalties for any unauthorized access, \nother use, or redisclosure without the taxpayer’s \nexpress permission or request. Taxpayer Notification.Internal Revenue Code, \nSection 6103(c), limits disclosure and use of return \ninformation provided pursuant to your consent and \nholds the recipient subject to penalties, brought by \nprivate right of action, for any unauthorized access, \nother use, or redisclosure without your express \npermission or request.Purpose of form. Use Form 4506 to request a copy \nof your tax return.You can also designate (on line 5) \na third party to receive the tax return.How long will it take? It may take up to 75  \ncalendar days for us to process your request. Where to file.",
+          "time": 20.646377325057983,
+          "input_token_size": 3379,
+          "output_token_size": 15,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_5c11aaf7",
+        "created_at": 1749877396.293395,
+        "processing_time": 22.676798105239868,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 53,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 53,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.722055"
+      }
+    }
+  },
+  {
+    "5c89ef06": {
+      "question": "What should be included with the check or money order for payment?",
+      "answer": "Make your check or money order payable to “United States Treasury.” Enter your SSN, ITIN, or EIN and “Form 4506 request” on your check or money order.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25
+          ],
+          "provenance_ids": [
+            1,
+            8,
+            9,
+            10,
+            12,
+            14,
+            15,
+            16,
+            17,
+            25
+          ],
+          "provenance": "▶ Request may be rejected if the form is incomplete or illegible.2b  Second social security number or individual \n\ntaxpayer identification number if joint tax return \n\n3   Current name, address (including apt., room, or suite no.), city, state, and ZIP code (see instructions).4   Previous address shown on the last return filed if different from line 3 (see instructions).6 \n\n7 \n\n8 \n\nCaution: If the tax return is being sent to the third party, ensure that lines 5 through 7 are completed before signing.Form  1040,  1120,  941,  etc.and  all  attachments  as  originally  submitted  to  the  IRS,  including  Form(s)  W-2, \nschedules,  or  amended  returns.Copies  of  Forms  1040,  1040A,  and  1040EZ  are  generally  available  for  7  years  from  filing  before  they  are \ndestroyed by law.Other returns may be available for a longer period of time. Enter only one return number.Make your check or money order payable to “United States Treasury.” Enter your SSN, ITIN, \nor EIN and “Form 4506 request” on your check or money order\n\n.",
+          "time": 22.25339388847351,
+          "input_token_size": 3513,
+          "output_token_size": 109,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_5c89ef06",
+        "created_at": 1750197567.0176914,
+        "processing_time": 25.59606170654297,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 26,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 26,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.722055"
+      }
+    }
+  },
+  {
+    "5d4813fb": {
+      "question": "What might happen if the form is incomplete or illegible?",
+      "answer": "Request may be rejected.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "▶ Request may be rejected if the form is incomplete or illegible.",
+          "time": 4.309485673904419,
+          "input_token_size": 4006,
+          "output_token_size": 26,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_5d4813fb",
+        "created_at": 1749877415.2979026,
+        "processing_time": 8.313119173049927,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.722055"
+      }
+    }
+  },
+  {
+    "60943201": {
+      "question": "Who must sign Form 4506?",
+      "answer": "Taxpayer(s) must sign Form 4506.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52
+          ],
+          "provenance_ids": [
+            33,
+            34,
+            35,
+            36,
+            52
+          ],
+          "provenance": ". . . . . . . . . . . . $ \n\n. . . . 9 \n\n$ \n\n. . . .Caution: Do not sign this form unless all applicable lines have been complete\nSignature of taxpayer(s).I declare that I am either the taxpayer whose name is shown on line 1a or 2a, or a person authorized to obtain the tax return \nrequested.If the request applies to a joint return, at least one spouse must sign.There are two address charts: one for \nindividual returns (Form 1040 series) and one for all \nother returns.",
+          "time": 16.473775625228882,
+          "input_token_size": 5313,
+          "output_token_size": 37,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_60943201",
+        "created_at": 1750197516.0748837,
+        "processing_time": 18.021303415298462,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 53,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 53,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.722055"
+      }
+    }
+  },
+  {
+    "6f10d9a3": {
+      "question": "To whom may the IRS disclose information from Form 4506?",
+      "answer": "The IRS may disclose information from Form 4506 to:\n\n1. The taxpayer whose name is shown on the form.\n2. A third party designated by the taxpayer on line 5.\n3. The Department of Justice for civil and criminal litigation.\n4. Cities, states, the District of Columbia, and U.S. commonwealths and possessions for use in administering their tax laws.\n5. Other countries under a tax treaty.\n6. Federal and state agencies to enforce federal nontax criminal laws.\n7. Federal law enforcement and intelligence agencies to combat terrorism.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            13,
+            14,
+            15,
+            19,
+            20,
+            22,
+            26,
+            29,
+            30,
+            31,
+            32,
+            34,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            60,
+            61,
+            62,
+            70,
+            73,
+            74,
+            76,
+            78,
+            79,
+            80,
+            81,
+            83,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            99,
+            103
+          ],
+          "provenance": "Form  4506\n\n(September 2024)\n\nDepartment of the Treasury  \nInternal Revenue Service \n\nRequest for Copy of Tax Return\n\n▶ Do not sign this form unless all applicable lines have been completed.▶ Request may be rejected if the form is incomplete or illegible.▶ For more information about Form 4506, visit www.irs.gov/form4506. OMB No.1545-0429\n\nTip: Get faster service: Online at www.irs.gov, Get Your Tax Record (Get Transcript) or by calling 1-800-908-9946 for specialized assistance.We \nhave  teams  available  to  assist.Note:  Taxpayers  may  register  to  use  Get  Transcript  to  view,  print,  or  download  the  following  transcript  types:  Tax \nReturn Transcript (shows most line items including Adjusted Gross Income (AGI) from your original Form 1040-series tax return as filed, along with \nany forms and schedules), Tax Account Transcript (shows basic data such as return type, marital status, AGI, taxable income and all payment types), \nRecord  of  Account  Transcript  (combines  the  tax  return  and  tax  account  transcripts  into  one  complete  transcript),  Wage  and  Income  Transcript \n(shows  data  from  information  returns  we  receive  such  as  Forms  W-2,  1099,  1098  and  Form  5498),  and  Verification  of  Non-filing  Letter  (provides \nproof that the IRS has no record of a filed Form 1040-series tax return for the year you request).(see instructions). Tax  return  requested.Form  1040,  1120,  941,  etc.and  all  attachments  as  originally  submitted  to  the  IRS,  including  Form(s)  W-2, \nschedules,  or  amended  returns.▶\n\nNote: If the copies must be certified for court or administrative proceedings, check here  .. . . . . . . . . . . . . . Year or period requested./ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\nFee.a  Cost for each return \n. b  Number of returns requested on line 7  .If the refund should go to the third party listed on line 5, check here  .. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .Caution: Do not sign this form unless all applicable lines have been complete\nSignature of taxpayer(s).If the request applies to a joint return, at least one spouse must sign.If signed by a corporate officer, 1 percent or more shareholder, partner, \nmanaging member, guardian, tax matters partner, executor, receiver, administrator, trustee, or party other than the taxpayer, I certify that I have the authority to \nexecute Form 4506 on behalf of the taxpayer.Note: This form must be received by IRS within 120 days of the signature date.Signatory attests that he/she has read the attestation clause and upon so reading \ndeclares that he/she has the authority to sign the Form 4506.See instructions \n\nPhone number of taxpayer on line \n1a or 2a \n\n/ \n\n/ \n\n/ \n\nSign  \nHere \n\n▲ Signature (see instructions) \n▲ Print/Type name\n▲ Spouse’s signature \n▲\n\nPrint/Type name\n\nTitle (if line 1a above is a corporation, partnership, estate, or trust) \n\nDate \n\nDate \n\nFor Privacy Act and Paperwork Reduction Act Notice, see page 2.Cat. No. 41721E \n\nForm 4506 (Rev. 9-2024) \n\n\fForm 4506 (Rev.9-2024) \n\nSection references are to the Internal Revenue Code \nunless otherwise noted.Chart for all other returns \n\nFuture Developments\nFor the latest information about Form 4506 and its \ninstructions, go to www.irs.gov/form4506.Purpose of form. Use Form 4506 to request a copy \nof your tax return.You can also designate (on line 5) \na third party to receive the tax return.How long will it take? It may take up to 75  \ncalendar days for us to process your request. Where to file.Attach payment and mail Form 4506 \nto the address below for the state you lived in, or the \nstate your business was in, when that return was \nfiled.There are two address charts: one for \nindividual returns (Form 1040 series) and one for all \nother returns.If you are requesting a return for more than one \n\nyear or period and the chart below shows two \ndifferent addresses, send your request based on the \naddress of your most recent return.Chart for individual returns    \n(Form 1040 series) \nIf you filed an  \nindividual return  \nand lived in: \n\nMail to: \n\nAlabama, Arizona, \nArkansas, Florida, \nGeorgia, Louisiana, \nMississippi, New Mexico, \nNorth Carolina, \nOklahoma, South \nCarolina, Tennessee, \nTexas, a foreign country, \nAmerican Samoa, Puerto \nRico, Guam, the \nCommonwealth of the \nNorthern Mariana Islands, \nthe U.S. Virgin Islands, or \nA.P.O. or F.P.O.address\n\nConnecticut, Delaware, \nDistrict of Columbia, \nIllinois, Indiana, Iowa, \nKentucky, Maine, \nMaryland, \nMassachusetts, \nMinnesota, Missouri, \nNew Hampshire, New \nJersey, New York, \nPennsylvania, Rhode \nIsland, Vermont, Virginia, \nWest Virginia, Wisconsin\n\nAlaska, California, \nColorado, Hawaii, Idaho, \nKansas, Michigan, \nMontana, Nebraska, \nNevada, North Dakota, \nOhio, Oregon, South \nDakota, Utah, \nWashington, Wyoming\n\nInternal Revenue Service \nRAIVS Team \nStop 6716 AUSC \nAustin, TX 73301\n\nInternal Revenue Service \nRAIVS Team \nStop 6705 S-2 \nKansas City, MO 64999\n\nInternal Revenue Service \nRAIVS Team \nP.O.Box 9941  \nMail Stop 6734  \nOgden, UT 84409\n\nMail to: \n\nInternal Revenue Service \nRAIVS Team \nStop 6705 S-2 \nKansas City, MO \n64999\n\nInternal Revenue Service \nRAIVS Team \nP.O.Box 9941 \nMail Stop 6734 \nOgden, UT 84409\n\nFor returns not in \nForm 1040 series, \nif the address on \nthe return was in:\n\nConnecticut, Delaware, \nDistrict of Columbia, \nGeorgia, Illinois, Indiana, \nKentucky, Maine, \nMaryland, \nMassachusetts, \nMichigan, New \nHampshire, New Jersey, \nNew York, North \nCarolina, Ohio, \nPennsylvania, Rhode \nIsland, South Carolina, \nTennessee, Vermont, \nVirginia, West Virginia, \nWisconsin\n\nAlabama, Alaska, \nArizona, Arkansas, \nCalifornia, Colorado, \nFlorida, Hawaii, Idaho, \nIowa, Kansas, Louisiana, \nMinnesota, Mississippi, \nMissouri, Montana, \nNebraska, Nevada, New \nMexico, North Dakota, \nOklahoma, Oregon, \nSouth Dakota, Texas, \nUtah, Washington, \nWyoming, a foreign \ncountry, American \nSamoa, Puerto Rico, \nGuam, the \nCommonwealth of the \nNorthern Mariana \nIslands, the U.S. Virgin \nIslands, or A.P.O.For example, if you are requesting Form \n1040 that includes Schedule C (Form 1040), enter \nyour SSN.Line 3. Enter your current address. If you use a P.O.box, please include it on this line 3. Line 4.The \nIRS must receive Form 4506 within 120 days of the \ndate signed by the taxpayer or it will be rejected.The form will not be \n\nCAUTION\nprocessed and returned to you if the box is \nunchecked.Page  2 \n\nIndividuals. Copies of jointly filed tax returns may \nbe furnished to either spouse.Sign Form 4506 exactly as your name \nappeared on the original return.Generally, Form 4506 can be \n\nsigned by: (1) an officer having legal authority to bind \nthe corporation, (2) any person designated by the \nboard of directors or other governing body, or (3) \nany officer or employee on written request by any \nprincipal officer and attested to by the secretary or  \nother officer.A bona fide shareholder of record \nowning 1 percent or more of the outstanding stock \nof the corporation may submit a Form 4506 but must \nprovide documentation to support the requester's \nright to receive the information.Partnerships. Generally, Form 4506 can be  \nsigned by any person who was a member of the \npartnership during any part of the tax period \nrequested on line 7. All others.See section 6103(e) if the taxpayer has \n\ndied, is insolvent, is a dissolved corporation, or if a \ntrustee, guardian, executor, receiver, or \nadministrator is acting for the taxpayer.Documentation. For entities other than individuals, \nyou must attach the authorization document.Signature by a representative.A representative \ncan sign Form 4506 for a taxpayer only if this \nauthority has been specifically delegated to the \nrepresentative on Form 2848, line 5a.Form 2848 \nshowing the delegation must be attached to Form \n4506.Privacy Act and Paperwork Reduction Act  \nNotice.We ask for the information on this form to \nestablish your right to gain access to the requested \nreturn(s) under the Internal Revenue Code.We need \nthis information to properly identify the return(s) and \nrespond to your request.If you request a copy of a \ntax return, sections 6103 and 6109 require you to \nprovide this information, including your SSN or EIN, \nto process your request.If you do not provide this \ninformation, we may not be able to process your \nrequest.Providing false or fraudulent information \nmay subject you to penalties.Routine uses of this information include giving it to \n\nthe Department of Justice for civil and criminal \nlitigation, and cities, states, the District of Columbia, \nand U.S. commonwealths and possessions for use \nin administering their tax laws.We may also  \ndisclose this information to other countries under a \ntax treaty, to federal and state agencies to enforce \nfederal nontax criminal laws, or to federal law \nenforcement and intelligence agencies to combat \nterrorism.You are not required to provide the information \nrequested on a form that is subject to the Paperwork \nReduction Act unless the form displays a valid OMB \ncontrol number.Books or records relating to a form  \nor its instructions must be retained as long as their \ncontents may become material in the administration \nof any Internal Revenue law.The time needed to complete and file Form 4506 \nwill vary depending on individual circumstances.You can write to: \n\nInternal Revenue Service                                    \nTax Forms and Publications Division                        \n1111 Constitution Ave. NW, IR-6526    \nWashington, DC 20224.",
+          "time": 231.23532152175903,
+          "input_token_size": 3620,
+          "output_token_size": 63,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_6f10d9a3",
+        "created_at": 1750197605.5784366,
+        "processing_time": 234.82295536994934,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 106,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 106,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.724060"
+      }
+    }
+  },
+  {
+    "6f4b9275": {
+      "question": "What happens if the IRS cannot find the requested tax return?",
+      "answer": "If the IRS cannot find the tax return, they will refund the fee.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            26,
+            27,
+            28
+          ],
+          "provenance_ids": [
+            27,
+            28
+          ],
+          "provenance": ". c  Total cost. Multiply line 8a by line 8b \n\n. . .If we cannot find the tax return, we will refund the fee.",
+          "time": 5.244741916656494,
+          "input_token_size": 4771,
+          "output_token_size": 81,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_6f4b9275",
+        "created_at": 1750197535.0844138,
+        "processing_time": 7.275838851928711,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.724060"
+      }
+    }
+  },
+  {
+    "79d1e139": {
+      "question": "What format should the ending date of the tax year be entered in?",
+      "answer": "mm/dd/yyyy",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            62,
+            63,
+            64,
+            65
+          ],
+          "provenance_ids": [
+            65
+          ],
+          "provenance": "Line 7. Enter the end date of the tax year or period \nrequested in mm/dd/yyyy format.",
+          "time": 2.4064223766326904,
+          "input_token_size": 4438,
+          "output_token_size": 15,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            66,
+            67,
+            68
+          ],
+          "provenance_ids": [
+            68
+          ],
+          "provenance": "Example: \nEnter 12/31/2018 for a calendar year 2018 Form \n1040 return, or 03/31/2017 for a first quarter Form \n941 return.",
+          "time": 7.378512144088745,
+          "input_token_size": 6207,
+          "output_token_size": 28,
+          "original_provenance_id": 1
+        },
+        {
+          "provenance_id": 2,
+          "input_sentence_ids": [
+            19,
+            20,
+            21
+          ],
+          "provenance_ids": [
+            21
+          ],
+          "provenance": "Enter the ending date of the tax year or period using the mm/dd/yyyy format (see instructions).",
+          "time": 11.073159217834473,
+          "input_token_size": 10188,
+          "output_token_size": 44,
+          "original_provenance_id": 2
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_79d1e139",
+        "created_at": 1750197547.925318,
+        "processing_time": 14.163169860839844,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 10,
+        "provenance_count": 3,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 10,
+            "provenance_count": 3,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.724060"
+      }
+    }
+  },
+  {
+    "7a132a1d": {
+      "question": "What types of tax returns can be requested with Form 4506?",
+      "answer": "Form 1040, Form 1040A, Form 1040EZ, Form 1120, Form 941.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            11,
+            14,
+            16
+          ],
+          "provenance": "Form  4506\n\n(September 2024)\n\nDepartment of the Treasury  \nInternal Revenue Service \n\nRequest for Copy of Tax Return\n\n▶ Do not sign this form unless all applicable lines have been completed.▶ Request may be rejected if the form is incomplete or illegible.▶ For more information about Form 4506, visit www.irs.gov/form4506. OMB No.1545-0429\n\nTip: Get faster service: Online at www.irs.gov, Get Your Tax Record (Get Transcript) or by calling 1-800-908-9946 for specialized assistance.We \nhave  teams  available  to  assist.5   If the tax return is to be mailed to a third party (such as a mortgage company), enter the third party’s name, address, and telephone number.Form  1040,  1120,  941,  etc.Copies  of  Forms  1040,  1040A,  and  1040EZ  are  generally  available  for  7  years  from  filing  before  they  are \ndestroyed by law.",
+          "time": 21.4188814163208,
+          "input_token_size": 3622,
+          "output_token_size": 63,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_7a132a1d",
+        "created_at": 1750197522.46794,
+        "processing_time": 23.53510069847107,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 106,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 106,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.724060"
+      }
+    }
+  },
+  {
+    "80edadf9": {
+      "question": "What is the title of Form 4506?",
+      "answer": "Request for Copy of Tax Return",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Form  4506\n\n(September 2024)\n\nDepartment of the Treasury  \nInternal Revenue Service \n\nRequest for Copy of Tax Return\n\n▶ Do not sign this form unless all applicable lines have been completed.",
+          "time": 4.8014020919799805,
+          "input_token_size": 4804,
+          "output_token_size": 45,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_80edadf9",
+        "created_at": 1749877370.8310034,
+        "processing_time": 8.007997512817383,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.724060"
+      }
+    }
+  },
+  {
+    "8c91ccbf": {
+      "question": "Where should comments on the time estimates for completing Form 4506 be sent?",
+      "answer": "Internal Revenue Service  \nTax Forms and Publications Division  \n1111 Constitution Ave. NW, IR-6526  \nWashington, DC 20224.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            102,
+            103
+          ],
+          "provenance": "If you have comments concerning the accuracy of \n\nthese time estimates or suggestions for making \nForm 4506 simpler, we would be happy to hear from \nyou.You can write to: \n\nInternal Revenue Service                                    \nTax Forms and Publications Division                        \n1111 Constitution Ave. NW, IR-6526    \nWashington, DC 20224.",
+          "time": 5.7940051555633545,
+          "input_token_size": 3568,
+          "output_token_size": 143,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_8c91ccbf",
+        "created_at": 1750197573.3599896,
+        "processing_time": 9.17253065109253,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.724060"
+      }
+    }
+  },
+  {
+    "9258d320": {
+      "question": "What are the confidentiality considerations mentioned in the document?",
+      "answer": "1. Internal Revenue Code, Section 6103(c), limits disclosure and use of return information received pursuant to the taxpayer’s consent and holds the recipient subject to penalties for any unauthorized access, other use, or redisclosure without the taxpayer’s express permission or request.\n2. Internal Revenue Code, Section 6103(c), limits disclosure and use of return information provided pursuant to your consent and holds the recipient subject to penalties, brought by private right of action, for any unauthorized access, other use, or redisclosure without your express permission or request.\n3. Generally, tax returns and return information are confidential, as required by section 6103.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            5,
+            7,
+            8,
+            13,
+            24,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            37,
+            42,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52
+          ],
+          "provenance": "Form  4506\n\n(September 2024)\n\nDepartment of the Treasury  \nInternal Revenue Service \n\nRequest for Copy of Tax Return\n\n▶ Do not sign this form unless all applicable lines have been completed.▶ Request may be rejected if the form is incomplete or illegible.Note:  Taxpayers  may  register  to  use  Get  Transcript  to  view,  print,  or  download  the  following  transcript  types:  Tax \nReturn Transcript (shows most line items including Adjusted Gross Income (AGI) from your original Form 1040-series tax return as filed, along with \nany forms and schedules), Tax Account Transcript (shows basic data such as return type, marital status, AGI, taxable income and all payment types), \nRecord  of  Account  Transcript  (combines  the  tax  return  and  tax  account  transcripts  into  one  complete  transcript),  Wage  and  Income  Transcript \n(shows  data  from  information  returns  we  receive  such  as  Forms  W-2,  1099,  1098  and  Form  5498),  and  Verification  of  Non-filing  Letter  (provides \nproof that the IRS has no record of a filed Form 1040-series tax return for the year you request).1b  First social security number on tax return, \n\nindividual taxpayer identification number, or \nemployer identification number (see instructions) \n\n2a  If a joint return, enter spouse’s name shown on tax return.2b  Second social security number or individual \n\ntaxpayer identification number if joint tax return \n\n3   Current name, address (including apt., room, or suite no.(see instructions). Tax  return  requested.Full payment must be included with your request or it will \nbe rejected.. c  Total cost. Multiply line 8a by line 8b \n\n. . .If we cannot find the tax return, we will refund the fee.If the refund should go to the third party listed on line 5, check here  .. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .If signed by a corporate officer, 1 percent or more shareholder, partner, \nmanaging member, guardian, tax matters partner, executor, receiver, administrator, trustee, or party other than the taxpayer, I certify that I have the authority to \nexecute Form 4506 on behalf of the taxpayer.9-2024) \n\nSection references are to the Internal Revenue Code \nunless otherwise noted.Designated Recipient Notification.Internal \nRevenue Code, Section 6103(c), limits disclosure \nand use of return information received pursuant to \nthe taxpayer’s consent and holds the recipient \nsubject to penalties for any unauthorized access, \nother use, or redisclosure without the taxpayer’s \nexpress permission or request. Taxpayer Notification.Internal Revenue Code, \nSection 6103(c), limits disclosure and use of return \ninformation provided pursuant to your consent and \nholds the recipient subject to penalties, brought by \nprivate right of action, for any unauthorized access, \nother use, or redisclosure without your express \npermission or request.Purpose of form. Use Form 4506 to request a copy \nof your tax return.You can also designate (on line 5) \na third party to receive the tax return.How long will it take? It may take up to 75  \ncalendar days for us to process your request. Where to file.Attach payment and mail Form 4506 \nto the address below for the state you lived in, or the \nstate your business was in, when that return was \nfiled.There are two address charts: one for \nindividual returns (Form 1040 series) and one for all \nother returns.",
+          "time": 109.67711019515991,
+          "input_token_size": 3379,
+          "output_token_size": 204,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_9258d320",
+        "created_at": 1749877428.0878243,
+        "processing_time": 114.11629486083984,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 53,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 53,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.724060"
+      }
+    }
+  },
+  {
+    "c1af2ae7": {
+      "question": "Who can sign the form for a corporation?",
+      "answer": "1. An officer having legal authority to bind the corporation  \n2. Any person designated by the board of directors or other governing body  \n3. Any officer or employee on written request by any principal officer and attested to by the secretary or other officer  \n4. A bona fide shareholder of record owning 1 percent or more of the outstanding stock of the corporation",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            41,
+            49,
+            51,
+            53,
+            54,
+            55,
+            56,
+            57,
+            69,
+            70,
+            78,
+            79
+          ],
+          "provenance": "Cat. No. 41721E \n\nForm 4506 (Rev. 9-2024) \n\n\fForm 4506 (Rev.You can also designate (on line 5) \na third party to receive the tax return.Attach payment and mail Form 4506 \nto the address below for the state you lived in, or the \nstate your business was in, when that return was \nfiled.If you are requesting a return for more than one \n\nyear or period and the chart below shows two \ndifferent addresses, send your request based on the \naddress of your most recent return.Chart for individual returns    \n(Form 1040 series) \nIf you filed an  \nindividual return  \nand lived in: \n\nMail to: \n\nAlabama, Arizona, \nArkansas, Florida, \nGeorgia, Louisiana, \nMississippi, New Mexico, \nNorth Carolina, \nOklahoma, South \nCarolina, Tennessee, \nTexas, a foreign country, \nAmerican Samoa, Puerto \nRico, Guam, the \nCommonwealth of the \nNorthern Mariana Islands, \nthe U.S. Virgin Islands, or \nA.P.O. or F.P.O.address\n\nConnecticut, Delaware, \nDistrict of Columbia, \nIllinois, Indiana, Iowa, \nKentucky, Maine, \nMaryland, \nMassachusetts, \nMinnesota, Missouri, \nNew Hampshire, New \nJersey, New York, \nPennsylvania, Rhode \nIsland, Vermont, Virginia, \nWest Virginia, Wisconsin\n\nAlaska, California, \nColorado, Hawaii, Idaho, \nKansas, Michigan, \nMontana, Nebraska, \nNevada, North Dakota, \nOhio, Oregon, South \nDakota, Utah, \nWashington, Wyoming\n\nInternal Revenue Service \nRAIVS Team \nStop 6716 AUSC \nAustin, TX 73301\n\nInternal Revenue Service \nRAIVS Team \nStop 6705 S-2 \nKansas City, MO 64999\n\nInternal Revenue Service \nRAIVS Team \nP.O.Box 9941  \nMail Stop 6734  \nOgden, UT 84409\n\nMail to: \n\nInternal Revenue Service \nRAIVS Team \nStop 6705 S-2 \nKansas City, MO \n64999\n\nInternal Revenue Service \nRAIVS Team \nP.O.Box 9941 \nMail Stop 6734 \nOgden, UT 84409\n\nFor returns not in \nForm 1040 series, \nif the address on \nthe return was in:\n\nConnecticut, Delaware, \nDistrict of Columbia, \nGeorgia, Illinois, Indiana, \nKentucky, Maine, \nMaryland, \nMassachusetts, \nMichigan, New \nHampshire, New Jersey, \nNew York, North \nCarolina, Ohio, \nPennsylvania, Rhode \nIsland, South Carolina, \nTennessee, Vermont, \nVirginia, West Virginia, \nWisconsin\n\nAlabama, Alaska, \nArizona, Arkansas, \nCalifornia, Colorado, \nFlorida, Hawaii, Idaho, \nIowa, Kansas, Louisiana, \nMinnesota, Mississippi, \nMissouri, Montana, \nNebraska, Nevada, New \nMexico, North Dakota, \nOklahoma, Oregon, \nSouth Dakota, Texas, \nUtah, Washington, \nWyoming, a foreign \ncountry, American \nSamoa, Puerto Rico, \nGuam, the \nCommonwealth of the \nNorthern Mariana \nIslands, the U.S. Virgin \nIslands, or A.P.O.Signature and date. Form 4506 must be signed and \ndated by the taxpayer listed on line 1a or 2a.The \nIRS must receive Form 4506 within 120 days of the \ndate signed by the taxpayer or it will be rejected.Generally, Form 4506 can be \n\nsigned by: (1) an officer having legal authority to bind \nthe corporation, (2) any person designated by the \nboard of directors or other governing body, or (3) \nany officer or employee on written request by any \nprincipal officer and attested to by the secretary or  \nother officer.A bona fide shareholder of record \nowning 1 percent or more of the outstanding stock \nof the corporation may submit a Form 4506 but must \nprovide documentation to support the requester's \nright to receive the information.",
+          "time": 79.0900776386261,
+          "input_token_size": 3612,
+          "output_token_size": 91,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_c1af2ae7",
+        "created_at": 1749877377.1779213,
+        "processing_time": 82.0193018913269,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 106,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 106,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.724060"
+      }
+    }
+  },
+  {
+    "ce939e0f": {
+      "question": "What document must be attached for entities other than individuals?",
+      "answer": "You must attach the authorization document.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            4,
+            8,
+            9,
+            10,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            34,
+            35,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            59,
+            78,
+            79,
+            81,
+            83,
+            85,
+            86,
+            88,
+            89,
+            90,
+            91,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103
+          ],
+          "provenance": "We \nhave  teams  available  to  assist.2b  Second social security number or individual \n\ntaxpayer identification number if joint tax return \n\n3   Current name, address (including apt., room, or suite no.), city, state, and ZIP code (see instructions).4   Previous address shown on the last return filed if different from line 3 (see instructions).6 \n\n7 \n\n8 \n\nCaution: If the tax return is being sent to the third party, ensure that lines 5 through 7 are completed before signing.(see instructions). Tax  return  requested.Form  1040,  1120,  941,  etc.and  all  attachments  as  originally  submitted  to  the  IRS,  including  Form(s)  W-2, \nschedules,  or  amended  returns.Copies  of  Forms  1040,  1040A,  and  1040EZ  are  generally  available  for  7  years  from  filing  before  they  are \ndestroyed by law.Other returns may be available for a longer period of time. Enter only one return number.If you need more than one \ntype of return, you must complete another Form 4506.▶\n\nNote: If the copies must be certified for court or administrative proceedings, check here  .. . . . . . . . . . . . . . Year or period requested.Enter the ending date of the tax year or period using the mm/dd/yyyy format (see instructions)./ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\nFee.There is a $30 fee for each return requested.Full payment must be included with your request or it will \nbe rejected.Make your check or money order payable to “United States Treasury.” Enter your SSN, ITIN, \nor EIN and “Form 4506 request” on your check or money order\n\n.. c  Total cost. Multiply line 8a by line 8b \n\n. . .If we cannot find the tax return, we will refund the fee.If the refund should go to the third party listed on line 5, check here  .. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .Caution: Do not sign this form unless all applicable lines have been complete\nSignature of taxpayer(s).I declare that I am either the taxpayer whose name is shown on line 1a or 2a, or a person authorized to obtain the tax return \nrequested.Purpose of form. Use Form 4506 to request a copy \nof your tax return.You can also designate (on line 5) \na third party to receive the tax return.How long will it take? It may take up to 75  \ncalendar days for us to process your request. Where to file.Attach payment and mail Form 4506 \nto the address below for the state you lived in, or the \nstate your business was in, when that return was \nfiled.There are two address charts: one for \nindividual returns (Form 1040 series) and one for all \nother returns.If you are requesting a return for more than one \n\nyear or period and the chart below shows two \ndifferent addresses, send your request based on the \naddress of your most recent return.Enter the social security number (SSN) or \nindividual taxpayer identification number (ITIN) for \nthe individual listed on line 1a, or enter the employer \nidentification number (EIN) for the business listed on \nline 1a.Generally, Form 4506 can be \n\nsigned by: (1) an officer having legal authority to bind \nthe corporation, (2) any person designated by the \nboard of directors or other governing body, or (3) \nany officer or employee on written request by any \nprincipal officer and attested to by the secretary or  \nother officer.A bona fide shareholder of record \nowning 1 percent or more of the outstanding stock \nof the corporation may submit a Form 4506 but must \nprovide documentation to support the requester's \nright to receive the information.See section 6103(e) if the taxpayer has \n\ndied, is insolvent, is a dissolved corporation, or if a \ntrustee, guardian, executor, receiver, or \nadministrator is acting for the taxpayer.Documentation. For entities other than individuals, \nyou must attach the authorization document.Signature by a representative.A representative \ncan sign Form 4506 for a taxpayer only if this \nauthority has been specifically delegated to the \nrepresentative on Form 2848, line 5a.Privacy Act and Paperwork Reduction Act  \nNotice.We ask for the information on this form to \nestablish your right to gain access to the requested \nreturn(s) under the Internal Revenue Code.We need \nthis information to properly identify the return(s) and \nrespond to your request.If you request a copy of a \ntax return, sections 6103 and 6109 require you to \nprovide this information, including your SSN or EIN, \nto process your request.Generally, tax returns \nand return information are confidential, as required \nby section 6103.The time needed to complete and file Form 4506 \nwill vary depending on individual circumstances.The \nestimated average time is: Learning about the law \nor the form, 10 min.; Preparing the form, 16 min. ; \nand Copying, assembling, and sending the form  \nto the IRS, 20 min.If you have comments concerning the accuracy of \n\nthese time estimates or suggestions for making \nForm 4506 simpler, we would be happy to hear from \nyou.You can write to: \n\nInternal Revenue Service                                    \nTax Forms and Publications Division                        \n1111 Constitution Ave. NW, IR-6526    \nWashington, DC 20224.",
+          "time": 54.41567397117615,
+          "input_token_size": 3616,
+          "output_token_size": 22,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_ce939e0f",
+        "created_at": 1750197579.7400966,
+        "processing_time": 56.31610727310181,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 106,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 106,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.726065"
+      }
+    }
+  },
+  {
+    "d8cfb618": {
+      "question": "What is the fee for requesting a tax return copy using Form 4506?",
+      "answer": "$30",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            22,
+            23,
+            24,
+            25
+          ],
+          "provenance_ids": [
+            23
+          ],
+          "provenance": "There is a $30 fee for each return requested.",
+          "time": 4.7188475131988525,
+          "input_token_size": 3339,
+          "output_token_size": 11,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_d8cfb618",
+        "created_at": 1750197503.323996,
+        "processing_time": 8.545126676559448,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.726065"
+      }
+    }
+  },
+  {
+    "da2339b8": {
+      "question": "What information must be included if sending the form to a third party?",
+      "answer": "Third party’s name, address, and telephone number.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "provenance_ids": [
+            11
+          ],
+          "provenance": "5   If the tax return is to be mailed to a third party (such as a mortgage company), enter the third party’s name, address, and telephone number.",
+          "time": 5.302470922470093,
+          "input_token_size": 3692,
+          "output_token_size": 78,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_da2339b8",
+        "created_at": 1750197541.557501,
+        "processing_time": 12.085582256317139,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.726065"
+      }
+    }
+  },
+  {
+    "da2c1eee": {
+      "question": "What is the time limit for the IRS to receive the signed Form 4506?",
+      "answer": "120 days",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            35,
+            36,
+            37,
+            38
+          ],
+          "provenance_ids": [
+            38
+          ],
+          "provenance": "Note: This form must be received by IRS within 120 days of the signature date.",
+          "time": 3.3822295665740967,
+          "input_token_size": 3330,
+          "output_token_size": 11,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            69,
+            70,
+            71
+          ],
+          "provenance_ids": [
+            70
+          ],
+          "provenance": "The \nIRS must receive Form 4506 within 120 days of the \ndate signed by the taxpayer or it will be rejected.",
+          "time": 8.544217109680176,
+          "input_token_size": 9818,
+          "output_token_size": 26,
+          "original_provenance_id": 1
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_da2c1eee",
+        "created_at": 1750197554.3047798,
+        "processing_time": 11.254889965057373,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 2,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 7,
+            "provenance_count": 2,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.726065"
+      }
+    }
+  },
+  {
+    "dce7be49": {
+      "question": "What are the estimated times for completing and filing Form 4506?",
+      "answer": "Learning about the law or the form: 10 min.; Preparing the form: 16 min.; Copying, assembling, and sending the form to the IRS: 20 min.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            99,
+            100,
+            101
+          ],
+          "provenance_ids": [
+            99,
+            100,
+            101
+          ],
+          "provenance": "The time needed to complete and file Form 4506 \nwill vary depending on individual circumstances.The \nestimated average time is: Learning about the law \nor the form, 10 min.; Preparing the form, 16 min. ; \nand Copying, assembling, and sending the form  \nto the IRS, 20 min.",
+          "time": 6.820147514343262,
+          "input_token_size": 3813,
+          "output_token_size": 187,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_dce7be49",
+        "created_at": 1750197586.1419687,
+        "processing_time": 9.88135838508606,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.726065"
+      }
+    }
+  },
+  {
+    "e01ded60": {
+      "question": "When was Form 4506 last revised?",
+      "answer": "September 2024",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Form  4506\n\n(September 2024)\n\nDepartment of the Treasury  \nInternal Revenue Service \n\nRequest for Copy of Tax Return\n\n▶ Do not sign this form unless all applicable lines have been completed.",
+          "time": 4.308701276779175,
+          "input_token_size": 4797,
+          "output_token_size": 28,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_e01ded60",
+        "created_at": 1750197496.9140875,
+        "processing_time": 6.867251396179199,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.726065"
+      }
+    }
+  },
+  {
+    "ed25a763": {
+      "question": "What will happen if the authority box in the signature area is not checked?",
+      "answer": "The form will not be processed and returned if the authority box in the signature area is unchecked.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            4,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            57,
+            58,
+            67,
+            69,
+            70,
+            71,
+            72,
+            73,
+            75,
+            79,
+            84,
+            85,
+            86,
+            87,
+            88,
+            90,
+            91,
+            92,
+            93,
+            96,
+            97,
+            98,
+            99,
+            100,
+            102,
+            104,
+            105
+          ],
+          "provenance": "Form  4506\n\n(September 2024)\n\nDepartment of the Treasury  \nInternal Revenue Service \n\nRequest for Copy of Tax Return\n\n▶ Do not sign this form unless all applicable lines have been completed.▶ Request may be rejected if the form is incomplete or illegible.We \nhave  teams  available  to  assist.6 \n\n7 \n\n8 \n\nCaution: If the tax return is being sent to the third party, ensure that lines 5 through 7 are completed before signing.(see instructions). Tax  return  requested.Form  1040,  1120,  941,  etc.and  all  attachments  as  originally  submitted  to  the  IRS,  including  Form(s)  W-2, \nschedules,  or  amended  returns.Copies  of  Forms  1040,  1040A,  and  1040EZ  are  generally  available  for  7  years  from  filing  before  they  are \ndestroyed by law.Other returns may be available for a longer period of time. Enter only one return number.If you need more than one \ntype of return, you must complete another Form 4506.▶\n\nNote: If the copies must be certified for court or administrative proceedings, check here  .. . . . . . . . . . . . . . Year or period requested.Enter the ending date of the tax year or period using the mm/dd/yyyy format (see instructions)./ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\nFee.There is a $30 fee for each return requested.a  Cost for each return \n. b  Number of returns requested on line 7  .. c  Total cost. Multiply line 8a by line 8b \n\n. . .If we cannot find the tax return, we will refund the fee.If the refund should go to the third party listed on line 5, check here  .. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .. . . . . . . . . . . . $ \n\n. . . . 9 \n\n$ \n\n. . . .Caution: Do not sign this form unless all applicable lines have been complete\nSignature of taxpayer(s).I declare that I am either the taxpayer whose name is shown on line 1a or 2a, or a person authorized to obtain the tax return \nrequested.If the request applies to a joint return, at least one spouse must sign.If signed by a corporate officer, 1 percent or more shareholder, partner, \nmanaging member, guardian, tax matters partner, executor, receiver, administrator, trustee, or party other than the taxpayer, I certify that I have the authority to \nexecute Form 4506 on behalf of the taxpayer.Note: This form must be received by IRS within 120 days of the signature date.Signatory attests that he/she has read the attestation clause and upon so reading \ndeclares that he/she has the authority to sign the Form 4506.See instructions \n\nPhone number of taxpayer on line \n1a or 2a \n\n/ \n\n/ \n\n/ \n\nSign  \nHere \n\n▲ Signature (see instructions) \n▲ Print/Type name\n▲ Spouse’s signature \n▲\n\nPrint/Type name\n\nTitle (if line 1a above is a corporation, partnership, estate, or trust) \n\nDate \n\nDate \n\nFor Privacy Act and Paperwork Reduction Act Notice, see page 2.Cat. No. 41721E \n\nForm 4506 (Rev. 9-2024) \n\n\fForm 4506 (Rev.9-2024) \n\nSection references are to the Internal Revenue Code \nunless otherwise noted.Chart for all other returns \n\nFuture Developments\nFor the latest information about Form 4506 and its \ninstructions, go to www.irs.gov/form4506.General Instructions \nCaution: Do not sign this form unless all applicable \nlines, including lines 5 through 7, have been \ncompleted.Designated Recipient Notification.Internal \nRevenue Code, Section 6103(c), limits disclosure \nand use of return information received pursuant to \nthe taxpayer’s consent and holds the recipient \nsubject to penalties for any unauthorized access, \nother use, or redisclosure without the taxpayer’s \nexpress permission or request. Taxpayer Notification.Internal Revenue Code, \nSection 6103(c), limits disclosure and use of return \ninformation provided pursuant to your consent and \nholds the recipient subject to penalties, brought by \nprivate right of action, for any unauthorized access, \nother use, or redisclosure without your express \npermission or request.Purpose of form. Use Form 4506 to request a copy \nof your tax return.You can also designate (on line 5) \na third party to receive the tax return.How long will it take? It may take up to 75  \ncalendar days for us to process your request. Where to file.Attach payment and mail Form 4506 \nto the address below for the state you lived in, or the \nstate your business was in, when that return was \nfiled.There are two address charts: one for \nindividual returns (Form 1040 series) and one for all \nother returns.If you are requesting a return for more than one \n\nyear or period and the chart below shows two \ndifferent addresses, send your request based on the \naddress of your most recent return.Chart for individual returns    \n(Form 1040 series) \nIf you filed an  \nindividual return  \nand lived in: \n\nMail to: \n\nAlabama, Arizona, \nArkansas, Florida, \nGeorgia, Louisiana, \nMississippi, New Mexico, \nNorth Carolina, \nOklahoma, South \nCarolina, Tennessee, \nTexas, a foreign country, \nAmerican Samoa, Puerto \nRico, Guam, the \nCommonwealth of the \nNorthern Mariana Islands, \nthe U.S. Virgin Islands, or \nA.P.O. or F.P.O.Box 9941 \nMail Stop 6734 \nOgden, UT 84409\n\nFor returns not in \nForm 1040 series, \nif the address on \nthe return was in:\n\nConnecticut, Delaware, \nDistrict of Columbia, \nGeorgia, Illinois, Indiana, \nKentucky, Maine, \nMaryland, \nMassachusetts, \nMichigan, New \nHampshire, New Jersey, \nNew York, North \nCarolina, Ohio, \nPennsylvania, Rhode \nIsland, South Carolina, \nTennessee, Vermont, \nVirginia, West Virginia, \nWisconsin\n\nAlabama, Alaska, \nArizona, Arkansas, \nCalifornia, Colorado, \nFlorida, Hawaii, Idaho, \nIowa, Kansas, Louisiana, \nMinnesota, Mississippi, \nMissouri, Montana, \nNebraska, Nevada, New \nMexico, North Dakota, \nOklahoma, Oregon, \nSouth Dakota, Texas, \nUtah, Washington, \nWyoming, a foreign \ncountry, American \nSamoa, Puerto Rico, \nGuam, the \nCommonwealth of the \nNorthern Mariana \nIslands, the U.S. Virgin \nIslands, or A.P.O.or \nF.P.O. address\n\nSpecific Instructions \nLine 1b.Enter each \nquarter requested for quarterly returns.Signature and date. Form 4506 must be signed and \ndated by the taxpayer listed on line 1a or 2a.The \nIRS must receive Form 4506 within 120 days of the \ndate signed by the taxpayer or it will be rejected.Ensure that all applicable lines, including lines 5 \nthrough 7, are completed before signing. ▲!You must check the box in the \nsignature area to acknowledge you \nhave the authority to sign and request \nthe information.The form will not be \n\nCAUTION\nprocessed and returned to you if the box is \nunchecked.Only one signature is \nrequired.A bona fide shareholder of record \nowning 1 percent or more of the outstanding stock \nof the corporation may submit a Form 4506 but must \nprovide documentation to support the requester's \nright to receive the information.For \nexample, this could be the letter from the principal \nofficer authorizing an employee of the corporation or \nthe letters testamentary authorizing an individual to \nact for an estate.Signature by a representative.A representative \ncan sign Form 4506 for a taxpayer only if this \nauthority has been specifically delegated to the \nrepresentative on Form 2848, line 5a.Form 2848 \nshowing the delegation must be attached to Form \n4506.Privacy Act and Paperwork Reduction Act  \nNotice.We need \nthis information to properly identify the return(s) and \nrespond to your request.If you request a copy of a \ntax return, sections 6103 and 6109 require you to \nprovide this information, including your SSN or EIN, \nto process your request.If you do not provide this \ninformation, we may not be able to process your \nrequest.Providing false or fraudulent information \nmay subject you to penalties.You are not required to provide the information \nrequested on a form that is subject to the Paperwork \nReduction Act unless the form displays a valid OMB \ncontrol number.Books or records relating to a form  \nor its instructions must be retained as long as their \ncontents may become material in the administration \nof any Internal Revenue law.Generally, tax returns \nand return information are confidential, as required \nby section 6103.The time needed to complete and file Form 4506 \nwill vary depending on individual circumstances.The \nestimated average time is: Learning about the law \nor the form, 10 min.If you have comments concerning the accuracy of \n\nthese time estimates or suggestions for making \nForm 4506 simpler, we would be happy to hear from \nyou.Do not send the form to this address.Instead, see \n\nWhere to file on this page.",
+          "time": 96.20818090438843,
+          "input_token_size": 3624,
+          "output_token_size": 33,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_ed25a763",
+        "created_at": 1750197599.1628654,
+        "processing_time": 97.58453702926636,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 106,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 106,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.726065"
+      }
+    }
+  },
+  {
+    "f5668b18": {
+      "question": "How long are copies of Form 1040 available?",
+      "answer": "Copies of Forms 1040, 1040A, and 1040EZ are generally available for 7 years from filing before they are destroyed by law.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80,
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100,
+            101,
+            102,
+            103,
+            104,
+            105
+          ],
+          "provenance_ids": [
+            1,
+            3,
+            4,
+            10,
+            11,
+            12,
+            13,
+            14,
+            16,
+            17,
+            18,
+            22,
+            23,
+            30,
+            31,
+            32,
+            34,
+            35,
+            39,
+            40,
+            41,
+            42,
+            46,
+            48,
+            49,
+            50,
+            51,
+            53,
+            54,
+            97,
+            98,
+            99,
+            100,
+            101,
+            103,
+            104,
+            105
+          ],
+          "provenance": "▶ Request may be rejected if the form is incomplete or illegible.1545-0429\n\nTip: Get faster service: Online at www.irs.gov, Get Your Tax Record (Get Transcript) or by calling 1-800-908-9946 for specialized assistance.We \nhave  teams  available  to  assist.4   Previous address shown on the last return filed if different from line 3 (see instructions).5   If the tax return is to be mailed to a third party (such as a mortgage company), enter the third party’s name, address, and telephone number.6 \n\n7 \n\n8 \n\nCaution: If the tax return is being sent to the third party, ensure that lines 5 through 7 are completed before signing.(see instructions). Tax  return  requested.Form  1040,  1120,  941,  etc.Copies  of  Forms  1040,  1040A,  and  1040EZ  are  generally  available  for  7  years  from  filing  before  they  are \ndestroyed by law.Other returns may be available for a longer period of time. Enter only one return number.If you need more than one \ntype of return, you must complete another Form 4506./ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\n/ \n\nFee.There is a $30 fee for each return requested.. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . .Caution: Do not sign this form unless all applicable lines have been complete\nSignature of taxpayer(s).I declare that I am either the taxpayer whose name is shown on line 1a or 2a, or a person authorized to obtain the tax return \nrequested.Signatory attests that he/she has read the attestation clause and upon so reading \ndeclares that he/she has the authority to sign the Form 4506.See instructions \n\nPhone number of taxpayer on line \n1a or 2a \n\n/ \n\n/ \n\n/ \n\nSign  \nHere \n\n▲ Signature (see instructions) \n▲ Print/Type name\n▲ Spouse’s signature \n▲\n\nPrint/Type name\n\nTitle (if line 1a above is a corporation, partnership, estate, or trust) \n\nDate \n\nDate \n\nFor Privacy Act and Paperwork Reduction Act Notice, see page 2.Cat. No. 41721E \n\nForm 4506 (Rev. 9-2024) \n\n\fForm 4506 (Rev.9-2024) \n\nSection references are to the Internal Revenue Code \nunless otherwise noted.Internal \nRevenue Code, Section 6103(c), limits disclosure \nand use of return information received pursuant to \nthe taxpayer’s consent and holds the recipient \nsubject to penalties for any unauthorized access, \nother use, or redisclosure without the taxpayer’s \nexpress permission or request. Taxpayer Notification.Purpose of form. Use Form 4506 to request a copy \nof your tax return.You can also designate (on line 5) \na third party to receive the tax return.How long will it take? It may take up to 75  \ncalendar days for us to process your request. Where to file.Attach payment and mail Form 4506 \nto the address below for the state you lived in, or the \nstate your business was in, when that return was \nfiled.If you are requesting a return for more than one \n\nyear or period and the chart below shows two \ndifferent addresses, send your request based on the \naddress of your most recent return.Chart for individual returns    \n(Form 1040 series) \nIf you filed an  \nindividual return  \nand lived in: \n\nMail to: \n\nAlabama, Arizona, \nArkansas, Florida, \nGeorgia, Louisiana, \nMississippi, New Mexico, \nNorth Carolina, \nOklahoma, South \nCarolina, Tennessee, \nTexas, a foreign country, \nAmerican Samoa, Puerto \nRico, Guam, the \nCommonwealth of the \nNorthern Mariana Islands, \nthe U.S. Virgin Islands, or \nA.P.O. or F.P.O.Books or records relating to a form  \nor its instructions must be retained as long as their \ncontents may become material in the administration \nof any Internal Revenue law.Generally, tax returns \nand return information are confidential, as required \nby section 6103.The time needed to complete and file Form 4506 \nwill vary depending on individual circumstances.The \nestimated average time is: Learning about the law \nor the form, 10 min.; Preparing the form, 16 min. ; \nand Copying, assembling, and sending the form  \nto the IRS, 20 min.You can write to: \n\nInternal Revenue Service                                    \nTax Forms and Publications Division                        \n1111 Constitution Ave. NW, IR-6526    \nWashington, DC 20224.Do not send the form to this address.Instead, see \n\nWhere to file on this page.",
+          "time": 62.80228662490845,
+          "input_token_size": 3616,
+          "output_token_size": 28,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_f5668b18",
+        "created_at": 1750197528.7772694,
+        "processing_time": 64.64431023597717,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 106,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 106,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.726065"
+      }
+    }
+  },
+  {
+    "fcb51ffa": {
+      "question": "Where should the payment for Form 4506 be directed?",
+      "answer": "Make your check or money order payable to “United States Treasury.”",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            22,
+            23,
+            24,
+            25
+          ],
+          "provenance_ids": [
+            23,
+            24,
+            25
+          ],
+          "provenance": "There is a $30 fee for each return requested.Full payment must be included with your request or it will \nbe rejected.Make your check or money order payable to “United States Treasury.” Enter your SSN, ITIN, \nor EIN and “Form 4506 request” on your check or money order\n\n.",
+          "time": 4.300180435180664,
+          "input_token_size": 3315,
+          "output_token_size": 66,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_fcb51ffa",
+        "created_at": 1750197509.7065084,
+        "processing_time": 7.555282831192017,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.726065"
+      }
+    }
+  },
+  {
+    "ff43b12c": {
+      "question": "How much is the fee for each return requested?",
+      "answer": "$30",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            22,
+            23,
+            24,
+            25
+          ],
+          "provenance_ids": [
+            23
+          ],
+          "provenance": "There is a $30 fee for each return requested.",
+          "time": 4.0751423835754395,
+          "input_token_size": 4022,
+          "output_token_size": 11,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "f4506_ff43b12c",
+        "created_at": 1749877383.5908346,
+        "processing_time": 6.741311073303223,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.728070"
+      }
+    }
+  }
+]

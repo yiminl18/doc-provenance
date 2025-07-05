@@ -1,0 +1,82 @@
+{
+  "document": "research_database",
+  "generated_at": "2025-06-11T10:53:40.650886",
+  "questions_by_difficulty": {
+    "easy": {
+      "description": "Easy questions - direct extraction",
+      "questions": [
+        {
+          "id": "easy_1",
+          "question": "Who are the authors of the document?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_2",
+          "question": "What journal published the document 'How to Design and Use a Research Database'?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_3",
+          "question": "Where are the authors affiliated?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_4",
+          "question": "What software is recommended for standalone research projects?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_5",
+          "question": "What legislation must be complied with according to the document?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "medium": {
+      "description": "Medium questions - simple synthesis",
+      "questions": [
+        {
+          "id": "medium_1",
+          "question": "How does the document suggest handling ethical considerations in database design?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_2",
+          "question": "What are the advantages of using Microsoft Excel for database management as discussed in the document?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_3",
+          "question": "How does the document differentiate between complete and linked anonymization?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_4",
+          "question": "What are the main topics and themes covered in the document?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_5",
+          "question": "How do the authors suggest ensuring that data coding is effective for analysis?",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "base_name": "research_database",
+    "generated_at_iso": "2025-06-11 10:53:40",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 33025,
+    "processed_text_length": 5035,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty"
+  },
+  "total_questions": 10
+}

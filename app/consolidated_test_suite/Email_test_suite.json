@@ -1,0 +1,2265 @@
+[
+  {
+    "028913d6": {
+      "question": "What was the initial call regarding the incident on 9/28/2016?",
+      "answer": "Uncooperative Inmate",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+          "time": 2.3157501220703125,
+          "input_token_size": 481,
+          "output_token_size": 10,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_028913d6",
+        "created_at": 1749627069.8266432,
+        "processing_time": 8.860650300979614,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.452365"
+      }
+    }
+  },
+  {
+    "047a8f11": {
+      "question": "Who were the two deputies with Dep. Dorn initially?",
+      "answer": "Dep. B. Tucker and Dep. C. Palomares-Velasco",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            5
+          ],
+          "provenance": "B. Tucker and Dep. C. Palomares-Velasco.",
+          "time": 3.9487085342407227,
+          "input_token_size": 580,
+          "output_token_size": 42,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_047a8f11",
+        "created_at": 1750197437.939794,
+        "processing_time": 5.4135847091674805,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.452365"
+      }
+    }
+  },
+  {
+    "1076b65d": {
+      "question": "What was the initial call about and how did it escalate?",
+      "answer": "Initial Call: Uncooperative Inmate  \nEscalation: Muniga assumed a fighting stance, refused to comply with orders, attempted to break free, kicked a deputy, and required additional deputies to gain control.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            1,
+            6,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.Muniga refused and said, \"No.\" Dep.Dorn grabbed Muniga\nby his shoulder.Muniga tried to turn away to break Dep. Dorn's grasp. Dep.Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).Five additional deputies\nresponded to help gain control of Muniga.Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 22.10710382461548,
+          "input_token_size": 442,
+          "output_token_size": 89,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_1076b65d",
+        "created_at": 1749768932.9691565,
+        "processing_time": 24.342717170715332,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "13d79176": {
+      "question": "What did Deputy Dorn instruct the inmate to do?",
+      "answer": "Deputy Dorn instructed the inmate to drop the shoe and turn around to be cuffed.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            7,
+            8,
+            9,
+            10
+          ],
+          "provenance_ids": [
+            7
+          ],
+          "provenance": "Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.",
+          "time": 2.8796253204345703,
+          "input_token_size": 258,
+          "output_token_size": 36,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_13d79176",
+        "created_at": 1750197382.308345,
+        "processing_time": 7.636364459991455,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "14d9b99b": {
+      "question": "What is the DR number associated with the incident?",
+      "answer": "16-253663",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+          "time": 1.9299118518829346,
+          "input_token_size": 467,
+          "output_token_size": 8,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_14d9b99b",
+        "created_at": 1750197419.3271406,
+        "processing_time": 3.44840145111084,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "15e47879": {
+      "question": "How many deputies used force in the incident described?",
+      "answer": "8",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+          "time": 1.5410997867584229,
+          "input_token_size": 467,
+          "output_token_size": 2,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_15e47879",
+        "created_at": 1749627083.0313191,
+        "processing_time": 4.744204998016357,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "2359b990": {
+      "question": "How many times did Dep. Dorn give the instruction?",
+      "answer": "2",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            7,
+            8,
+            9,
+            10
+          ],
+          "provenance_ids": [
+            7
+          ],
+          "provenance": "Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.",
+          "time": 2.2571024894714355,
+          "input_token_size": 260,
+          "output_token_size": 2,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_2359b990",
+        "created_at": 1750197388.456982,
+        "processing_time": 3.766514301300049,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "27b3e5d2": {
+      "question": "Where was the inmate transported for treatment?",
+      "answer": "OC Global Santa Ana",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            14
+          ],
+          "provenance": "Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 1.7972493171691895,
+          "input_token_size": 273,
+          "output_token_size": 8,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_27b3e5d2",
+        "created_at": 1750197413.1674266,
+        "processing_time": 3.438145399093628,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "34bca663": {
+      "question": "How many deputies initially entered the vestibule with Dep. Dorn?",
+      "answer": "3",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            1,
+            4,
+            5,
+            6
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep.B. Tucker and Dep. C. Palomares-Velasco.Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.",
+          "time": 4.378367185592651,
+          "input_token_size": 586,
+          "output_token_size": 14,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_34bca663",
+        "created_at": 1749869619.2879593,
+        "processing_time": 5.9878270626068115,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 7,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 7,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "41fc2ad3": {
+      "question": "Where did the incident take place?",
+      "answer": "550 Flower",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+          "time": 1.7546031475067139,
+          "input_token_size": 461,
+          "output_token_size": 4,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_41fc2ad3",
+        "created_at": 1750197345.2768295,
+        "processing_time": 4.919739246368408,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "42844b94": {
+      "question": "What was the response after Muniga assumed a fighting stance?",
+      "answer": "Dep. Dorn ordered Muniga two times to drop the shoe and turn around to be cuffed. Muniga refused and said, \"No.\" Dep. Dorn grabbed Muniga by his shoulder. Muniga tried to turn away to break Dep. Dorn's grasp. Dep. Dorn, Tucker, and Palomares-Velasco pulled Muniga to the ground to gain control. Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b). Five additional deputies responded to help gain control of Muniga. Muniga was transported to OC Global Santa Ana to be treated for his injuries.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            6,
+            7,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance": "Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.Muniga tried to turn away to break Dep. Dorn's grasp. Dep.Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).Five additional deputies\nresponded to help gain control of Muniga.Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 26.860267400741577,
+          "input_token_size": 442,
+          "output_token_size": 2,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_42844b94",
+        "created_at": 1749869631.666512,
+        "processing_time": 29.462568521499634,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "5120a693": {
+      "question": "What was the outcome for Muniga after the incident in terms of medical treatment?",
+      "answer": "Muniga was transported to OC Global Santa Ana to be treated for his injuries.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            13,
+            14
+          ],
+          "provenance": "Five additional deputies\nresponded to help gain control of Muniga.Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 3.0684549808502197,
+          "input_token_size": 289,
+          "output_token_size": 32,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_5120a693",
+        "created_at": 1749869650.2534726,
+        "processing_time": 4.825345993041992,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "5b2e8444": {
+      "question": "Who was the inmate involved in the incident?",
+      "answer": "Raymond Muniga",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            3
+          ],
+          "provenance": "The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.",
+          "time": 2.789543628692627,
+          "input_token_size": 545,
+          "output_token_size": 10,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_5b2e8444",
+        "created_at": 1749869594.59726,
+        "processing_time": 4.31468653678894,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "6306cdae": {
+      "question": "How many additional deputies responded to help?",
+      "answer": "Five additional deputies responded to help.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            8,
+            9,
+            10,
+            12,
+            13
+          ],
+          "provenance": "Muniga refused and said, \"No.\" Dep.Dorn grabbed Muniga\nby his shoulder.Muniga tried to turn away to break Dep. Dorn's grasp. Dep.Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).Five additional deputies\nresponded to help gain control of Muniga.",
+          "time": 4.849767208099365,
+          "input_token_size": 362,
+          "output_token_size": 12,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_6306cdae",
+        "created_at": 1750197406.9904337,
+        "processing_time": 7.047435760498047,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 8,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 8,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "6ebaf58f": {
+      "question": "Who submitted the UOF for review?",
+      "answer": "Jerry Carlsen",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.",
+          "time": 3.3835690021514893,
+          "input_token_size": 463,
+          "output_token_size": 6,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_6ebaf58f",
+        "created_at": 1750197320.6042743,
+        "processing_time": 5.445919752120972,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "7711696b": {
+      "question": "What stance did the inmate assume?",
+      "answer": "Fighting stance",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            3,
+            6
+          ],
+          "provenance": "The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.",
+          "time": 2.821944236755371,
+          "input_token_size": 539,
+          "output_token_size": 8,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_7711696b",
+        "created_at": 1750197369.98685,
+        "processing_time": 3.934596538543701,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.453364"
+      }
+    }
+  },
+  {
+    "7798a77e": {
+      "question": "What is the subject of the email?",
+      "answer": "UOF: 16-253663 has been Submitted for the Captain's Review",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.",
+          "time": 2.4382688999176025,
+          "input_token_size": 463,
+          "output_token_size": 32,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_7798a77e",
+        "created_at": 1750197326.7485335,
+        "processing_time": 4.41283106803894,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.461970"
+      }
+    }
+  },
+  {
+    "79bd27c3": {
+      "question": "Who ordered Muniga to drop the shoe and turn around?",
+      "answer": "Dep. J. Dorn",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.J. Dorn was talking to an inmate who was standing in\nModule B's vestibule.The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep.B. Tucker and Dep. C. Palomares-Velasco.Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.Muniga refused and said, \"No.\" Dep.Dorn grabbed Muniga\nby his shoulder.Muniga tried to turn away to break Dep. Dorn's grasp. Dep.Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).Five additional deputies\nresponded to help gain control of Muniga.Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 5.995481967926025,
+          "input_token_size": 442,
+          "output_token_size": 4,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_79bd27c3",
+        "created_at": 1749869613.1208324,
+        "processing_time": 7.045280933380127,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.461970"
+      }
+    }
+  },
+  {
+    "7d96b217": {
+      "question": "How did Dep. Dorn and his colleagues initially attempt to gain control of Muniga?",
+      "answer": "Dep. Dorn and his colleagues initially attempted to gain control of Muniga by ordering him to drop the shoe and turn around to be cuffed. When Muniga refused, they pulled him to the ground to gain control.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            11
+          ],
+          "provenance": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.J. Dorn was talking to an inmate who was standing in\nModule B's vestibule.The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep.B. Tucker and Dep. C. Palomares-Velasco.Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.Muniga refused and said, \"No.\" Dep.Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.",
+          "time": 23.786715269088745,
+          "input_token_size": 452,
+          "output_token_size": 89,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_7d96b217",
+        "created_at": 1749768945.350176,
+        "processing_time": 25.598934412002563,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.462985"
+      }
+    }
+  },
+  {
+    "7e8e76be": {
+      "question": "On what date was the UOF submitted?",
+      "answer": "October 19, 2016",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            9,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.J. Dorn was talking to an inmate who was standing in\nModule B's vestibule.The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep.B. Tucker and Dep. C. Palomares-Velasco.Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.Dorn grabbed Muniga\nby his shoulder.Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).Five additional deputies\nresponded to help gain control of Muniga.Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 10.481589317321777,
+          "input_token_size": 436,
+          "output_token_size": 8,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_7e8e76be",
+        "created_at": 1750197332.9272811,
+        "processing_time": 11.586431503295898,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.462985"
+      }
+    }
+  },
+  {
+    "848b9dcf": {
+      "question": "At what time did the incident on 9/28/2016 occur?",
+      "answer": "7:58 AM",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+          "time": 2.3174285888671875,
+          "input_token_size": 479,
+          "output_token_size": 8,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_848b9dcf",
+        "created_at": 1750197425.4841528,
+        "processing_time": 3.9373598098754883,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.464428"
+      }
+    }
+  },
+  {
+    "870c2679": {
+      "question": "What actions did Dep. Dorn take when the inmate refused to comply?",
+      "answer": "Dep. Dorn ordered Muniga two times to drop the shoe and turn around to be cuffed. When Muniga refused, Dep. Dorn grabbed Muniga by his shoulder. When Muniga tried to turn away, Dep. Dorn, Tucker, and Palomares-Velasco pulled Muniga to the ground to gain control.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance": "Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.Muniga refused and said, \"No.\" Dep.Dorn grabbed Muniga\nby his shoulder.Muniga tried to turn away to break Dep. Dorn's grasp. Dep.Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).Five additional deputies\nresponded to help gain control of Muniga.Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 21.325516939163208,
+          "input_token_size": 446,
+          "output_token_size": 46,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_870c2679",
+        "created_at": 1749627095.3944623,
+        "processing_time": 23.513223886489868,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.464792"
+      }
+    }
+  },
+  {
+    "9a4ed0d4": {
+      "question": "What actions by Raymond Muniga led to a violation of CPC 240/243(b)?",
+      "answer": "Muniga assumed a fighting stance, refused to drop the shoe, tried to break Dep. Dorn's grasp, and kicked Dep. Palomares-Velasco several times.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            5,
+            6,
+            7,
+            8,
+            10,
+            12
+          ],
+          "provenance": "B. Tucker and Dep. C. Palomares-Velasco.Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.Muniga refused and said, \"No.\" Dep.Muniga tried to turn away to break Dep. Dorn's grasp. Dep.Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).",
+          "time": 20.83992910385132,
+          "input_token_size": 454,
+          "output_token_size": 56,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_9a4ed0d4",
+        "created_at": 1749768951.5191026,
+        "processing_time": 23.59931182861328,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.464792"
+      }
+    }
+  },
+  {
+    "9e30a89d": {
+      "question": "Who submitted the UOF for the Captain's review?",
+      "answer": "Jerry Carlsen",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.",
+          "time": 2.080780267715454,
+          "input_token_size": 469,
+          "output_token_size": 6,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_9e30a89d",
+        "created_at": 1749627063.6439052,
+        "processing_time": 5.097774505615234,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.465821"
+      }
+    }
+  },
+  {
+    "a575f13b": {
+      "question": "How did the number of deputies involved change during the incident?",
+      "answer": "The number of deputies involved changed from 3 to 8.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            11,
+            13
+          ],
+          "provenance": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.Five additional deputies\nresponded to help gain control of Muniga.",
+          "time": 11.351275444030762,
+          "input_token_size": 442,
+          "output_token_size": 17,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_a575f13b",
+        "created_at": 1749768926.822076,
+        "processing_time": 12.686129808425903,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.465821"
+      }
+    }
+  },
+  {
+    "b2fbc721": {
+      "question": "What sequence of actions did Dep. Dorn take when Muniga refused to comply?",
+      "answer": "1. Dep. Dorn ordered Muniga two times to drop the shoe and turn around to be cuffed.\n2. Dep. Dorn grabbed Muniga by his shoulder.\n3. Muniga tried to turn away to break Dep. Dorn's grasp.\n4. Dep. Dorn, Tucker, and Palomares-Velasco pulled Muniga to the ground to gain control.\n5. Five additional deputies responded to help gain control of Muniga.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            0,
+            2,
+            3,
+            4,
+            6,
+            7,
+            9,
+            10,
+            11,
+            13
+          ],
+          "provenance": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.J. Dorn was talking to an inmate who was standing in\nModule B's vestibule.The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep.Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.Dorn grabbed Muniga\nby his shoulder.Muniga tried to turn away to break Dep. Dorn's grasp. Dep.Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.Five additional deputies\nresponded to help gain control of Muniga.",
+          "time": 29.504867792129517,
+          "input_token_size": 450,
+          "output_token_size": 135,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_b2fbc721",
+        "created_at": 1749869625.4883115,
+        "processing_time": 31.763792753219604,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.465821"
+      }
+    }
+  },
+  {
+    "c165591c": {
+      "question": "What object was the inmate holding?",
+      "answer": "One of his shoes.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            6
+          ],
+          "provenance": "Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.",
+          "time": 2.745598316192627,
+          "input_token_size": 539,
+          "output_token_size": 12,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_c165591c",
+        "created_at": 1750197376.1404426,
+        "processing_time": 4.380882263183594,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.465821"
+      }
+    }
+  },
+  {
+    "c1b87bfe": {
+      "question": "What time did the incident on 9/28/2016 occur?",
+      "answer": "7:58 AM",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+          "time": 2.628876209259033,
+          "input_token_size": 477,
+          "output_token_size": 8,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_c1b87bfe",
+        "created_at": 1749869600.7548172,
+        "processing_time": 5.508671760559082,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.466820"
+      }
+    }
+  },
+  {
+    "c323f8cb": {
+      "question": "How many deputies were involved in using force?",
+      "answer": "8",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+          "time": 1.8004941940307617,
+          "input_token_size": 465,
+          "output_token_size": 2,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_c323f8cb",
+        "created_at": 1750197351.4231067,
+        "processing_time": 3.416353464126587,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.466820"
+      }
+    }
+  },
+  {
+    "c52680ea": {
+      "question": "What was the inmate's name and booking number involved in the incident?",
+      "answer": "Raymond Muniga, 2955064",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            3
+          ],
+          "provenance": "The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.",
+          "time": 6.411549091339111,
+          "input_token_size": 589,
+          "output_token_size": 19,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_c52680ea",
+        "created_at": 1749627089.2136242,
+        "processing_time": 8.211688756942749,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.467820"
+      }
+    }
+  },
+  {
+    "c8e4673f": {
+      "question": "Who was talking to the inmate initially?",
+      "answer": "Dep. J. Dorn",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1,
+            2
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.J. Dorn was talking to an inmate who was standing in\nModule B's vestibule.",
+          "time": 3.0959136486053467,
+          "input_token_size": 463,
+          "output_token_size": 10,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_c8e4673f",
+        "created_at": 1750197363.806055,
+        "processing_time": 4.926623106002808,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.467820"
+      }
+    }
+  },
+  {
+    "cf438138": {
+      "question": "Which module's vestibule was the inmate standing in?",
+      "answer": "Module B's vestibule",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            0,
+            2,
+            14
+          ],
+          "provenance": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.J. Dorn was talking to an inmate who was standing in\nModule B's vestibule.Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 7.720641613006592,
+          "input_token_size": 440,
+          "output_token_size": 3,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_cf438138",
+        "created_at": 1750197431.7167802,
+        "processing_time": 8.846291065216064,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.467820"
+      }
+    }
+  },
+  {
+    "d5592f86": {
+      "question": "What chain of events led to the involvement of five additional deputies?",
+      "answer": "Five additional deputies responded to help gain control of Muniga after he kicked Dep. Palomares-Velasco several times.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            8,
+            10,
+            12,
+            13,
+            14
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.J. Dorn was talking to an inmate who was standing in\nModule B's vestibule.The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep.Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.Muniga refused and said, \"No.\" Dep.Muniga tried to turn away to break Dep. Dorn's grasp. Dep.Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).Five additional deputies\nresponded to help gain control of Muniga.Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 13.26290249824524,
+          "input_token_size": 444,
+          "output_token_size": 76,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_d5592f86",
+        "created_at": 1749869644.0650961,
+        "processing_time": 15.13969874382019,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.468820"
+      }
+    }
+  },
+  {
+    "db3ef86f": {
+      "question": "What was the initial call about?",
+      "answer": "Uncooperative Inmate",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+          "time": 1.5168819427490234,
+          "input_token_size": 461,
+          "output_token_size": 10,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_db3ef86f",
+        "created_at": 1750197357.6015925,
+        "processing_time": 3.4650073051452637,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.468820"
+      }
+    }
+  },
+  {
+    "df13be7f": {
+      "question": "What is the date of the incident involving Raymond Muniga?",
+      "answer": "9/28/2016",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+          "time": 4.7444140911102295,
+          "input_token_size": 471,
+          "output_token_size": 12,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_df13be7f",
+        "created_at": 1749665061.5932333,
+        "processing_time": 9.287693738937378,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 3,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 3,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.468820"
+      }
+    }
+  },
+  {
+    "e0d47475": {
+      "question": "What was the violation mentioned in the summary?",
+      "answer": "Violation of CPC 240/243(b)",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.J. Dorn was talking to an inmate who was standing in\nModule B's vestibule.The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep.Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.Muniga refused and said, \"No.\" Dep.Dorn grabbed Muniga\nby his shoulder.Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).Five additional deputies\nresponded to help gain control of Muniga.Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 9.024004220962524,
+          "input_token_size": 436,
+          "output_token_size": 9,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_e0d47475",
+        "created_at": 1750197400.8420596,
+        "processing_time": 10.6024751663208,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 15,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 15,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.468820"
+      }
+    }
+  },
+  {
+    "e3b23a3c": {
+      "question": "Who was kicked by Raymond Muniga during the incident?",
+      "answer": "Dep. Palomares-Velasco",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            12
+          ],
+          "provenance": "Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).",
+          "time": 2.3495492935180664,
+          "input_token_size": 279,
+          "output_token_size": 16,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_e3b23a3c",
+        "created_at": 1749869606.9353778,
+        "processing_time": 4.22726583480835,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.469819"
+      }
+    }
+  },
+  {
+    "ea0a5260": {
+      "question": "Who was kicked by the inmate?",
+      "answer": "Dep. Palomares-Velasco",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            12
+          ],
+          "provenance": "Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).",
+          "time": 2.1528847217559814,
+          "input_token_size": 271,
+          "output_token_size": 16,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_ea0a5260",
+        "created_at": 1750197394.6535249,
+        "processing_time": 3.8530080318450928,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.469819"
+      }
+    }
+  },
+  {
+    "ea4881d1": {
+      "question": "Who is the inmate mentioned in the document?",
+      "answer": "Raymond Muniga",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            3
+          ],
+          "provenance": "The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.",
+          "time": 2.253568649291992,
+          "input_token_size": 574,
+          "output_token_size": 9,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_ea4881d1",
+        "created_at": 1750197339.1244004,
+        "processing_time": 3.656379461288452,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.469819"
+      }
+    }
+  },
+  {
+    "ee382b79": {
+      "question": "Why was Raymond Muniga transported to OC Global Santa Ana?",
+      "answer": "Raymond Muniga was transported to OC Global Santa Ana to be treated for his injuries.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            13,
+            14
+          ],
+          "provenance": "Five additional deputies\nresponded to help gain control of Muniga.Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+          "time": 5.195604085922241,
+          "input_token_size": 281,
+          "output_token_size": 32,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_ee382b79",
+        "created_at": 1749768939.1335065,
+        "processing_time": 7.826605558395386,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.469819"
+      }
+    }
+  },
+  {
+    "f14e6f3a": {
+      "question": "How did the deputies respond to Muniga's attempt to break free from Dep. Dorn's grasp?",
+      "answer": "The deputies pulled Muniga to the ground to gain control. Five additional deputies responded to help gain control of Muniga.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14
+          ],
+          "provenance_ids": [
+            10,
+            11,
+            12,
+            13
+          ],
+          "provenance": "Muniga tried to turn away to break Dep. Dorn's grasp. Dep.Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).Five additional deputies\nresponded to help gain control of Muniga.",
+          "time": 6.827808618545532,
+          "input_token_size": 398,
+          "output_token_size": 50,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_f14e6f3a",
+        "created_at": 1749869637.861416,
+        "processing_time": 8.421343088150024,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 8,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 8,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.469819"
+      }
+    }
+  },
+  {
+    "f1a4676a": {
+      "question": "What did Raymond Muniga hold in his hand during the incident?",
+      "answer": "One of his shoes.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            3,
+            4,
+            5,
+            6
+          ],
+          "provenance_ids": [
+            6
+          ],
+          "provenance": "Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.",
+          "time": 4.391612529754639,
+          "input_token_size": 557,
+          "output_token_size": 12,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "Email_f1a4676a",
+        "created_at": 1749665080.196042,
+        "processing_time": 5.823446273803711,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          },
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.469819"
+      }
+    }
+  }
+]

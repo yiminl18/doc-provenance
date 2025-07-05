@@ -1,0 +1,33 @@
+{
+  "base_name": "whatgoesaround-sigmodrec2024",
+  "questions": [
+    "Who authored the document discussed in the summary?",
+    "What is the primary focus of the document by Michael Stonebraker and Andrew Pavlo?",
+    "When was MapReduce initially developed according to the document?",
+    "Which company developed Dynamo, a key-value store mentioned in the document?",
+    "What type of databases are MongoDB classified under in the document?",
+    "How have key-value stores like Amazon's Dynamo evolved according to the document?",
+    "What are the challenges faced by hardware accelerators such as FPGAs and GPUs in DBMSs as mentioned in the document?",
+    "Compare the roles of data lakes and lakehouses as described in the document.",
+    "What advancements in DBMS architectures are highlighted in the document concerning cloud databases?",
+    "What are the limitations of blockchain databases in DBMSs as discussed in the document?"
+  ],
+  "metadata": {
+    "base_name": "whatgoesaround-sigmodrec2024",
+    "generated_at_iso": "2025-06-11 10:54:45",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 97132,
+    "processed_text_length": 7657,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty",
+    "has_difficulty_levels": true,
+    "source_file": "whatgoesaround-sigmodrec2024_questions_by_difficulty.json",
+    "total_questions": 10
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "document": "database_design_article",
+  "generated_at": "2025-06-11T10:52:17.213800",
+  "questions_by_difficulty": {
+    "easy": {
+      "description": "Easy questions - direct extraction",
+      "questions": [
+        {
+          "id": "easy_1",
+          "question": "Who authored the article 'Artificial Intelligence Research: The Utility and Design of a Relational Database System'?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_2",
+          "question": "What is the main topic of the article published in Advances in Radiation Oncology in 2020?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_3",
+          "question": "When was the concept of relational databases first introduced?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_4",
+          "question": "What is the name of the database system discussed in the article?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_5",
+          "question": "Where was the article 'Artificial Intelligence Research: The Utility and Design of a Relational Database System' published?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "medium": {
+      "description": "Medium questions - simple synthesis",
+      "questions": [
+        {
+          "id": "medium_1",
+          "question": "How do relational database systems compare with spreadsheets in managing clinical data?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_2",
+          "question": "What are the limitations of using spreadsheets for complex clinical data management?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_3",
+          "question": "What advantages do relational databases offer for AI research in radiation oncology?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_4",
+          "question": "How does the article describe the implementation example of a relational database system?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_5",
+          "question": "What is the role of SQL in relational database systems according to the document?",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "base_name": "database_design_article",
+    "generated_at_iso": "2025-06-11 10:52:17",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 24882,
+    "processed_text_length": 4937,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty"
+  },
+  "total_questions": 10
+}

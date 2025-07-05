@@ -378,8 +378,307 @@ class ProvenanceLayoutMapper:
             'medium_confidence_boxes': len([c for c in confidence_scores if 0.5 < c <= 0.8]),
             'low_confidence_boxes': len([c for c in confidence_scores if c <= 0.5])
         }
+    
+    def get_provenance_text_bounding_boxes(self, provenance_text: str, sentence_ids: List[int] = None) -> List[Dict]:
+        """
+        Get precise bounding boxes for specific provenance text (not just sentence-level)
 
-# Usage example and testing
+        Args:
+            provenance_text: The exact text that should be highlighted
+            sentence_ids: Optional list of sentence IDs to constrain search (performance optimization)
+
+        Returns:
+            List of bounding boxes with confidence scores for the specific text
+        """
+        self.logger.info(f"Getting text-level boxes for: '{provenance_text[:50]}...'")
+
+        # Clean the provenance text
+        clean_provenance = self._clean_text(provenance_text)
+
+        if len(clean_provenance) < 5:
+            self.logger.warning("Provenance text too short for reliable matching")
+            return []
+
+        # Strategy 1: Direct text search across all elements
+        direct_matches = self._find_direct_text_matches(clean_provenance)
+        if direct_matches:
+            self.logger.info(f"Found {len(direct_matches)} direct text matches")
+            return direct_matches
+
+        # Strategy 2: Search within sentence constraints (if provided)
+        if sentence_ids:
+            constrained_matches = self._find_text_within_sentences(clean_provenance, sentence_ids)
+            if constrained_matches:
+                self.logger.info(f"Found {len(constrained_matches)} sentence-constrained matches")
+                return constrained_matches
+
+        # Strategy 3: Fuzzy text matching
+        fuzzy_matches = self._find_fuzzy_text_matches(clean_provenance)
+        if fuzzy_matches:
+            self.logger.info(f"Found {len(fuzzy_matches)} fuzzy text matches")
+            return fuzzy_matches
+
+        self.logger.warning("No reliable text matches found")
+        return []
+
+    def _find_direct_text_matches(self, clean_target_text: str) -> List[Dict]:
+        """Find exact matches of the target text in PDF elements"""
+        matches = []
+
+        for page_data in self.pages_layout:
+            for element in page_data.get('elements', []):
+                if not element.get('text'):
+                    continue
+
+                clean_element = self._clean_text(element['text'])
+
+                # Check for exact substring match
+                if clean_target_text in clean_element:
+                    # Create sub-element bounding box
+                    sub_box = self._create_sub_element_box(element, clean_target_text, clean_element)
+                    if sub_box:
+                        matches.append(sub_box)
+                        self.logger.debug(f"Direct match in element: '{element['text'][:50]}...'")
+
+                # Check for partial match (element contained in target)
+                elif clean_element in clean_target_text and len(clean_element) > 10:
+                    # This element is part of our target text
+                    matches.append({
+                        'page': element['page'],
+                        'x0': element['x0'],
+                        'y0': element['y0'], 
+                        'x1': element['x1'],
+                        'y1': element['y1'],
+                        'confidence': 0.8,
+                        'match_type': 'partial_element_match',
+                        'source': 'direct_text_mapper'
+                    })
+                    self.logger.debug(f"Partial match: element is part of target")
+
+        return matches
+
+    def _find_text_within_sentences(self, clean_target_text: str, sentence_ids: List[int]) -> List[Dict]:
+        """Find target text within specific sentences"""
+        matches = []
+
+        for sentence_id in sentence_ids:
+            if sentence_id >= len(self.sentences):
+                continue
+
+            sentence_data = self.sentences[sentence_id]
+            sentence_bounds = sentence_data.get('bounding_boxes', [])
+
+            if not sentence_bounds:
+                continue
+
+            # Find elements within this sentence's bounds
+            sentence_page = sentence_data.get('primary_page', sentence_bounds[0].get('page', 1))
+
+            page_layout = None
+            for page in self.pages_layout:
+                if page.get('page_num') == sentence_page:
+                    page_layout = page
+                    break
+
+            if not page_layout:
+                continue
+
+            # Filter elements to those within sentence bounds
+            sentence_elements = []
+            for element in page_layout.get('elements', []):
+                if self._element_within_sentence_bounds(element, sentence_bounds):
+                    sentence_elements.append(element)
+
+            # Search for target text within these elements
+            for element in sentence_elements:
+                clean_element = self._clean_text(element['text'])
+
+                if clean_target_text in clean_element:
+                    sub_box = self._create_sub_element_box(element, clean_target_text, clean_element)
+                    if sub_box:
+                        sub_box['sentence_id'] = sentence_id
+                        matches.append(sub_box)
+                        self.logger.debug(f"Found text within sentence {sentence_id}")
+
+            # Try multi-element matching within this sentence
+            if not matches:
+                multi_matches = self._find_multi_element_text_match(sentence_elements, clean_target_text)
+                for match in multi_matches:
+                    match['sentence_id'] = sentence_id
+                    matches.append(match)
+
+        return matches
+
+    def _create_sub_element_box(self, element: Dict, target_text: str, element_text: str) -> Optional[Dict]:
+        """Create a precise sub-element bounding box for target text within an element"""
+
+        # Find where target starts in element
+        start_pos = element_text.find(target_text)
+        if start_pos == -1:
+            return None
+
+        # Calculate element dimensions
+        element_width = element['x1'] - element['x0']
+        element_height = element['y1'] - element['y0']
+        total_chars = len(element_text)
+
+        if total_chars == 0 or element_width <= 0:
+            return None
+
+        # Estimate character positioning
+        char_width = element_width / total_chars
+
+        # Calculate sub-element bounds
+        start_x = element['x0'] + (start_pos * char_width)
+        end_x = element['x0'] + ((start_pos + len(target_text)) * char_width)
+
+        # Add small padding and ensure bounds
+        start_x = max(element['x0'], start_x - 2)
+        end_x = min(element['x1'], end_x + 2)
+
+        return {
+            'page': element['page'],
+            'x0': start_x,
+            'y0': element['y0'],
+            'x1': end_x,
+            'y1': element['y1'],
+            'confidence': 0.9,
+            'match_type': 'sub_element_precise',
+            'source': 'text_level_mapper',
+            'target_start_pos': start_pos,
+            'estimated_char_width': char_width
+        }
+
+    def _find_multi_element_text_match(self, elements: List[Dict], target_text: str) -> List[Dict]:
+        """Find target text that spans multiple elements"""
+        matches = []
+
+        # Sort elements by reading order
+        elements.sort(key=lambda x: (-x.get('y1', 0), x.get('x0', 0)))
+
+        # Try combining consecutive elements
+        for start_idx in range(len(elements)):
+            for end_idx in range(start_idx + 1, min(start_idx + 4, len(elements) + 1)):
+                element_sequence = elements[start_idx:end_idx]
+
+                # Combine text
+                combined_text = ' '.join([elem.get('text', '') for elem in element_sequence])
+                clean_combined = self._clean_text(combined_text)
+
+                if target_text in clean_combined:
+                    # Found match - create boxes for relevant parts
+                    matches.extend(self._create_multi_element_boxes(
+                        element_sequence, target_text, clean_combined
+                    ))
+                    return matches  # Return first good match
+
+        return matches
+
+    def _create_multi_element_boxes(self, element_sequence: List[Dict], target_text: str, combined_text: str) -> List[Dict]:
+        """Create bounding boxes when target spans multiple elements"""
+        boxes = []
+
+        target_start = combined_text.find(target_text)
+        if target_start == -1:
+            # Fallback: highlight all elements
+            for elem in element_sequence:
+                boxes.append({
+                    'page': elem['page'],
+                    'x0': elem['x0'],
+                    'y0': elem['y0'],
+                    'x1': elem['x1'],
+                    'y1': elem['y1'],
+                    'confidence': 0.7,
+                    'match_type': 'multi_element_fallback',
+                    'source': 'text_level_mapper'
+                })
+            return boxes
+
+        # Calculate precise positioning across elements
+        char_pos = 0
+        target_end = target_start + len(target_text)
+
+        for elem in element_sequence:
+            elem_text = self._clean_text(elem.get('text', ''))
+            elem_length = len(elem_text)
+
+            elem_start = char_pos
+            elem_end = char_pos + elem_length
+
+            # Check if this element contains part of target
+            if elem_end > target_start and elem_start < target_end:
+                # Calculate portion of element that contains target
+                relative_start = max(0, target_start - elem_start)
+                relative_end = min(elem_length, target_end - elem_start)
+
+                # Create sub-element box
+                elem_width = elem['x1'] - elem['x0']
+                char_width = elem_width / elem_length if elem_length > 0 else 0
+
+                start_x = elem['x0'] + (relative_start * char_width)
+                end_x = elem['x0'] + (relative_end * char_width)
+
+                boxes.append({
+                    'page': elem['page'],
+                    'x0': max(elem['x0'], start_x - 2),
+                    'y0': elem['y0'],
+                    'x1': min(elem['x1'], end_x + 2),
+                    'y1': elem['y1'],
+                    'confidence': 0.85,
+                    'match_type': 'multi_element_precise',
+                    'source': 'text_level_mapper',
+                    'element_portion': f"{relative_start}-{relative_end}"
+                })
+
+            char_pos += elem_length + 1  # +1 for space between elements
+
+        return boxes
+
+    def _element_within_sentence_bounds(self, element: Dict, sentence_bounds: List[Dict]) -> bool:
+        """Check if element overlaps with sentence bounding boxes"""
+        for bound in sentence_bounds:
+            # Check for overlap (not strictly within, just overlap)
+            if not (element.get('x1', 0) < bound.get('x0', 0) - 10 or 
+                    element.get('x0', 0) > bound.get('x1', 100) + 10 or
+                    element.get('y1', 0) < bound.get('y0', 0) - 5 or 
+                    element.get('y0', 0) > bound.get('y1', 20) + 5):
+                return True
+        return False
+
+    def _find_fuzzy_text_matches(self, target_text: str) -> List[Dict]:
+        """Find fuzzy matches for target text"""
+        matches = []
+        target_words = set(target_text.split())
+
+        if len(target_words) < 3:
+            return matches
+
+        for page_data in self.pages_layout:
+            for element in page_data.get('elements', []):
+                clean_element = self._clean_text(element['text'])
+                element_words = set(clean_element.split())
+
+                # Check word overlap
+                common_words = target_words & element_words
+
+                if len(common_words) >= len(target_words) * 0.7:  # 70% word overlap
+                    confidence = len(common_words) / len(target_words)
+
+                    matches.append({
+                        'page': element['page'],
+                        'x0': element['x0'],
+                        'y0': element['y0'],
+                        'x1': element['x1'],
+                        'y1': element['y1'],
+                        'confidence': confidence * 0.8,  # Penalty for fuzzy
+                        'match_type': 'fuzzy_text_match',
+                        'source': 'text_level_mapper',
+                        'word_overlap': f"{len(common_words)}/{len(target_words)}"
+                    })
+
+        return matches[:3]  # Return top 3 matches
+
+    # Usage example and testing
 def test_provenance_mapper(layout_file_path: str, test_sentence_ids: List[int]):
     """Test the provenance mapper with sample data"""
     mapper = ProvenanceLayoutMapper(layout_file_path, debug=True)

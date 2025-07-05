@@ -1,0 +1,2869 @@
+[
+  {
+    "0146e3f9": {
+      "question": "When was Publication 1 last revised?",
+      "answer": "Rev. 9-2017",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38
+          ],
+          "provenance_ids": [
+            18,
+            19,
+            20
+          ],
+          "provenance": "Taxpayers have the right to receive assistance from the \nTaxpayer Advocate Service if they are experiencing financial \ndifficulty or if the IRS has not resolved their tax issues properly \nand timely through its normal channels.The IRS Mission\n\nProvide America’s taxpayers top-quality service by helping them understand and meet \ntheir tax responsibilities and enforce the law with integrity and fairness to all. Publication 1  (Rev.9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.",
+          "time": 8.669183254241943,
+          "input_token_size": 2667,
+          "output_token_size": 14,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_0146e3f9",
+        "created_at": 1750198250.3955014,
+        "processing_time": 12.21200680732727,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 39,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 39,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.766778"
+      }
+    }
+  },
+  {
+    "0e54d494": {
+      "question": "Who can taxpayers contact to report IRS employee misconduct?",
+      "answer": "Treasury Inspector General for Tax Administration: 1-800-366-4484 (1-800-877-8339 for TTY/TDD).",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            74,
+            78
+          ],
+          "provenance": "If you qualify for our \nassistance, which is always free, we will do \neverything possible to help you.(cid:127) Treasury Inspector General for Tax \n\nAdministration: You can confidentially \nreport misconduct, waste, fraud, or \nabuse by an IRS employee by calling \n1-800-366-4484 (1-800-877-8339 for \nTTY/TDD). You can remain anonymous.",
+          "time": 7.165717124938965,
+          "input_token_size": 2763,
+          "output_token_size": 128,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_0e54d494",
+        "created_at": 1750198294.3589926,
+        "processing_time": 11.506750345230103,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.767775"
+      }
+    }
+  },
+  {
+    "0e7ce947": {
+      "question": "How can taxpayers file claims for refunds according to the document?",
+      "answer": "You may file a claim for refund if you think you paid too much tax. You must generally file the claim within 3 years from the date you filed your original return or 2 years from the date you paid the tax, whichever is later. If you were due a refund but you did not file a return, you generally must file your return within 3 years from the date the return was due (including extensions) to get that refund.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            67,
+            68,
+            71,
+            78
+          ],
+          "provenance": "Refunds \nYou may file a claim for refund if you think \nyou paid too much tax.You must generally \nfile the claim within 3 years from the date \nyou filed your original return or 2 years from \nthe date you paid the tax, whichever is \nlater.If you were due a refund but you did not \n\nfile a return, you generally must file your \nreturn within 3 years from the date the \nreturn was due (including extensions) to get \nthat refund.(cid:127) Treasury Inspector General for Tax \n\nAdministration: You can confidentially \nreport misconduct, waste, fraud, or \nabuse by an IRS employee by calling \n1-800-366-4484 (1-800-877-8339 for \nTTY/TDD). You can remain anonymous.",
+          "time": 30.186450719833374,
+          "input_token_size": 2785,
+          "output_token_size": 231,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_0e7ce947",
+        "created_at": 1749877614.3673797,
+        "processing_time": 34.21390509605408,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 20,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 20,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.768775"
+      }
+    }
+  },
+  {
+    "1003f689": {
+      "question": "What service can help low-income taxpayers with representation?",
+      "answer": "Low Income Taxpayer Clinic",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "provenance_ids": [
+            16,
+            17
+          ],
+          "provenance": "Taxpayers have the right to seek assistance from a Low \nIncome Taxpayer Clinic if they cannot afford representation. 10.The Right to a Fair and Just Tax System\nTaxpayers have the right to expect the tax system to consider \nfacts and circumstances that might affect their underlying \nliabilities, ability to pay, or ability to provide information timely.",
+          "time": 3.6517820358276367,
+          "input_token_size": 2756,
+          "output_token_size": 20,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_1003f689",
+        "created_at": 1750198325.7933562,
+        "processing_time": 7.103538513183594,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.768775"
+      }
+    }
+  },
+  {
+    "117581ca": {
+      "question": "Who is entitled to a fair and impartial administrative appeal of most IRS decisions?",
+      "answer": "Taxpayers",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "provenance_ids": [
+            8
+          ],
+          "provenance": "5. The Right to Appeal an IRS Decision in an \nIndependent Forum\nTaxpayers are entitled to a fair and impartial administrative \nappeal of most IRS decisions, including many penalties, and \nhave the right to receive a written response regarding the \nOffice of Appeals’ decision.",
+          "time": 3.204655408859253,
+          "input_token_size": 2858,
+          "output_token_size": 12,
+          "original_provenance_id": 0
+        },
+        {
+          "provenance_id": 1,
+          "input_sentence_ids": [
+            9,
+            10,
+            11,
+            12,
+            13
+          ],
+          "provenance_ids": [
+            11,
+            12
+          ],
+          "provenance": "Taxpayers have the right to know \nwhen the IRS has finished an audit. 7.The Right to Privacy\nTaxpayers have the right to expect that any IRS inquiry, \nexamination, or enforcement action will comply with the law \nand be no more intrusive than necessary, and will respect all \ndue process rights, including search and seizure protections, \nand will provide, where applicable, a collection due process \nhearing.",
+          "time": 6.610829591751099,
+          "input_token_size": 3666,
+          "output_token_size": 19,
+          "original_provenance_id": 1
+        },
+        {
+          "provenance_id": 2,
+          "input_sentence_ids": [
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "provenance_ids": [
+            15,
+            17
+          ],
+          "provenance": "9. The Right to Retain Representation\nTaxpayers have the right to retain an authorized representative \nof their choice to represent them in their dealings with the \nIRS.The Right to a Fair and Just Tax System\nTaxpayers have the right to expect the tax system to consider \nfacts and circumstances that might affect their underlying \nliabilities, ability to pay, or ability to provide information timely.",
+          "time": 8.26237177848816,
+          "input_token_size": 3890,
+          "output_token_size": 22,
+          "original_provenance_id": 2
+        },
+        {
+          "provenance_id": 3,
+          "input_sentence_ids": [
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38
+          ],
+          "provenance_ids": [
+            20,
+            30,
+            34,
+            35,
+            36,
+            37
+          ],
+          "provenance": "9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.Publication 556, Examination of Returns, \n\nAppeal Rights, and Claims for Refund, \nexplains the rules and procedures that we \nfollow in examinations.You can \nrespond by mail or you can request a \npersonal interview with an examiner.If you \nmail us the requested information or \nprovide an explanation, we may or may not \nagree with you, and we will explain the \nreasons for any changes.Please do not \nhesitate to write to us about anything you \ndo not understand.By Interview \nIf we notify you that we will conduct your \nexamination through a personal interview, \nor you request such an interview, you have \nthe right to ask that the examination take \nplace at a reasonable time and place that is \nconvenient for both you and the IRS.",
+          "time": 17.960949659347534,
+          "input_token_size": 5052,
+          "output_token_size": 28,
+          "original_provenance_id": 3
+        },
+        {
+          "provenance_id": 4,
+          "input_sentence_ids": [
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48
+          ],
+          "provenance_ids": [
+            42,
+            43,
+            44,
+            46,
+            47,
+            48
+          ],
+          "provenance": "Most \ndifferences can be settled without \nexpensive and time-consuming court trials.Your appeal rights are explained in detail in \nboth Publication 5, Your Appeal Rights and \nHow To Prepare a Protest If You Don’t \nAgree, and Publication 556, Examination of \nReturns, Appeal Rights, and Claims for \nRefund.If you do not wish to use the Appeals \nOffice or disagree with its findings, you \nmay be able to take your case to the U.S. \nTax Court, U.S. Court of Federal Claims, or \nthe U.S. District Court where you live.If the court \nagrees with you on most issues in your \ncase and finds that our position was largely \nunjustified, you may be able to recover \nsome of your administrative and litigation \ncosts.You will not be eligible to recover \nthese costs unless you tried to resolve your \ncase administratively, including going \nthrough the appeals system, and you gave \nus the information necessary to resolve the \ncase.Collections \nPublication 594, The IRS Collection \nProcess, explains your rights and \nresponsibilities regarding payment of \nfederal taxes.",
+          "time": 23.434512615203857,
+          "input_token_size": 7947,
+          "output_token_size": 42,
+          "original_provenance_id": 4
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_117581ca",
+        "created_at": 1750198218.3584914,
+        "processing_time": 24.971376419067383,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 45,
+        "provenance_count": 5,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 45,
+            "provenance_count": 5,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.768775"
+      }
+    }
+  },
+  {
+    "1506655c": {
+      "question": "Which publication explains the IRS collection process?",
+      "answer": "Publication 594",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            0,
+            48
+          ],
+          "provenance": "Your Rights \nas a Taxpayer\n\nPublication 1\n\n \nThis publication explains your rights as a taxpayer and the processes for examination, appeal, collection, and refunds.Collections \nPublication 594, The IRS Collection \nProcess, explains your rights and \nresponsibilities regarding payment of \nfederal taxes.",
+          "time": 8.597009897232056,
+          "input_token_size": 2649,
+          "output_token_size": 11,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_1506655c",
+        "created_at": 1750198307.0539167,
+        "processing_time": 12.290578126907349,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 79,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 79,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.768775"
+      }
+    }
+  },
+  {
+    "1edff556": {
+      "question": "Who published the guide 'Your Rights as a Taxpayer'?",
+      "answer": "Department of the Treasury Internal Revenue Service",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            1,
+            3,
+            4,
+            5,
+            6,
+            20,
+            55,
+            56,
+            73,
+            74,
+            75,
+            77,
+            78
+          ],
+          "provenance": "Also available in Spanish. The Taxpayer Bill of Rights\n\n1.They are entitled to clear \nexplanations of the laws and IRS procedures in all tax forms, \ninstructions, publications, notices, and correspondence.They \nhave the right to be informed of IRS decisions about their tax \naccounts and to receive clear explanations of the outcomes. 2.The Right to Quality Service\nTaxpayers have the right to receive prompt, courteous, and \nprofessional assistance in their dealings with the IRS, to be \nspoken to in a way they can easily understand, to receive clear \nand easily understandable communications from the IRS, and \nto speak to a supervisor about inadequate service.3. The Right to Pay No More than the \nCorrect Amount of Tax\nTaxpayers have the right to pay only the amount of tax legally \ndue, including interest and penalties, and to have the IRS \napply all tax payments properly. 4.9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.Your collection appeal rights are explained \nin detail in Publication 1660, Collection \nAppeal Rights.Innocent Spouse Relief \nGenerally, both you and your spouse are \neach responsible for paying the full \namount of tax, interest, and penalties due \non your joint return.We can offer you help if your tax \nproblem is causing a hardship, or you’ve \ntried but haven’t been able to resolve your \nproblem with the IRS.If you qualify for our \nassistance, which is always free, we will do \neverything possible to help you.Visit \nwww.taxpayeradvocate.irs.gov or call \n1-877-777-4778.(cid:127) Tax Questions: 1-800-829-1040 \n(1-800-829-4059 for TTY/TDD)\n\n(cid:127) Forms and Publications: \n\n1-800-829-3676 (1-800-829-4059 for \nTTY/TDD) \n\n(cid:127) Internet: www.irs.gov \n(cid:127) Small Business Ombudsman: A small \nbusiness entity can participate in the \nregulatory process and comment on \nenforcement actions of the IRS by \ncalling 1-888-REG-FAIR.(cid:127) Treasury Inspector General for Tax \n\nAdministration: You can confidentially \nreport misconduct, waste, fraud, or \nabuse by an IRS employee by calling \n1-800-366-4484 (1-800-877-8339 for \nTTY/TDD). You can remain anonymous.",
+          "time": 22.26384472846985,
+          "input_token_size": 2657,
+          "output_token_size": 4,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_1edff556",
+        "created_at": 1749877557.3431413,
+        "processing_time": 23.633763074874878,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 79,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 79,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.768775"
+      }
+    }
+  },
+  {
+    "26051001": {
+      "question": "Who has the right to retain representation in dealings with the IRS?",
+      "answer": "Taxpayers have the right to retain an authorized representative of their choice to represent them in their dealings with the IRS.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "provenance_ids": [
+            15,
+            18
+          ],
+          "provenance": "9. The Right to Retain Representation\nTaxpayers have the right to retain an authorized representative \nof their choice to represent them in their dealings with the \nIRS.Taxpayers have the right to receive assistance from the \nTaxpayer Advocate Service if they are experiencing financial \ndifficulty or if the IRS has not resolved their tax issues properly \nand timely through its normal channels.",
+          "time": 5.42301869392395,
+          "input_token_size": 2768,
+          "output_token_size": 96,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_26051001",
+        "created_at": 1750198319.5666268,
+        "processing_time": 8.275997161865234,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.768775"
+      }
+    }
+  },
+  {
+    "2782b770": {
+      "question": "What rights do taxpayers have if they believe they paid too much tax?",
+      "answer": "1. The Right to Be Informed  \n2. The Right to Quality Service  \n3. The Right to Pay No More than the Correct Amount of Tax  \n4. The Right to Challenge the IRS’s Position and Be Heard  \n5. The Right to Appeal an IRS Decision in an Independent Forum  \n6. The Right to Finality  \n7. The Right to Privacy  \n8. The Right to Confidentiality  \n9. The Right to Retain Representation  \n10. The Right to a Fair and Just Tax System  \n11. File a claim for refund within 3 years from the date you filed your original return or 2 years from the date you paid the tax, whichever is later.  \n12. Interest on your refund if not paid within 45 days of the date you filed your return or claim for refund.  \n13. Seek assistance from the Taxpayer Advocate Service if experiencing hardship or unresolved issues with the IRS.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance": "Your Rights \nas a Taxpayer\n\nPublication 1\n\n \nThis publication explains your rights as a taxpayer and the processes for examination, appeal, collection, and refunds.Also available in Spanish. The Taxpayer Bill of Rights\n\n1.The Right to Be Informed\nTaxpayers have the right to know what they need to do to \ncomply with the tax laws.They are entitled to clear \nexplanations of the laws and IRS procedures in all tax forms, \ninstructions, publications, notices, and correspondence.They \nhave the right to be informed of IRS decisions about their tax \naccounts and to receive clear explanations of the outcomes. 2.The Right to Quality Service\nTaxpayers have the right to receive prompt, courteous, and \nprofessional assistance in their dealings with the IRS, to be \nspoken to in a way they can easily understand, to receive clear \nand easily understandable communications from the IRS, and \nto speak to a supervisor about inadequate service.3. The Right to Pay No More than the \nCorrect Amount of Tax\nTaxpayers have the right to pay only the amount of tax legally \ndue, including interest and penalties, and to have the IRS \napply all tax payments properly. 4.The Right to Challenge the IRS’s Position \nand Be Heard\nTaxpayers have the right to raise objections and provide \nadditional documentation in response to formal IRS actions or \nproposed actions, to expect that the IRS will consider their \ntimely objections and documentation promptly and fairly, and \nto receive a response if the IRS does not agree with their \nposition.5. The Right to Appeal an IRS Decision in an \nIndependent Forum\nTaxpayers are entitled to a fair and impartial administrative \nappeal of most IRS decisions, including many penalties, and \nhave the right to receive a written response regarding the \nOffice of Appeals’ decision.Taxpayers generally have the right \nto take their cases to court. 6.The Right to Finality\nTaxpayers have the right to know the maximum amount of \ntime they have to challenge the IRS’s position as well as the \nmaximum amount of time the IRS has to audit a particular tax \nyear or collect a tax debt.Taxpayers have the right to know \nwhen the IRS has finished an audit. 7.The Right to Privacy\nTaxpayers have the right to expect that any IRS inquiry, \nexamination, or enforcement action will comply with the law \nand be no more intrusive than necessary, and will respect all \ndue process rights, including search and seizure protections, \nand will provide, where applicable, a collection due process \nhearing.8. The Right to Conﬁdentiality\nTaxpayers have the right to expect that any information they \nprovide to the IRS will not be disclosed unless authorized by \nthe taxpayer or by law.Taxpayers have the right to expect \nappropriate action will be taken against employees, return \npreparers, and others who wrongfully use or disclose taxpayer \nreturn information.9. The Right to Retain Representation\nTaxpayers have the right to retain an authorized representative \nof their choice to represent them in their dealings with the \nIRS.Taxpayers have the right to seek assistance from a Low \nIncome Taxpayer Clinic if they cannot afford representation. 10.The Right to a Fair and Just Tax System\nTaxpayers have the right to expect the tax system to consider \nfacts and circumstances that might affect their underlying \nliabilities, ability to pay, or ability to provide information timely.Taxpayers have the right to receive assistance from the \nTaxpayer Advocate Service if they are experiencing financial \ndifficulty or if the IRS has not resolved their tax issues properly \nand timely through its normal channels.The IRS Mission\n\nProvide America’s taxpayers top-quality service by helping them understand and meet \ntheir tax responsibilities and enforce the law with integrity and fairness to all. Publication 1  (Rev.9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.If we inquire about your return or select it \nfor examination, it does not suggest that \nyou are dishonest.The inquiry or \nexamination may or may not result in more \ntax.We may close your case without \nchange; or, you may receive a refund.The process of selecting a return for \nexamination usually begins in one of two \nways.First, we use computer programs to \nidentify returns that may have incorrect \namounts.These programs may be based \non information returns, such as Forms \n1099 and W-2, on studies of past \nexaminations, or on certain issues \nidentified by compliance projects.Second, \nwe use information from outside sources \nthat indicates that a return may have \nincorrect amounts.These sources may \ninclude newspapers, public records, and \nindividuals.If we determine that the \ninformation is accurate and reliable, we \nmay use it to select a return for \nexamination.Publication 556, Examination of Returns, \n\nAppeal Rights, and Claims for Refund, \nexplains the rules and procedures that we \nfollow in examinations.The following \nsections give an overview of how we \nconduct examinations.By Mail \nWe handle many examinations and \ninquiries by mail.We will send you a letter \nwith either a request for more information \nor a reason why we believe a change to \nyour return may be needed.You can \nrespond by mail or you can request a \npersonal interview with an examiner.If you \nmail us the requested information or \nprovide an explanation, we may or may not \nagree with you, and we will explain the \nreasons for any changes.Please do not \nhesitate to write to us about anything you \ndo not understand.By Interview \nIf we notify you that we will conduct your \nexamination through a personal interview, \nor you request such an interview, you have \nthe right to ask that the examination take \nplace at a reasonable time and place that is \nconvenient for both you and the IRS.If our \nexaminer proposes any changes to your \nreturn, he or she will explain the reasons for \nthe changes.If you do not agree with these \nchanges, you can meet with the examiner’s \nsupervisor.Repeat Examinations \nIf we examined your return for the same \nitems in either of the 2 previous years and \nproposed no change to your tax liability, \nplease contact us as soon as possible so \nwe can see if we should discontinue the \nexamination.Appeals\nIf you do not agree with the examiner’s \nproposed changes, you can appeal them to \n\nthe Appeals Office of the IRS.Most \ndifferences can be settled without \nexpensive and time-consuming court trials.Your appeal rights are explained in detail in \nboth Publication 5, Your Appeal Rights and \nHow To Prepare a Protest If You Don’t \nAgree, and Publication 556, Examination of \nReturns, Appeal Rights, and Claims for \nRefund.If you do not wish to use the Appeals \nOffice or disagree with its findings, you \nmay be able to take your case to the U.S. \nTax Court, U.S. Court of Federal Claims, or \nthe U.S. District Court where you live.If \nyou take your case to court, the IRS will \nhave the burden of proving certain facts if \nyou kept adequate records to show your \ntax liability, cooperated with the IRS, and \nmeet certain other conditions.If the court \nagrees with you on most issues in your \ncase and finds that our position was largely \nunjustified, you may be able to recover \nsome of your administrative and litigation \ncosts.You will not be eligible to recover \nthese costs unless you tried to resolve your \ncase administratively, including going \nthrough the appeals system, and you gave \nus the information necessary to resolve the \ncase.Collections \nPublication 594, The IRS Collection \nProcess, explains your rights and \nresponsibilities regarding payment of \nfederal taxes.It describes: \n(cid:127) What to do when you owe taxes.It \n\ndescribes what to do if you get a tax bill \nand what to do if you think your bill is \nwrong.It also covers making installment \npayments, delaying collection action, \nand submitting an offer in compromise.(cid:127) IRS collection actions.It covers liens, \n\nreleasing a lien, levies, releasing a levy, \nseizures and sales, and release of \nproperty.(cid:127) IRS certification to the State Department \nof a seriously delinquent tax debt, which \nwill generally result in denial of a \npassport application and may lead to \nrevocation of a passport.Your collection appeal rights are explained \nin detail in Publication 1660, Collection \nAppeal Rights.Innocent Spouse Relief \nGenerally, both you and your spouse are \neach responsible for paying the full \namount of tax, interest, and penalties due \non your joint return.However, if you \nqualify for innocent spouse relief, you may \nbe relieved of part or all of the joint \nliability.To request relief, you must file \nForm 8857, Request for Innocent Spouse \nRelief.For more information on innocent \nspouse relief, see Publication 971, Innocent \nSpouse Relief, and Form 8857.Potential Third Party Contacts \nGenerally, the IRS will deal directly with you \nor your duly authorized representative.However, we sometimes talk with other \npersons if we need information that you \nhave been unable to provide, or to verify \ninformation we have received.If we do \ncontact other persons, such as a neighbor, \nbank, employer, or employees, we will \ngenerally need to tell them limited \ninformation, such as your name.The law \nprohibits us from disclosing any more \ninformation than is necessary to obtain or \nverify the information we are seeking.Our \nneed to contact other persons may \ncontinue as long as there is activity in your \ncase.If we do contact other persons, you \nhave a right to request a list of those \ncontacted.Your request can be made by \ntelephone, in writing, or during a personal \ninterview.Refunds \nYou may file a claim for refund if you think \nyou paid too much tax.You must generally \nfile the claim within 3 years from the date \nyou filed your original return or 2 years from \nthe date you paid the tax, whichever is \nlater.The law generally provides for interest \non your refund if it is not paid within 45 \ndays of the date you filed your return or \nclaim for refund.Publication 556, \nExamination of Returns, Appeal Rights, \nand Claims for Refund, has more \ninformation on refunds.If you were due a refund but you did not \n\nfile a return, you generally must file your \nreturn within 3 years from the date the \nreturn was due (including extensions) to get \nthat refund.Taxpayer Advocate Service  \nTAS is an independent organization within \nthe IRS that can help protect your taxpayer \nrights.We can offer you help if your tax \nproblem is causing a hardship, or you’ve \ntried but haven’t been able to resolve your \nproblem with the IRS.If you qualify for our \nassistance, which is always free, we will do \neverything possible to help you.Visit \nwww.taxpayeradvocate.irs.gov or call \n1-877-777-4778.Tax Information \nThe IRS provides the following sources for \nforms, publications, and additional \ninformation.(cid:127) Tax Questions: 1-800-829-1040 \n(1-800-829-4059 for TTY/TDD)\n\n(cid:127) Forms and Publications: \n\n1-800-829-3676 (1-800-829-4059 for \nTTY/TDD) \n\n(cid:127) Internet: www.irs.gov \n(cid:127) Small Business Ombudsman: A small \nbusiness entity can participate in the \nregulatory process and comment on \nenforcement actions of the IRS by \ncalling 1-888-REG-FAIR.(cid:127) Treasury Inspector General for Tax \n\nAdministration: You can confidentially \nreport misconduct, waste, fraud, or \nabuse by an IRS employee by calling \n1-800-366-4484 (1-800-877-8339 for \nTTY/TDD). You can remain anonymous.",
+          "time": 217.22098565101624,
+          "input_token_size": 2661,
+          "output_token_size": 247,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_2782b770",
+        "created_at": 1750198230.8423564,
+        "processing_time": 222.2588713169098,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 79,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 79,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.768775"
+      }
+    }
+  },
+  {
+    "59bf07d6": {
+      "question": "What rights do taxpayers have regarding IRS examinations?",
+      "answer": "1. The Right to Be Informed  \n2. The Right to Quality Service  \n3. The Right to Pay No More than the Correct Amount of Tax  \n4. The Right to Challenge the IRS’s Position and Be Heard  \n5. The Right to Appeal an IRS Decision in an Independent Forum  \n6. The Right to Finality  \n7. The Right to Privacy  \n8. The Right to Confidentiality  \n9. The Right to Retain Representation  \n10. The Right to a Fair and Just Tax System",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "provenance_ids": [
+            4,
+            5,
+            6,
+            7,
+            8,
+            10,
+            11,
+            12,
+            17
+          ],
+          "provenance": "They \nhave the right to be informed of IRS decisions about their tax \naccounts and to receive clear explanations of the outcomes. 2.The Right to Quality Service\nTaxpayers have the right to receive prompt, courteous, and \nprofessional assistance in their dealings with the IRS, to be \nspoken to in a way they can easily understand, to receive clear \nand easily understandable communications from the IRS, and \nto speak to a supervisor about inadequate service.3. The Right to Pay No More than the \nCorrect Amount of Tax\nTaxpayers have the right to pay only the amount of tax legally \ndue, including interest and penalties, and to have the IRS \napply all tax payments properly. 4.The Right to Challenge the IRS’s Position \nand Be Heard\nTaxpayers have the right to raise objections and provide \nadditional documentation in response to formal IRS actions or \nproposed actions, to expect that the IRS will consider their \ntimely objections and documentation promptly and fairly, and \nto receive a response if the IRS does not agree with their \nposition.5. The Right to Appeal an IRS Decision in an \nIndependent Forum\nTaxpayers are entitled to a fair and impartial administrative \nappeal of most IRS decisions, including many penalties, and \nhave the right to receive a written response regarding the \nOffice of Appeals’ decision.The Right to Finality\nTaxpayers have the right to know the maximum amount of \ntime they have to challenge the IRS’s position as well as the \nmaximum amount of time the IRS has to audit a particular tax \nyear or collect a tax debt.Taxpayers have the right to know \nwhen the IRS has finished an audit. 7.The Right to Privacy\nTaxpayers have the right to expect that any IRS inquiry, \nexamination, or enforcement action will comply with the law \nand be no more intrusive than necessary, and will respect all \ndue process rights, including search and seizure protections, \nand will provide, where applicable, a collection due process \nhearing.The Right to a Fair and Just Tax System\nTaxpayers have the right to expect the tax system to consider \nfacts and circumstances that might affect their underlying \nliabilities, ability to pay, or ability to provide information timely.",
+          "time": 57.38556671142578,
+          "input_token_size": 2945,
+          "output_token_size": 460,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_59bf07d6",
+        "created_at": 1749877601.0831542,
+        "processing_time": 66.16273260116577,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 19,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 19,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.770967"
+      }
+    }
+  },
+  {
+    "5ea9454e": {
+      "question": "What action should be taken if a taxpayer owes federal taxes?",
+      "answer": "Answer is not found.",
+      "provenance": [],
+      "metadata": {
+        "question_id": "p1_5ea9454e",
+        "created_at": 1750198313.3205698,
+        "processing_time": 0.5650970935821533,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "default",
+        "sentence_count": 999999,
+        "provenance_count": 0,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 999999,
+            "provenance_count": 0,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.770967"
+      }
+    }
+  },
+  {
+    "66bbc9d9": {
+      "question": "What must taxpayers do to comply with tax laws according to their rights?",
+      "answer": "Taxpayers must:\n\n1. Know what they need to do to comply with tax laws.\n2. Pay only the amount of tax legally due, including interest and penalties.\n3. Raise objections and provide additional documentation in response to formal IRS actions or proposed actions.\n4. Appeal IRS decisions in an independent forum if they disagree with them.\n5. File a claim for refund if they think they paid too much tax within the specified time limits. \n6. File their return within 3 years from the date the return was due to receive a refund if they were due one but did not file.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance": "Your Rights \nas a Taxpayer\n\nPublication 1\n\n \nThis publication explains your rights as a taxpayer and the processes for examination, appeal, collection, and refunds.Also available in Spanish. The Taxpayer Bill of Rights\n\n1.The Right to Be Informed\nTaxpayers have the right to know what they need to do to \ncomply with the tax laws.They are entitled to clear \nexplanations of the laws and IRS procedures in all tax forms, \ninstructions, publications, notices, and correspondence.They \nhave the right to be informed of IRS decisions about their tax \naccounts and to receive clear explanations of the outcomes. 2.The Right to Quality Service\nTaxpayers have the right to receive prompt, courteous, and \nprofessional assistance in their dealings with the IRS, to be \nspoken to in a way they can easily understand, to receive clear \nand easily understandable communications from the IRS, and \nto speak to a supervisor about inadequate service.3. The Right to Pay No More than the \nCorrect Amount of Tax\nTaxpayers have the right to pay only the amount of tax legally \ndue, including interest and penalties, and to have the IRS \napply all tax payments properly. 4.The Right to Challenge the IRS’s Position \nand Be Heard\nTaxpayers have the right to raise objections and provide \nadditional documentation in response to formal IRS actions or \nproposed actions, to expect that the IRS will consider their \ntimely objections and documentation promptly and fairly, and \nto receive a response if the IRS does not agree with their \nposition.5. The Right to Appeal an IRS Decision in an \nIndependent Forum\nTaxpayers are entitled to a fair and impartial administrative \nappeal of most IRS decisions, including many penalties, and \nhave the right to receive a written response regarding the \nOffice of Appeals’ decision.Taxpayers generally have the right \nto take their cases to court. 6.The Right to Finality\nTaxpayers have the right to know the maximum amount of \ntime they have to challenge the IRS’s position as well as the \nmaximum amount of time the IRS has to audit a particular tax \nyear or collect a tax debt.Taxpayers have the right to know \nwhen the IRS has finished an audit. 7.The Right to Privacy\nTaxpayers have the right to expect that any IRS inquiry, \nexamination, or enforcement action will comply with the law \nand be no more intrusive than necessary, and will respect all \ndue process rights, including search and seizure protections, \nand will provide, where applicable, a collection due process \nhearing.8. The Right to Conﬁdentiality\nTaxpayers have the right to expect that any information they \nprovide to the IRS will not be disclosed unless authorized by \nthe taxpayer or by law.Taxpayers have the right to expect \nappropriate action will be taken against employees, return \npreparers, and others who wrongfully use or disclose taxpayer \nreturn information.9. The Right to Retain Representation\nTaxpayers have the right to retain an authorized representative \nof their choice to represent them in their dealings with the \nIRS.Taxpayers have the right to seek assistance from a Low \nIncome Taxpayer Clinic if they cannot afford representation. 10.The Right to a Fair and Just Tax System\nTaxpayers have the right to expect the tax system to consider \nfacts and circumstances that might affect their underlying \nliabilities, ability to pay, or ability to provide information timely.Taxpayers have the right to receive assistance from the \nTaxpayer Advocate Service if they are experiencing financial \ndifficulty or if the IRS has not resolved their tax issues properly \nand timely through its normal channels.The IRS Mission\n\nProvide America’s taxpayers top-quality service by helping them understand and meet \ntheir tax responsibilities and enforce the law with integrity and fairness to all. Publication 1  (Rev.9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.If we inquire about your return or select it \nfor examination, it does not suggest that \nyou are dishonest.The inquiry or \nexamination may or may not result in more \ntax.We may close your case without \nchange; or, you may receive a refund.The process of selecting a return for \nexamination usually begins in one of two \nways.First, we use computer programs to \nidentify returns that may have incorrect \namounts.These programs may be based \non information returns, such as Forms \n1099 and W-2, on studies of past \nexaminations, or on certain issues \nidentified by compliance projects.Second, \nwe use information from outside sources \nthat indicates that a return may have \nincorrect amounts.These sources may \ninclude newspapers, public records, and \nindividuals.If we determine that the \ninformation is accurate and reliable, we \nmay use it to select a return for \nexamination.Publication 556, Examination of Returns, \n\nAppeal Rights, and Claims for Refund, \nexplains the rules and procedures that we \nfollow in examinations.The following \nsections give an overview of how we \nconduct examinations.By Mail \nWe handle many examinations and \ninquiries by mail.We will send you a letter \nwith either a request for more information \nor a reason why we believe a change to \nyour return may be needed.You can \nrespond by mail or you can request a \npersonal interview with an examiner.If you \nmail us the requested information or \nprovide an explanation, we may or may not \nagree with you, and we will explain the \nreasons for any changes.Please do not \nhesitate to write to us about anything you \ndo not understand.By Interview \nIf we notify you that we will conduct your \nexamination through a personal interview, \nor you request such an interview, you have \nthe right to ask that the examination take \nplace at a reasonable time and place that is \nconvenient for both you and the IRS.If our \nexaminer proposes any changes to your \nreturn, he or she will explain the reasons for \nthe changes.If you do not agree with these \nchanges, you can meet with the examiner’s \nsupervisor.Repeat Examinations \nIf we examined your return for the same \nitems in either of the 2 previous years and \nproposed no change to your tax liability, \nplease contact us as soon as possible so \nwe can see if we should discontinue the \nexamination.Appeals\nIf you do not agree with the examiner’s \nproposed changes, you can appeal them to \n\nthe Appeals Office of the IRS.Most \ndifferences can be settled without \nexpensive and time-consuming court trials.Your appeal rights are explained in detail in \nboth Publication 5, Your Appeal Rights and \nHow To Prepare a Protest If You Don’t \nAgree, and Publication 556, Examination of \nReturns, Appeal Rights, and Claims for \nRefund.If you do not wish to use the Appeals \nOffice or disagree with its findings, you \nmay be able to take your case to the U.S. \nTax Court, U.S. Court of Federal Claims, or \nthe U.S. District Court where you live.If \nyou take your case to court, the IRS will \nhave the burden of proving certain facts if \nyou kept adequate records to show your \ntax liability, cooperated with the IRS, and \nmeet certain other conditions.If the court \nagrees with you on most issues in your \ncase and finds that our position was largely \nunjustified, you may be able to recover \nsome of your administrative and litigation \ncosts.You will not be eligible to recover \nthese costs unless you tried to resolve your \ncase administratively, including going \nthrough the appeals system, and you gave \nus the information necessary to resolve the \ncase.Collections \nPublication 594, The IRS Collection \nProcess, explains your rights and \nresponsibilities regarding payment of \nfederal taxes.It describes: \n(cid:127) What to do when you owe taxes.It \n\ndescribes what to do if you get a tax bill \nand what to do if you think your bill is \nwrong.It also covers making installment \npayments, delaying collection action, \nand submitting an offer in compromise.(cid:127) IRS collection actions.It covers liens, \n\nreleasing a lien, levies, releasing a levy, \nseizures and sales, and release of \nproperty.(cid:127) IRS certification to the State Department \nof a seriously delinquent tax debt, which \nwill generally result in denial of a \npassport application and may lead to \nrevocation of a passport.Your collection appeal rights are explained \nin detail in Publication 1660, Collection \nAppeal Rights.Innocent Spouse Relief \nGenerally, both you and your spouse are \neach responsible for paying the full \namount of tax, interest, and penalties due \non your joint return.However, if you \nqualify for innocent spouse relief, you may \nbe relieved of part or all of the joint \nliability.To request relief, you must file \nForm 8857, Request for Innocent Spouse \nRelief.For more information on innocent \nspouse relief, see Publication 971, Innocent \nSpouse Relief, and Form 8857.Potential Third Party Contacts \nGenerally, the IRS will deal directly with you \nor your duly authorized representative.However, we sometimes talk with other \npersons if we need information that you \nhave been unable to provide, or to verify \ninformation we have received.If we do \ncontact other persons, such as a neighbor, \nbank, employer, or employees, we will \ngenerally need to tell them limited \ninformation, such as your name.The law \nprohibits us from disclosing any more \ninformation than is necessary to obtain or \nverify the information we are seeking.Our \nneed to contact other persons may \ncontinue as long as there is activity in your \ncase.If we do contact other persons, you \nhave a right to request a list of those \ncontacted.Your request can be made by \ntelephone, in writing, or during a personal \ninterview.Refunds \nYou may file a claim for refund if you think \nyou paid too much tax.You must generally \nfile the claim within 3 years from the date \nyou filed your original return or 2 years from \nthe date you paid the tax, whichever is \nlater.The law generally provides for interest \non your refund if it is not paid within 45 \ndays of the date you filed your return or \nclaim for refund.Publication 556, \nExamination of Returns, Appeal Rights, \nand Claims for Refund, has more \ninformation on refunds.If you were due a refund but you did not \n\nfile a return, you generally must file your \nreturn within 3 years from the date the \nreturn was due (including extensions) to get \nthat refund.Taxpayer Advocate Service  \nTAS is an independent organization within \nthe IRS that can help protect your taxpayer \nrights.We can offer you help if your tax \nproblem is causing a hardship, or you’ve \ntried but haven’t been able to resolve your \nproblem with the IRS.If you qualify for our \nassistance, which is always free, we will do \neverything possible to help you.Visit \nwww.taxpayeradvocate.irs.gov or call \n1-877-777-4778.Tax Information \nThe IRS provides the following sources for \nforms, publications, and additional \ninformation.(cid:127) Tax Questions: 1-800-829-1040 \n(1-800-829-4059 for TTY/TDD)\n\n(cid:127) Forms and Publications: \n\n1-800-829-3676 (1-800-829-4059 for \nTTY/TDD) \n\n(cid:127) Internet: www.irs.gov \n(cid:127) Small Business Ombudsman: A small \nbusiness entity can participate in the \nregulatory process and comment on \nenforcement actions of the IRS by \ncalling 1-888-REG-FAIR.(cid:127) Treasury Inspector General for Tax \n\nAdministration: You can confidentially \nreport misconduct, waste, fraud, or \nabuse by an IRS employee by calling \n1-800-366-4484 (1-800-877-8339 for \nTTY/TDD). You can remain anonymous.",
+          "time": 150.89567613601685,
+          "input_token_size": 2661,
+          "output_token_size": 290,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_66bbc9d9",
+        "created_at": 1750198263.034497,
+        "processing_time": 154.04754281044006,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 79,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 79,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.770967"
+      }
+    }
+  },
+  {
+    "68840468": {
+      "question": "What rights do taxpayers have regarding the confidentiality of their information?",
+      "answer": "8. The Right to Conﬁdentiality  \nTaxpayers have the right to expect that any information they provide to the IRS will not be disclosed unless authorized by the taxpayer or by law. Taxpayers have the right to expect appropriate action will be taken against employees, return preparers, and others who wrongfully use or disclose taxpayer return information.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "provenance_ids": [
+            13,
+            14
+          ],
+          "provenance": "8. The Right to Conﬁdentiality\nTaxpayers have the right to expect that any information they \nprovide to the IRS will not be disclosed unless authorized by \nthe taxpayer or by law.Taxpayers have the right to expect \nappropriate action will be taken against employees, return \npreparers, and others who wrongfully use or disclose taxpayer \nreturn information.",
+          "time": 15.594350337982178,
+          "input_token_size": 3001,
+          "output_token_size": 244,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_68840468",
+        "created_at": 1750198288.070369,
+        "processing_time": 20.89646053314209,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 10,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 10,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.770967"
+      }
+    }
+  },
+  {
+    "725b8434": {
+      "question": "What right allows taxpayers to challenge the IRS’s position?",
+      "answer": "The Right to Challenge the IRS’s Position and Be Heard",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "provenance_ids": [
+            4,
+            7
+          ],
+          "provenance": "They \nhave the right to be informed of IRS decisions about their tax \naccounts and to receive clear explanations of the outcomes. 2.The Right to Challenge the IRS’s Position \nand Be Heard\nTaxpayers have the right to raise objections and provide \nadditional documentation in response to formal IRS actions or \nproposed actions, to expect that the IRS will consider their \ntimely objections and documentation promptly and fairly, and \nto receive a response if the IRS does not agree with their \nposition.",
+          "time": 4.1715710163116455,
+          "input_token_size": 2842,
+          "output_token_size": 44,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_725b8434",
+        "created_at": 1750198332.0882008,
+        "processing_time": 7.10748291015625,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.770967"
+      }
+    }
+  },
+  {
+    "7a5e451f": {
+      "question": "How does the IRS select returns for examination?",
+      "answer": "The IRS selects returns for examination using two main methods: \n\n1. Computer programs to identify returns that may have incorrect amounts based on information returns, studies of past examinations, or compliance projects.\n2. Information from outside sources that indicates a return may have incorrect amounts, such as newspapers, public records, and individuals.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38
+          ],
+          "provenance_ids": [
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            37,
+            38
+          ],
+          "provenance": "9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.If we inquire about your return or select it \nfor examination, it does not suggest that \nyou are dishonest.The inquiry or \nexamination may or may not result in more \ntax.We may close your case without \nchange; or, you may receive a refund.The process of selecting a return for \nexamination usually begins in one of two \nways.First, we use computer programs to \nidentify returns that may have incorrect \namounts.These programs may be based \non information returns, such as Forms \n1099 and W-2, on studies of past \nexaminations, or on certain issues \nidentified by compliance projects.Second, \nwe use information from outside sources \nthat indicates that a return may have \nincorrect amounts.These sources may \ninclude newspapers, public records, and \nindividuals.If we determine that the \ninformation is accurate and reliable, we \nmay use it to select a return for \nexamination.By Interview \nIf we notify you that we will conduct your \nexamination through a personal interview, \nor you request such an interview, you have \nthe right to ask that the examination take \nplace at a reasonable time and place that is \nconvenient for both you and the IRS.If our \nexaminer proposes any changes to your \nreturn, he or she will explain the reasons for \nthe changes.",
+          "time": 21.04297947883606,
+          "input_token_size": 2462,
+          "output_token_size": 173,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_7a5e451f",
+        "created_at": 1749877588.5672054,
+        "processing_time": 23.990023851394653,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 20,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 20,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.770967"
+      }
+    }
+  },
+  {
+    "7c6c83e0": {
+      "question": "When was the publication revised?",
+      "answer": "Rev. 9-2017",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            19,
+            20,
+            21,
+            22,
+            23
+          ],
+          "provenance_ids": [
+            19,
+            20
+          ],
+          "provenance": "The IRS Mission\n\nProvide America’s taxpayers top-quality service by helping them understand and meet \ntheir tax responsibilities and enforce the law with integrity and fairness to all. Publication 1  (Rev.9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.",
+          "time": 3.6108553409576416,
+          "input_token_size": 2333,
+          "output_token_size": 28,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_7c6c83e0",
+        "created_at": 1749877569.8646107,
+        "processing_time": 6.736607551574707,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.770967"
+      }
+    }
+  },
+  {
+    "910c8ed8": {
+      "question": "What are the processes involved in appealing an IRS decision?",
+      "answer": "1. Raise objections and provide additional documentation in response to formal IRS actions or proposed actions.\n2. Appeal to the Appeals Office of the IRS if you do not agree with the examiner’s proposed changes.\n3. Receive a written response regarding the Office of Appeals’ decision.\n4. Take the case to court if you disagree with the Appeals Office's findings.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            6,
+            7,
+            8,
+            9,
+            14,
+            15,
+            40,
+            41,
+            42,
+            43,
+            45,
+            46,
+            54,
+            55,
+            56,
+            57,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            77,
+            78
+          ],
+          "provenance": "Your Rights \nas a Taxpayer\n\nPublication 1\n\n \nThis publication explains your rights as a taxpayer and the processes for examination, appeal, collection, and refunds.Also available in Spanish. The Taxpayer Bill of Rights\n\n1.The Right to Be Informed\nTaxpayers have the right to know what they need to do to \ncomply with the tax laws.They are entitled to clear \nexplanations of the laws and IRS procedures in all tax forms, \ninstructions, publications, notices, and correspondence.They \nhave the right to be informed of IRS decisions about their tax \naccounts and to receive clear explanations of the outcomes. 2.3. The Right to Pay No More than the \nCorrect Amount of Tax\nTaxpayers have the right to pay only the amount of tax legally \ndue, including interest and penalties, and to have the IRS \napply all tax payments properly. 4.The Right to Challenge the IRS’s Position \nand Be Heard\nTaxpayers have the right to raise objections and provide \nadditional documentation in response to formal IRS actions or \nproposed actions, to expect that the IRS will consider their \ntimely objections and documentation promptly and fairly, and \nto receive a response if the IRS does not agree with their \nposition.5. The Right to Appeal an IRS Decision in an \nIndependent Forum\nTaxpayers are entitled to a fair and impartial administrative \nappeal of most IRS decisions, including many penalties, and \nhave the right to receive a written response regarding the \nOffice of Appeals’ decision.Taxpayers generally have the right \nto take their cases to court. 6.Taxpayers have the right to expect \nappropriate action will be taken against employees, return \npreparers, and others who wrongfully use or disclose taxpayer \nreturn information.9. The Right to Retain Representation\nTaxpayers have the right to retain an authorized representative \nof their choice to represent them in their dealings with the \nIRS.Repeat Examinations \nIf we examined your return for the same \nitems in either of the 2 previous years and \nproposed no change to your tax liability, \nplease contact us as soon as possible so \nwe can see if we should discontinue the \nexamination.Appeals\nIf you do not agree with the examiner’s \nproposed changes, you can appeal them to \n\nthe Appeals Office of the IRS.Most \ndifferences can be settled without \nexpensive and time-consuming court trials.Your appeal rights are explained in detail in \nboth Publication 5, Your Appeal Rights and \nHow To Prepare a Protest If You Don’t \nAgree, and Publication 556, Examination of \nReturns, Appeal Rights, and Claims for \nRefund.If \nyou take your case to court, the IRS will \nhave the burden of proving certain facts if \nyou kept adequate records to show your \ntax liability, cooperated with the IRS, and \nmeet certain other conditions.If the court \nagrees with you on most issues in your \ncase and finds that our position was largely \nunjustified, you may be able to recover \nsome of your administrative and litigation \ncosts.(cid:127) IRS certification to the State Department \nof a seriously delinquent tax debt, which \nwill generally result in denial of a \npassport application and may lead to \nrevocation of a passport.Your collection appeal rights are explained \nin detail in Publication 1660, Collection \nAppeal Rights.Innocent Spouse Relief \nGenerally, both you and your spouse are \neach responsible for paying the full \namount of tax, interest, and penalties due \non your joint return.However, if you \nqualify for innocent spouse relief, you may \nbe relieved of part or all of the joint \nliability.For more information on innocent \nspouse relief, see Publication 971, Innocent \nSpouse Relief, and Form 8857.Potential Third Party Contacts \nGenerally, the IRS will deal directly with you \nor your duly authorized representative.However, we sometimes talk with other \npersons if we need information that you \nhave been unable to provide, or to verify \ninformation we have received.If we do \ncontact other persons, such as a neighbor, \nbank, employer, or employees, we will \ngenerally need to tell them limited \ninformation, such as your name.The law \nprohibits us from disclosing any more \ninformation than is necessary to obtain or \nverify the information we are seeking.Our \nneed to contact other persons may \ncontinue as long as there is activity in your \ncase.If we do contact other persons, you \nhave a right to request a list of those \ncontacted.Your request can be made by \ntelephone, in writing, or during a personal \ninterview.Refunds \nYou may file a claim for refund if you think \nyou paid too much tax.You must generally \nfile the claim within 3 years from the date \nyou filed your original return or 2 years from \nthe date you paid the tax, whichever is \nlater.The law generally provides for interest \non your refund if it is not paid within 45 \ndays of the date you filed your return or \nclaim for refund.Publication 556, \nExamination of Returns, Appeal Rights, \nand Claims for Refund, has more \ninformation on refunds.If you were due a refund but you did not \n\nfile a return, you generally must file your \nreturn within 3 years from the date the \nreturn was due (including extensions) to get \nthat refund.Taxpayer Advocate Service  \nTAS is an independent organization within \nthe IRS that can help protect your taxpayer \nrights.We can offer you help if your tax \nproblem is causing a hardship, or you’ve \ntried but haven’t been able to resolve your \nproblem with the IRS.If you qualify for our \nassistance, which is always free, we will do \neverything possible to help you.Visit \nwww.taxpayeradvocate.irs.gov or call \n1-877-777-4778.(cid:127) Tax Questions: 1-800-829-1040 \n(1-800-829-4059 for TTY/TDD)\n\n(cid:127) Forms and Publications: \n\n1-800-829-3676 (1-800-829-4059 for \nTTY/TDD) \n\n(cid:127) Internet: www.irs.gov \n(cid:127) Small Business Ombudsman: A small \nbusiness entity can participate in the \nregulatory process and comment on \nenforcement actions of the IRS by \ncalling 1-888-REG-FAIR.(cid:127) Treasury Inspector General for Tax \n\nAdministration: You can confidentially \nreport misconduct, waste, fraud, or \nabuse by an IRS employee by calling \n1-800-366-4484 (1-800-877-8339 for \nTTY/TDD). You can remain anonymous.",
+          "time": 119.12875938415527,
+          "input_token_size": 2655,
+          "output_token_size": 151,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_910c8ed8",
+        "created_at": 1749877594.820264,
+        "processing_time": 121.57781934738159,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 79,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 79,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.770967"
+      }
+    }
+  },
+  {
+    "98fd1fc3": {
+      "question": "Where can a taxpayer take their case if they disagree with the Appeals Office's findings?",
+      "answer": "U.S. Tax Court, U.S. Court of Federal Claims, or the U.S. District Court where you live.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            56,
+            57,
+            58,
+            59,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance": "Your Rights \nas a Taxpayer\n\nPublication 1\n\n \nThis publication explains your rights as a taxpayer and the processes for examination, appeal, collection, and refunds.Also available in Spanish. The Taxpayer Bill of Rights\n\n1.The Right to Be Informed\nTaxpayers have the right to know what they need to do to \ncomply with the tax laws.They are entitled to clear \nexplanations of the laws and IRS procedures in all tax forms, \ninstructions, publications, notices, and correspondence.They \nhave the right to be informed of IRS decisions about their tax \naccounts and to receive clear explanations of the outcomes. 2.The Right to Quality Service\nTaxpayers have the right to receive prompt, courteous, and \nprofessional assistance in their dealings with the IRS, to be \nspoken to in a way they can easily understand, to receive clear \nand easily understandable communications from the IRS, and \nto speak to a supervisor about inadequate service.3. The Right to Pay No More than the \nCorrect Amount of Tax\nTaxpayers have the right to pay only the amount of tax legally \ndue, including interest and penalties, and to have the IRS \napply all tax payments properly. 4.The Right to Challenge the IRS’s Position \nand Be Heard\nTaxpayers have the right to raise objections and provide \nadditional documentation in response to formal IRS actions or \nproposed actions, to expect that the IRS will consider their \ntimely objections and documentation promptly and fairly, and \nto receive a response if the IRS does not agree with their \nposition.5. The Right to Appeal an IRS Decision in an \nIndependent Forum\nTaxpayers are entitled to a fair and impartial administrative \nappeal of most IRS decisions, including many penalties, and \nhave the right to receive a written response regarding the \nOffice of Appeals’ decision.Taxpayers generally have the right \nto take their cases to court. 6.The Right to Finality\nTaxpayers have the right to know the maximum amount of \ntime they have to challenge the IRS’s position as well as the \nmaximum amount of time the IRS has to audit a particular tax \nyear or collect a tax debt.Taxpayers have the right to know \nwhen the IRS has finished an audit. 7.The Right to Privacy\nTaxpayers have the right to expect that any IRS inquiry, \nexamination, or enforcement action will comply with the law \nand be no more intrusive than necessary, and will respect all \ndue process rights, including search and seizure protections, \nand will provide, where applicable, a collection due process \nhearing.8. The Right to Conﬁdentiality\nTaxpayers have the right to expect that any information they \nprovide to the IRS will not be disclosed unless authorized by \nthe taxpayer or by law.Taxpayers have the right to expect \nappropriate action will be taken against employees, return \npreparers, and others who wrongfully use or disclose taxpayer \nreturn information.9. The Right to Retain Representation\nTaxpayers have the right to retain an authorized representative \nof their choice to represent them in their dealings with the \nIRS.Taxpayers have the right to seek assistance from a Low \nIncome Taxpayer Clinic if they cannot afford representation. 10.The Right to a Fair and Just Tax System\nTaxpayers have the right to expect the tax system to consider \nfacts and circumstances that might affect their underlying \nliabilities, ability to pay, or ability to provide information timely.Taxpayers have the right to receive assistance from the \nTaxpayer Advocate Service if they are experiencing financial \ndifficulty or if the IRS has not resolved their tax issues properly \nand timely through its normal channels.9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.If we inquire about your return or select it \nfor examination, it does not suggest that \nyou are dishonest.The inquiry or \nexamination may or may not result in more \ntax.We may close your case without \nchange; or, you may receive a refund.The process of selecting a return for \nexamination usually begins in one of two \nways.First, we use computer programs to \nidentify returns that may have incorrect \namounts.These programs may be based \non information returns, such as Forms \n1099 and W-2, on studies of past \nexaminations, or on certain issues \nidentified by compliance projects.Second, \nwe use information from outside sources \nthat indicates that a return may have \nincorrect amounts.These sources may \ninclude newspapers, public records, and \nindividuals.If we determine that the \ninformation is accurate and reliable, we \nmay use it to select a return for \nexamination.Publication 556, Examination of Returns, \n\nAppeal Rights, and Claims for Refund, \nexplains the rules and procedures that we \nfollow in examinations.The following \nsections give an overview of how we \nconduct examinations.By Mail \nWe handle many examinations and \ninquiries by mail.We will send you a letter \nwith either a request for more information \nor a reason why we believe a change to \nyour return may be needed.You can \nrespond by mail or you can request a \npersonal interview with an examiner.If you \nmail us the requested information or \nprovide an explanation, we may or may not \nagree with you, and we will explain the \nreasons for any changes.Please do not \nhesitate to write to us about anything you \ndo not understand.By Interview \nIf we notify you that we will conduct your \nexamination through a personal interview, \nor you request such an interview, you have \nthe right to ask that the examination take \nplace at a reasonable time and place that is \nconvenient for both you and the IRS.If our \nexaminer proposes any changes to your \nreturn, he or she will explain the reasons for \nthe changes.If you do not agree with these \nchanges, you can meet with the examiner’s \nsupervisor.Repeat Examinations \nIf we examined your return for the same \nitems in either of the 2 previous years and \nproposed no change to your tax liability, \nplease contact us as soon as possible so \nwe can see if we should discontinue the \nexamination.Appeals\nIf you do not agree with the examiner’s \nproposed changes, you can appeal them to \n\nthe Appeals Office of the IRS.Most \ndifferences can be settled without \nexpensive and time-consuming court trials.Your appeal rights are explained in detail in \nboth Publication 5, Your Appeal Rights and \nHow To Prepare a Protest If You Don’t \nAgree, and Publication 556, Examination of \nReturns, Appeal Rights, and Claims for \nRefund.If you do not wish to use the Appeals \nOffice or disagree with its findings, you \nmay be able to take your case to the U.S. \nTax Court, U.S. Court of Federal Claims, or \nthe U.S. District Court where you live.If \nyou take your case to court, the IRS will \nhave the burden of proving certain facts if \nyou kept adequate records to show your \ntax liability, cooperated with the IRS, and \nmeet certain other conditions.Innocent Spouse Relief \nGenerally, both you and your spouse are \neach responsible for paying the full \namount of tax, interest, and penalties due \non your joint return.However, if you \nqualify for innocent spouse relief, you may \nbe relieved of part or all of the joint \nliability.To request relief, you must file \nForm 8857, Request for Innocent Spouse \nRelief.For more information on innocent \nspouse relief, see Publication 971, Innocent \nSpouse Relief, and Form 8857.If we do \ncontact other persons, such as a neighbor, \nbank, employer, or employees, we will \ngenerally need to tell them limited \ninformation, such as your name.The law \nprohibits us from disclosing any more \ninformation than is necessary to obtain or \nverify the information we are seeking.Our \nneed to contact other persons may \ncontinue as long as there is activity in your \ncase.If we do contact other persons, you \nhave a right to request a list of those \ncontacted.Your request can be made by \ntelephone, in writing, or during a personal \ninterview.Refunds \nYou may file a claim for refund if you think \nyou paid too much tax.You must generally \nfile the claim within 3 years from the date \nyou filed your original return or 2 years from \nthe date you paid the tax, whichever is \nlater.The law generally provides for interest \non your refund if it is not paid within 45 \ndays of the date you filed your return or \nclaim for refund.Publication 556, \nExamination of Returns, Appeal Rights, \nand Claims for Refund, has more \ninformation on refunds.If you were due a refund but you did not \n\nfile a return, you generally must file your \nreturn within 3 years from the date the \nreturn was due (including extensions) to get \nthat refund.Taxpayer Advocate Service  \nTAS is an independent organization within \nthe IRS that can help protect your taxpayer \nrights.We can offer you help if your tax \nproblem is causing a hardship, or you’ve \ntried but haven’t been able to resolve your \nproblem with the IRS.If you qualify for our \nassistance, which is always free, we will do \neverything possible to help you.Visit \nwww.taxpayeradvocate.irs.gov or call \n1-877-777-4778.Tax Information \nThe IRS provides the following sources for \nforms, publications, and additional \ninformation.(cid:127) Tax Questions: 1-800-829-1040 \n(1-800-829-4059 for TTY/TDD)\n\n(cid:127) Forms and Publications: \n\n1-800-829-3676 (1-800-829-4059 for \nTTY/TDD) \n\n(cid:127) Internet: www.irs.gov \n(cid:127) Small Business Ombudsman: A small \nbusiness entity can participate in the \nregulatory process and comment on \nenforcement actions of the IRS by \ncalling 1-888-REG-FAIR.(cid:127) Treasury Inspector General for Tax \n\nAdministration: You can confidentially \nreport misconduct, waste, fraud, or \nabuse by an IRS employee by calling \n1-800-366-4484 (1-800-877-8339 for \nTTY/TDD). You can remain anonymous.",
+          "time": 51.75321650505066,
+          "input_token_size": 2667,
+          "output_token_size": 34,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_98fd1fc3",
+        "created_at": 1750198338.3744562,
+        "processing_time": 53.56440186500549,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 79,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 79,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.772971"
+      }
+    }
+  },
+  {
+    "9cb2356a": {
+      "question": "Who can taxpayers speak to if they receive inadequate service from the IRS?",
+      "answer": "Taxpayers can speak to a supervisor about inadequate service from the IRS.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71
+          ],
+          "provenance": "Your Rights \nas a Taxpayer\n\nPublication 1\n\n \nThis publication explains your rights as a taxpayer and the processes for examination, appeal, collection, and refunds.Also available in Spanish. The Taxpayer Bill of Rights\n\n1.The Right to Be Informed\nTaxpayers have the right to know what they need to do to \ncomply with the tax laws.They are entitled to clear \nexplanations of the laws and IRS procedures in all tax forms, \ninstructions, publications, notices, and correspondence.They \nhave the right to be informed of IRS decisions about their tax \naccounts and to receive clear explanations of the outcomes. 2.The Right to Quality Service\nTaxpayers have the right to receive prompt, courteous, and \nprofessional assistance in their dealings with the IRS, to be \nspoken to in a way they can easily understand, to receive clear \nand easily understandable communications from the IRS, and \nto speak to a supervisor about inadequate service.3. The Right to Pay No More than the \nCorrect Amount of Tax\nTaxpayers have the right to pay only the amount of tax legally \ndue, including interest and penalties, and to have the IRS \napply all tax payments properly. 4.The Right to Challenge the IRS’s Position \nand Be Heard\nTaxpayers have the right to raise objections and provide \nadditional documentation in response to formal IRS actions or \nproposed actions, to expect that the IRS will consider their \ntimely objections and documentation promptly and fairly, and \nto receive a response if the IRS does not agree with their \nposition.5. The Right to Appeal an IRS Decision in an \nIndependent Forum\nTaxpayers are entitled to a fair and impartial administrative \nappeal of most IRS decisions, including many penalties, and \nhave the right to receive a written response regarding the \nOffice of Appeals’ decision.Taxpayers generally have the right \nto take their cases to court. 6.The Right to Finality\nTaxpayers have the right to know the maximum amount of \ntime they have to challenge the IRS’s position as well as the \nmaximum amount of time the IRS has to audit a particular tax \nyear or collect a tax debt.Taxpayers have the right to know \nwhen the IRS has finished an audit. 7.The Right to Privacy\nTaxpayers have the right to expect that any IRS inquiry, \nexamination, or enforcement action will comply with the law \nand be no more intrusive than necessary, and will respect all \ndue process rights, including search and seizure protections, \nand will provide, where applicable, a collection due process \nhearing.8. The Right to Conﬁdentiality\nTaxpayers have the right to expect that any information they \nprovide to the IRS will not be disclosed unless authorized by \nthe taxpayer or by law.Taxpayers have the right to expect \nappropriate action will be taken against employees, return \npreparers, and others who wrongfully use or disclose taxpayer \nreturn information.9. The Right to Retain Representation\nTaxpayers have the right to retain an authorized representative \nof their choice to represent them in their dealings with the \nIRS.Taxpayers have the right to seek assistance from a Low \nIncome Taxpayer Clinic if they cannot afford representation. 10.The Right to a Fair and Just Tax System\nTaxpayers have the right to expect the tax system to consider \nfacts and circumstances that might affect their underlying \nliabilities, ability to pay, or ability to provide information timely.Taxpayers have the right to receive assistance from the \nTaxpayer Advocate Service if they are experiencing financial \ndifficulty or if the IRS has not resolved their tax issues properly \nand timely through its normal channels.The IRS Mission\n\nProvide America’s taxpayers top-quality service by helping them understand and meet \ntheir tax responsibilities and enforce the law with integrity and fairness to all. Publication 1  (Rev.9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.If we inquire about your return or select it \nfor examination, it does not suggest that \nyou are dishonest.The inquiry or \nexamination may or may not result in more \ntax.We may close your case without \nchange; or, you may receive a refund.The process of selecting a return for \nexamination usually begins in one of two \nways.First, we use computer programs to \nidentify returns that may have incorrect \namounts.These programs may be based \non information returns, such as Forms \n1099 and W-2, on studies of past \nexaminations, or on certain issues \nidentified by compliance projects.Second, \nwe use information from outside sources \nthat indicates that a return may have \nincorrect amounts.These sources may \ninclude newspapers, public records, and \nindividuals.If we determine that the \ninformation is accurate and reliable, we \nmay use it to select a return for \nexamination.Publication 556, Examination of Returns, \n\nAppeal Rights, and Claims for Refund, \nexplains the rules and procedures that we \nfollow in examinations.The following \nsections give an overview of how we \nconduct examinations.By Mail \nWe handle many examinations and \ninquiries by mail.We will send you a letter \nwith either a request for more information \nor a reason why we believe a change to \nyour return may be needed.You can \nrespond by mail or you can request a \npersonal interview with an examiner.If you \nmail us the requested information or \nprovide an explanation, we may or may not \nagree with you, and we will explain the \nreasons for any changes.Please do not \nhesitate to write to us about anything you \ndo not understand.By Interview \nIf we notify you that we will conduct your \nexamination through a personal interview, \nor you request such an interview, you have \nthe right to ask that the examination take \nplace at a reasonable time and place that is \nconvenient for both you and the IRS.If our \nexaminer proposes any changes to your \nreturn, he or she will explain the reasons for \nthe changes.If you do not agree with these \nchanges, you can meet with the examiner’s \nsupervisor.Repeat Examinations \nIf we examined your return for the same \nitems in either of the 2 previous years and \nproposed no change to your tax liability, \nplease contact us as soon as possible so \nwe can see if we should discontinue the \nexamination.Appeals\nIf you do not agree with the examiner’s \nproposed changes, you can appeal them to \n\nthe Appeals Office of the IRS.Most \ndifferences can be settled without \nexpensive and time-consuming court trials.Your appeal rights are explained in detail in \nboth Publication 5, Your Appeal Rights and \nHow To Prepare a Protest If You Don’t \nAgree, and Publication 556, Examination of \nReturns, Appeal Rights, and Claims for \nRefund.If you do not wish to use the Appeals \nOffice or disagree with its findings, you \nmay be able to take your case to the U.S. \nTax Court, U.S. Court of Federal Claims, or \nthe U.S. District Court where you live.If \nyou take your case to court, the IRS will \nhave the burden of proving certain facts if \nyou kept adequate records to show your \ntax liability, cooperated with the IRS, and \nmeet certain other conditions.If the court \nagrees with you on most issues in your \ncase and finds that our position was largely \nunjustified, you may be able to recover \nsome of your administrative and litigation \ncosts.You will not be eligible to recover \nthese costs unless you tried to resolve your \ncase administratively, including going \nthrough the appeals system, and you gave \nus the information necessary to resolve the \ncase.Collections \nPublication 594, The IRS Collection \nProcess, explains your rights and \nresponsibilities regarding payment of \nfederal taxes.It describes: \n(cid:127) What to do when you owe taxes.It \n\ndescribes what to do if you get a tax bill \nand what to do if you think your bill is \nwrong.It also covers making installment \npayments, delaying collection action, \nand submitting an offer in compromise.(cid:127) IRS collection actions.It covers liens, \n\nreleasing a lien, levies, releasing a levy, \nseizures and sales, and release of \nproperty.(cid:127) IRS certification to the State Department \nof a seriously delinquent tax debt, which \nwill generally result in denial of a \npassport application and may lead to \nrevocation of a passport.Your collection appeal rights are explained \nin detail in Publication 1660, Collection \nAppeal Rights.Innocent Spouse Relief \nGenerally, both you and your spouse are \neach responsible for paying the full \namount of tax, interest, and penalties due \non your joint return.However, if you \nqualify for innocent spouse relief, you may \nbe relieved of part or all of the joint \nliability.To request relief, you must file \nForm 8857, Request for Innocent Spouse \nRelief.For more information on innocent \nspouse relief, see Publication 971, Innocent \nSpouse Relief, and Form 8857.Potential Third Party Contacts \nGenerally, the IRS will deal directly with you \nor your duly authorized representative.However, we sometimes talk with other \npersons if we need information that you \nhave been unable to provide, or to verify \ninformation we have received.If we do \ncontact other persons, such as a neighbor, \nbank, employer, or employees, we will \ngenerally need to tell them limited \ninformation, such as your name.The law \nprohibits us from disclosing any more \ninformation than is necessary to obtain or \nverify the information we are seeking.Our \nneed to contact other persons may \ncontinue as long as there is activity in your \ncase.If we do contact other persons, you \nhave a right to request a list of those \ncontacted.Your request can be made by \ntelephone, in writing, or during a personal \ninterview.Refunds \nYou may file a claim for refund if you think \nyou paid too much tax.You must generally \nfile the claim within 3 years from the date \nyou filed your original return or 2 years from \nthe date you paid the tax, whichever is \nlater.The law generally provides for interest \non your refund if it is not paid within 45 \ndays of the date you filed your return or \nclaim for refund.Publication 556, \nExamination of Returns, Appeal Rights, \nand Claims for Refund, has more \ninformation on refunds.If you were due a refund but you did not \n\nfile a return, you generally must file your \nreturn within 3 years from the date the \nreturn was due (including extensions) to get \nthat refund.",
+          "time": 51.300297021865845,
+          "input_token_size": 2661,
+          "output_token_size": 12,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_9cb2356a",
+        "created_at": 1750198269.3270006,
+        "processing_time": 53.12375593185425,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 79,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 79,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.772971"
+      }
+    }
+  },
+  {
+    "9e960784": {
+      "question": "What is the purpose of Publication 1?",
+      "answer": "The purpose of Publication 1 is to explain your rights as a taxpayer and the processes for examination, appeal, collection, and refunds.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            0
+          ],
+          "provenance": "Your Rights \nas a Taxpayer\n\nPublication 1\n\n \nThis publication explains your rights as a taxpayer and the processes for examination, appeal, collection, and refunds.",
+          "time": 5.56684684753418,
+          "input_token_size": 2663,
+          "output_token_size": 108,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_9e960784",
+        "created_at": 1750198212.090286,
+        "processing_time": 9.695305824279785,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.772971"
+      }
+    }
+  },
+  {
+    "c16aec7d": {
+      "question": "What language versions are available for the document?",
+      "answer": "Spanish",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "provenance_ids": [
+            1
+          ],
+          "provenance": "Also available in Spanish. The Taxpayer Bill of Rights\n\n1.",
+          "time": 2.5915701389312744,
+          "input_token_size": 2663,
+          "output_token_size": 4,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_c16aec7d",
+        "created_at": 1749877563.6023667,
+        "processing_time": 5.360039949417114,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 4,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 4,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.772971"
+      }
+    }
+  },
+  {
+    "c770c4f2": {
+      "question": "What is the catalog number for the publication?",
+      "answer": "64731W",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            19,
+            20,
+            21,
+            22,
+            23
+          ],
+          "provenance_ids": [
+            20
+          ],
+          "provenance": "9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.",
+          "time": 3.036146402359009,
+          "input_token_size": 2345,
+          "output_token_size": 12,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_c770c4f2",
+        "created_at": 1749877582.3524268,
+        "processing_time": 6.246395587921143,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.772971"
+      }
+    }
+  },
+  {
+    "c9c943ab": {
+      "question": "What is the role of the Taxpayer Advocate Service in helping taxpayers?",
+      "answer": "The Taxpayer Advocate Service helps taxpayers by providing assistance if they are experiencing financial difficulty or if the IRS has not resolved their tax issues properly and timely through its normal channels.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18
+          ],
+          "provenance_ids": [
+            2,
+            5,
+            6,
+            9,
+            11,
+            13,
+            18
+          ],
+          "provenance": "The Right to Be Informed\nTaxpayers have the right to know what they need to do to \ncomply with the tax laws.The Right to Quality Service\nTaxpayers have the right to receive prompt, courteous, and \nprofessional assistance in their dealings with the IRS, to be \nspoken to in a way they can easily understand, to receive clear \nand easily understandable communications from the IRS, and \nto speak to a supervisor about inadequate service.3. The Right to Pay No More than the \nCorrect Amount of Tax\nTaxpayers have the right to pay only the amount of tax legally \ndue, including interest and penalties, and to have the IRS \napply all tax payments properly. 4.Taxpayers generally have the right \nto take their cases to court. 6.Taxpayers have the right to know \nwhen the IRS has finished an audit. 7.8. The Right to Conﬁdentiality\nTaxpayers have the right to expect that any information they \nprovide to the IRS will not be disclosed unless authorized by \nthe taxpayer or by law.Taxpayers have the right to receive assistance from the \nTaxpayer Advocate Service if they are experiencing financial \ndifficulty or if the IRS has not resolved their tax issues properly \nand timely through its normal channels.",
+          "time": 23.844841241836548,
+          "input_token_size": 3525,
+          "output_token_size": 100,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_c9c943ab",
+        "created_at": 1749877627.661265,
+        "processing_time": 26.74775981903076,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 19,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 19,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.772971"
+      }
+    }
+  },
+  {
+    "d39dc593": {
+      "question": "Where can taxpayers find more information about their appeal rights and claims for refund?",
+      "answer": "Taxpayers can find more information about their appeal rights and claims for refund in Publication 556, Examination of Returns, Appeal Rights, and Claims for Refund, and Publication 5, Your Appeal Rights and How To Prepare a Protest If You Don’t Agree.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            7,
+            8,
+            19,
+            21,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            33,
+            34,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            43,
+            66,
+            67,
+            68,
+            69,
+            70,
+            72,
+            77
+          ],
+          "provenance": "The Right to Challenge the IRS’s Position \nand Be Heard\nTaxpayers have the right to raise objections and provide \nadditional documentation in response to formal IRS actions or \nproposed actions, to expect that the IRS will consider their \ntimely objections and documentation promptly and fairly, and \nto receive a response if the IRS does not agree with their \nposition.5. The Right to Appeal an IRS Decision in an \nIndependent Forum\nTaxpayers are entitled to a fair and impartial administrative \nappeal of most IRS decisions, including many penalties, and \nhave the right to receive a written response regarding the \nOffice of Appeals’ decision.The IRS Mission\n\nProvide America’s taxpayers top-quality service by helping them understand and meet \ntheir tax responsibilities and enforce the law with integrity and fairness to all. Publication 1  (Rev.If we inquire about your return or select it \nfor examination, it does not suggest that \nyou are dishonest.The process of selecting a return for \nexamination usually begins in one of two \nways.First, we use computer programs to \nidentify returns that may have incorrect \namounts.These programs may be based \non information returns, such as Forms \n1099 and W-2, on studies of past \nexaminations, or on certain issues \nidentified by compliance projects.Second, \nwe use information from outside sources \nthat indicates that a return may have \nincorrect amounts.These sources may \ninclude newspapers, public records, and \nindividuals.If we determine that the \ninformation is accurate and reliable, we \nmay use it to select a return for \nexamination.Publication 556, Examination of Returns, \n\nAppeal Rights, and Claims for Refund, \nexplains the rules and procedures that we \nfollow in examinations.The following \nsections give an overview of how we \nconduct examinations.We will send you a letter \nwith either a request for more information \nor a reason why we believe a change to \nyour return may be needed.You can \nrespond by mail or you can request a \npersonal interview with an examiner.Please do not \nhesitate to write to us about anything you \ndo not understand.By Interview \nIf we notify you that we will conduct your \nexamination through a personal interview, \nor you request such an interview, you have \nthe right to ask that the examination take \nplace at a reasonable time and place that is \nconvenient for both you and the IRS.If our \nexaminer proposes any changes to your \nreturn, he or she will explain the reasons for \nthe changes.If you do not agree with these \nchanges, you can meet with the examiner’s \nsupervisor.Repeat Examinations \nIf we examined your return for the same \nitems in either of the 2 previous years and \nproposed no change to your tax liability, \nplease contact us as soon as possible so \nwe can see if we should discontinue the \nexamination.Appeals\nIf you do not agree with the examiner’s \nproposed changes, you can appeal them to \n\nthe Appeals Office of the IRS.Your appeal rights are explained in detail in \nboth Publication 5, Your Appeal Rights and \nHow To Prepare a Protest If You Don’t \nAgree, and Publication 556, Examination of \nReturns, Appeal Rights, and Claims for \nRefund.Your request can be made by \ntelephone, in writing, or during a personal \ninterview.Refunds \nYou may file a claim for refund if you think \nyou paid too much tax.You must generally \nfile the claim within 3 years from the date \nyou filed your original return or 2 years from \nthe date you paid the tax, whichever is \nlater.The law generally provides for interest \non your refund if it is not paid within 45 \ndays of the date you filed your return or \nclaim for refund.Publication 556, \nExamination of Returns, Appeal Rights, \nand Claims for Refund, has more \ninformation on refunds.Taxpayer Advocate Service  \nTAS is an independent organization within \nthe IRS that can help protect your taxpayer \nrights.(cid:127) Tax Questions: 1-800-829-1040 \n(1-800-829-4059 for TTY/TDD)\n\n(cid:127) Forms and Publications: \n\n1-800-829-3676 (1-800-829-4059 for \nTTY/TDD) \n\n(cid:127) Internet: www.irs.gov \n(cid:127) Small Business Ombudsman: A small \nbusiness entity can participate in the \nregulatory process and comment on \nenforcement actions of the IRS by \ncalling 1-888-REG-FAIR.",
+          "time": 82.60657119750977,
+          "input_token_size": 2663,
+          "output_token_size": 76,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_d39dc593",
+        "created_at": 1750198224.6251917,
+        "processing_time": 85.06875324249268,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 79,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 79,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.772971"
+      }
+    }
+  },
+  {
+    "d4376e97": {
+      "question": "Where can taxpayers appeal IRS decisions?",
+      "answer": "Taxpayers can appeal IRS decisions to the Appeals Office of the IRS or take their cases to the U.S. Tax Court, U.S. Court of Federal Claims, or the U.S. District Court where they live.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            1,
+            2,
+            8,
+            9,
+            15,
+            18,
+            19,
+            20,
+            21,
+            22,
+            41,
+            43,
+            44,
+            45,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            73,
+            74,
+            75,
+            76,
+            77
+          ],
+          "provenance": "Also available in Spanish. The Taxpayer Bill of Rights\n\n1.The Right to Be Informed\nTaxpayers have the right to know what they need to do to \ncomply with the tax laws.5. The Right to Appeal an IRS Decision in an \nIndependent Forum\nTaxpayers are entitled to a fair and impartial administrative \nappeal of most IRS decisions, including many penalties, and \nhave the right to receive a written response regarding the \nOffice of Appeals’ decision.Taxpayers generally have the right \nto take their cases to court. 6.9. The Right to Retain Representation\nTaxpayers have the right to retain an authorized representative \nof their choice to represent them in their dealings with the \nIRS.Taxpayers have the right to receive assistance from the \nTaxpayer Advocate Service if they are experiencing financial \ndifficulty or if the IRS has not resolved their tax issues properly \nand timely through its normal channels.The IRS Mission\n\nProvide America’s taxpayers top-quality service by helping them understand and meet \ntheir tax responsibilities and enforce the law with integrity and fairness to all. Publication 1  (Rev.9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.If we inquire about your return or select it \nfor examination, it does not suggest that \nyou are dishonest.The inquiry or \nexamination may or may not result in more \ntax.Appeals\nIf you do not agree with the examiner’s \nproposed changes, you can appeal them to \n\nthe Appeals Office of the IRS.Your appeal rights are explained in detail in \nboth Publication 5, Your Appeal Rights and \nHow To Prepare a Protest If You Don’t \nAgree, and Publication 556, Examination of \nReturns, Appeal Rights, and Claims for \nRefund.If you do not wish to use the Appeals \nOffice or disagree with its findings, you \nmay be able to take your case to the U.S. \nTax Court, U.S. Court of Federal Claims, or \nthe U.S. District Court where you live.If \nyou take your case to court, the IRS will \nhave the burden of proving certain facts if \nyou kept adequate records to show your \ntax liability, cooperated with the IRS, and \nmeet certain other conditions.Innocent Spouse Relief \nGenerally, both you and your spouse are \neach responsible for paying the full \namount of tax, interest, and penalties due \non your joint return.However, if you \nqualify for innocent spouse relief, you may \nbe relieved of part or all of the joint \nliability.To request relief, you must file \nForm 8857, Request for Innocent Spouse \nRelief.For more information on innocent \nspouse relief, see Publication 971, Innocent \nSpouse Relief, and Form 8857.Potential Third Party Contacts \nGenerally, the IRS will deal directly with you \nor your duly authorized representative.However, we sometimes talk with other \npersons if we need information that you \nhave been unable to provide, or to verify \ninformation we have received.If we do \ncontact other persons, such as a neighbor, \nbank, employer, or employees, we will \ngenerally need to tell them limited \ninformation, such as your name.The law \nprohibits us from disclosing any more \ninformation than is necessary to obtain or \nverify the information we are seeking.Our \nneed to contact other persons may \ncontinue as long as there is activity in your \ncase.If we do contact other persons, you \nhave a right to request a list of those \ncontacted.Your request can be made by \ntelephone, in writing, or during a personal \ninterview.Refunds \nYou may file a claim for refund if you think \nyou paid too much tax.You must generally \nfile the claim within 3 years from the date \nyou filed your original return or 2 years from \nthe date you paid the tax, whichever is \nlater.The law generally provides for interest \non your refund if it is not paid within 45 \ndays of the date you filed your return or \nclaim for refund.Publication 556, \nExamination of Returns, Appeal Rights, \nand Claims for Refund, has more \ninformation on refunds.If you were due a refund but you did not \n\nfile a return, you generally must file your \nreturn within 3 years from the date the \nreturn was due (including extensions) to get \nthat refund.We can offer you help if your tax \nproblem is causing a hardship, or you’ve \ntried but haven’t been able to resolve your \nproblem with the IRS.If you qualify for our \nassistance, which is always free, we will do \neverything possible to help you.Visit \nwww.taxpayeradvocate.irs.gov or call \n1-877-777-4778.Tax Information \nThe IRS provides the following sources for \nforms, publications, and additional \ninformation.(cid:127) Tax Questions: 1-800-829-1040 \n(1-800-829-4059 for TTY/TDD)\n\n(cid:127) Forms and Publications: \n\n1-800-829-3676 (1-800-829-4059 for \nTTY/TDD) \n\n(cid:127) Internet: www.irs.gov \n(cid:127) Small Business Ombudsman: A small \nbusiness entity can participate in the \nregulatory process and comment on \nenforcement actions of the IRS by \ncalling 1-888-REG-FAIR.",
+          "time": 77.53232645988464,
+          "input_token_size": 2647,
+          "output_token_size": 49,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_d4376e97",
+        "created_at": 1749877576.088514,
+        "processing_time": 79.18026185035706,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs_prev1",
+        "reason": "shorter_provenance",
+        "sentence_count": 79,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs_prev1",
+            "sentence_count": 79,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.772971"
+      }
+    }
+  },
+  {
+    "d66b092c": {
+      "question": "What is the IRS Mission?",
+      "answer": "Provide America’s taxpayers top-quality service by helping them understand and meet their tax responsibilities and enforce the law with integrity and fairness to all.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            19,
+            20,
+            21,
+            22,
+            23
+          ],
+          "provenance_ids": [
+            19
+          ],
+          "provenance": "The IRS Mission\n\nProvide America’s taxpayers top-quality service by helping them understand and meet \ntheir tax responsibilities and enforce the law with integrity and fairness to all. Publication 1  (Rev.",
+          "time": 6.115087985992432,
+          "input_token_size": 2333,
+          "output_token_size": 108,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_d66b092c",
+        "created_at": 1750198256.659975,
+        "processing_time": 9.607662200927734,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.774976"
+      }
+    }
+  },
+  {
+    "e11f4a78": {
+      "question": "What must be filed to request innocent spouse relief?",
+      "answer": "Form 8857, Request for Innocent Spouse Relief.",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            69,
+            70,
+            71,
+            72,
+            74,
+            76,
+            77
+          ],
+          "provenance": "Your Rights \nas a Taxpayer\n\nPublication 1\n\n \nThis publication explains your rights as a taxpayer and the processes for examination, appeal, collection, and refunds.Also available in Spanish. The Taxpayer Bill of Rights\n\n1.The Right to Be Informed\nTaxpayers have the right to know what they need to do to \ncomply with the tax laws.They are entitled to clear \nexplanations of the laws and IRS procedures in all tax forms, \ninstructions, publications, notices, and correspondence.They \nhave the right to be informed of IRS decisions about their tax \naccounts and to receive clear explanations of the outcomes. 2.The Right to Quality Service\nTaxpayers have the right to receive prompt, courteous, and \nprofessional assistance in their dealings with the IRS, to be \nspoken to in a way they can easily understand, to receive clear \nand easily understandable communications from the IRS, and \nto speak to a supervisor about inadequate service.3. The Right to Pay No More than the \nCorrect Amount of Tax\nTaxpayers have the right to pay only the amount of tax legally \ndue, including interest and penalties, and to have the IRS \napply all tax payments properly. 4.The Right to Challenge the IRS’s Position \nand Be Heard\nTaxpayers have the right to raise objections and provide \nadditional documentation in response to formal IRS actions or \nproposed actions, to expect that the IRS will consider their \ntimely objections and documentation promptly and fairly, and \nto receive a response if the IRS does not agree with their \nposition.5. The Right to Appeal an IRS Decision in an \nIndependent Forum\nTaxpayers are entitled to a fair and impartial administrative \nappeal of most IRS decisions, including many penalties, and \nhave the right to receive a written response regarding the \nOffice of Appeals’ decision.Taxpayers generally have the right \nto take their cases to court. 6.The Right to Finality\nTaxpayers have the right to know the maximum amount of \ntime they have to challenge the IRS’s position as well as the \nmaximum amount of time the IRS has to audit a particular tax \nyear or collect a tax debt.Taxpayers have the right to know \nwhen the IRS has finished an audit. 7.The Right to Privacy\nTaxpayers have the right to expect that any IRS inquiry, \nexamination, or enforcement action will comply with the law \nand be no more intrusive than necessary, and will respect all \ndue process rights, including search and seizure protections, \nand will provide, where applicable, a collection due process \nhearing.8. The Right to Conﬁdentiality\nTaxpayers have the right to expect that any information they \nprovide to the IRS will not be disclosed unless authorized by \nthe taxpayer or by law.Taxpayers have the right to expect \nappropriate action will be taken against employees, return \npreparers, and others who wrongfully use or disclose taxpayer \nreturn information.9. The Right to Retain Representation\nTaxpayers have the right to retain an authorized representative \nof their choice to represent them in their dealings with the \nIRS.Taxpayers have the right to seek assistance from a Low \nIncome Taxpayer Clinic if they cannot afford representation. 10.The Right to a Fair and Just Tax System\nTaxpayers have the right to expect the tax system to consider \nfacts and circumstances that might affect their underlying \nliabilities, ability to pay, or ability to provide information timely.Taxpayers have the right to receive assistance from the \nTaxpayer Advocate Service if they are experiencing financial \ndifficulty or if the IRS has not resolved their tax issues properly \nand timely through its normal channels.The IRS Mission\n\nProvide America’s taxpayers top-quality service by helping them understand and meet \ntheir tax responsibilities and enforce the law with integrity and fairness to all. Publication 1  (Rev.9-2017)  Catalog Number 64731W  Department of the Treasury  Internal Revenue Service  www.irs.gov\n\n\fExaminations, Appeals, Collections, and Refunds\n\nExaminations (Audits) \nWe accept most taxpayers’ returns as filed.If we inquire about your return or select it \nfor examination, it does not suggest that \nyou are dishonest.The inquiry or \nexamination may or may not result in more \ntax.We may close your case without \nchange; or, you may receive a refund.The process of selecting a return for \nexamination usually begins in one of two \nways.First, we use computer programs to \nidentify returns that may have incorrect \namounts.These programs may be based \non information returns, such as Forms \n1099 and W-2, on studies of past \nexaminations, or on certain issues \nidentified by compliance projects.Second, \nwe use information from outside sources \nthat indicates that a return may have \nincorrect amounts.These sources may \ninclude newspapers, public records, and \nindividuals.If we determine that the \ninformation is accurate and reliable, we \nmay use it to select a return for \nexamination.Publication 556, Examination of Returns, \n\nAppeal Rights, and Claims for Refund, \nexplains the rules and procedures that we \nfollow in examinations.The following \nsections give an overview of how we \nconduct examinations.By Mail \nWe handle many examinations and \ninquiries by mail.We will send you a letter \nwith either a request for more information \nor a reason why we believe a change to \nyour return may be needed.You can \nrespond by mail or you can request a \npersonal interview with an examiner.If you \nmail us the requested information or \nprovide an explanation, we may or may not \nagree with you, and we will explain the \nreasons for any changes.Please do not \nhesitate to write to us about anything you \ndo not understand.By Interview \nIf we notify you that we will conduct your \nexamination through a personal interview, \nor you request such an interview, you have \nthe right to ask that the examination take \nplace at a reasonable time and place that is \nconvenient for both you and the IRS.If our \nexaminer proposes any changes to your \nreturn, he or she will explain the reasons for \nthe changes.If you do not agree with these \nchanges, you can meet with the examiner’s \nsupervisor.Repeat Examinations \nIf we examined your return for the same \nitems in either of the 2 previous years and \nproposed no change to your tax liability, \nplease contact us as soon as possible so \nwe can see if we should discontinue the \nexamination.Appeals\nIf you do not agree with the examiner’s \nproposed changes, you can appeal them to \n\nthe Appeals Office of the IRS.Most \ndifferences can be settled without \nexpensive and time-consuming court trials.Your appeal rights are explained in detail in \nboth Publication 5, Your Appeal Rights and \nHow To Prepare a Protest If You Don’t \nAgree, and Publication 556, Examination of \nReturns, Appeal Rights, and Claims for \nRefund.If you do not wish to use the Appeals \nOffice or disagree with its findings, you \nmay be able to take your case to the U.S. \nTax Court, U.S. Court of Federal Claims, or \nthe U.S. District Court where you live.If \nyou take your case to court, the IRS will \nhave the burden of proving certain facts if \nyou kept adequate records to show your \ntax liability, cooperated with the IRS, and \nmeet certain other conditions.If the court \nagrees with you on most issues in your \ncase and finds that our position was largely \nunjustified, you may be able to recover \nsome of your administrative and litigation \ncosts.You will not be eligible to recover \nthese costs unless you tried to resolve your \ncase administratively, including going \nthrough the appeals system, and you gave \nus the information necessary to resolve the \ncase.Collections \nPublication 594, The IRS Collection \nProcess, explains your rights and \nresponsibilities regarding payment of \nfederal taxes.It describes: \n(cid:127) What to do when you owe taxes.It \n\ndescribes what to do if you get a tax bill \nand what to do if you think your bill is \nwrong.It also covers making installment \npayments, delaying collection action, \nand submitting an offer in compromise.(cid:127) IRS collection actions.It covers liens, \n\nreleasing a lien, levies, releasing a levy, \nseizures and sales, and release of \nproperty.(cid:127) IRS certification to the State Department \nof a seriously delinquent tax debt, which \nwill generally result in denial of a \npassport application and may lead to \nrevocation of a passport.Your collection appeal rights are explained \nin detail in Publication 1660, Collection \nAppeal Rights.Innocent Spouse Relief \nGenerally, both you and your spouse are \neach responsible for paying the full \namount of tax, interest, and penalties due \non your joint return.However, if you \nqualify for innocent spouse relief, you may \nbe relieved of part or all of the joint \nliability.To request relief, you must file \nForm 8857, Request for Innocent Spouse \nRelief.The law generally provides for interest \non your refund if it is not paid within 45 \ndays of the date you filed your return or \nclaim for refund.Publication 556, \nExamination of Returns, Appeal Rights, \nand Claims for Refund, has more \ninformation on refunds.If you were due a refund but you did not \n\nfile a return, you generally must file your \nreturn within 3 years from the date the \nreturn was due (including extensions) to get \nthat refund.Taxpayer Advocate Service  \nTAS is an independent organization within \nthe IRS that can help protect your taxpayer \nrights.If you qualify for our \nassistance, which is always free, we will do \neverything possible to help you.Tax Information \nThe IRS provides the following sources for \nforms, publications, and additional \ninformation.(cid:127) Tax Questions: 1-800-829-1040 \n(1-800-829-4059 for TTY/TDD)\n\n(cid:127) Forms and Publications: \n\n1-800-829-3676 (1-800-829-4059 for \nTTY/TDD) \n\n(cid:127) Internet: www.irs.gov \n(cid:127) Small Business Ombudsman: A small \nbusiness entity can participate in the \nregulatory process and comment on \nenforcement actions of the IRS by \ncalling 1-888-REG-FAIR.",
+          "time": 34.12822914123535,
+          "input_token_size": 2653,
+          "output_token_size": 5,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_e11f4a78",
+        "created_at": 1750198300.7884533,
+        "processing_time": 35.581313371658325,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 79,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 79,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.774976"
+      }
+    }
+  },
+  {
+    "e60393ff": {
+      "question": "What is the contact number for the Taxpayer Advocate Service?",
+      "answer": "1-877-777-4778",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            75
+          ],
+          "provenance": "Visit \nwww.taxpayeradvocate.irs.gov or call \n1-877-777-4778.",
+          "time": 4.0952653884887695,
+          "input_token_size": 2771,
+          "output_token_size": 32,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_e60393ff",
+        "created_at": 1750198275.5581892,
+        "processing_time": 7.686318635940552,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.774976"
+      }
+    }
+  },
+  {
+    "f7efcacc": {
+      "question": "Where can taxpayers find tax forms and publications online?",
+      "answer": "www.irs.gov",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            74,
+            75,
+            76,
+            77,
+            78
+          ],
+          "provenance_ids": [
+            77
+          ],
+          "provenance": "(cid:127) Tax Questions: 1-800-829-1040 \n(1-800-829-4059 for TTY/TDD)\n\n(cid:127) Forms and Publications: \n\n1-800-829-3676 (1-800-829-4059 for \nTTY/TDD) \n\n(cid:127) Internet: www.irs.gov \n(cid:127) Small Business Ombudsman: A small \nbusiness entity can participate in the \nregulatory process and comment on \nenforcement actions of the IRS by \ncalling 1-888-REG-FAIR.",
+          "time": 4.629792213439941,
+          "input_token_size": 4082,
+          "output_token_size": 17,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_f7efcacc",
+        "created_at": 1750198281.825618,
+        "processing_time": 7.087686538696289,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.774976"
+      }
+    }
+  },
+  {
+    "fdeeeffe": {
+      "question": "Who can assist taxpayers experiencing financial difficulty with the IRS?",
+      "answer": "Taxpayer Advocate Service (TAS)",
+      "provenance": [
+        {
+          "provenance_id": 0,
+          "input_sentence_ids": [
+            69,
+            70,
+            71,
+            72,
+            73
+          ],
+          "provenance_ids": [
+            72,
+            73
+          ],
+          "provenance": "Taxpayer Advocate Service  \nTAS is an independent organization within \nthe IRS that can help protect your taxpayer \nrights.We can offer you help if your tax \nproblem is causing a hardship, or you’ve \ntried but haven’t been able to resolve your \nproblem with the IRS.",
+          "time": 5.283392429351807,
+          "input_token_size": 4282,
+          "output_token_size": 46,
+          "original_provenance_id": 0
+        }
+      ],
+      "metadata": {
+        "question_id": "p1_fdeeeffe",
+        "created_at": 1750198244.119112,
+        "processing_time": 7.143866777420044,
+        "processing_complete": true,
+        "max_provenances": 5
+      },
+      "source_info": {
+        "selected_from": "test_outputs",
+        "reason": "shorter_provenance",
+        "sentence_count": 5,
+        "provenance_count": 1,
+        "alternatives": [
+          {
+            "source": "test_outputs",
+            "sentence_count": 5,
+            "provenance_count": 1,
+            "has_answer": true
+          }
+        ],
+        "selection_timestamp": "2025-06-17T16:48:52.774976"
+      }
+    }
+  }
+]

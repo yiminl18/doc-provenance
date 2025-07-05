@@ -1,0 +1,82 @@
+{
+  "document": "2020-0061 Exhibits 2-S Training (20)",
+  "generated_at": "2025-06-11T10:50:54.743129",
+  "questions_by_difficulty": {
+    "easy": {
+      "description": "Easy questions - direct extraction",
+      "questions": [
+        {
+          "id": "easy_1",
+          "question": "Who are the two police officers mentioned in the document?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_2",
+          "question": "What department do Mark A. Bishop and David S. Dechow belong to?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_3",
+          "question": "When did Mark A. Bishop start his service?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_4",
+          "question": "What is the total training time completed by David S. Dechow?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_5",
+          "question": "Where do the officers serve within their department?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "medium": {
+      "description": "Medium questions - simple synthesis",
+      "questions": [
+        {
+          "id": "medium_1",
+          "question": "How does the number of training modules completed by Mark A. Bishop compare to those completed by David S. Dechow?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_2",
+          "question": "What are some of the training topics covered by both officers?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_3",
+          "question": "How did the document ensure that the officers comply with professional training standards?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_4",
+          "question": "What is the significance of CA-POST certifications mentioned in the document?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_5",
+          "question": "How does the training duration for the two officers compare from 1998 to 2020?",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "base_name": "2020-0061 Exhibits 2-S Training (20)",
+    "generated_at_iso": "2025-06-11 10:50:54",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 39799,
+    "processed_text_length": 4124,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty"
+  },
+  "total_questions": 10
+}

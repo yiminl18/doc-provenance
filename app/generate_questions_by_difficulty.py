@@ -30,18 +30,17 @@ def setup_paths():
     app_dir = script_dir.parent / 'app'
     sys.path.insert(0, str(app_dir))
 
-def find_documents_with_mappings(self) -> List[str]:
+def find_documents_with_pdfcache(self) -> List[str]:
         """Find all documents that have mapping files"""
-        mappings_dir = Path("stable_mappings")
-        
-        if not mappings_dir.exists():
+        pdfcache_dir = Path("pdfjs_cache")
+
+        if not pdfcache_dir.exists():
             return []
         
         documents = []
-        for mapping_file in mappings_dir.glob("*_mappings.json"):
-            # Extract document basename
-            basename = mapping_file.stem.replace("_mappings", "")
-            
+        for file in os.listdir(pdfcache_dir):
+            # the name of the directory folder is the basename
+            basename = file
 
             documents.append(basename)
 
@@ -52,15 +51,15 @@ def find_documents_with_mappings(self) -> List[str]:
 def get_document_sentences_path(base_name):
     """Get the path to sentences file in the app/sentences directory"""
     script_dir = Path(__file__).parent
-    sentences_dir = script_dir.parent / 'app' / 'sentences'
+    sentences_dir = script_dir.parent / 'app' / 'layouts'
     return sentences_dir / f"{base_name}_sentences.json"
 
 def get_document_text(pdf_info):
     """Get text from document, preferring sentences files when available"""
     
     base_name = pdf_info
-    
-    # Strategy 1: Try app/sentences directory (for regular uploaded documents)
+
+    # Strategy 1: Try app/layouts directory (for regular uploaded documents)
     app_sentences_file = get_document_sentences_path(base_name)
     
     if app_sentences_file.exists():
@@ -270,12 +269,12 @@ def check_existing_questions(base_name, output_dir, difficulty_levels):
     """Check if questions already exist for this document"""
     
     # Check for structured format
-    structured_file = output_dir / f"{base_name}_questions_by_difficulty.json"
-    if structured_file.exists():
+    structured_file = os.path.join(output_dir, f"{base_name}_questions_by_difficulty.json")
+    if os.path.exists(structured_file):
         try:
             with open(structured_file, 'r', encoding='utf-8') as f:
                 existing_data = json.load(f)
-            
+        
             # Check if we have questions for the requested difficulty levels
             questions_by_difficulty = existing_data.get('questions_by_difficulty', {})
             has_all_requested = all(
@@ -283,13 +282,13 @@ def check_existing_questions(base_name, output_dir, difficulty_levels):
                 len(questions_by_difficulty[level].get('questions', [])) > 0
                 for level in difficulty_levels
             )
-            
+
             if has_all_requested:
                 total_questions = sum(
                     len(questions_by_difficulty[level].get('questions', []))
                     for level in difficulty_levels
                 )
-                
+
                 return {
                     'exists': True,
                     'file_path': structured_file,
@@ -299,23 +298,41 @@ def check_existing_questions(base_name, output_dir, difficulty_levels):
                 }
         except Exception as e:
             print(f"⚠️ Error reading structured questions file {structured_file}: {e}")
-    
+
     return {'exists': False}
 
-def generate_difficulty_questions(client, document_content, pdf_info, difficulty_levels, questions_per_difficulty):
+def get_existing_questions(base_name, output_dir, difficulty_level):
+    """Retrieve existing questions for a specific difficulty level"""
+    existing_questions = []
+
+    # Check for structured format
+    structured_file = os.path.join(output_dir, f"{base_name}_questions_by_difficulty.json")
+    if os.path.exists(structured_file):
+        try:
+            with open(structured_file, 'r', encoding='utf-8') as f:
+                existing_data = json.load(f)
+            
+            questions_by_difficulty = existing_data.get('questions_by_difficulty', {})
+            if difficulty_level in questions_by_difficulty:
+                existing_questions = questions_by_difficulty[difficulty_level].get('questions_lookup', [])
+        except Exception as e:
+            print(f"⚠️ Error reading structured questions file {structured_file}: {e}")
+    return existing_questions
+
+def generate_difficulty_questions(client, document_content, pdf_info, difficulty_levels, questions_per_difficulty, existing_questions=None):
     """Generate questions for specific difficulty levels"""
     
     difficulty_descriptions = {
         'easy': {
-            'description': 'Direct fact extraction - answers can be found by simple text search',
+            'description': 'Direct fact extraction and lookup questions',
             'characteristics': 'Focus on who, what, when, where questions. Answers should be directly extractable from the text.',
             'examples': '"Who is a subject in the document?", "What happened on a specific date?", "When did something happen?"'
-        },
-        'medium': {
-            'description': 'Simple synthesis - requires combining information from multiple sentences or sections', 
-            'characteristics': 'Require reading 2-3 sentences or sections. Involve simple comparisons or summaries.',
-            'examples': '"How do two things in the document compare?", "What are limitations?", "What were key results or outcomes?"'
-        }
+        }#,
+        #'medium': {
+        #    'description': 'Simple synthesis - requires combining information from multiple sentences or sections', 
+        #    'characteristics': 'Require reading 2-3 sentences or sections. Involve simple comparisons or summaries.',
+        #    'examples': '"How do two things in the document compare?", "What are limitations?", "What were key results or outcomes?"'
+        #}
     }
     
     # Build the prompt for difficulty-based question generation
@@ -323,7 +340,7 @@ def generate_difficulty_questions(client, document_content, pdf_info, difficulty
     
     prompt_parts = [
         f"Generate questions for this document at {len(difficulties_to_generate)} difficulty levels.",
-        f"Generate {questions_per_difficulty} questions for each difficulty level.",
+        f"Generate {questions_per_difficulty} UNIQUE questions for each difficulty level.",
         "",
         "Document content:",
         document_content,
@@ -331,8 +348,10 @@ def generate_difficulty_questions(client, document_content, pdf_info, difficulty
         "Difficulty levels:"
     ]
     
+    
     for difficulty in difficulties_to_generate:
         desc = difficulty_descriptions[difficulty]
+       
         prompt_parts.extend([
             f"",
             f"**{difficulty.upper()} Questions ({questions_per_difficulty} questions)**",
@@ -340,6 +359,13 @@ def generate_difficulty_questions(client, document_content, pdf_info, difficulty
             f"- {desc['characteristics']}",
             f"- Examples: {desc['examples']}"
         ])
+
+        if existing_questions and difficulty in existing_questions:
+           formatted_questions = ', '.join(
+               f'"{q}"' for q in existing_questions[difficulty])
+           prompt_parts.append(
+               f"- {difficulty.upper()} (existing questions): {formatted_questions}"
+           )
     
     prompt_parts.extend([
         "",
@@ -411,16 +437,7 @@ def generate_questions_for_document(pdf_info, difficulty_levels, questions_per_d
     # Create output directory
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Check if questions already exist
-    existing_check = check_existing_questions(base_name, output_dir, difficulty_levels)
-    
-    if existing_check['exists']:
-        print(f"✅ Questions already exist for {base_name}")
-        print(f"   File: {existing_check['file_path']}")
-        print(f"   Questions: {existing_check['questions_count']}")
-        print(f"   Format: {existing_check['format']}")
-        print(f"   Generated: {existing_check['generated_at']}")
-        return True
+  
     
     # Get document text
     pdf_text = get_document_text(pdf_info)
@@ -452,10 +469,22 @@ def generate_questions_for_document(pdf_info, difficulty_levels, questions_per_d
 {document_content}
 
 [Note: The full document contains more detailed information than shown in this summary]"""
-    
+        
+      # Check if questions already exist
+    existing_check = check_existing_questions(base_name, 'questions_lookup', difficulty_levels)
+    existing_questions = None
+    if existing_check['exists']:
+        print(f"✅ Questions already exist for {base_name}")
+        print(f"   File: {existing_check['file_path']}")
+        print(f"   Questions: {existing_check['questions_count']}")
+        print(f"   Format: {existing_check['format']}")
+        print(f"   Generated: {existing_check['generated_at']}")
+        #return True
+        existing_questions = {level: get_existing_questions(pdf_info, 'questions_lookup', level) for level in difficulty_levels}
+
     # Generate questions
     questions_data = generate_difficulty_questions(
-        client, document_content, pdf_info, difficulty_levels, questions_per_difficulty
+        client, document_content, pdf_info, difficulty_levels, questions_per_difficulty, existing_questions
     )
     
     if not questions_data:
@@ -558,8 +587,8 @@ def main():
     parser = argparse.ArgumentParser(description="Generate difficulty-based questions for documents")
     parser.add_argument("--easy-only", action="store_true", help="Generate only easy questions")
     parser.add_argument("--medium-only", action="store_true", help="Generate only medium questions")
-    parser.add_argument("--per-difficulty", type=int, default=5, help="Questions per difficulty level")
-    parser.add_argument("--output-dir", help="Output directory (default: ./questions_difficulty)")
+    parser.add_argument("--per-difficulty", type=int, default=20, help="Questions per difficulty level")
+    parser.add_argument("--output-dir", help="Output directory (default: ./questions_lookup)")
     
     args = parser.parse_args()
     
@@ -575,17 +604,17 @@ def main():
         difficulty_levels = ['easy', 'medium']  # Default: both easy and medium
     
     # Setup paths
-    path = Path(os.path.join(os.getcwd(), 'app', 'uploads'))
+    path = Path(os.path.join(os.getcwd(), 'app', 'pdfjs_cache'))
     paths = [path]
     
     if args.output_dir:
         output_dir = Path(args.output_dir)
     else:
-        output_dir = Path(os.path.join(os.getcwd(), 'questions_difficulty'))
-    
+        output_dir = Path(os.path.join(os.getcwd(), 'questions_lookup'))
+    output_dir.mkdir(parents=True, exist_ok=True)
     # Find PDFs
-    pdf_files = find_documents_with_mappings(paths)
-    
+    pdf_files = find_documents_with_pdfcache(paths)
+
     if not pdf_files:
         print("❌ No PDF files found in the specified paths")
         sys.exit(1)
@@ -598,6 +627,15 @@ def main():
     failed = 0
     skipped = 0
     for pdf_info in pdf_files:
+
+        # if there's already a questions file, skip
+        questions_file = os.path.join('questions_lookup', f"{pdf_info}_questions.json")
+
+        if os.path.exists(questions_file):
+            print(f"⏭️ Skipping {pdf_info} - questions already exist at {questions_file}")
+            skipped += 1
+            continue
+
         success = generate_questions_for_document(
             pdf_info, 
             difficulty_levels,

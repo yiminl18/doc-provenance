@@ -3,7 +3,7 @@
 Test Suite Generator for Document QA System
 
 This script generates a test suite by:
-1. Finding all documents with mapping files in stable_mappings/
+1. Finding all documents with pdfjs_cache_file files in pdfjs_cache/
 2. Finding matching question files in questions/
 3. Running questions against documents via the /ask endpoint
 4. Letting the backend handle all file saving (progressive writing)
@@ -86,23 +86,22 @@ class TestSuiteGenerator:
             'question_ids_generated': []
         }
 
-    def find_documents_with_mappings(self) -> List[str]:
+    def find_documents_with_pdfjs_cache(self) -> List[str]:
         """Find all documents that have mapping files"""
-        mappings_dir = Path("mappings")
+        pdfjs_cache_dir = Path("pdfjs_cache")
         
-        if not mappings_dir.exists():
-            logger.warning(f"Mappings directory not found: {mappings_dir}")
+        if not pdfjs_cache_dir.exists():
+            logger.warning(f"pdfjs_cache directory not found: {pdfjs_cache_dir}")
             return []
         
         documents = []
-        for mapping_file in mappings_dir.glob("*_mappings.json"):
-            # Extract document basename
-            basename = mapping_file.stem.replace("_mappings", "")
+        for pdfjs_cache_file in os.listdir(pdfjs_cache_dir):
+            # the folder name is the basename of the PDF
+            basename = pdfjs_cache_file
             
             # Verify the PDF exists (check common locations)
             pdf_locations = [
                 Path("uploads") / f"{basename}.pdf",
-                Path("gdrive_downloads") / "**" / f"{basename}.pdf",
                 Path("app/uploads") / f"{basename}.pdf"
             ]
             
@@ -114,16 +113,16 @@ class TestSuiteGenerator:
             
             if pdf_exists:
                 documents.append(basename)
-                logger.info(f"Found document with mappings: {basename}")
+                logger.info(f"Found document with pdfjs_cache: {basename}")
             else:
                 logger.warning(f"Mapping file found but no PDF: {basename}")
-        
-        logger.info(f"Found {len(documents)} documents with mappings")
+
+        logger.info(f"Found {len(documents)} documents with pdfjs_cache")
         return documents
 
     def load_questions_for_document(self, document_basename: str) -> List[str]:
         """Load questions for a specific document by basename"""
-        questions_dir = Path("questions")
+        questions_dir = Path("questions_lookup")
         question_file = questions_dir / f"{document_basename}_questions.json"
 
         # Create directory structure: results/{safe_pdf_name}/{question_id}/
@@ -340,11 +339,11 @@ class TestSuiteGenerator:
         logger.info("🚀 Starting test suite generation...")
         logger.info("📁 Backend will save all files to TEST_SUITE_DIR")
         
-        # Find documents with mappings
-        documents = self.find_documents_with_mappings()
+        # Find documents with pdfjs_cache
+        documents = self.find_documents_with_pdfjs_cache()
         
         if not documents:
-            logger.error("❌ No documents with mappings found!")
+            logger.error("❌ No documents with pdfjs_cache found!")
             return
         
         # Process each document with its specific questions
@@ -353,6 +352,12 @@ class TestSuiteGenerator:
         for doc_idx, document_name in enumerate(documents):
             logger.info(f"\n📄 Document {doc_idx + 1}/{len(documents)}: {document_name}")
             
+            # if the document_name already has a folder in test_outputs, skip it
+            results_dir = os.path.join(Path("test_outputs"), secure_filename(document_name))
+            if os.path.exists(results_dir):
+                logger.info(f"  📁 Results directory already exists: {results_dir}, skipping...")
+                self.stats['documents_skipped'] += 1
+                continue
             # Load questions specifically for this document
             questions = self.load_questions_for_document(document_name)
             
@@ -412,7 +417,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generate test suite for document QA system")
     parser.add_argument("--base-url", default="http://localhost:5000/api",
                        help="Base URL for the API")
-    parser.add_argument("--max-questions", type=int, default=10,
+    parser.add_argument("--max-questions", type=int, default=20,
                        help="Maximum questions per document")
     parser.add_argument("--timeout", type=int, default=120,
                        help="Timeout for answer generation (seconds)")

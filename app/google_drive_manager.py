@@ -13,7 +13,7 @@ import time
 from typing import Dict, List, Optional, Tuple
 
 from .google_workspace import GoogleDrive, GoogleDriveFileInfo
-from .utils import estimate_pdf_size_from_pages, is_pdf_text_extractable
+from .pdf_gdrive_processing import estimate_pdf_size_from_pages, is_pdf_text_extractable
 
 logger = logging.getLogger(__name__)
 
@@ -175,11 +175,6 @@ class GoogleDriveManager:
         files.sort(key=lambda x: x['page_num'])
         return files
     
-    def generate_path_hash(self, gdrive_path: str, filename: str) -> str:
-        """Generate a hash from the full Google Drive path + filename"""
-        full_path = f"{gdrive_path}/{filename}"
-        return hashlib.sha256(full_path.encode('utf-8')).hexdigest()[:12]
-    
     def create_safe_filename_with_hash(self, gdrive_path: str, original_filename: str) -> str:
         """Create a safe filename with path hash prefix"""
         from werkzeug.utils import secure_filename
@@ -243,7 +238,6 @@ class GoogleDriveManager:
 
             safe_filename = self.create_safe_filename_with_hash(gdrive_path, filename)
             filepath = os.path.join(self.downloads_dir, safe_filename)
-            path_hash = self.generate_path_hash(gdrive_path, filename)
             
             logger.info(f"📥 Downloading file: {filename} (ID: {actual_file_id})")
             
@@ -274,13 +268,12 @@ class GoogleDriveManager:
                 }
             
             # Save path mapping
-            self.save_path_mapping(path_hash, gdrive_path, filename, safe_filename)
+            self.save_path_mapping(gdrive_path, filename, safe_filename)
             
             return {
                 'success': True,
                 'filepath': filepath,
                 'safe_filename': safe_filename,
-                'path_hash': path_hash,
                 'original_path': gdrive_path,
                 'original_filename': filename,
                 'metadata': {
@@ -334,7 +327,6 @@ class GoogleDriveManager:
                     document_metadata = {
                         'filename': download_result['safe_filename'],
                         'original_name': download_result['original_filename'],
-                        'path_hash': download_result['path_hash'],
                         'gdrive_path': download_result['original_path'],
                         'gdrive_url': file_row['gdrive_id'],
                         'file_id': file_id,

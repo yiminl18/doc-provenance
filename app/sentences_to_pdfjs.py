@@ -769,9 +769,6 @@ extractEnhancedTextContent(path.resolve(pdfPath));
             element_text = element['normalized_text']
             element_words = element_text.split()
             
-            # Skip very short elements
-            if len(element_text) < 10:
-                continue
             
             # Check for substantial overlap
             overlap_score = self._calculate_text_overlap(sentence_words, element_words)

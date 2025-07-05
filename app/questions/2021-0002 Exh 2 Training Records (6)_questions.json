@@ -1,0 +1,33 @@
+{
+  "base_name": "2021-0002 Exh 2 Training Records (6)",
+  "questions": [
+    "Who is the instructor mentioned in the document?",
+    "What is the employment status of Daniel P. Eldred?",
+    "When did Daniel P. Eldred complete the Firearms/Tactical Rifle 1st Responder course?",
+    "Where is the Fresno Police Department Regional Training Center located?",
+    "What subject did Daniel P. Eldred complete on 02/01/2021?",
+    "How many training modules did Daniel P. Eldred complete in 2020?",
+    "What training subjects did Daniel P. Eldred complete in 2018?",
+    "How does the total training time compare between 2019 and 2021 for Daniel P. Eldred?",
+    "What certifications were obtained by Daniel P. Eldred in 2017?",
+    "How do the training hours in 2018 compare to those in 2017 for Daniel P. Eldred?"
+  ],
+  "metadata": {
+    "base_name": "2021-0002 Exh 2 Training Records (6)",
+    "generated_at_iso": "2025-06-11 10:51:50",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 4293,
+    "processed_text_length": 4293,
+    "was_summarized": false,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty",
+    "has_difficulty_levels": true,
+    "source_file": "2021-0002 Exh 2 Training Records (6)_questions_by_difficulty.json",
+    "total_questions": 10
+  }
+}

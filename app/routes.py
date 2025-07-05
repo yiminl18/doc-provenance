@@ -1,4 +1,4 @@
-import doc_provenance, hashlib, io, json, logging, os, random, re, sys, time, traceback
+import doc_provenance, hashlib, io, json, logging, os, random, re, sys, tiktoken, time, traceback
 from datetime import datetime, timedelta
 from io import StringIO
 import pandas as pd
@@ -26,6 +26,15 @@ provisional_sampler = None
 # sufficient == raw -> only minimal strategies are used
 # minimal == null -> only sufficient strategies are used
 # all other combinations are a process where the first step is sufficient and the second step is minimal
+
+DEFAULT_THRESHOLDS = {
+    'minTokensPerProvenance': 100,
+    'minSentencesPerProvenance': 2,
+    'minProvenancesPerQuestion': 1,
+    'minGoodQuestionsPerDocument': 2,
+    'minQuestionRatio': 0.3
+}
+
 
 ALGORITHM_CONFIGURATIONS = {
     'sufficient': sufficient_provenance_strategy_pool,
@@ -66,6 +75,81 @@ for directory in [RESULTS_DIR, UPLOADS_DIR, STUDY_LOGS_DIR, QUESTIONS_DIR, SENTE
 
 #google_drive_manager = GoogleDriveManager(DOWNLOADS_DIR)
 text_processing_manager = TextProcessingManager(SENTENCES_DIR, TEST_SUITE_OUTPUT_DIR)
+
+def init_tiktoken():
+    """Initialize tiktoken encoder"""
+    try:
+        return tiktoken.encoding_for_model("gpt-4")
+    except:
+        return tiktoken.get_encoding("cl100k_base")
+
+enc = init_tiktoken()
+
+def is_good_provenance(provenance, thresholds=None):
+    """Check if a single provenance is good"""
+    if not provenance or not provenance.get('provenance'):
+        return False
+    
+    thresholds = thresholds or DEFAULT_THRESHOLDS
+    
+    token_count = len(enc.encode(provenance['provenance']))
+    sentence_count = len(provenance.get('provenance_ids', []))
+    
+    return (token_count >= thresholds['minTokensPerProvenance'] and 
+            sentence_count >= thresholds['minSentencesPerProvenance'])
+
+def is_good_question(question, thresholds=None):
+    """Check if a question is good"""
+    if not question or not question.get('provenance_data'):
+        return False
+    
+    thresholds = thresholds or DEFAULT_THRESHOLDS
+    
+    good_provenances = [p for p in question['provenance_data'] if is_good_provenance(p, thresholds)]
+    return len(good_provenances) >= thresholds['minProvenancesPerQuestion']
+
+def is_good_document(document, thresholds=None):
+    """Check if a document is good"""
+    if not document or not document.get('questions'):
+        return False
+    
+    thresholds = thresholds or DEFAULT_THRESHOLDS
+    
+    good_questions = [q for q in document['questions'] if is_good_question(q, thresholds)]
+    total_questions = len(document['questions'])
+    
+    if total_questions == 0:
+        return False
+    
+    good_question_ratio = len(good_questions) / total_questions
+    
+    return (len(good_questions) >= thresholds['minGoodQuestionsPerDocument'] and
+            good_question_ratio >= thresholds['minQuestionRatio'])
+
+def get_filtering_stats(documents, thresholds=None):
+    """Get filtering statistics"""
+    total_docs = len(documents)
+    good_docs = 0
+    total_questions = 0
+    good_questions = 0
+    
+    for doc in documents:
+        if doc.get('questions'):
+            total_questions += len(doc['questions'])
+            doc_good_questions = [q for q in doc['questions'] if is_good_question(q, thresholds)]
+            good_questions += len(doc_good_questions)
+            
+            if is_good_document(doc, thresholds):
+                good_docs += 1
+    
+    return {
+        'totalDocuments': total_docs,
+        'goodDocuments': good_docs,
+        'totalQuestions': total_questions,
+        'goodQuestions': good_questions,
+        'documentPassRate': (good_docs / total_docs * 100) if total_docs > 0 else 0,
+        'questionPassRate': (good_questions / total_questions * 100) if total_questions > 0 else 0
+    }
 
 # In routes.py - Add this at the top to debug routing
 @main.route('/test', methods=['GET', 'POST'])
@@ -2335,7 +2419,7 @@ def get_next_provenance_route_enhanced(question_id):
                 if sentence_ids:
                     try:
                         # Try to get coordinate highlights using file finder
-                        mapping_info = get_file_finder().find_file(filename, 'mappings')
+                        mapping_info = get_file_finder().find_file(filename, 'stable_mappings')
                         
                         if mapping_info:
                             # Load mapping data and add coordinate highlights
@@ -2754,7 +2838,7 @@ def get_highlight_data_for_sentences(filename):
             }), 400
         
         # Use file finder to get mapping data
-        mapping_info = get_file_finder().find_file(filename, 'mappings')
+        mapping_info = get_file_finder().find_file(filename, 'stable_mappings')
         
         if not mapping_info:
             return jsonify({
@@ -2872,7 +2956,7 @@ def get_document_processing_status(filename):
         files_available = {
             'sentences': all_files.get('sentences') is not None,
             'layout': all_files.get('layout') is not None,
-            'mappings': all_files.get('mappings') is not None
+            'mappings': all_files.get('stable_mappings') is not None
         }
         
         # Check if we have a processing summary (if you implement this)
@@ -3035,7 +3119,7 @@ def debug_highlight_test(filename):
         logger.info(f"🐛 Debug highlight test for {filename}, sentences: {test_sentence_ids}")
         
         # Use file finder to get mapping data
-        mapping_info = get_file_finder().find_file(filename, 'mappings')
+        mapping_info = get_file_finder().find_file(filename, 'stable_mappings')
         
         if not mapping_info:
             return jsonify({
@@ -3098,7 +3182,7 @@ def get_document_mappings_overview(filename):
         logger.info(f"📝 Mappings overview requested for {filename}")
         basename = filename.replace('.pdf', '')
         # Use file finder to locate mapping data
-        mapping_info = get_file_finder().find_file(basename, 'mappings')
+        mapping_info = get_file_finder().find_file(filename, 'stable_mappings')
         
         if not mapping_info:
             return jsonify({
@@ -3118,7 +3202,7 @@ def get_document_mappings_overview(filename):
             }), 404
         
         # Get questions count if available
-        questions_info = get_file_finder().find_file(basename, 'questions')
+        questions_info = get_file_finder().find_file(filename, 'questions')
         total_questions = 0
         if questions_info:
             try:
@@ -3347,10 +3431,10 @@ def sample_provisional_documents():
     """Sample documents from provisional cases"""
     try:
         data = request.get_json() or {}
-        target_count = data.get('target_count', 5)
-        max_attempts = data.get('max_attempts', 20)
+        target_count = data.get('target_count', 30)
+        max_attempts = data.get('max_attempts', 100)
         prefer_diverse_cases = data.get('prefer_diverse_cases', True)
-        min_pages = data.get('min_pages', 0)
+        min_pages = data.get('min_pages', 2)
         
         sampler = get_sampler()
         result = sampler.sample_documents(
@@ -3367,24 +3451,81 @@ def sample_provisional_documents():
             'success': False,
             'error': str(e)
         }), 500
-    
+
 @main.route('/drive/pvc-sample/downloaded-summary', methods=['GET'])
 def get_downloaded_summary():
     """Get summary of downloaded files organized by provisional case"""
     try:
+        logger.info("📊 Getting downloaded files summary...")
         sampler = get_sampler()
         
         # Get the raw file summary
         summary = sampler.get_downloaded_files_summary()
+        logger.info(f"📋 Raw summary result: success={summary.get('success')}, total_files={summary.get('total_files', 0)}")
         
         if not summary['success']:
+            logger.warning(f"⚠️ Failed to get file summary: {summary}")
             return jsonify(summary)
         
+        # Log the raw summary structure
+        logger.info(f"📁 Summary structure: {list(summary.keys())}")
+        if 'cases' in summary:
+            logger.info(f"📂 Found {len(summary['cases'])} cases: {list(summary['cases'].keys())}")
+        
         # Enhance the summary with metadata from the original inventory
-        # This assumes you want to add county/agency info to each file
         enhanced_summary = enhance_file_summary_with_metadata(sampler, summary)
         
+        # Log the enhanced summary
+        logger.info(f"✅ Enhanced summary ready: {enhanced_summary.get('total_files', 0)} files in {enhanced_summary.get('total_cases', 0)} cases")
+        if 'cases' in enhanced_summary:
+            for case_name, case_data in enhanced_summary['cases'].items():
+                logger.info(f"  📁 Case {case_name}: {len(case_data.get('files', []))} files")
+        
         return jsonify(enhanced_summary)
+        
+    except Exception as e:
+        logger.error(f"❌ Error getting downloaded summary: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+    
+@main.route('/documents/filter-analysis', methods=['POST'])
+def filter_analysis():
+    """
+    Analyze documents for filtering without actually filtering them
+    Just returns which documents/questions are good
+    """
+    try:
+        data = request.json
+        documents = data.get('documents', [])
+        thresholds = data.get('thresholds', DEFAULT_THRESHOLDS)
+        
+        # Analyze each document
+        analysis = {}
+        for doc in documents:
+            filename = doc.get('filename')
+            if not filename:
+                continue
+                
+            analysis[filename] = {
+                'isGoodDocument': is_good_document(doc, thresholds),
+                'goodQuestions': [q.get('question_id') for q in doc.get('questions', []) if is_good_question(q, thresholds)],
+                'totalQuestions': len(doc.get('questions', [])),
+                'goodQuestionCount': len([q for q in doc.get('questions', []) if is_good_question(q, thresholds)])
+            }
+        
+        # Get overall stats
+        stats = get_filtering_stats(documents, thresholds)
+        
+        return jsonify({
+            'success': True,
+            'analysis': analysis,
+            'stats': stats
+        })
         
     except Exception as e:
         return jsonify({
@@ -3392,12 +3533,70 @@ def get_downloaded_summary():
             'error': str(e)
         }), 500
 
+@main.route('/documents/filtered', methods=['POST'])
+def get_filtered_documents():
+    """
+    Filter documents on the backend
+    """
+    try:
+        data = request.json
+        documents = data.get('documents', [])
+        thresholds = data.get('thresholds', DEFAULT_THRESHOLDS)
+        only_good_documents = data.get('onlyGoodDocuments', False)
+        
+        filtered_documents = []
+        
+        for doc in documents:
+            # Filter questions within each document
+            filtered_questions = [q for q in doc.get('questions', []) if is_good_question(q, thresholds)]
+            
+            # Create filtered document
+            filtered_doc = {
+                **doc,
+                'questions': filtered_questions,
+                'filteringAnalysis': {
+                    'totalQuestions': len(doc.get('questions', [])),
+                    'goodQuestions': len(filtered_questions),
+                    'goodQuestionRatio': len(filtered_questions) / len(doc.get('questions', [])) if doc.get('questions') else 0,
+                    'isGoodDocument': is_good_document(doc, thresholds)
+                }
+            }
+            
+            # Only include if it passes document filter (if requested)
+            if only_good_documents:
+                if filtered_doc['filteringAnalysis']['isGoodDocument']:
+                    filtered_documents.append(filtered_doc)
+            else:
+                filtered_documents.append(filtered_doc)
+        
+        # Get overall stats
+        stats = get_filtering_stats(documents, thresholds)
+        
+        return jsonify({
+            'success': True,
+            'documents': filtered_documents,
+            'stats': stats
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Replace your enhance_file_summary_with_metadata function with this debug version:
+
 def enhance_file_summary_with_metadata(sampler, summary):
     """Enhance file summary with metadata from the drive inventory"""
     try:
+        logger.info(f"🔍 Enhancing summary with metadata...")
+        
         if not sampler.drive_services_available or sampler.drive_inventory_df is None:
+            logger.warning("⚠️ Drive services not available or inventory is None")
             # Return basic summary without enhancement
             return summary
+        
+        logger.info(f"📊 Drive inventory has {len(sampler.drive_inventory_df)} entries")
         
         # Create a lookup dictionary from the inventory
         inventory_lookup = {}
@@ -3413,23 +3612,33 @@ def enhance_file_summary_with_metadata(sampler, summary):
                     'page_count': int(row.get('page_num', 0))
                 }
         
+        logger.info(f"📋 Created inventory lookup with {len(inventory_lookup)} entries")
+        
         # Enhance each file with metadata
         enhanced_cases = {}
         for case_name, case_data in summary.get('cases', {}).items():
             enhanced_files = []
             
+            logger.info(f"📁 Processing case {case_name} with {len(case_data['files'])} files")
+            
             for file_info in case_data['files']:
                 gdrive_id = file_info['gdrive_id']
+                logger.info(f"  🔍 Looking up gdrive_id: {gdrive_id}")
                 
                 # Look up metadata from inventory
-                metadata = inventory_lookup.get(gdrive_id, {
-                    'county': 'Unknown',
-                    'agency': 'Unknown',
-                    'subject': 'Unknown',
-                    'incident_date': None,
-                    'case_numbers': None,
-                    'page_count': 0
-                })
+                metadata = inventory_lookup.get(gdrive_id)
+                if metadata:
+                    logger.info(f"    ✅ Found metadata: county={metadata['county']}, agency={metadata['agency']}")
+                else:
+                    logger.warning(f"    ❌ No metadata found for gdrive_id: {gdrive_id}")
+                    metadata = {
+                        'county': 'Unknown',
+                        'agency': 'Unknown',
+                        'subject': 'Unknown',
+                        'incident_date': None,
+                        'case_numbers': None,
+                        'page_count': 0
+                    }
                 
                 enhanced_file = {
                     **file_info,
@@ -3442,15 +3651,109 @@ def enhance_file_summary_with_metadata(sampler, summary):
                 'files': enhanced_files
             }
         
-        return {
+        enhanced_summary = {
             **summary,
             'cases': enhanced_cases
         }
         
+        logger.info(f"✅ Enhancement complete")
+        return enhanced_summary
+        
     except Exception as e:
         # If enhancement fails, return the original summary
-        print(f"Warning: Failed to enhance summary with metadata: {e}")
+        logger.error(f"❌ Failed to enhance summary with metadata: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return summary
+    
+@main.route('/debug/pvc-summary-structure', methods=['GET'])
+def debug_summary_structure():
+    """Debug route to examine the structure of the enhanced summary"""
+    try:
+        sampler = get_sampler()
+        
+        # Get raw summary
+        raw_summary = sampler.get_downloaded_files_summary()
+        logger.info(f"📋 Raw summary success: {raw_summary.get('success')}")
+        
+        # Get enhanced summary
+        enhanced_summary = enhance_file_summary_with_metadata(sampler, raw_summary)
+        
+        # Create debug info
+        debug_info = {
+            'raw_summary_structure': {
+                'success': raw_summary.get('success'),
+                'total_cases': raw_summary.get('total_cases'),
+                'total_files': raw_summary.get('total_files'),
+                'cases_keys': list(raw_summary.get('cases', {}).keys())
+            },
+            'enhanced_summary_structure': {
+                'success': enhanced_summary.get('success'),
+                'total_cases': enhanced_summary.get('total_cases'),
+                'total_files': enhanced_summary.get('total_files'),
+                'cases_keys': list(enhanced_summary.get('cases', {}).keys())
+            },
+            'sample_file_structure': {},
+            'inventory_info': {
+                'drive_services_available': sampler.drive_services_available,
+                'inventory_loaded': sampler.drive_inventory_df is not None,
+                'inventory_size': len(sampler.drive_inventory_df) if sampler.drive_inventory_df is not None else 0
+            }
+        }
+        
+        # Get a sample file structure
+        if enhanced_summary.get('cases'):
+            first_case_name = list(enhanced_summary['cases'].keys())[0]
+            first_case = enhanced_summary['cases'][first_case_name]
+            if first_case.get('files'):
+                sample_file = first_case['files'][0]
+                debug_info['sample_file_structure'] = {
+                    'keys': list(sample_file.keys()),
+                    'has_metadata': 'metadata' in sample_file,
+                    'metadata_keys': list(sample_file.get('metadata', {}).keys()) if 'metadata' in sample_file else [],
+                    'gdrive_id': sample_file.get('gdrive_id'),
+                    'filename': sample_file.get('filename'),
+                    'county_from_metadata': sample_file.get('metadata', {}).get('county') if 'metadata' in sample_file else 'NO_METADATA'
+                }
+        
+        # Check a few gdrive_ids in the inventory
+        if sampler.drive_inventory_df is not None and enhanced_summary.get('cases'):
+            gdrive_ids_to_check = []
+            for case_data in enhanced_summary['cases'].values():
+                for file_info in case_data.get('files', []):
+                    gdrive_ids_to_check.append(file_info.get('gdrive_id'))
+                if len(gdrive_ids_to_check) >= 3:
+                    break
+            
+            debug_info['inventory_lookup_test'] = {}
+            for gdrive_id in gdrive_ids_to_check[:3]:
+                # Check if this gdrive_id exists in the inventory
+                matching_rows = sampler.drive_inventory_df[sampler.drive_inventory_df['extracted_file_id'] == gdrive_id]
+                if len(matching_rows) > 0:
+                    row = matching_rows.iloc[0]
+                    debug_info['inventory_lookup_test'][gdrive_id] = {
+                        'found': True,
+                        'county': row.get('county'),
+                        'agency': row.get('agency'),
+                        'provisional_case_name': row.get('provisional_case_name')
+                    }
+                else:
+                    debug_info['inventory_lookup_test'][gdrive_id] = {
+                        'found': False,
+                        'note': 'gdrive_id not found in inventory'
+                    }
+        
+        return jsonify({
+            'success': True,
+            'debug_info': debug_info
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
     
 # Add this near the end of routes.py, after all route definitions
 @main.route('/debug/routes', methods=['GET'])

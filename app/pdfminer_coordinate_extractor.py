@@ -9,19 +9,34 @@ from pdfminer.layout import LAParams, LTTextContainer, LTTextBox, LTTextLine, LT
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
-import nltk
-import json
-import os
+from werkzeug.utils import secure_filename
+import difflib, json, nltk, os, re, time
 from pathlib import Path
-import re
-import time
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Set
 
 # Ensure NLTK data is available
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
     nltk.download('punkt', quiet=True)
+
+
+@dataclass
+class LayoutElement:
+    """Represents a discrete layout element from PDFMiner"""
+    element_id: str
+    text: str
+    page: int
+    x0: float
+    y0: float
+    x1: float
+    y1: float
+    element_type: str
+    char_count: int
+    reading_order: int
+    parent_id: Optional[str] = None
+    used: bool = False  # Track if element is already assigned to a sentence
+
 
 def convert_pdfminer_to_pdfjs_coords(pdfminer_coords: Dict, page_height: float) -> Dict:
     """
@@ -75,10 +90,10 @@ class CoordinateAwareSentenceExtractor:
             laparams = LAParams(
                 all_texts=True,
                 detect_vertical=True,
-                word_margin=0.1,
-                char_margin=2.0,
-                line_margin=0.5,
-                boxes_flow=0.5
+                word_margin=0.05,
+                char_margin=1.5,
+                line_margin=0.3,
+                boxes_flow=0.3
             )
             device = PDFPageAggregator(rsrcmgr, laparams=laparams)
             interpreter = PDFPageInterpreter(rsrcmgr, device)
@@ -162,7 +177,7 @@ class CoordinateAwareSentenceExtractor:
             process_element(element)
         
         # Sort by reading order (top to bottom, left to right)
-        elements.sort(key=lambda x: (-x['y1'], x['x0']))
+        #elements.sort(key=lambda x: (-x['y1'], x['x0']))
         return elements
     
     def _estimate_character_coordinates(self, element: Dict, text: str) -> List[Dict]:
@@ -236,12 +251,17 @@ class CoordinateAwareSentenceExtractor:
         # Step 1: Extract text with character positions
         full_text, character_positions, page_dimensions = self.extract_text_with_positions()
         
-        # Step 2: Apply your EXACT sentence tokenization
-        self.log("Applying sentence tokenization...")
-        raw_sentences = nltk.sent_tokenize(full_text)
-        final_sentences = self.merge_short_sentences_original(raw_sentences)
-        
-        self.log(f"Created {len(final_sentences)} final sentences from {len(raw_sentences)} raw sentences")
+        # Step 2: read the sentences from sentences.json file
+        file_basename = str(os.path.basename(self.pdf_path)).replace('.pdf', '')
+        sentences_path = os.path.join("layouts", f"{file_basename}_sentences.json")
+
+        if not os.path.exists(sentences_path):
+            file_basename = str(secure_filename(os.path.basename(self.pdf_path))).replace('.pdf', '')
+            sentences_path = os.path.join("layouts", f"{file_basename}_sentences.json")
+        with open(sentences_path, "r", encoding='utf-8') as f:
+            final_sentences = json.load(f)
+
+        self.log(f"Created {len(final_sentences)} final sentences")
         
         # Step 3: Map sentences to coordinate regions
         self.log("Mapping sentences to coordinate regions...")
@@ -382,8 +402,8 @@ def extract_and_save_coordinate_data(pdf_path: str, output_dir: str = None,
     if output_dir is None:
         output_dir = os.path.dirname(pdf_path)
     
-    base_name = os.path.splitext(os.path.basename(pdf_path))[0]
-    sentences_file = os.path.join('sentences', f"{base_name}_sentences.json")
+    base_name = secure_filename(os.path.splitext(os.path.basename(pdf_path))[0])
+    sentences_file = os.path.join('layouts', f"{base_name}_sentences.json")
     regions_file = os.path.join('pdfminer_coordinate_regions', f"{base_name}_pdfminer_coordinate_regions.json")
     
     # Check if files already exist and are recent
@@ -403,8 +423,8 @@ def extract_and_save_coordinate_data(pdf_path: str, output_dir: str = None,
         sentences, sentence_regions = extractor.extract_sentences_with_regions()
         
         # Save traditional sentences.json (unchanged format for compatibility)
-        with open(sentences_file, 'w', encoding='utf-8') as f:
-            json.dump(sentences, f, indent=2, ensure_ascii=False)
+        #with open(sentences_file, 'w', encoding='utf-8') as f:
+        #    json.dump(sentences, f, indent=2, ensure_ascii=False)
         
         # Save coordinate regions for PDF.js mapping
         regions_data = {
@@ -457,10 +477,9 @@ def validate_coordinate_extraction(pdf_path: str) -> bool:
     
     try:
         # Original method (your exact pipeline)
-        original_text = extract_text(pdf_path)
-        original_sentences = nltk.sent_tokenize(original_text)
-        # Apply your merge function (simplified for validation)
-        original_final = merge_short_sentences_validation(original_sentences)
+        sentence_path = os.path.join('layouts', f"{os.path.splitext(os.path.basename(pdf_path))[0]}_sentences.json")
+        with open(sentence_path, 'r', encoding='utf-8') as f:
+            original_final = json.load(f) 
         
         # Coordinate-aware method
         extractor = CoordinateAwareSentenceExtractor(pdf_path, verbose=False)
@@ -490,39 +509,7 @@ def validate_coordinate_extraction(pdf_path: str) -> bool:
         return False
 
 
-def merge_short_sentences_validation(sentences, length=30):
-    """Simplified version of your merge function for validation"""
-    merged = []
-    i = 0
-    n = len(sentences)
-    
-    while i < n:
-        current = sentences[i]
-        
-        if len(current) >= length:
-            merged.append(current)
-            i += 1
-        else:
-            if not merged and i < n - 1:
-                sentences[i + 1] = current + " " + sentences[i + 1]
-                i += 1
-            elif i == n - 1:
-                if merged:
-                    merged[-1] = merged[-1] + " " + current
-                else:
-                    merged.append(current)
-                i += 1
-            else:
-                previous = merged[-1] if merged else ""
-                next_sent = sentences[i + 1]
-                
-                if len(previous) <= len(next_sent):
-                    merged[-1] = previous + " " + current
-                    i += 1
-                else:
-                    sentences[i + 1] = current + " " + next_sent
-                    i += 1
-    return merged
+
 
 
 # Main processing function

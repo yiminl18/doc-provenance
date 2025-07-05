@@ -1,0 +1,82 @@
+{
+  "document": "Attachment_16_Redacted_sk_done_Redacted",
+  "generated_at": "2025-06-11T10:57:04.193967",
+  "questions_by_difficulty": {
+    "easy": {
+      "description": "Easy questions - direct extraction",
+      "questions": [
+        {
+          "id": "easy_1",
+          "question": "Who authored the investigation report?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_2",
+          "question": "What is the case number associated with the investigation?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_3",
+          "question": "On what date did Investigator Callori conduct interviews and follow-up communications?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_4",
+          "question": "Who approved the investigation report?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_5",
+          "question": "When were the detailed entries in CATS made from September 18, 2019, to what date?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "medium": {
+      "description": "Medium questions - simple synthesis",
+      "questions": [
+        {
+          "id": "medium_1",
+          "question": "How does the report emphasize the importance of compliance with nursing standards?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_2",
+          "question": "What activities were included in the investigation process according to the report?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_3",
+          "question": "In what ways did Investigator Callori ensure thoroughness in the investigation?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_4",
+          "question": "What were the main reasons for Investigator Callori's requests for additional hours?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_5",
+          "question": "How did the investigation process address the confidentiality of personnel records?",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "base_name": "Attachment_16_Redacted_sk_done_Redacted",
+    "generated_at_iso": "2025-06-11 10:57:04",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 14560,
+    "processed_text_length": 3088,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty"
+  },
+  "total_questions": 10
+}

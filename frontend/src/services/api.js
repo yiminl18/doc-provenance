@@ -677,7 +677,60 @@ export const checkProvisionalCaseSupport = async () => {
   }
 };
 
+// Get filtering analysis from backend
+export const getFilteringAnalysis = async (documents, thresholds = null) => {
+  try {
+    const response = await fetch(`${API_URL}/documents/filter-analysis`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        documents,
+        thresholds
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to get filtering analysis');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error getting filtering analysis:', error);
+    throw error;
+  }
+};
 
+// Get filtered documents from backend
+export const getFilteredDocuments = async (documents, thresholds = null, onlyGoodDocuments = false) => {
+  try {
+    const response = await fetch(`${API_URL}/documents/filtered`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        documents,
+        thresholds,
+        onlyGoodDocuments
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to get filtered documents');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error getting filtered documents:', error);
+    throw error;
+  }
+};
 
 
 // Get pre-generated questions for a document

@@ -1,0 +1,33 @@
+{
+  "base_name": "2020-0061 Exhibits 2-S Training (20)",
+  "questions": [
+    "Who are the two police officers mentioned in the document?",
+    "What department do Mark A. Bishop and David S. Dechow belong to?",
+    "When did Mark A. Bishop start his service?",
+    "What is the total training time completed by David S. Dechow?",
+    "Where do the officers serve within their department?",
+    "How does the number of training modules completed by Mark A. Bishop compare to those completed by David S. Dechow?",
+    "What are some of the training topics covered by both officers?",
+    "How did the document ensure that the officers comply with professional training standards?",
+    "What is the significance of CA-POST certifications mentioned in the document?",
+    "How does the training duration for the two officers compare from 1998 to 2020?"
+  ],
+  "metadata": {
+    "base_name": "2020-0061 Exhibits 2-S Training (20)",
+    "generated_at_iso": "2025-06-11 10:50:54",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 39799,
+    "processed_text_length": 4124,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty",
+    "has_difficulty_levels": true,
+    "source_file": "2020-0061 Exhibits 2-S Training (20)_questions_by_difficulty.json",
+    "total_questions": 10
+  }
+}

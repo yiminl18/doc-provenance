@@ -1,0 +1,82 @@
+{
+  "document": "12000010_3_NCSO_Redacted-jw",
+  "generated_at": "2025-06-11T10:56:44.785475",
+  "questions_by_difficulty": {
+    "easy": {
+      "description": "Easy questions - direct extraction",
+      "questions": [
+        {
+          "id": "easy_1",
+          "question": "Who prepared the supplemental incident report?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_2",
+          "question": "What significant event took place on January 1, 2020, in Grass Valley, California?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_3",
+          "question": "Where was the evidence collection site located?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_4",
+          "question": "When was the supplemental report approved?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_5",
+          "question": "What case number is associated with the incident report?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "medium": {
+      "description": "Medium questions - simple synthesis",
+      "questions": [
+        {
+          "id": "medium_1",
+          "question": "What role did the Nevada County District Attorney's Office play in the investigation?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_2",
+          "question": "How did the methodology of evidence collection contribute to the investigation process?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_3",
+          "question": "What were some of the key pieces of evidence collected at the scene?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_4",
+          "question": "In what ways did the involvement of multiple law enforcement agencies enhance the investigation?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_5",
+          "question": "How is the documentation of evidence critical to building a comprehensive case?",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "base_name": "12000010_3_NCSO_Redacted-jw",
+    "generated_at_iso": "2025-06-11 10:56:44",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 34199,
+    "processed_text_length": 3452,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty"
+  },
+  "total_questions": 10
+}

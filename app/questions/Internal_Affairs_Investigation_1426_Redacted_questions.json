@@ -1,0 +1,33 @@
+{
+  "base_name": "Internal_Affairs_Investigation_1426_Redacted",
+  "questions": [
+    "Who led the investigation in the document?",
+    "What was the date of the officer-involved shooting incident?",
+    "Where did the incident involving Jerry Lee Matheny occur?",
+    "Who were the officers involved in the shooting as mentioned in the document?",
+    "What type of vehicle was associated with the suspicious person reported?",
+    "How did the officers' actions align with the Menlo Park Police Department's policy on the use of deadly force?",
+    "What was the sequence of events leading to the officers firing their weapons?",
+    "What were the discrepancies or issues noted in the activation of safety equipment during the incident?",
+    "How did the officers justify their use of force during the incident?",
+    "What were the key pieces of evidence included in the investigation's attachments?"
+  ],
+  "metadata": {
+    "base_name": "Internal_Affairs_Investigation_1426_Redacted",
+    "generated_at_iso": "2025-06-11 10:57:30",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 42422,
+    "processed_text_length": 4085,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty",
+    "has_difficulty_levels": true,
+    "source_file": "Internal_Affairs_Investigation_1426_Redacted_questions_by_difficulty.json",
+    "total_questions": 10
+  }
+}

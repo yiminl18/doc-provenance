@@ -1,0 +1,6819 @@
+{
+  "sentence_mappings": {
+    "0": {
+      "sentence_id": 0,
+      "sentence_text": "From:\nTo:\nCc:\nSubject:\nDate:\n\nCRMAdmin\nBaker, William J\nCarlsen, Jerry J\nUOF: 16-253663 has been Submitted for the Captain\"s Review\nWednesday, October 19, 2016 8:14:29 PM\n\n    \nJerry Carlsen  submitted a UOF for your review.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 0,
+          "page": 1,
+          "text": "From:",
+          "words_consumed": [
+            "from"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 79.5,
+            "y": 69,
+            "width": 22.1175,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f1",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "from_0_5",
+            "positionHash": "80_69_22_8",
+            "contextFingerprint": "|From|"
+          },
+          "reading_order_index": 0
+        },
+        {
+          "stable_index": 2,
+          "page": 1,
+          "text": "CRMAdmin",
+          "words_consumed": [
+            "crmadmin"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 156,
+            "y": 69,
+            "width": 35.7975,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f2",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "crmadmin_2_8",
+            "positionHash": "156_69_36_8",
+            "contextFingerprint": "|CRMAdmin|"
+          },
+          "reading_order_index": 2
+        },
+        {
+          "stable_index": 4,
+          "page": 1,
+          "text": "To:",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 79.5,
+            "y": 79.5,
+            "width": 11.940000000000001,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f1",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "to_4_3",
+            "positionHash": "80_80_12_8",
+            "contextFingerprint": "|To|"
+          },
+          "reading_order_index": 20
+        },
+        {
+          "stable_index": 6,
+          "page": 1,
+          "text": "Baker, William J",
+          "words_consumed": [
+            "baker",
+            "william",
+            "j"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 156,
+            "y": 79.5,
+            "width": 52.70249999999999,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f2",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "bakerwilliamj_6_16",
+            "positionHash": "156_80_53_8",
+            "contextFingerprint": "|BakerWilliamJ|"
+          },
+          "reading_order_index": 22
+        },
+        {
+          "stable_index": 8,
+          "page": 1,
+          "text": "Cc:",
+          "words_consumed": [
+            "cc"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 79.5,
+            "y": 90,
+            "width": 11.6775,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f1",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "cc_8_3",
+            "positionHash": "80_90_12_8",
+            "contextFingerprint": "|Cc|"
+          },
+          "reading_order_index": 23
+        },
+        {
+          "stable_index": 10,
+          "page": 1,
+          "text": "Carlsen, Jerry J",
+          "words_consumed": [
+            "carlsen",
+            "jerry",
+            "j"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 156,
+            "y": 90,
+            "width": 50.64,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f2",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "carlsenjerryj_10_16",
+            "positionHash": "156_90_51_8",
+            "contextFingerprint": "|CarlsenJerryJ|"
+          },
+          "reading_order_index": 25
+        },
+        {
+          "stable_index": 12,
+          "page": 1,
+          "text": "Subject:",
+          "words_consumed": [
+            "subject"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 79.5,
+            "y": 100.5,
+            "width": 31.26,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f1",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "subject_12_8",
+            "positionHash": "80_101_31_8",
+            "contextFingerprint": "|Subject|"
+          },
+          "reading_order_index": 29
+        },
+        {
+          "stable_index": 14,
+          "page": 1,
+          "text": "UOF: 16-253663",
+          "words_consumed": [
+            "16253663",
+            "uof"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 156,
+            "y": 100.5,
+            "width": 54.62250000000001,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f2",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "uof16253663_14_14",
+            "positionHash": "156_101_55_8",
+            "contextFingerprint": "|UOF16253663|"
+          },
+          "reading_order_index": 41
+        },
+        {
+          "stable_index": 16,
+          "page": 1,
+          "text": "has been Submitted for the Captain\"s Review",
+          "words_consumed": [
+            "for",
+            "has",
+            "captains",
+            "the",
+            "submitted",
+            "been",
+            "review"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 212.96999999999997,
+            "y": 100.5,
+            "width": 150.0525000000001,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f2",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "hasbeensubmittedforthecaptainsreview_16_43",
+            "positionHash": "213_101_150_8",
+            "contextFingerprint": "|hasbeenSubmittedfortheCaptainsReview|"
+          },
+          "reading_order_index": 43
+        },
+        {
+          "stable_index": 18,
+          "page": 1,
+          "text": "Date:",
+          "words_consumed": [
+            "date"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 79.5,
+            "y": 111,
+            "width": 20.467499999999998,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f1",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "date_18_5",
+            "positionHash": "80_111_20_8",
+            "contextFingerprint": "|Date|"
+          },
+          "reading_order_index": 61
+        },
+        {
+          "stable_index": 20,
+          "page": 1,
+          "text": "Wednesday, October 19, 2016 8:14:29 PM",
+          "words_consumed": [
+            "pm",
+            "19",
+            "2016",
+            "october",
+            "81429",
+            "wednesday"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 156,
+            "y": 111,
+            "width": 140.84249999999997,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f2",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "wednesdayoctober19201681429pm_20_38",
+            "positionHash": "156_111_141_8",
+            "contextFingerprint": "|WednesdayOctober19201681429PM|"
+          },
+          "reading_order_index": 73
+        },
+        {
+          "stable_index": 22,
+          "page": 1,
+          "text": "Jerry",
+          "words_consumed": [
+            "jerry"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 178.5,
+            "width": 23.988,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "jerry_22_5",
+            "positionHash": "78_179_24_12",
+            "contextFingerprint": "|Jerry|"
+          },
+          "reading_order_index": 86
+        },
+        {
+          "stable_index": 24,
+          "page": 1,
+          "text": "Carlsen",
+          "words_consumed": [
+            "carlsen"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 104.988,
+            "y": 178.5,
+            "width": 36.66,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "carlsen_24_7",
+            "positionHash": "105_179_37_12",
+            "contextFingerprint": "|Carlsen|"
+          },
+          "reading_order_index": 99
+        },
+        {
+          "stable_index": 26,
+          "page": 1,
+          "text": "submitted",
+          "words_consumed": [
+            "submitted"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 147.648,
+            "y": 178.5,
+            "width": 47.339999999999996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "submitted_26_9",
+            "positionHash": "148_179_47_12",
+            "contextFingerprint": "|submitted|"
+          },
+          "reading_order_index": 118
+        },
+        {
+          "stable_index": 28,
+          "page": 1,
+          "text": "a",
+          "words_consumed": [
+            "a"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 197.98800000000006,
+            "y": 178.5,
+            "width": 5.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "a_28_1",
+            "positionHash": "198_179_5_12",
+            "contextFingerprint": "|a|"
+          },
+          "reading_order_index": 134
+        },
+        {
+          "stable_index": 30,
+          "page": 1,
+          "text": "UOF",
+          "words_consumed": [
+            "uof"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 206.31600000000006,
+            "y": 178.5,
+            "width": 24,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "uof_30_3",
+            "positionHash": "206_179_24_12",
+            "contextFingerprint": "|UOF|"
+          },
+          "reading_order_index": 150
+        },
+        {
+          "stable_index": 32,
+          "page": 1,
+          "text": "for",
+          "words_consumed": [
+            "for"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 233.31600000000003,
+            "y": 178.5,
+            "width": 13.991999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "for_32_3",
+            "positionHash": "233_179_14_12",
+            "contextFingerprint": "|for|"
+          },
+          "reading_order_index": 163
+        },
+        {
+          "stable_index": 34,
+          "page": 1,
+          "text": "your",
+          "words_consumed": [
+            "your"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 250.30800000000005,
+            "y": 178.5,
+            "width": 21.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "your_34_4",
+            "positionHash": "250_179_22_12",
+            "contextFingerprint": "|your|"
+          },
+          "reading_order_index": 174
+        },
+        {
+          "stable_index": 36,
+          "page": 1,
+          "text": "review.",
+          "words_consumed": [
+            "review"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 275.30400000000003,
+            "y": 178.5,
+            "width": 35.652,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "review_36_7",
+            "positionHash": "275_179_36_12",
+            "contextFingerprint": "|review|UOF"
+          },
+          "reading_order_index": 190
+        },
+        {
+          "stable_index": 37,
+          "page": 1,
+          "text": "UOF",
+          "words_consumed": [
+            "uof"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 81,
+            "y": 204,
+            "width": 24,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "uof_37_3",
+            "positionHash": "81_204_24_12",
+            "contextFingerprint": "review|UOF|"
+          },
+          "reading_order_index": 195
+        },
+        {
+          "stable_index": 43,
+          "page": 1,
+          "text": "16-253663",
+          "words_consumed": [
+            "16253663"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 101.004,
+            "y": 255,
+            "width": 51.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "16253663_43_9",
+            "positionHash": "101_255_52_12",
+            "contextFingerprint": "|16253663|Date"
+          },
+          "reading_order_index": 199
+        },
+        {
+          "stable_index": 44,
+          "page": 1,
+          "text": "Date:",
+          "words_consumed": [
+            "date"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 280.5,
+            "width": 25.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "date_44_5",
+            "positionHash": "78_281_26_12",
+            "contextFingerprint": "16253663|Date|"
+          },
+          "reading_order_index": 200
+        },
+        {
+          "stable_index": 91,
+          "page": 1,
+          "text": "J.",
+          "words_consumed": [
+            "j"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 262.32000000000005,
+            "y": 408,
+            "width": 7.668,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "j_91_2",
+            "positionHash": "262_408_8_12",
+            "contextFingerprint": "|J|"
+          },
+          "reading_order_index": 225
+        },
+        {
+          "stable_index": 99,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 358.644,
+            "y": 408,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_99_2",
+            "positionHash": "359_408_9_12",
+            "contextFingerprint": "|to|"
+          },
+          "reading_order_index": 229
+        },
+        {
+          "stable_index": 118,
+          "page": 1,
+          "text": "The",
+          "words_consumed": [
+            "the"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 185.49600000000007,
+            "y": 421.5,
+            "width": 18.66,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "the_118_3",
+            "positionHash": "185_422_19_12",
+            "contextFingerprint": "|The|"
+          },
+          "reading_order_index": 239
+        },
+        {
+          "stable_index": 143,
+          "page": 1,
+          "text": "the",
+          "words_consumed": [
+            "the"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 243.94800000000004,
+            "y": 435,
+            "width": 14.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "the_143_3",
+            "positionHash": "244_435_15_12",
+            "contextFingerprint": "|the|"
+          },
+          "reading_order_index": 252
+        },
+        {
+          "stable_index": 149,
+          "page": 1,
+          "text": "the",
+          "words_consumed": [
+            "the"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 348.276,
+            "y": 435,
+            "width": 14.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "the_149_3",
+            "positionHash": "348_435_15_12",
+            "contextFingerprint": "|the|"
+          },
+          "reading_order_index": 255
+        },
+        {
+          "stable_index": 180,
+          "page": 1,
+          "text": "a",
+          "words_consumed": [
+            "a"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 444.5999999999998,
+            "y": 448.5,
+            "width": 5.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "a_180_1",
+            "positionHash": "445_449_5_12",
+            "contextFingerprint": "|a|"
+          },
+          "reading_order_index": 271
+        },
+        {
+          "stable_index": 217,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 481.9559999999999,
+            "y": 462,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_217_2",
+            "positionHash": "482_462_9_12",
+            "contextFingerprint": "|to|"
+          },
+          "reading_order_index": 290
+        },
+        {
+          "stable_index": 221,
+          "page": 1,
+          "text": "the",
+          "words_consumed": [
+            "the"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 519.2879999999999,
+            "y": 462,
+            "width": 14.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "the_221_3",
+            "positionHash": "519_462_15_12",
+            "contextFingerprint": "|the|shoe"
+          },
+          "reading_order_index": 292
+        },
+        {
+          "stable_index": 230,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 181.98000000000005,
+            "y": 475.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_230_2",
+            "positionHash": "182_476_9_12",
+            "contextFingerprint": "|to|"
+          },
+          "reading_order_index": 297
+        },
+        {
+          "stable_index": 263,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 222.6600000000001,
+            "y": 489,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_263_2",
+            "positionHash": "223_489_9_12",
+            "contextFingerprint": "|to|"
+          },
+          "reading_order_index": 314
+        },
+        {
+          "stable_index": 269,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 285.6480000000001,
+            "y": 489,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_269_2",
+            "positionHash": "286_489_9_12",
+            "contextFingerprint": "|to|"
+          },
+          "reading_order_index": 317
+        },
+        {
+          "stable_index": 292,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 267.30000000000007,
+            "y": 502.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_292_2",
+            "positionHash": "267_503_9_12",
+            "contextFingerprint": "|to|"
+          },
+          "reading_order_index": 329
+        },
+        {
+          "stable_index": 294,
+          "page": 1,
+          "text": "the",
+          "words_consumed": [
+            "the"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 279.6360000000001,
+            "y": 502.5,
+            "width": 14.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "the_294_3",
+            "positionHash": "280_503_15_12",
+            "contextFingerprint": "|the|"
+          },
+          "reading_order_index": 330
+        },
+        {
+          "stable_index": 298,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 334.29600000000005,
+            "y": 502.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_298_2",
+            "positionHash": "334_503_9_12",
+            "contextFingerprint": "|to|"
+          },
+          "reading_order_index": 332
+        },
+        {
+          "stable_index": 315,
+          "page": 1,
+          "text": "a",
+          "words_consumed": [
+            "a"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 242.6280000000001,
+            "y": 516,
+            "width": 5.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "a_315_1",
+            "positionHash": "243_516_5_12",
+            "contextFingerprint": "|a|"
+          },
+          "reading_order_index": 341
+        },
+        {
+          "stable_index": 332,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 130.32,
+            "y": 529.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_332_2",
+            "positionHash": "130_530_9_12",
+            "contextFingerprint": "|to|"
+          },
+          "reading_order_index": 350
+        },
+        {
+          "stable_index": 350,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 402.288,
+            "y": 529.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_350_2",
+            "positionHash": "402_530_9_12",
+            "contextFingerprint": "|to|"
+          },
+          "reading_order_index": 359
+        },
+        {
+          "stable_index": 360,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 522.612,
+            "y": 529.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_360_2",
+            "positionHash": "523_530_9_12",
+            "contextFingerprint": "|to|be"
+          },
+          "reading_order_index": 364
+        },
+        {
+          "stable_index": 365,
+          "page": 1,
+          "text": "for",
+          "words_consumed": [
+            "for"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 127.98,
+            "y": 543,
+            "width": 13.991999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "for_365_3",
+            "positionHash": "128_543_14_12",
+            "contextFingerprint": "|for|"
+          },
+          "reading_order_index": 367
+        }
+      ],
+      "confidence": 1.0,
+      "match_method": "word_based_consumption_aware",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 69,
+        "width": 455.9519999999999,
+        "height": 486
+      },
+      "element_count": 41,
+      "words_consumed": {
+        "0": [
+          "from"
+        ],
+        "2": [
+          "crmadmin"
+        ],
+        "4": [
+          "to"
+        ],
+        "6": [
+          "baker",
+          "william",
+          "j"
+        ],
+        "8": [
+          "cc"
+        ],
+        "10": [
+          "carlsen",
+          "jerry",
+          "j"
+        ],
+        "12": [
+          "subject"
+        ],
+        "14": [
+          "16253663",
+          "uof"
+        ],
+        "16": [
+          "for",
+          "has",
+          "captains",
+          "the",
+          "submitted",
+          "been",
+          "review"
+        ],
+        "18": [
+          "date"
+        ],
+        "20": [
+          "pm",
+          "19",
+          "2016",
+          "october",
+          "81429",
+          "wednesday"
+        ],
+        "22": [
+          "jerry"
+        ],
+        "24": [
+          "carlsen"
+        ],
+        "26": [
+          "submitted"
+        ],
+        "28": [
+          "a"
+        ],
+        "30": [
+          "uof"
+        ],
+        "32": [
+          "for"
+        ],
+        "34": [
+          "your"
+        ],
+        "36": [
+          "review"
+        ],
+        "37": [
+          "uof"
+        ],
+        "43": [
+          "16253663"
+        ],
+        "44": [
+          "date"
+        ],
+        "91": [
+          "j"
+        ],
+        "99": [
+          "to"
+        ],
+        "118": [
+          "the"
+        ],
+        "143": [
+          "the"
+        ],
+        "149": [
+          "the"
+        ],
+        "180": [
+          "a"
+        ],
+        "217": [
+          "to"
+        ],
+        "221": [
+          "the"
+        ],
+        "230": [
+          "to"
+        ],
+        "263": [
+          "to"
+        ],
+        "269": [
+          "to"
+        ],
+        "292": [
+          "to"
+        ],
+        "294": [
+          "the"
+        ],
+        "298": [
+          "to"
+        ],
+        "315": [
+          "a"
+        ],
+        "332": [
+          "to"
+        ],
+        "350": [
+          "to"
+        ],
+        "360": [
+          "to"
+        ],
+        "365": [
+          "for"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "1": {
+      "sentence_id": 1,
+      "sentence_text": "UOF Link\n\nSummary:\n\nDR: 16-253663\n\nDate: 9/28/2016 7:58 AM\n\nLocation: 550 Flower\n\n# of Deputies using Force: 8\n\nInitial Call: Uncooperative Inmate\n\nNotification Summary:\n\nOn 9/28/16 at about 0758 hours, Dep.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 14,
+          "page": 1,
+          "text": "UOF: 16-253663",
+          "words_consumed": [
+            "16253663",
+            "uof"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 156,
+            "y": 100.5,
+            "width": 54.62250000000001,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f2",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "uof16253663_14_14",
+            "positionHash": "156_101_55_8",
+            "contextFingerprint": "|UOF16253663|"
+          },
+          "reading_order_index": 41
+        },
+        {
+          "stable_index": 18,
+          "page": 1,
+          "text": "Date:",
+          "words_consumed": [
+            "date"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 79.5,
+            "y": 111,
+            "width": 20.467499999999998,
+            "height": 7.5
+          },
+          "font_info": {
+            "font_name": "g_d0_f1",
+            "font_size": 7.5
+          },
+          "identifiers": {
+            "textFingerprint": "date_18_5",
+            "positionHash": "80_111_20_8",
+            "contextFingerprint": "|Date|"
+          },
+          "reading_order_index": 61
+        },
+        {
+          "stable_index": 30,
+          "page": 1,
+          "text": "UOF",
+          "words_consumed": [
+            "uof"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 206.31600000000006,
+            "y": 178.5,
+            "width": 24,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "uof_30_3",
+            "positionHash": "206_179_24_12",
+            "contextFingerprint": "|UOF|"
+          },
+          "reading_order_index": 150
+        },
+        {
+          "stable_index": 37,
+          "page": 1,
+          "text": "UOF",
+          "words_consumed": [
+            "uof"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 81,
+            "y": 204,
+            "width": 24,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "uof_37_3",
+            "positionHash": "81_204_24_12",
+            "contextFingerprint": "review|UOF|"
+          },
+          "reading_order_index": 195
+        },
+        {
+          "stable_index": 39,
+          "page": 1,
+          "text": "Link",
+          "words_consumed": [
+            "link"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 108,
+            "y": 204,
+            "width": 22.668,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "link_39_4",
+            "positionHash": "108_204_23_12",
+            "contextFingerprint": "|Link|Summary"
+          },
+          "reading_order_index": 196
+        },
+        {
+          "stable_index": 40,
+          "page": 1,
+          "text": "Summary:",
+          "words_consumed": [
+            "summary"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 229.5,
+            "width": 50.004,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "summary_40_8",
+            "positionHash": "78_230_50_12",
+            "contextFingerprint": "Link|Summary|DR"
+          },
+          "reading_order_index": 197
+        },
+        {
+          "stable_index": 41,
+          "page": 1,
+          "text": "DR:",
+          "words_consumed": [
+            "dr"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 255,
+            "width": 20.004,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dr_41_3",
+            "positionHash": "78_255_20_12",
+            "contextFingerprint": "Summary|DR|"
+          },
+          "reading_order_index": 198
+        },
+        {
+          "stable_index": 43,
+          "page": 1,
+          "text": "16-253663",
+          "words_consumed": [
+            "16253663"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 101.004,
+            "y": 255,
+            "width": 51.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "16253663_43_9",
+            "positionHash": "101_255_52_12",
+            "contextFingerprint": "|16253663|Date"
+          },
+          "reading_order_index": 199
+        },
+        {
+          "stable_index": 44,
+          "page": 1,
+          "text": "Date:",
+          "words_consumed": [
+            "date"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 280.5,
+            "width": 25.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "date_44_5",
+            "positionHash": "78_281_26_12",
+            "contextFingerprint": "16253663|Date|"
+          },
+          "reading_order_index": 200
+        },
+        {
+          "stable_index": 46,
+          "page": 1,
+          "text": "9/28/2016",
+          "words_consumed": [
+            "9282016"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 106.992,
+            "y": 280.5,
+            "width": 48.672,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "9282016_46_9",
+            "positionHash": "107_281_49_12",
+            "contextFingerprint": "|9282016|"
+          },
+          "reading_order_index": 201
+        },
+        {
+          "stable_index": 48,
+          "page": 1,
+          "text": "7:58",
+          "words_consumed": [
+            "758"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 158.66400000000002,
+            "y": 280.5,
+            "width": 21.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "758_48_4",
+            "positionHash": "159_281_21_12",
+            "contextFingerprint": "|758|"
+          },
+          "reading_order_index": 202
+        },
+        {
+          "stable_index": 50,
+          "page": 1,
+          "text": "AM",
+          "words_consumed": [
+            "am"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 183.00000000000003,
+            "y": 280.5,
+            "width": 19.332,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "am_50_2",
+            "positionHash": "183_281_19_12",
+            "contextFingerprint": "|AM|Location"
+          },
+          "reading_order_index": 203
+        },
+        {
+          "stable_index": 51,
+          "page": 1,
+          "text": "Location:",
+          "words_consumed": [
+            "location"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 306,
+            "width": 45.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "location_51_9",
+            "positionHash": "78_306_46_12",
+            "contextFingerprint": "AM|Location|"
+          },
+          "reading_order_index": 204
+        },
+        {
+          "stable_index": 53,
+          "page": 1,
+          "text": "550",
+          "words_consumed": [
+            "550"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 126.996,
+            "y": 306,
+            "width": 18,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "550_53_3",
+            "positionHash": "127_306_18_12",
+            "contextFingerprint": "|550|"
+          },
+          "reading_order_index": 205
+        },
+        {
+          "stable_index": 55,
+          "page": 1,
+          "text": "Flower",
+          "words_consumed": [
+            "flower"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 147.99599999999998,
+            "y": 306,
+            "width": 33.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "flower_55_6",
+            "positionHash": "148_306_34_12",
+            "contextFingerprint": "|Flower|"
+          },
+          "reading_order_index": 206
+        },
+        {
+          "stable_index": 58,
+          "page": 1,
+          "text": "of",
+          "words_consumed": [
+            "of"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 87,
+            "y": 331.5,
+            "width": 9.995999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "of_58_2",
+            "positionHash": "87_332_10_12",
+            "contextFingerprint": "|of|"
+          },
+          "reading_order_index": 207
+        },
+        {
+          "stable_index": 60,
+          "page": 1,
+          "text": "Deputies",
+          "words_consumed": [
+            "deputies"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 99.996,
+            "y": 331.5,
+            "width": 42.66,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "deputies_60_8",
+            "positionHash": "100_332_43_12",
+            "contextFingerprint": "|Deputies|"
+          },
+          "reading_order_index": 208
+        },
+        {
+          "stable_index": 62,
+          "page": 1,
+          "text": "using",
+          "words_consumed": [
+            "using"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 145.65600000000003,
+            "y": 331.5,
+            "width": 26.003999999999998,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "using_62_5",
+            "positionHash": "146_332_26_12",
+            "contextFingerprint": "|using|"
+          },
+          "reading_order_index": 209
+        },
+        {
+          "stable_index": 64,
+          "page": 1,
+          "text": "Force:",
+          "words_consumed": [
+            "force"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 174.66000000000005,
+            "y": 331.5,
+            "width": 30.660000000000004,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "force_64_6",
+            "positionHash": "175_332_31_12",
+            "contextFingerprint": "|Force|"
+          },
+          "reading_order_index": 210
+        },
+        {
+          "stable_index": 66,
+          "page": 1,
+          "text": "8",
+          "words_consumed": [
+            "8"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 208.32000000000008,
+            "y": 331.5,
+            "width": 6,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "8_66_1",
+            "positionHash": "208_332_6_12",
+            "contextFingerprint": "|8|Initial"
+          },
+          "reading_order_index": 211
+        },
+        {
+          "stable_index": 67,
+          "page": 1,
+          "text": "Initial",
+          "words_consumed": [
+            "initial"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 357,
+            "width": 28.668000000000003,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "initial_67_7",
+            "positionHash": "78_357_29_12",
+            "contextFingerprint": "8|Initial|"
+          },
+          "reading_order_index": 212
+        },
+        {
+          "stable_index": 69,
+          "page": 1,
+          "text": "Call:",
+          "words_consumed": [
+            "call"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 109.66799999999999,
+            "y": 357,
+            "width": 23.34,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "call_69_5",
+            "positionHash": "110_357_23_12",
+            "contextFingerprint": "|Call|"
+          },
+          "reading_order_index": 213
+        },
+        {
+          "stable_index": 71,
+          "page": 1,
+          "text": "Uncooperative",
+          "words_consumed": [
+            "uncooperative"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 136.008,
+            "y": 357,
+            "width": 70.64400000000002,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "uncooperative_71_13",
+            "positionHash": "136_357_71_12",
+            "contextFingerprint": "|Uncooperative|"
+          },
+          "reading_order_index": 214
+        },
+        {
+          "stable_index": 73,
+          "page": 1,
+          "text": "Inmate",
+          "words_consumed": [
+            "inmate"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 209.65200000000004,
+            "y": 357,
+            "width": 33.324,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "inmate_73_6",
+            "positionHash": "210_357_33_12",
+            "contextFingerprint": "|Inmate|Notificati"
+          },
+          "reading_order_index": 215
+        },
+        {
+          "stable_index": 74,
+          "page": 1,
+          "text": "Notification",
+          "words_consumed": [
+            "notification"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 382.5,
+            "width": 57.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "notification_74_12",
+            "positionHash": "78_383_58_12",
+            "contextFingerprint": "Inmate|Notification|"
+          },
+          "reading_order_index": 216
+        },
+        {
+          "stable_index": 76,
+          "page": 1,
+          "text": "Summary:",
+          "words_consumed": [
+            "summary"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 138.99599999999998,
+            "y": 382.5,
+            "width": 50.004,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "summary_76_8",
+            "positionHash": "139_383_50_12",
+            "contextFingerprint": "|Summary|On"
+          },
+          "reading_order_index": 217
+        },
+        {
+          "stable_index": 77,
+          "page": 1,
+          "text": "On",
+          "words_consumed": [
+            "on"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 408,
+            "width": 14.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "on_77_2",
+            "positionHash": "78_408_15_12",
+            "contextFingerprint": "Summary|On|"
+          },
+          "reading_order_index": 218
+        },
+        {
+          "stable_index": 79,
+          "page": 1,
+          "text": "9/28/16",
+          "words_consumed": [
+            "92816"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 95.664,
+            "y": 408,
+            "width": 36.672,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "92816_79_7",
+            "positionHash": "96_408_37_12",
+            "contextFingerprint": "|92816|"
+          },
+          "reading_order_index": 219
+        },
+        {
+          "stable_index": 81,
+          "page": 1,
+          "text": "at",
+          "words_consumed": [
+            "at"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 135.336,
+            "y": 408,
+            "width": 8.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "at_81_2",
+            "positionHash": "135_408_9_12",
+            "contextFingerprint": "|at|"
+          },
+          "reading_order_index": 220
+        },
+        {
+          "stable_index": 83,
+          "page": 1,
+          "text": "about",
+          "words_consumed": [
+            "about"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 147.00000000000003,
+            "y": 408,
+            "width": 26.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "about_83_5",
+            "positionHash": "147_408_27_12",
+            "contextFingerprint": "|about|"
+          },
+          "reading_order_index": 221
+        },
+        {
+          "stable_index": 85,
+          "page": 1,
+          "text": "0758",
+          "words_consumed": [
+            "0758"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 176.66400000000004,
+            "y": 408,
+            "width": 24,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "0758_85_4",
+            "positionHash": "177_408_24_12",
+            "contextFingerprint": "|0758|"
+          },
+          "reading_order_index": 222
+        },
+        {
+          "stable_index": 87,
+          "page": 1,
+          "text": "hours,",
+          "words_consumed": [
+            "hours"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 203.66400000000004,
+            "y": 408,
+            "width": 29.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "hours_87_6",
+            "positionHash": "204_408_30_12",
+            "contextFingerprint": "|hours|"
+          },
+          "reading_order_index": 223
+        },
+        {
+          "stable_index": 89,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 236.32800000000006,
+            "y": 408,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_89_4",
+            "positionHash": "236_408_23_12",
+            "contextFingerprint": "|Dep|"
+          },
+          "reading_order_index": 224
+        },
+        {
+          "stable_index": 103,
+          "page": 1,
+          "text": "inmate",
+          "words_consumed": [
+            "inmate"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 385.308,
+            "y": 408,
+            "width": 32.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "inmate_103_6",
+            "positionHash": "385_408_33_12",
+            "contextFingerprint": "|inmate|"
+          },
+          "reading_order_index": 231
+        },
+        {
+          "stable_index": 120,
+          "page": 1,
+          "text": "inmate,",
+          "words_consumed": [
+            "inmate"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 207.15600000000006,
+            "y": 421.5,
+            "width": 35.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "inmate_120_7",
+            "positionHash": "207_422_36_12",
+            "contextFingerprint": "|inmate|"
+          },
+          "reading_order_index": 240
+        },
+        {
+          "stable_index": 135,
+          "page": 1,
+          "text": "uncooperative.",
+          "words_consumed": [
+            "uncooperative"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 435,
+            "width": 70.98,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "uncooperative_135_14",
+            "positionHash": "78_435_71_12",
+            "contextFingerprint": "and|uncooperative|"
+          },
+          "reading_order_index": 248
+        },
+        {
+          "stable_index": 137,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 151.98000000000002,
+            "y": 435,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_137_4",
+            "positionHash": "152_435_23_12",
+            "contextFingerprint": "|Dep|"
+          },
+          "reading_order_index": 249
+        },
+        {
+          "stable_index": 160,
+          "page": 1,
+          "text": "deputies,",
+          "words_consumed": [
+            "deputies"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 448.5,
+            "width": 42.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "deputies_160_9",
+            "positionHash": "78_449_43_12",
+            "contextFingerprint": "additional|deputies|"
+          },
+          "reading_order_index": 261
+        },
+        {
+          "stable_index": 162,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 123.99600000000001,
+            "y": 448.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_162_4",
+            "positionHash": "124_449_23_12",
+            "contextFingerprint": "|Dep|"
+          },
+          "reading_order_index": 262
+        },
+        {
+          "stable_index": 170,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 221.304,
+            "y": 448.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_170_4",
+            "positionHash": "221_449_23_12",
+            "contextFingerprint": "|Dep|"
+          },
+          "reading_order_index": 266
+        },
+        {
+          "stable_index": 193,
+          "page": 1,
+          "text": "of",
+          "words_consumed": [
+            "of"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 179.98800000000003,
+            "y": 462,
+            "width": 9.995999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "of_193_2",
+            "positionHash": "180_462_10_12",
+            "contextFingerprint": "|of|"
+          },
+          "reading_order_index": 278
+        },
+        {
+          "stable_index": 205,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 298.32000000000005,
+            "y": 462,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_205_4",
+            "positionHash": "298_462_23_12",
+            "contextFingerprint": "|Dep|"
+          },
+          "reading_order_index": 284
+        },
+        {
+          "stable_index": 246,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 400.056,
+            "y": 475.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_246_4",
+            "positionHash": "400_476_23_12",
+            "contextFingerprint": "|Dep|"
+          },
+          "reading_order_index": 305
+        },
+        {
+          "stable_index": 273,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 327.636,
+            "y": 489,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_273_4",
+            "positionHash": "328_489_23_12",
+            "contextFingerprint": "|Dep|"
+          },
+          "reading_order_index": 319
+        },
+        {
+          "stable_index": 279,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 420.10799999999995,
+            "y": 489,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_279_4",
+            "positionHash": "420_489_23_12",
+            "contextFingerprint": "|Dep|"
+          },
+          "reading_order_index": 322
+        },
+        {
+          "stable_index": 308,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 485.616,
+            "y": 502.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_308_4",
+            "positionHash": "486_503_23_12",
+            "contextFingerprint": "|Dep|PalomaresV"
+          },
+          "reading_order_index": 337
+        },
+        {
+          "stable_index": 319,
+          "page": 1,
+          "text": "of",
+          "words_consumed": [
+            "of"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 296.62800000000016,
+            "y": 516,
+            "width": 9.995999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "of_319_2",
+            "positionHash": "297_516_10_12",
+            "contextFingerprint": "|of|"
+          },
+          "reading_order_index": 343
+        },
+        {
+          "stable_index": 329,
+          "page": 1,
+          "text": "deputies",
+          "words_consumed": [
+            "deputies"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 469.9680000000002,
+            "y": 516,
+            "width": 39.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "deputies_329_8",
+            "positionHash": "470_516_40_12",
+            "contextFingerprint": "|deputies|responded"
+          },
+          "reading_order_index": 348
+        },
+        {
+          "stable_index": 340,
+          "page": 1,
+          "text": "of",
+          "words_consumed": [
+            "of"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 226.98000000000008,
+            "y": 529.5,
+            "width": 9.995999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "of_340_2",
+            "positionHash": "227_530_10_12",
+            "contextFingerprint": "|of|"
+          },
+          "reading_order_index": 354
+        }
+      ],
+      "confidence": 1.0,
+      "match_method": "word_based_consumption_aware",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 100.5,
+        "width": 431.96400000000017,
+        "height": 441.0
+      },
+      "element_count": 49,
+      "words_consumed": {
+        "14": [
+          "16253663",
+          "uof"
+        ],
+        "18": [
+          "date"
+        ],
+        "30": [
+          "uof"
+        ],
+        "37": [
+          "uof"
+        ],
+        "39": [
+          "link"
+        ],
+        "40": [
+          "summary"
+        ],
+        "41": [
+          "dr"
+        ],
+        "43": [
+          "16253663"
+        ],
+        "44": [
+          "date"
+        ],
+        "46": [
+          "9282016"
+        ],
+        "48": [
+          "758"
+        ],
+        "50": [
+          "am"
+        ],
+        "51": [
+          "location"
+        ],
+        "53": [
+          "550"
+        ],
+        "55": [
+          "flower"
+        ],
+        "58": [
+          "of"
+        ],
+        "60": [
+          "deputies"
+        ],
+        "62": [
+          "using"
+        ],
+        "64": [
+          "force"
+        ],
+        "66": [
+          "8"
+        ],
+        "67": [
+          "initial"
+        ],
+        "69": [
+          "call"
+        ],
+        "71": [
+          "uncooperative"
+        ],
+        "73": [
+          "inmate"
+        ],
+        "74": [
+          "notification"
+        ],
+        "76": [
+          "summary"
+        ],
+        "77": [
+          "on"
+        ],
+        "79": [
+          "92816"
+        ],
+        "81": [
+          "at"
+        ],
+        "83": [
+          "about"
+        ],
+        "85": [
+          "0758"
+        ],
+        "87": [
+          "hours"
+        ],
+        "89": [
+          "dep"
+        ],
+        "103": [
+          "inmate"
+        ],
+        "120": [
+          "inmate"
+        ],
+        "135": [
+          "uncooperative"
+        ],
+        "137": [
+          "dep"
+        ],
+        "160": [
+          "deputies"
+        ],
+        "162": [
+          "dep"
+        ],
+        "170": [
+          "dep"
+        ],
+        "193": [
+          "of"
+        ],
+        "205": [
+          "dep"
+        ],
+        "246": [
+          "dep"
+        ],
+        "273": [
+          "dep"
+        ],
+        "279": [
+          "dep"
+        ],
+        "308": [
+          "dep"
+        ],
+        "319": [
+          "of"
+        ],
+        "329": [
+          "deputies"
+        ],
+        "340": [
+          "of"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "2": {
+      "sentence_id": 2,
+      "sentence_text": "J. Dorn was talking to an inmate who was standing in\nModule B's vestibule.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 97,
+          "page": 1,
+          "text": "talking",
+          "words_consumed": [
+            "talking"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 322.308,
+            "y": 408,
+            "width": 33.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "talking_97_7",
+            "positionHash": "322_408_33_12",
+            "contextFingerprint": "|talking|"
+          },
+          "reading_order_index": 228
+        },
+        {
+          "stable_index": 281,
+          "page": 1,
+          "text": "Dorn,",
+          "words_consumed": [
+            "dorn"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 446.0999999999999,
+            "y": 489,
+            "width": 27.659999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dorn_281_5",
+            "positionHash": "446_489_28_12",
+            "contextFingerprint": "|Dorn|"
+          },
+          "reading_order_index": 323
+        },
+        {
+          "stable_index": 101,
+          "page": 1,
+          "text": "an",
+          "words_consumed": [
+            "an"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 370.98,
+            "y": 408,
+            "width": 11.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "an_101_2",
+            "positionHash": "371_408_11_12",
+            "contextFingerprint": "|an|"
+          },
+          "reading_order_index": 230
+        },
+        {
+          "stable_index": 199,
+          "page": 1,
+          "text": "in",
+          "words_consumed": [
+            "in"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 239.65200000000007,
+            "y": 462,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "in_199_2",
+            "positionHash": "240_462_9_12",
+            "contextFingerprint": "|in|"
+          },
+          "reading_order_index": 281
+        },
+        {
+          "stable_index": 120,
+          "page": 1,
+          "text": "inmate,",
+          "words_consumed": [
+            "inmate"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 207.15600000000006,
+            "y": 421.5,
+            "width": 35.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "inmate_120_7",
+            "positionHash": "207_422_36_12",
+            "contextFingerprint": "|inmate|"
+          },
+          "reading_order_index": 240
+        },
+        {
+          "stable_index": 105,
+          "page": 1,
+          "text": "who",
+          "words_consumed": [
+            "who"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 420.972,
+            "y": 408,
+            "width": 20.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "who_105_3",
+            "positionHash": "421_408_21_12",
+            "contextFingerprint": "|who|"
+          },
+          "reading_order_index": 232
+        },
+        {
+          "stable_index": 109,
+          "page": 1,
+          "text": "standing",
+          "words_consumed": [
+            "standing"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 466.29599999999994,
+            "y": 408,
+            "width": 40.668,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "standing_109_8",
+            "positionHash": "466_408_41_12",
+            "contextFingerprint": "|standing|"
+          },
+          "reading_order_index": 234
+        },
+        {
+          "stable_index": 112,
+          "page": 1,
+          "text": "Module",
+          "words_consumed": [
+            "module"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 421.5,
+            "width": 37.332,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "module_112_6",
+            "positionHash": "78_422_37_12",
+            "contextFingerprint": "in|Module|"
+          },
+          "reading_order_index": 236
+        },
+        {
+          "stable_index": 145,
+          "page": 1,
+          "text": "vestibule",
+          "words_consumed": [
+            "vestibule"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 261.612,
+            "y": 435,
+            "width": 43.332,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "vestibule_145_9",
+            "positionHash": "262_435_43_12",
+            "contextFingerprint": "|vestibule|"
+          },
+          "reading_order_index": 253
+        },
+        {
+          "stable_index": 346,
+          "page": 1,
+          "text": "was",
+          "words_consumed": [
+            "was"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 323.6400000000001,
+            "y": 529.5,
+            "width": 18.66,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "was_346_3",
+            "positionHash": "324_530_19_12",
+            "contextFingerprint": "|was|"
+          },
+          "reading_order_index": 357
+        },
+        {
+          "stable_index": 360,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 522.612,
+            "y": 529.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_360_2",
+            "positionHash": "523_530_9_12",
+            "contextFingerprint": "|to|be"
+          },
+          "reading_order_index": 364
+        },
+        {
+          "stable_index": 114,
+          "page": 1,
+          "text": "B's",
+          "words_consumed": [
+            "bs"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 118.33200000000001,
+            "y": 421.5,
+            "width": 14.832,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "bs_114_3",
+            "positionHash": "118_422_15_12",
+            "contextFingerprint": "|Bs|"
+          },
+          "reading_order_index": 237
+        },
+        {
+          "stable_index": 91,
+          "page": 1,
+          "text": "J.",
+          "words_consumed": [
+            "j"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 262.32000000000005,
+            "y": 408,
+            "width": 7.668,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "j_91_2",
+            "positionHash": "262_408_8_12",
+            "contextFingerprint": "|J|"
+          },
+          "reading_order_index": 225
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 408,
+        "width": 453.948,
+        "height": 133.5
+      },
+      "element_count": 13,
+      "words_consumed": {
+        "97": [
+          "talking"
+        ],
+        "281": [
+          "dorn"
+        ],
+        "101": [
+          "an"
+        ],
+        "199": [
+          "in"
+        ],
+        "120": [
+          "inmate"
+        ],
+        "105": [
+          "who"
+        ],
+        "109": [
+          "standing"
+        ],
+        "112": [
+          "module"
+        ],
+        "145": [
+          "vestibule"
+        ],
+        "346": [
+          "was"
+        ],
+        "360": [
+          "to"
+        ],
+        "114": [
+          "bs"
+        ],
+        "91": [
+          "j"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "3": {
+      "sentence_id": 3,
+      "sentence_text": "The inmate, Raymond Muniga (bk# 2955064) appeared agitated and\nuncooperative. Dep.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 122,
+          "page": 1,
+          "text": "Raymond",
+          "words_consumed": [
+            "raymond"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 245.8200000000001,
+            "y": 421.5,
+            "width": 46.668000000000006,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "raymond_122_7",
+            "positionHash": "246_422_47_12",
+            "contextFingerprint": "|Raymond|"
+          },
+          "reading_order_index": 241
+        },
+        {
+          "stable_index": 130,
+          "page": 1,
+          "text": "appeared",
+          "words_consumed": [
+            "appeared"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 409.81200000000007,
+            "y": 421.5,
+            "width": 43.308,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "appeared_130_8",
+            "positionHash": "410_422_43_12",
+            "contextFingerprint": "|appeared|"
+          },
+          "reading_order_index": 245
+        },
+        {
+          "stable_index": 344,
+          "page": 1,
+          "text": "Muniga",
+          "words_consumed": [
+            "muniga"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 283.3080000000001,
+            "y": 529.5,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "muniga_344_6",
+            "positionHash": "283_530_37_12",
+            "contextFingerprint": "|Muniga|"
+          },
+          "reading_order_index": 356
+        },
+        {
+          "stable_index": 126,
+          "page": 1,
+          "text": "(bk#",
+          "words_consumed": [
+            "bk"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 335.8200000000001,
+            "y": 421.5,
+            "width": 21.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "bk_126_4",
+            "positionHash": "336_422_22_12",
+            "contextFingerprint": "|bk|"
+          },
+          "reading_order_index": 243
+        },
+        {
+          "stable_index": 284,
+          "page": 1,
+          "text": "and",
+          "words_consumed": [
+            "and"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 502.5,
+            "width": 17.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "and_284_3",
+            "positionHash": "78_503_17_12",
+            "contextFingerprint": "Tucker|and|"
+          },
+          "reading_order_index": 325
+        },
+        {
+          "stable_index": 308,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 485.616,
+            "y": 502.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_308_4",
+            "positionHash": "486_503_23_12",
+            "contextFingerprint": "|Dep|PalomaresV"
+          },
+          "reading_order_index": 337
+        },
+        {
+          "stable_index": 128,
+          "page": 1,
+          "text": "2955064)",
+          "words_consumed": [
+            "2955064"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 360.8160000000001,
+            "y": 421.5,
+            "width": 45.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "2955064_128_8",
+            "positionHash": "361_422_46_12",
+            "contextFingerprint": "|2955064|"
+          },
+          "reading_order_index": 244
+        },
+        {
+          "stable_index": 294,
+          "page": 1,
+          "text": "the",
+          "words_consumed": [
+            "the"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 279.6360000000001,
+            "y": 502.5,
+            "width": 14.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "the_294_3",
+            "positionHash": "280_503_15_12",
+            "contextFingerprint": "|the|"
+          },
+          "reading_order_index": 330
+        },
+        {
+          "stable_index": 135,
+          "page": 1,
+          "text": "uncooperative.",
+          "words_consumed": [
+            "uncooperative"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 435,
+            "width": 70.98,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "uncooperative_135_14",
+            "positionHash": "78_435_71_12",
+            "contextFingerprint": "and|uncooperative|"
+          },
+          "reading_order_index": 248
+        },
+        {
+          "stable_index": 132,
+          "page": 1,
+          "text": "agitated",
+          "words_consumed": [
+            "agitated"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 456.11999999999995,
+            "y": 421.5,
+            "width": 37.992,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "agitated_132_8",
+            "positionHash": "456_422_38_12",
+            "contextFingerprint": "|agitated|"
+          },
+          "reading_order_index": 246
+        },
+        {
+          "stable_index": 120,
+          "page": 1,
+          "text": "inmate,",
+          "words_consumed": [
+            "inmate"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 207.15600000000006,
+            "y": 421.5,
+            "width": 35.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "inmate_120_7",
+            "positionHash": "207_422_36_12",
+            "contextFingerprint": "|inmate|"
+          },
+          "reading_order_index": 240
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 421.5,
+        "width": 430.608,
+        "height": 120.0
+      },
+      "element_count": 11,
+      "words_consumed": {
+        "122": [
+          "raymond"
+        ],
+        "130": [
+          "appeared"
+        ],
+        "344": [
+          "muniga"
+        ],
+        "126": [
+          "bk"
+        ],
+        "284": [
+          "and"
+        ],
+        "308": [
+          "dep"
+        ],
+        "128": [
+          "2955064"
+        ],
+        "294": [
+          "the"
+        ],
+        "135": [
+          "uncooperative"
+        ],
+        "132": [
+          "agitated"
+        ],
+        "120": [
+          "inmate"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "4": {
+      "sentence_id": 4,
+      "sentence_text": "Dorn entered the vestibule through the hallway door with two additional\ndeputies, Dep.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 281,
+          "page": 1,
+          "text": "Dorn,",
+          "words_consumed": [
+            "dorn"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 446.0999999999999,
+            "y": 489,
+            "width": 27.659999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dorn_281_5",
+            "positionHash": "446_489_28_12",
+            "contextFingerprint": "|Dorn|"
+          },
+          "reading_order_index": 323
+        },
+        {
+          "stable_index": 151,
+          "page": 1,
+          "text": "hallway",
+          "words_consumed": [
+            "hallway"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 365.94,
+            "y": 435,
+            "width": 37.992,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "hallway_151_7",
+            "positionHash": "366_435_38_12",
+            "contextFingerprint": "|hallway|"
+          },
+          "reading_order_index": 256
+        },
+        {
+          "stable_index": 327,
+          "page": 1,
+          "text": "additional",
+          "words_consumed": [
+            "additional"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 418.9680000000002,
+            "y": 516,
+            "width": 48,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "additional_327_10",
+            "positionHash": "419_516_48_12",
+            "contextFingerprint": "|additional|"
+          },
+          "reading_order_index": 347
+        },
+        {
+          "stable_index": 155,
+          "page": 1,
+          "text": "with",
+          "words_consumed": [
+            "with"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 431.92799999999994,
+            "y": 435,
+            "width": 21.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "with_155_4",
+            "positionHash": "432_435_21_12",
+            "contextFingerprint": "|with|"
+          },
+          "reading_order_index": 258
+        },
+        {
+          "stable_index": 329,
+          "page": 1,
+          "text": "deputies",
+          "words_consumed": [
+            "deputies"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 469.9680000000002,
+            "y": 516,
+            "width": 39.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "deputies_329_8",
+            "positionHash": "470_516_40_12",
+            "contextFingerprint": "|deputies|responded"
+          },
+          "reading_order_index": 348
+        },
+        {
+          "stable_index": 153,
+          "page": 1,
+          "text": "door",
+          "words_consumed": [
+            "door"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 406.93199999999996,
+            "y": 435,
+            "width": 21.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "door_153_4",
+            "positionHash": "407_435_22_12",
+            "contextFingerprint": "|door|"
+          },
+          "reading_order_index": 257
+        },
+        {
+          "stable_index": 294,
+          "page": 1,
+          "text": "the",
+          "words_consumed": [
+            "the"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 279.6360000000001,
+            "y": 502.5,
+            "width": 14.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "the_294_3",
+            "positionHash": "280_503_15_12",
+            "contextFingerprint": "|the|"
+          },
+          "reading_order_index": 330
+        },
+        {
+          "stable_index": 145,
+          "page": 1,
+          "text": "vestibule",
+          "words_consumed": [
+            "vestibule"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 261.612,
+            "y": 435,
+            "width": 43.332,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "vestibule_145_9",
+            "positionHash": "262_435_43_12",
+            "contextFingerprint": "|vestibule|"
+          },
+          "reading_order_index": 253
+        },
+        {
+          "stable_index": 213,
+          "page": 1,
+          "text": "two",
+          "words_consumed": [
+            "two"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 431.9519999999999,
+            "y": 462,
+            "width": 18,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "two_213_3",
+            "positionHash": "432_462_18_12",
+            "contextFingerprint": "|two|"
+          },
+          "reading_order_index": 288
+        },
+        {
+          "stable_index": 141,
+          "page": 1,
+          "text": "entered",
+          "words_consumed": [
+            "entered"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 205.632,
+            "y": 435,
+            "width": 35.316,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "entered_141_7",
+            "positionHash": "206_435_35_12",
+            "contextFingerprint": "|entered|"
+          },
+          "reading_order_index": 251
+        },
+        {
+          "stable_index": 147,
+          "page": 1,
+          "text": "through",
+          "words_consumed": [
+            "through"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 307.944,
+            "y": 435,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "through_147_7",
+            "positionHash": "308_435_37_12",
+            "contextFingerprint": "|through|"
+          },
+          "reading_order_index": 254
+        },
+        {
+          "stable_index": 308,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 485.616,
+            "y": 502.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_308_4",
+            "positionHash": "486_503_23_12",
+            "contextFingerprint": "|Dep|PalomaresV"
+          },
+          "reading_order_index": 337
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 205.632,
+        "y": 435,
+        "width": 304.33200000000016,
+        "height": 93
+      },
+      "element_count": 12,
+      "words_consumed": {
+        "281": [
+          "dorn"
+        ],
+        "151": [
+          "hallway"
+        ],
+        "327": [
+          "additional"
+        ],
+        "155": [
+          "with"
+        ],
+        "329": [
+          "deputies"
+        ],
+        "153": [
+          "door"
+        ],
+        "294": [
+          "the"
+        ],
+        "145": [
+          "vestibule"
+        ],
+        "213": [
+          "two"
+        ],
+        "141": [
+          "entered"
+        ],
+        "147": [
+          "through"
+        ],
+        "308": [
+          "dep"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "5": {
+      "sentence_id": 5,
+      "sentence_text": "B. Tucker and Dep. C. Palomares-Velasco.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 172,
+          "page": 1,
+          "text": "C.",
+          "words_consumed": [
+            "c"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 247.296,
+            "y": 448.5,
+            "width": 11.004000000000001,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "c_172_2",
+            "positionHash": "247_449_11_12",
+            "contextFingerprint": "|C|"
+          },
+          "reading_order_index": 267
+        },
+        {
+          "stable_index": 284,
+          "page": 1,
+          "text": "and",
+          "words_consumed": [
+            "and"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 502.5,
+            "width": 17.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "and_284_3",
+            "positionHash": "78_503_17_12",
+            "contextFingerprint": "Tucker|and|"
+          },
+          "reading_order_index": 325
+        },
+        {
+          "stable_index": 283,
+          "page": 1,
+          "text": "Tucker,",
+          "words_consumed": [
+            "tucker"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 476.7599999999999,
+            "y": 489,
+            "width": 36.983999999999995,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "tucker_283_7",
+            "positionHash": "477_489_37_12",
+            "contextFingerprint": "|Tucker|and"
+          },
+          "reading_order_index": 324
+        },
+        {
+          "stable_index": 309,
+          "page": 1,
+          "text": "Palomares-Velasco",
+          "words_consumed": [
+            "palomaresvelasco"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 516,
+            "width": 92.64,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "palomaresvelasco_309_17",
+            "positionHash": "78_516_93_12",
+            "contextFingerprint": "Dep|PalomaresVelasco|"
+          },
+          "reading_order_index": 338
+        },
+        {
+          "stable_index": 164,
+          "page": 1,
+          "text": "B.",
+          "words_consumed": [
+            "b"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 149.988,
+            "y": 448.5,
+            "width": 11.004000000000001,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "b_164_2",
+            "positionHash": "150_449_11_12",
+            "contextFingerprint": "|B|"
+          },
+          "reading_order_index": 263
+        },
+        {
+          "stable_index": 308,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 485.616,
+            "y": 502.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_308_4",
+            "positionHash": "486_503_23_12",
+            "contextFingerprint": "|Dep|PalomaresV"
+          },
+          "reading_order_index": 337
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 448.5,
+        "width": 435.7439999999999,
+        "height": 79.5
+      },
+      "element_count": 6,
+      "words_consumed": {
+        "172": [
+          "c"
+        ],
+        "284": [
+          "and"
+        ],
+        "283": [
+          "tucker"
+        ],
+        "309": [
+          "palomaresvelasco"
+        ],
+        "164": [
+          "b"
+        ],
+        "308": [
+          "dep"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "6": {
+      "sentence_id": 6,
+      "sentence_text": "Muniga assumed a fighting stance\nand was holding one of his shoes in his hand.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 178,
+          "page": 1,
+          "text": "assumed",
+          "words_consumed": [
+            "assumed"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 400.2719999999998,
+            "y": 448.5,
+            "width": 41.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "assumed_178_7",
+            "positionHash": "400_449_41_12",
+            "contextFingerprint": "|assumed|"
+          },
+          "reading_order_index": 270
+        },
+        {
+          "stable_index": 340,
+          "page": 1,
+          "text": "of",
+          "words_consumed": [
+            "of"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 226.98000000000008,
+            "y": 529.5,
+            "width": 9.995999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "of_340_2",
+            "positionHash": "227_530_10_12",
+            "contextFingerprint": "|of|"
+          },
+          "reading_order_index": 354
+        },
+        {
+          "stable_index": 315,
+          "page": 1,
+          "text": "a",
+          "words_consumed": [
+            "a"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 242.6280000000001,
+            "y": 516,
+            "width": 5.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "a_315_1",
+            "positionHash": "243_516_5_12",
+            "contextFingerprint": "|a|"
+          },
+          "reading_order_index": 341
+        },
+        {
+          "stable_index": 344,
+          "page": 1,
+          "text": "Muniga",
+          "words_consumed": [
+            "muniga"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 283.3080000000001,
+            "y": 529.5,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "muniga_344_6",
+            "positionHash": "283_530_37_12",
+            "contextFingerprint": "|Muniga|"
+          },
+          "reading_order_index": 356
+        },
+        {
+          "stable_index": 284,
+          "page": 1,
+          "text": "and",
+          "words_consumed": [
+            "and"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 502.5,
+            "width": 17.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "and_284_3",
+            "positionHash": "78_503_17_12",
+            "contextFingerprint": "Tucker|and|"
+          },
+          "reading_order_index": 325
+        },
+        {
+          "stable_index": 191,
+          "page": 1,
+          "text": "one",
+          "words_consumed": [
+            "one"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 159.66000000000003,
+            "y": 462,
+            "width": 17.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "one_191_3",
+            "positionHash": "160_462_17_12",
+            "contextFingerprint": "|one|"
+          },
+          "reading_order_index": 277
+        },
+        {
+          "stable_index": 367,
+          "page": 1,
+          "text": "his",
+          "words_consumed": [
+            "his"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 144.972,
+            "y": 543,
+            "width": 14.004000000000001,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "his_367_3",
+            "positionHash": "145_543_14_12",
+            "contextFingerprint": "|his|"
+          },
+          "reading_order_index": 368
+        },
+        {
+          "stable_index": 199,
+          "page": 1,
+          "text": "in",
+          "words_consumed": [
+            "in"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 239.65200000000007,
+            "y": 462,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "in_199_2",
+            "positionHash": "240_462_9_12",
+            "contextFingerprint": "|in|"
+          },
+          "reading_order_index": 281
+        },
+        {
+          "stable_index": 197,
+          "page": 1,
+          "text": "shoes",
+          "words_consumed": [
+            "shoes"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 209.98800000000006,
+            "y": 462,
+            "width": 26.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "shoes_197_5",
+            "positionHash": "210_462_27_12",
+            "contextFingerprint": "|shoes|"
+          },
+          "reading_order_index": 280
+        },
+        {
+          "stable_index": 184,
+          "page": 1,
+          "text": "stance",
+          "words_consumed": [
+            "stance"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 493.9319999999998,
+            "y": 448.5,
+            "width": 29.988,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "stance_184_6",
+            "positionHash": "494_449_30_12",
+            "contextFingerprint": "|stance|and"
+          },
+          "reading_order_index": 273
+        },
+        {
+          "stable_index": 346,
+          "page": 1,
+          "text": "was",
+          "words_consumed": [
+            "was"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 323.6400000000001,
+            "y": 529.5,
+            "width": 18.66,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "was_346_3",
+            "positionHash": "324_530_19_12",
+            "contextFingerprint": "|was|"
+          },
+          "reading_order_index": 357
+        },
+        {
+          "stable_index": 203,
+          "page": 1,
+          "text": "hand.",
+          "words_consumed": [
+            "hand"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 268.9920000000001,
+            "y": 462,
+            "width": 26.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "hand_203_5",
+            "positionHash": "269_462_26_12",
+            "contextFingerprint": "|hand|"
+          },
+          "reading_order_index": 283
+        },
+        {
+          "stable_index": 182,
+          "page": 1,
+          "text": "fighting",
+          "words_consumed": [
+            "fighting"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 452.92799999999977,
+            "y": 448.5,
+            "width": 38.004,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "fighting_182_8",
+            "positionHash": "453_449_38_12",
+            "contextFingerprint": "|fighting|"
+          },
+          "reading_order_index": 272
+        },
+        {
+          "stable_index": 189,
+          "page": 1,
+          "text": "holding",
+          "words_consumed": [
+            "holding"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 119.98800000000001,
+            "y": 462,
+            "width": 36.672,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "holding_189_7",
+            "positionHash": "120_462_37_12",
+            "contextFingerprint": "|holding|"
+          },
+          "reading_order_index": 276
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 448.5,
+        "width": 445.91999999999985,
+        "height": 106.5
+      },
+      "element_count": 14,
+      "words_consumed": {
+        "178": [
+          "assumed"
+        ],
+        "340": [
+          "of"
+        ],
+        "315": [
+          "a"
+        ],
+        "344": [
+          "muniga"
+        ],
+        "284": [
+          "and"
+        ],
+        "191": [
+          "one"
+        ],
+        "367": [
+          "his"
+        ],
+        "199": [
+          "in"
+        ],
+        "197": [
+          "shoes"
+        ],
+        "184": [
+          "stance"
+        ],
+        "346": [
+          "was"
+        ],
+        "203": [
+          "hand"
+        ],
+        "182": [
+          "fighting"
+        ],
+        "189": [
+          "holding"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "7": {
+      "sentence_id": 7,
+      "sentence_text": "Dep. Dorn ordered Muniga two times to drop the\nshoe and turn around to be cuffed.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 281,
+          "page": 1,
+          "text": "Dorn,",
+          "words_consumed": [
+            "dorn"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 446.0999999999999,
+            "y": 489,
+            "width": 27.659999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dorn_281_5",
+            "positionHash": "446_489_28_12",
+            "contextFingerprint": "|Dorn|"
+          },
+          "reading_order_index": 323
+        },
+        {
+          "stable_index": 344,
+          "page": 1,
+          "text": "Muniga",
+          "words_consumed": [
+            "muniga"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 283.3080000000001,
+            "y": 529.5,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "muniga_344_6",
+            "positionHash": "283_530_37_12",
+            "contextFingerprint": "|Muniga|"
+          },
+          "reading_order_index": 356
+        },
+        {
+          "stable_index": 209,
+          "page": 1,
+          "text": "ordered",
+          "words_consumed": [
+            "ordered"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 351.972,
+            "y": 462,
+            "width": 36.647999999999996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "ordered_209_7",
+            "positionHash": "352_462_37_12",
+            "contextFingerprint": "|ordered|"
+          },
+          "reading_order_index": 286
+        },
+        {
+          "stable_index": 284,
+          "page": 1,
+          "text": "and",
+          "words_consumed": [
+            "and"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 502.5,
+            "width": 17.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "and_284_3",
+            "positionHash": "78_503_17_12",
+            "contextFingerprint": "Tucker|and|"
+          },
+          "reading_order_index": 325
+        },
+        {
+          "stable_index": 265,
+          "page": 1,
+          "text": "turn",
+          "words_consumed": [
+            "turn"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 234.99600000000012,
+            "y": 489,
+            "width": 19.332,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "turn_265_4",
+            "positionHash": "235_489_19_12",
+            "contextFingerprint": "|turn|"
+          },
+          "reading_order_index": 315
+        },
+        {
+          "stable_index": 294,
+          "page": 1,
+          "text": "the",
+          "words_consumed": [
+            "the"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 279.6360000000001,
+            "y": 502.5,
+            "width": 14.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "the_294_3",
+            "positionHash": "280_503_15_12",
+            "contextFingerprint": "|the|"
+          },
+          "reading_order_index": 330
+        },
+        {
+          "stable_index": 222,
+          "page": 1,
+          "text": "shoe",
+          "words_consumed": [
+            "shoe"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 475.5,
+            "width": 21.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "shoe_222_4",
+            "positionHash": "78_476_22_12",
+            "contextFingerprint": "the|shoe|"
+          },
+          "reading_order_index": 293
+        },
+        {
+          "stable_index": 234,
+          "page": 1,
+          "text": "cuffed.",
+          "words_consumed": [
+            "cuffed"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 208.64400000000006,
+            "y": 475.5,
+            "width": 33.647999999999996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "cuffed_234_7",
+            "positionHash": "209_476_34_12",
+            "contextFingerprint": "|cuffed|"
+          },
+          "reading_order_index": 299
+        },
+        {
+          "stable_index": 213,
+          "page": 1,
+          "text": "two",
+          "words_consumed": [
+            "two"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 431.9519999999999,
+            "y": 462,
+            "width": 18,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "two_213_3",
+            "positionHash": "432_462_18_12",
+            "contextFingerprint": "|two|"
+          },
+          "reading_order_index": 288
+        },
+        {
+          "stable_index": 219,
+          "page": 1,
+          "text": "drop",
+          "words_consumed": [
+            "drop"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 494.2919999999999,
+            "y": 462,
+            "width": 21.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "drop_219_4",
+            "positionHash": "494_462_22_12",
+            "contextFingerprint": "|drop|"
+          },
+          "reading_order_index": 291
+        },
+        {
+          "stable_index": 360,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 522.612,
+            "y": 529.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_360_2",
+            "positionHash": "523_530_9_12",
+            "contextFingerprint": "|to|be"
+          },
+          "reading_order_index": 364
+        },
+        {
+          "stable_index": 361,
+          "page": 1,
+          "text": "be",
+          "words_consumed": [
+            "be"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 543,
+            "width": 11.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "be_361_2",
+            "positionHash": "78_543_11_12",
+            "contextFingerprint": "to|be|"
+          },
+          "reading_order_index": 365
+        },
+        {
+          "stable_index": 313,
+          "page": 1,
+          "text": "times,",
+          "words_consumed": [
+            "times"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 210.62400000000005,
+            "y": 516,
+            "width": 29.003999999999998,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "times_313_6",
+            "positionHash": "211_516_29_12",
+            "contextFingerprint": "|times|"
+          },
+          "reading_order_index": 340
+        },
+        {
+          "stable_index": 228,
+          "page": 1,
+          "text": "around",
+          "words_consumed": [
+            "around"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 145.65600000000003,
+            "y": 475.5,
+            "width": 33.324,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "around_228_6",
+            "positionHash": "146_476_33_12",
+            "contextFingerprint": "|around|"
+          },
+          "reading_order_index": 296
+        },
+        {
+          "stable_index": 308,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 485.616,
+            "y": 502.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_308_4",
+            "positionHash": "486_503_23_12",
+            "contextFingerprint": "|Dep|PalomaresV"
+          },
+          "reading_order_index": 337
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 462,
+        "width": 453.948,
+        "height": 93
+      },
+      "element_count": 15,
+      "words_consumed": {
+        "281": [
+          "dorn"
+        ],
+        "344": [
+          "muniga"
+        ],
+        "209": [
+          "ordered"
+        ],
+        "284": [
+          "and"
+        ],
+        "265": [
+          "turn"
+        ],
+        "294": [
+          "the"
+        ],
+        "222": [
+          "shoe"
+        ],
+        "234": [
+          "cuffed"
+        ],
+        "213": [
+          "two"
+        ],
+        "219": [
+          "drop"
+        ],
+        "360": [
+          "to"
+        ],
+        "361": [
+          "be"
+        ],
+        "313": [
+          "times"
+        ],
+        "228": [
+          "around"
+        ],
+        "308": [
+          "dep"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "8": {
+      "sentence_id": 8,
+      "sentence_text": "Muniga refused and said, \"No.\" Dep.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 242,
+          "page": 1,
+          "text": "said,",
+          "words_consumed": [
+            "said"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 344.268,
+            "y": 475.5,
+            "width": 22.332,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "said_242_5",
+            "positionHash": "344_476_22_12",
+            "contextFingerprint": "|said|"
+          },
+          "reading_order_index": 303
+        },
+        {
+          "stable_index": 344,
+          "page": 1,
+          "text": "Muniga",
+          "words_consumed": [
+            "muniga"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 283.3080000000001,
+            "y": 529.5,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "muniga_344_6",
+            "positionHash": "283_530_37_12",
+            "contextFingerprint": "|Muniga|"
+          },
+          "reading_order_index": 356
+        },
+        {
+          "stable_index": 284,
+          "page": 1,
+          "text": "and",
+          "words_consumed": [
+            "and"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 502.5,
+            "width": 17.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "and_284_3",
+            "positionHash": "78_503_17_12",
+            "contextFingerprint": "Tucker|and|"
+          },
+          "reading_order_index": 325
+        },
+        {
+          "stable_index": 244,
+          "page": 1,
+          "text": "\"No.\"",
+          "words_consumed": [
+            "no"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 369.59999999999997,
+            "y": 475.5,
+            "width": 27.455999999999996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "no_244_5",
+            "positionHash": "370_476_27_12",
+            "contextFingerprint": "|No|"
+          },
+          "reading_order_index": 304
+        },
+        {
+          "stable_index": 238,
+          "page": 1,
+          "text": "refused",
+          "words_consumed": [
+            "refused"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 285.6240000000001,
+            "y": 475.5,
+            "width": 35.316,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "refused_238_7",
+            "positionHash": "286_476_35_12",
+            "contextFingerprint": "|refused|"
+          },
+          "reading_order_index": 301
+        },
+        {
+          "stable_index": 308,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 485.616,
+            "y": 502.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_308_4",
+            "positionHash": "486_503_23_12",
+            "contextFingerprint": "|Dep|PalomaresV"
+          },
+          "reading_order_index": 337
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 475.5,
+        "width": 430.608,
+        "height": 66.0
+      },
+      "element_count": 6,
+      "words_consumed": {
+        "242": [
+          "said"
+        ],
+        "344": [
+          "muniga"
+        ],
+        "284": [
+          "and"
+        ],
+        "244": [
+          "no"
+        ],
+        "238": [
+          "refused"
+        ],
+        "308": [
+          "dep"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "9": {
+      "sentence_id": 9,
+      "sentence_text": "Dorn grabbed Muniga\nby his shoulder.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 281,
+          "page": 1,
+          "text": "Dorn,",
+          "words_consumed": [
+            "dorn"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 446.0999999999999,
+            "y": 489,
+            "width": 27.659999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dorn_281_5",
+            "positionHash": "446_489_28_12",
+            "contextFingerprint": "|Dorn|"
+          },
+          "reading_order_index": 323
+        },
+        {
+          "stable_index": 344,
+          "page": 1,
+          "text": "Muniga",
+          "words_consumed": [
+            "muniga"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 283.3080000000001,
+            "y": 529.5,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "muniga_344_6",
+            "positionHash": "283_530_37_12",
+            "contextFingerprint": "|Muniga|"
+          },
+          "reading_order_index": 356
+        },
+        {
+          "stable_index": 250,
+          "page": 1,
+          "text": "grabbed",
+          "words_consumed": [
+            "grabbed"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 453.7079999999999,
+            "y": 475.5,
+            "width": 38.652,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "grabbed_250_7",
+            "positionHash": "454_476_39_12",
+            "contextFingerprint": "|grabbed|"
+          },
+          "reading_order_index": 307
+        },
+        {
+          "stable_index": 367,
+          "page": 1,
+          "text": "his",
+          "words_consumed": [
+            "his"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 144.972,
+            "y": 543,
+            "width": 14.004000000000001,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "his_367_3",
+            "positionHash": "145_543_14_12",
+            "contextFingerprint": "|his|"
+          },
+          "reading_order_index": 368
+        },
+        {
+          "stable_index": 257,
+          "page": 1,
+          "text": "shoulder.",
+          "words_consumed": [
+            "shoulder"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 110.004,
+            "y": 489,
+            "width": 44.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "shoulder_257_9",
+            "positionHash": "110_489_44_12",
+            "contextFingerprint": "|shoulder|"
+          },
+          "reading_order_index": 311
+        },
+        {
+          "stable_index": 253,
+          "page": 1,
+          "text": "by",
+          "words_consumed": [
+            "by"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 489,
+            "width": 12,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "by_253_2",
+            "positionHash": "78_489_12_12",
+            "contextFingerprint": "Muniga|by|"
+          },
+          "reading_order_index": 309
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 475.5,
+        "width": 414.3599999999999,
+        "height": 79.5
+      },
+      "element_count": 6,
+      "words_consumed": {
+        "281": [
+          "dorn"
+        ],
+        "344": [
+          "muniga"
+        ],
+        "250": [
+          "grabbed"
+        ],
+        "367": [
+          "his"
+        ],
+        "257": [
+          "shoulder"
+        ],
+        "253": [
+          "by"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "10": {
+      "sentence_id": 10,
+      "sentence_text": "Muniga tried to turn away to break Dep. Dorn's grasp. Dep.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 344,
+          "page": 1,
+          "text": "Muniga",
+          "words_consumed": [
+            "muniga"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 283.3080000000001,
+            "y": 529.5,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "muniga_344_6",
+            "positionHash": "283_530_37_12",
+            "contextFingerprint": "|Muniga|"
+          },
+          "reading_order_index": 356
+        },
+        {
+          "stable_index": 261,
+          "page": 1,
+          "text": "tried",
+          "words_consumed": [
+            "tried"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 197.66400000000007,
+            "y": 489,
+            "width": 21.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "tried_261_5",
+            "positionHash": "198_489_22_12",
+            "contextFingerprint": "|tried|"
+          },
+          "reading_order_index": 313
+        },
+        {
+          "stable_index": 277,
+          "page": 1,
+          "text": "grasp.",
+          "words_consumed": [
+            "grasp"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 388.116,
+            "y": 489,
+            "width": 28.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "grasp_277_6",
+            "positionHash": "388_489_29_12",
+            "contextFingerprint": "|grasp|"
+          },
+          "reading_order_index": 321
+        },
+        {
+          "stable_index": 275,
+          "page": 1,
+          "text": "Dorn's",
+          "words_consumed": [
+            "dorns"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 353.628,
+            "y": 489,
+            "width": 31.487999999999996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dorns_275_6",
+            "positionHash": "354_489_31_12",
+            "contextFingerprint": "|Dorns|"
+          },
+          "reading_order_index": 320
+        },
+        {
+          "stable_index": 265,
+          "page": 1,
+          "text": "turn",
+          "words_consumed": [
+            "turn"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 234.99600000000012,
+            "y": 489,
+            "width": 19.332,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "turn_265_4",
+            "positionHash": "235_489_19_12",
+            "contextFingerprint": "|turn|"
+          },
+          "reading_order_index": 315
+        },
+        {
+          "stable_index": 271,
+          "page": 1,
+          "text": "break",
+          "words_consumed": [
+            "break"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 297.9840000000001,
+            "y": 489,
+            "width": 26.652,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "break_271_5",
+            "positionHash": "298_489_27_12",
+            "contextFingerprint": "|break|"
+          },
+          "reading_order_index": 318
+        },
+        {
+          "stable_index": 360,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 522.612,
+            "y": 529.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_360_2",
+            "positionHash": "523_530_9_12",
+            "contextFingerprint": "|to|be"
+          },
+          "reading_order_index": 364
+        },
+        {
+          "stable_index": 267,
+          "page": 1,
+          "text": "away",
+          "words_consumed": [
+            "away"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 257.32800000000015,
+            "y": 489,
+            "width": 25.32,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "away_267_4",
+            "positionHash": "257_489_25_12",
+            "contextFingerprint": "|away|"
+          },
+          "reading_order_index": 316
+        },
+        {
+          "stable_index": 308,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 485.616,
+            "y": 502.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_308_4",
+            "positionHash": "486_503_23_12",
+            "contextFingerprint": "|Dep|PalomaresV"
+          },
+          "reading_order_index": 337
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 197.66400000000007,
+        "y": 489,
+        "width": 334.2839999999999,
+        "height": 52.5
+      },
+      "element_count": 9,
+      "words_consumed": {
+        "344": [
+          "muniga"
+        ],
+        "261": [
+          "tried"
+        ],
+        "277": [
+          "grasp"
+        ],
+        "275": [
+          "dorns"
+        ],
+        "265": [
+          "turn"
+        ],
+        "271": [
+          "break"
+        ],
+        "360": [
+          "to"
+        ],
+        "267": [
+          "away"
+        ],
+        "308": [
+          "dep"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "11": {
+      "sentence_id": 11,
+      "sentence_text": "Dorn, Tucker,\nand Palomares-Velasco pulled Muniga to the ground to gain control.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 281,
+          "page": 1,
+          "text": "Dorn,",
+          "words_consumed": [
+            "dorn"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 446.0999999999999,
+            "y": 489,
+            "width": 27.659999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dorn_281_5",
+            "positionHash": "446_489_28_12",
+            "contextFingerprint": "|Dorn|"
+          },
+          "reading_order_index": 323
+        },
+        {
+          "stable_index": 344,
+          "page": 1,
+          "text": "Muniga",
+          "words_consumed": [
+            "muniga"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 283.3080000000001,
+            "y": 529.5,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "muniga_344_6",
+            "positionHash": "283_530_37_12",
+            "contextFingerprint": "|Muniga|"
+          },
+          "reading_order_index": 356
+        },
+        {
+          "stable_index": 284,
+          "page": 1,
+          "text": "and",
+          "words_consumed": [
+            "and"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 502.5,
+            "width": 17.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "and_284_3",
+            "positionHash": "78_503_17_12",
+            "contextFingerprint": "Tucker|and|"
+          },
+          "reading_order_index": 325
+        },
+        {
+          "stable_index": 283,
+          "page": 1,
+          "text": "Tucker,",
+          "words_consumed": [
+            "tucker"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 476.7599999999999,
+            "y": 489,
+            "width": 36.983999999999995,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "tucker_283_7",
+            "positionHash": "477_489_37_12",
+            "contextFingerprint": "|Tucker|and"
+          },
+          "reading_order_index": 324
+        },
+        {
+          "stable_index": 294,
+          "page": 1,
+          "text": "the",
+          "words_consumed": [
+            "the"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 279.6360000000001,
+            "y": 502.5,
+            "width": 14.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "the_294_3",
+            "positionHash": "280_503_15_12",
+            "contextFingerprint": "|the|"
+          },
+          "reading_order_index": 330
+        },
+        {
+          "stable_index": 338,
+          "page": 1,
+          "text": "control",
+          "words_consumed": [
+            "control"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 189.98400000000004,
+            "y": 529.5,
+            "width": 33.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "control_338_7",
+            "positionHash": "190_530_34_12",
+            "contextFingerprint": "|control|"
+          },
+          "reading_order_index": 353
+        },
+        {
+          "stable_index": 296,
+          "page": 1,
+          "text": "ground",
+          "words_consumed": [
+            "ground"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 297.30000000000007,
+            "y": 502.5,
+            "width": 33.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "ground_296_6",
+            "positionHash": "297_503_34_12",
+            "contextFingerprint": "|ground|"
+          },
+          "reading_order_index": 331
+        },
+        {
+          "stable_index": 336,
+          "page": 1,
+          "text": "gain",
+          "words_consumed": [
+            "gain"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 166.32000000000002,
+            "y": 529.5,
+            "width": 20.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "gain_336_4",
+            "positionHash": "166_530_21_12",
+            "contextFingerprint": "|gain|"
+          },
+          "reading_order_index": 352
+        },
+        {
+          "stable_index": 360,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 522.612,
+            "y": 529.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_360_2",
+            "positionHash": "523_530_9_12",
+            "contextFingerprint": "|to|be"
+          },
+          "reading_order_index": 364
+        },
+        {
+          "stable_index": 309,
+          "page": 1,
+          "text": "Palomares-Velasco",
+          "words_consumed": [
+            "palomaresvelasco"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 516,
+            "width": 92.64,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "palomaresvelasco_309_17",
+            "positionHash": "78_516_93_12",
+            "contextFingerprint": "Dep|PalomaresVelasco|"
+          },
+          "reading_order_index": 338
+        },
+        {
+          "stable_index": 288,
+          "page": 1,
+          "text": "pulled",
+          "words_consumed": [
+            "pulled"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 193.96800000000005,
+            "y": 502.5,
+            "width": 30,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "pulled_288_6",
+            "positionHash": "194_503_30_12",
+            "contextFingerprint": "|pulled|"
+          },
+          "reading_order_index": 327
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 489,
+        "width": 453.948,
+        "height": 52.5
+      },
+      "element_count": 11,
+      "words_consumed": {
+        "281": [
+          "dorn"
+        ],
+        "344": [
+          "muniga"
+        ],
+        "284": [
+          "and"
+        ],
+        "283": [
+          "tucker"
+        ],
+        "294": [
+          "the"
+        ],
+        "338": [
+          "control"
+        ],
+        "296": [
+          "ground"
+        ],
+        "336": [
+          "gain"
+        ],
+        "360": [
+          "to"
+        ],
+        "309": [
+          "palomaresvelasco"
+        ],
+        "288": [
+          "pulled"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "12": {
+      "sentence_id": 12,
+      "sentence_text": "Muniga kicked Dep. Palomares-Velasco several times, a violation of CPC 240/243(b).",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 340,
+          "page": 1,
+          "text": "of",
+          "words_consumed": [
+            "of"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 226.98000000000008,
+            "y": 529.5,
+            "width": 9.995999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "of_340_2",
+            "positionHash": "227_530_10_12",
+            "contextFingerprint": "|of|"
+          },
+          "reading_order_index": 354
+        },
+        {
+          "stable_index": 344,
+          "page": 1,
+          "text": "Muniga",
+          "words_consumed": [
+            "muniga"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 283.3080000000001,
+            "y": 529.5,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "muniga_344_6",
+            "positionHash": "283_530_37_12",
+            "contextFingerprint": "|Muniga|"
+          },
+          "reading_order_index": 356
+        },
+        {
+          "stable_index": 315,
+          "page": 1,
+          "text": "a",
+          "words_consumed": [
+            "a"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 242.6280000000001,
+            "y": 516,
+            "width": 5.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "a_315_1",
+            "positionHash": "243_516_5_12",
+            "contextFingerprint": "|a|"
+          },
+          "reading_order_index": 341
+        },
+        {
+          "stable_index": 311,
+          "page": 1,
+          "text": "several",
+          "words_consumed": [
+            "several"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 173.64000000000001,
+            "y": 516,
+            "width": 33.983999999999995,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "several_311_7",
+            "positionHash": "174_516_34_12",
+            "contextFingerprint": "|several|"
+          },
+          "reading_order_index": 339
+        },
+        {
+          "stable_index": 317,
+          "page": 1,
+          "text": "violation",
+          "words_consumed": [
+            "violation"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 250.9560000000001,
+            "y": 516,
+            "width": 42.672,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "violation_317_9",
+            "positionHash": "251_516_43_12",
+            "contextFingerprint": "|violation|"
+          },
+          "reading_order_index": 342
+        },
+        {
+          "stable_index": 323,
+          "page": 1,
+          "text": "240/243(b).",
+          "words_consumed": [
+            "240243b"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 335.3040000000002,
+            "y": 516,
+            "width": 56.32800000000001,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "240243b_323_11",
+            "positionHash": "335_516_56_12",
+            "contextFingerprint": "|240243b|"
+          },
+          "reading_order_index": 345
+        },
+        {
+          "stable_index": 321,
+          "page": 1,
+          "text": "CPC",
+          "words_consumed": [
+            "cpc"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 309.62400000000014,
+            "y": 516,
+            "width": 22.68,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "cpc_321_3",
+            "positionHash": "310_516_23_12",
+            "contextFingerprint": "|CPC|"
+          },
+          "reading_order_index": 344
+        },
+        {
+          "stable_index": 306,
+          "page": 1,
+          "text": "kicked",
+          "words_consumed": [
+            "kicked"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 450.624,
+            "y": 502.5,
+            "width": 31.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "kicked_306_6",
+            "positionHash": "451_503_32_12",
+            "contextFingerprint": "|kicked|"
+          },
+          "reading_order_index": 336
+        },
+        {
+          "stable_index": 309,
+          "page": 1,
+          "text": "Palomares-Velasco",
+          "words_consumed": [
+            "palomaresvelasco"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 516,
+            "width": 92.64,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "palomaresvelasco_309_17",
+            "positionHash": "78_516_93_12",
+            "contextFingerprint": "Dep|PalomaresVelasco|"
+          },
+          "reading_order_index": 338
+        },
+        {
+          "stable_index": 313,
+          "page": 1,
+          "text": "times,",
+          "words_consumed": [
+            "times"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 210.62400000000005,
+            "y": 516,
+            "width": 29.003999999999998,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "times_313_6",
+            "positionHash": "211_516_29_12",
+            "contextFingerprint": "|times|"
+          },
+          "reading_order_index": 340
+        },
+        {
+          "stable_index": 308,
+          "page": 1,
+          "text": "Dep.",
+          "words_consumed": [
+            "dep"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 485.616,
+            "y": 502.5,
+            "width": 22.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "dep_308_4",
+            "positionHash": "486_503_23_12",
+            "contextFingerprint": "|Dep|PalomaresV"
+          },
+          "reading_order_index": 337
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 502.5,
+        "width": 430.608,
+        "height": 39.0
+      },
+      "element_count": 11,
+      "words_consumed": {
+        "340": [
+          "of"
+        ],
+        "344": [
+          "muniga"
+        ],
+        "315": [
+          "a"
+        ],
+        "311": [
+          "several"
+        ],
+        "317": [
+          "violation"
+        ],
+        "323": [
+          "240243b"
+        ],
+        "321": [
+          "cpc"
+        ],
+        "306": [
+          "kicked"
+        ],
+        "309": [
+          "palomaresvelasco"
+        ],
+        "313": [
+          "times"
+        ],
+        "308": [
+          "dep"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "13": {
+      "sentence_id": 13,
+      "sentence_text": "Five additional deputies\nresponded to help gain control of Muniga.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 340,
+          "page": 1,
+          "text": "of",
+          "words_consumed": [
+            "of"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 226.98000000000008,
+            "y": 529.5,
+            "width": 9.995999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "of_340_2",
+            "positionHash": "227_530_10_12",
+            "contextFingerprint": "|of|"
+          },
+          "reading_order_index": 354
+        },
+        {
+          "stable_index": 325,
+          "page": 1,
+          "text": "Five",
+          "words_consumed": [
+            "five"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 394.6320000000002,
+            "y": 516,
+            "width": 21.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "five_325_4",
+            "positionHash": "395_516_21_12",
+            "contextFingerprint": "|Five|"
+          },
+          "reading_order_index": 346
+        },
+        {
+          "stable_index": 344,
+          "page": 1,
+          "text": "Muniga",
+          "words_consumed": [
+            "muniga"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 283.3080000000001,
+            "y": 529.5,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "muniga_344_6",
+            "positionHash": "283_530_37_12",
+            "contextFingerprint": "|Muniga|"
+          },
+          "reading_order_index": 356
+        },
+        {
+          "stable_index": 329,
+          "page": 1,
+          "text": "deputies",
+          "words_consumed": [
+            "deputies"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 469.9680000000002,
+            "y": 516,
+            "width": 39.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "deputies_329_8",
+            "positionHash": "470_516_40_12",
+            "contextFingerprint": "|deputies|responded"
+          },
+          "reading_order_index": 348
+        },
+        {
+          "stable_index": 327,
+          "page": 1,
+          "text": "additional",
+          "words_consumed": [
+            "additional"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 418.9680000000002,
+            "y": 516,
+            "width": 48,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "additional_327_10",
+            "positionHash": "419_516_48_12",
+            "contextFingerprint": "|additional|"
+          },
+          "reading_order_index": 347
+        },
+        {
+          "stable_index": 330,
+          "page": 1,
+          "text": "responded",
+          "words_consumed": [
+            "responded"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 529.5,
+            "width": 49.31999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "responded_330_9",
+            "positionHash": "78_530_49_12",
+            "contextFingerprint": "deputies|responded|"
+          },
+          "reading_order_index": 349
+        },
+        {
+          "stable_index": 334,
+          "page": 1,
+          "text": "help",
+          "words_consumed": [
+            "help"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 142.656,
+            "y": 529.5,
+            "width": 20.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "help_334_4",
+            "positionHash": "143_530_21_12",
+            "contextFingerprint": "|help|"
+          },
+          "reading_order_index": 351
+        },
+        {
+          "stable_index": 338,
+          "page": 1,
+          "text": "control",
+          "words_consumed": [
+            "control"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 189.98400000000004,
+            "y": 529.5,
+            "width": 33.996,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "control_338_7",
+            "positionHash": "190_530_34_12",
+            "contextFingerprint": "|control|"
+          },
+          "reading_order_index": 353
+        },
+        {
+          "stable_index": 336,
+          "page": 1,
+          "text": "gain",
+          "words_consumed": [
+            "gain"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 166.32000000000002,
+            "y": 529.5,
+            "width": 20.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "gain_336_4",
+            "positionHash": "166_530_21_12",
+            "contextFingerprint": "|gain|"
+          },
+          "reading_order_index": 352
+        },
+        {
+          "stable_index": 360,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 522.612,
+            "y": 529.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_360_2",
+            "positionHash": "523_530_9_12",
+            "contextFingerprint": "|to|be"
+          },
+          "reading_order_index": 364
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 516,
+        "width": 453.948,
+        "height": 25.5
+      },
+      "element_count": 10,
+      "words_consumed": {
+        "340": [
+          "of"
+        ],
+        "325": [
+          "five"
+        ],
+        "344": [
+          "muniga"
+        ],
+        "329": [
+          "deputies"
+        ],
+        "327": [
+          "additional"
+        ],
+        "330": [
+          "responded"
+        ],
+        "334": [
+          "help"
+        ],
+        "338": [
+          "control"
+        ],
+        "336": [
+          "gain"
+        ],
+        "360": [
+          "to"
+        ]
+      },
+      "cross_page_elements": null
+    },
+    "14": {
+      "sentence_id": 14,
+      "sentence_text": "Muniga was transported to OC Global Santa Ana to\nbe treated for his injuries.",
+      "page_number": 1,
+      "all_pages": [
+        1
+      ],
+      "spans_multiple_pages": false,
+      "found": true,
+      "stable_elements": [
+        {
+          "stable_index": 365,
+          "page": 1,
+          "text": "for",
+          "words_consumed": [
+            "for"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 127.98,
+            "y": 543,
+            "width": 13.991999999999999,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "for_365_3",
+            "positionHash": "128_543_14_12",
+            "contextFingerprint": "|for|"
+          },
+          "reading_order_index": 367
+        },
+        {
+          "stable_index": 344,
+          "page": 1,
+          "text": "Muniga",
+          "words_consumed": [
+            "muniga"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 283.3080000000001,
+            "y": 529.5,
+            "width": 37.331999999999994,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "muniga_344_6",
+            "positionHash": "283_530_37_12",
+            "contextFingerprint": "|Muniga|"
+          },
+          "reading_order_index": 356
+        },
+        {
+          "stable_index": 367,
+          "page": 1,
+          "text": "his",
+          "words_consumed": [
+            "his"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 144.972,
+            "y": 543,
+            "width": 14.004000000000001,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "his_367_3",
+            "positionHash": "145_543_14_12",
+            "contextFingerprint": "|his|"
+          },
+          "reading_order_index": 368
+        },
+        {
+          "stable_index": 352,
+          "page": 1,
+          "text": "OC",
+          "words_consumed": [
+            "oc"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 414.624,
+            "y": 529.5,
+            "width": 16.668,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "oc_352_2",
+            "positionHash": "415_530_17_12",
+            "contextFingerprint": "|OC|"
+          },
+          "reading_order_index": 360
+        },
+        {
+          "stable_index": 358,
+          "page": 1,
+          "text": "Ana",
+          "words_consumed": [
+            "ana"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 499.62,
+            "y": 529.5,
+            "width": 19.991999999999997,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "ana_358_3",
+            "positionHash": "500_530_20_12",
+            "contextFingerprint": "|Ana|"
+          },
+          "reading_order_index": 363
+        },
+        {
+          "stable_index": 354,
+          "page": 1,
+          "text": "Global",
+          "words_consumed": [
+            "global"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 434.29200000000003,
+            "y": 529.5,
+            "width": 32.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "global_354_6",
+            "positionHash": "434_530_33_12",
+            "contextFingerprint": "|Global|"
+          },
+          "reading_order_index": 361
+        },
+        {
+          "stable_index": 369,
+          "page": 1,
+          "text": "injuries.",
+          "words_consumed": [
+            "injuries"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 161.97600000000003,
+            "y": 543,
+            "width": 39,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "injuries_369_9",
+            "positionHash": "162_543_39_12",
+            "contextFingerprint": "|injuries|"
+          },
+          "reading_order_index": 369
+        },
+        {
+          "stable_index": 346,
+          "page": 1,
+          "text": "was",
+          "words_consumed": [
+            "was"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 323.6400000000001,
+            "y": 529.5,
+            "width": 18.66,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "was_346_3",
+            "positionHash": "324_530_19_12",
+            "contextFingerprint": "|was|"
+          },
+          "reading_order_index": 357
+        },
+        {
+          "stable_index": 360,
+          "page": 1,
+          "text": "to",
+          "words_consumed": [
+            "to"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 522.612,
+            "y": 529.5,
+            "width": 9.336,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "to_360_2",
+            "positionHash": "523_530_9_12",
+            "contextFingerprint": "|to|be"
+          },
+          "reading_order_index": 364
+        },
+        {
+          "stable_index": 356,
+          "page": 1,
+          "text": "Santa",
+          "words_consumed": [
+            "santa"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 469.956,
+            "y": 529.5,
+            "width": 26.664,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "santa_356_5",
+            "positionHash": "470_530_27_12",
+            "contextFingerprint": "|Santa|"
+          },
+          "reading_order_index": 362
+        },
+        {
+          "stable_index": 361,
+          "page": 1,
+          "text": "be",
+          "words_consumed": [
+            "be"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 78,
+            "y": 543,
+            "width": 11.328,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "be_361_2",
+            "positionHash": "78_543_11_12",
+            "contextFingerprint": "to|be|"
+          },
+          "reading_order_index": 365
+        },
+        {
+          "stable_index": 348,
+          "page": 1,
+          "text": "transported",
+          "words_consumed": [
+            "transported"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 345.30000000000007,
+            "y": 529.5,
+            "width": 53.98800000000001,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "transported_348_11",
+            "positionHash": "345_530_54_12",
+            "contextFingerprint": "|transported|"
+          },
+          "reading_order_index": 358
+        },
+        {
+          "stable_index": 363,
+          "page": 1,
+          "text": "treated",
+          "words_consumed": [
+            "treated"
+          ],
+          "consumption_ratio": 1.0,
+          "coordinates": {
+            "x": 92.328,
+            "y": 543,
+            "width": 32.652,
+            "height": 12
+          },
+          "font_info": {
+            "font_name": "g_d0_f3",
+            "font_size": 12
+          },
+          "identifiers": {
+            "textFingerprint": "treated_363_7",
+            "positionHash": "92_543_33_12",
+            "contextFingerprint": "|treated|"
+          },
+          "reading_order_index": 366
+        }
+      ],
+      "confidence": 0.99,
+      "match_method": "exact_sequential_match_no_consumption_assigned_page",
+      "character_coverage": 1.0,
+      "word_coverage": 1.0,
+      "bounding_box": {
+        "x": 78,
+        "y": 529.5,
+        "width": 453.948,
+        "height": 25.5
+      },
+      "element_count": 13,
+      "words_consumed": {
+        "365": [
+          "for"
+        ],
+        "344": [
+          "muniga"
+        ],
+        "367": [
+          "his"
+        ],
+        "352": [
+          "oc"
+        ],
+        "358": [
+          "ana"
+        ],
+        "354": [
+          "global"
+        ],
+        "369": [
+          "injuries"
+        ],
+        "346": [
+          "was"
+        ],
+        "360": [
+          "to"
+        ],
+        "356": [
+          "santa"
+        ],
+        "361": [
+          "be"
+        ],
+        "348": [
+          "transported"
+        ],
+        "363": [
+          "treated"
+        ]
+      },
+      "cross_page_elements": null
+    }
+  },
+  "statistics": {
+    "total_sentences": 15,
+    "mapped_sentences": 15,
+    "mapping_methods": {
+      "word_based_consumption_aware": 2,
+      "exact_sequential_match_no_consumption_assigned_page": 13
+    },
+    "average_confidence": 0.9913333333333335,
+    "total_stable_items": 370,
+    "consumption_stats": {
+      "pages": {
+        "1": {
+          "total_elements": 194,
+          "fully_consumed": 158,
+          "partially_consumed": 0,
+          "unused": 36,
+          "average_consumption_ratio": 0.8144329896907216
+        }
+      },
+      "overall": {
+        "total_elements": 194,
+        "fully_consumed": 158,
+        "partially_consumed": 0,
+        "unused": 36,
+        "average_consumption_ratio": 0.8144329896907216
+      }
+    },
+    "mapping_rate": 1.0
+  },
+  "metadata": {
+    "total_pages": 1,
+    "processing_version": "1.0",
+    "min_confidence_threshold": 0.7,
+    "consumption_tracking_enabled": true
+  }
+}

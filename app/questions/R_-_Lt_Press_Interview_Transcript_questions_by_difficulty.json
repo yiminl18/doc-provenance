@@ -1,0 +1,82 @@
+{
+  "document": "R_-_Lt_Press_Interview_Transcript",
+  "generated_at": "2025-06-11T10:57:54.049942",
+  "questions_by_difficulty": {
+    "easy": {
+      "description": "Easy questions - direct extraction",
+      "questions": [
+        {
+          "id": "easy_1",
+          "question": "Who conducted the interview involving Lieutenant Press?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_2",
+          "question": "What section of the Elk Grove Police Department's policy was under review?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_3",
+          "question": "When did the incident involving Officer Schmidt take place?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_4",
+          "question": "Who was the subject involved in the incident with Officer Schmidt?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_5",
+          "question": "What did the CAD report indicate about the presence of weapons?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "medium": {
+      "description": "Medium questions - simple synthesis",
+      "questions": [
+        {
+          "id": "medium_1",
+          "question": "How did MP view the kick to Mendoza's head by Officer Schmidt?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_2",
+          "question": "What were MP's concerns about Officer Schmidt's assumptions regarding Mendoza?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_3",
+          "question": "How did Officer Schmidt's actions deviate from standard procedures?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_4",
+          "question": "What were the communication issues identified by MP during the incident?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_5",
+          "question": "How does the document emphasize the importance of factual information in use of force situations?",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "base_name": "R_-_Lt_Press_Interview_Transcript",
+    "generated_at_iso": "2025-06-11 10:57:54",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 41054,
+    "processed_text_length": 4342,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty"
+  },
+  "total_questions": 10
+}

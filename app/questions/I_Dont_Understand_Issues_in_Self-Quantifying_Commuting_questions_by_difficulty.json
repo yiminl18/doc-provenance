@@ -1,0 +1,82 @@
+{
+  "document": "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting",
+  "generated_at": "2025-06-11T10:52:38.908389",
+  "questions_by_difficulty": {
+    "easy": {
+      "description": "Easy questions - direct extraction",
+      "questions": [
+        {
+          "id": "easy_1",
+          "question": "Who authored the document 'I Don’t Understand…'?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_2",
+          "question": "What is the main objective of the study presented in the document?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_3",
+          "question": "Where were the authors of the document affiliated?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_4",
+          "question": "Who participated in the study mentioned in the document?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_5",
+          "question": "What did participant P7 note about the commuting cost calculations?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "medium": {
+      "description": "Medium questions - simple synthesis",
+      "questions": [
+        {
+          "id": "medium_1",
+          "question": "How do participants' perceptions of the eco-calculator model's results compare to their understanding of sustainable practices?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_2",
+          "question": "What limitations of current self-tracking models are highlighted in the document?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_3",
+          "question": "What were the phases involved in the study's methodology?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_4",
+          "question": "How does the study suggest self-tracking tools can influence behavior change?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_5",
+          "question": "What discrepancies did participants find in the commuting data models?",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "base_name": "I_Dont_Understand_Issues_in_Self-Quantifying_Commuting",
+    "generated_at_iso": "2025-06-11 10:52:38",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 27365,
+    "processed_text_length": 4051,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty"
+  },
+  "total_questions": 10
+}

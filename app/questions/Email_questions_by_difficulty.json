@@ -1,0 +1,82 @@
+{
+  "document": "Email",
+  "generated_at": "2025-06-11T10:57:14.602393",
+  "questions_by_difficulty": {
+    "easy": {
+      "description": "Easy questions - direct extraction",
+      "questions": [
+        {
+          "id": "easy_1",
+          "question": "Who submitted the UOF for review?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_2",
+          "question": "What is the date of the incident involving Raymond Muniga?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_3",
+          "question": "Where did the incident take place?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_4",
+          "question": "How many deputies were involved in using force?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_5",
+          "question": "What did Raymond Muniga hold in his hand during the incident?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "medium": {
+      "description": "Medium questions - simple synthesis",
+      "questions": [
+        {
+          "id": "medium_1",
+          "question": "How did the number of deputies involved change during the incident?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_2",
+          "question": "What was the initial call about and how did it escalate?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_3",
+          "question": "Why was Raymond Muniga transported to OC Global Santa Ana?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_4",
+          "question": "How did Dep. Dorn and his colleagues initially attempt to gain control of Muniga?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_5",
+          "question": "What actions by Raymond Muniga led to a violation of CPC 240/243(b)?",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "base_name": "Email",
+    "generated_at_iso": "2025-06-11 10:57:14",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 1320,
+    "processed_text_length": 1320,
+    "was_summarized": false,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty"
+  },
+  "total_questions": 10
+}

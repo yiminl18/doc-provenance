@@ -1,0 +1,33 @@
+{
+  "base_name": "research_database",
+  "questions": [
+    "Who are the authors of the document?",
+    "What journal published the document 'How to Design and Use a Research Database'?",
+    "Where are the authors affiliated?",
+    "What software is recommended for standalone research projects?",
+    "What legislation must be complied with according to the document?",
+    "How does the document suggest handling ethical considerations in database design?",
+    "What are the advantages of using Microsoft Excel for database management as discussed in the document?",
+    "How does the document differentiate between complete and linked anonymization?",
+    "What are the main topics and themes covered in the document?",
+    "How do the authors suggest ensuring that data coding is effective for analysis?"
+  ],
+  "metadata": {
+    "base_name": "research_database",
+    "generated_at_iso": "2025-06-11 10:53:40",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 33025,
+    "processed_text_length": 5035,
+    "was_summarized": true,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty",
+    "has_difficulty_levels": true,
+    "source_file": "research_database_questions_by_difficulty.json",
+    "total_questions": 10
+  }
+}

@@ -35,13 +35,11 @@ Format:
 ]
 """
 
-import os
-import json
-import logging
+import argparse, json, logging, os
 from pathlib import Path
-from typing import Dict, List, Any
-import argparse
+from typing import Dict, List, Any, Tuple, Optional
 from datetime import datetime
+from collections import defaultdict
 
 # Configure logging
 logging.basicConfig(
@@ -52,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 class TestSuiteConsolidator:
     def __init__(self, 
-                 input_dir: str = "test_outputs",
+                 input_dirs: List[str] = None,
                  output_dir: str = "consolidated_test_suite"):
         """
         Initialize the consolidator
@@ -61,11 +59,15 @@ class TestSuiteConsolidator:
             input_dir: Directory containing test outputs
             output_dir: Directory to save consolidated files
         """
-        self.input_dir = Path(input_dir)
+        if input_dirs is None:
+            input_dirs = ["test_outputs", "test_outputs_prev", "test_outputs_prev1"]
+        
+        self.input_dirs = [Path(d) for d in input_dirs]
         self.output_dir = Path(output_dir)
         
         # Create output directory
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
         
         # Statistics
         self.stats = {
@@ -73,24 +75,62 @@ class TestSuiteConsolidator:
             'documents_skipped': 0,
             'total_questions': 0,
             'successful_consolidations': 0,
-            'failed_consolidations': 0
+            'failed_consolidations': 0,
+            'provenance_selections': defaultdict(int),  # Track selection reasons
+            'unique_provenances_assigned': 0
         }
 
-    def find_document_directories(self) -> List[str]:
-        """Find all document directories in test outputs"""
-        documents_dir = self.input_dir
+    def find_all_documents(self) -> Dict[str, List[Path]]:
+        """Find all document directories across all input directories"""
+        all_documents = defaultdict(list)
         
-        if not documents_dir.exists():
-            logger.error(f"Documents directory not found: {documents_dir}")
-            return []
+        for input_dir in self.input_dirs:
+            if not input_dir.exists():
+                logger.warning(f"Input directory not found: {input_dir}")
+                continue
+            
+            logger.info(f"🔍 Scanning {input_dir}")
+            
+            for item in input_dir.iterdir():
+                if item.is_dir():
+                    document_name = item.name
+                    all_documents[document_name].append(item)
         
-        document_names = []
-        for item in documents_dir.iterdir():
-            if item.is_dir():
-                document_names.append(item.name)
+        logger.info(f"📁 Found {len(all_documents)} unique documents across all directories")
         
-        logger.info(f"Found {len(document_names)} document directories")
-        return sorted(document_names)
+        # Log document availability
+        for doc_name, paths in all_documents.items():
+            sources = [p.parent.name for p in paths]
+            logger.debug(f"  {doc_name}: available in {sources}")
+        
+        return all_documents
+    
+    def find_questions_for_document(self, document_paths: List[Path]) -> Dict[str, List[Tuple[Path, str]]]:
+        """Find all questions for a document across multiple directories"""
+        all_questions = defaultdict(list)
+        
+        for doc_path in document_paths:
+            source_dir = doc_path.parent.name
+            
+            if not doc_path.exists():
+                continue
+            
+            for item in doc_path.iterdir():
+                if item.is_dir():
+                    # question_id also can be <document_name>_<question_id>
+                    folder_name = item.name
+                    if '_q' in folder_name:
+                        question_id = folder_name.split('_q')[-1]
+                    elif '_question' in folder_name:
+                        question_id = folder_name.split('_question')[-1]
+                    else:
+                        # Try to extract the last part after underscore
+                        parts = folder_name.split('_')
+                        question_id = parts[-1] if len(parts) > 1 else folder_name
+                    
+                    all_questions[question_id].append((item, source_dir))
+        
+        return all_questions
 
     def load_json_file(self, file_path: Path) -> Any:
         """Safely load a JSON file"""
@@ -103,104 +143,230 @@ class TestSuiteConsolidator:
         except Exception as e:
             logger.warning(f"Failed to load {file_path}: {e}")
             return None
+        
+    def count_provenance_sentences(self, provenance_data: List[Dict]) -> int:
+        """Count total sentences across all provenances"""
+        if not provenance_data or not isinstance(provenance_data, list):
+            return 999999  # Consider invalid provenance as "worst"
+        
+        total_sentences = 0
+        for prov in provenance_data:
+            if isinstance(prov, dict):
+                # Count sentences in provenance_ids or sentences_ids
+                prov_ids = prov.get('provenance_ids', [])
+                sentence_ids = prov.get('sentences_ids', [])
+                input_sentence_ids = prov.get('input_sentence_ids', [])
+                
+                # Use the largest list as the sentence count
+                sentence_count = max(
+                    len(prov_ids) if isinstance(prov_ids, list) else 0,
+                    len(sentence_ids) if isinstance(sentence_ids, list) else 0,
+                    len(input_sentence_ids) if isinstance(input_sentence_ids, list) else 0
+                )
+                
+                total_sentences += sentence_count
+        
+        return total_sentences
 
-    def extract_question_data(self, question_dir: Path) -> Dict[str, Any]:
-        """Extract and consolidate data from a question directory"""
+    def assign_unique_provenance_ids(self, provenance_data: List[Dict]) -> List[Dict]:
+        """Assign unique provenance IDs to provenance data"""
+        if not provenance_data or not isinstance(provenance_data, list):
+            return provenance_data
+        
+        new_provenance_id = 0
+        
+        updated_provenance = []
+        for prov in provenance_data:
+            if isinstance(prov, dict):
+                # Create a copy and assign new unique ID
+                prov_copy = prov.copy()
+                prov_copy['provenance_id'] = new_provenance_id
+                prov_copy['original_provenance_id'] = prov.get('provenance_id', 'unknown')
+                
+                updated_provenance.append(prov_copy)
+                new_provenance_id += 1
+                self.stats['unique_provenances_assigned'] += 1
+            else:
+                updated_provenance.append(prov)
+        
+        return updated_provenance
+
+    def select_best_question_data(self, question_candidates: List[Tuple[Path, str]], question_id: str) -> Optional[Dict]:
+        """Select the best question data from multiple candidates"""
+        if not question_candidates:
+            return None
+        
+        best_candidate = None
+        best_sentence_count = 999999
+        alternatives = []
+        
+        logger.debug(f"    🔍 Evaluating {len(question_candidates)} candidates for question {question_id}")
+        
+        for question_dir, source_dir in question_candidates:
+            try:
+                # Load all the data for this candidate
+                answer_data = self.load_json_file(question_dir / "answer.json")
+                provenance_data = self.load_json_file(question_dir / "provenance.json")
+                metadata_data = self.load_json_file(question_dir / "metadata.json")
+                
+                if not answer_data:
+                    logger.debug(f"      ❌ {source_dir}: No answer.json")
+                    continue
+                
+                # Count sentences in provenance
+                sentence_count = self.count_provenance_sentences(provenance_data)
+                
+                # Create candidate info
+                candidate_info = {
+                    'source_dir': source_dir,
+                    'question_dir': question_dir,
+                    'sentence_count': sentence_count,
+                    'answer_data': answer_data,
+                    'provenance_data': provenance_data or [],
+                    'metadata_data': metadata_data or {},
+                    'has_valid_answer': bool(answer_data.get('answer')),
+                    'has_provenance': bool(provenance_data),
+                    'provenance_count': len(provenance_data) if isinstance(provenance_data, list) else 0
+                }
+                
+                alternatives.append({
+                    'source': source_dir,
+                    'sentence_count': sentence_count,
+                    'provenance_count': candidate_info['provenance_count'],
+                    'has_answer': candidate_info['has_valid_answer']
+                })
+                
+                logger.debug(f"      📊 {source_dir}: {sentence_count} sentences, {candidate_info['provenance_count']} provenances")
+                
+                # Selection criteria (in order of priority):
+                # 1. Must have a valid answer
+                # 2. Prefer fewer sentences (better provenance)
+                # 3. Prefer having some provenance over none
+                
+                is_better = False
+                selection_reason = ""
+                
+                if not candidate_info['has_valid_answer']:
+                    logger.debug(f"      ❌ {source_dir}: No valid answer")
+                    continue
+                
+                if best_candidate is None:
+                    is_better = True
+                    selection_reason = "first_valid"
+                elif not best_candidate['has_valid_answer'] and candidate_info['has_valid_answer']:
+                    is_better = True
+                    selection_reason = "has_answer"
+                elif sentence_count < best_sentence_count:
+                    is_better = True
+                    selection_reason = "shorter_provenance"
+                elif sentence_count == best_sentence_count and candidate_info['has_provenance'] and not best_candidate['has_provenance']:
+                    is_better = True
+                    selection_reason = "has_provenance"
+                
+                if is_better:
+                    best_candidate = candidate_info
+                    best_sentence_count = sentence_count
+                    logger.debug(f"      ✅ {source_dir}: New best ({selection_reason})")
+                    
+            except Exception as e:
+                logger.warning(f"      ❌ Error evaluating {source_dir}: {e}")
+                continue
+        
+        if not best_candidate:
+            logger.warning(f"    ❌ No valid candidates found for question {question_id}")
+            return None
+        
+        # Track selection statistics
+        selection_reason = "shorter_provenance" if best_sentence_count < 999999 else "default"
+        self.stats['provenance_selections'][selection_reason] += 1
+        
+        # Extract and structure the question data
         question_data = {}
         
-        # Load answer.json
-        answer_data = self.load_json_file(question_dir / "answer.json")
-        if answer_data:
-            # Extract question and answer text
-            question_text = ""
-            answer_text = ""
-            
-            if isinstance(answer_data.get('question'), list) and answer_data['question']:
-                question_text = answer_data['question'][0]
-            elif isinstance(answer_data.get('question'), str):
-                question_text = answer_data['question']
-            
-            if isinstance(answer_data.get('answer'), list) and answer_data['answer']:
-                answer_text = answer_data['answer'][0]
-            elif isinstance(answer_data.get('answer'), str):
-                answer_text = answer_data['answer']
-            
-            question_data['question'] = question_text
-            question_data['answer'] = answer_text
-            
-            # Include processing time if available
-            if 'processing_time' in answer_data:
-                question_data['processing_time'] = answer_data['processing_time']
-        else:
-            logger.warning(f"No answer.json found in {question_dir}")
-            return {}
+        # Extract question and answer text
+        answer_data = best_candidate['answer_data']
+        question_text = ""
+        answer_text = ""
         
-        # Load provenance.json
-        provenance_data = self.load_json_file(question_dir / "provenance.json")
-        if provenance_data:
-            question_data['provenance'] = provenance_data
-        else:
-            logger.warning(f"No provenance.json found in {question_dir}")
-            question_data['provenance'] = []
+        if isinstance(answer_data.get('question'), list) and answer_data['question']:
+            question_text = answer_data['question'][0]
+        elif isinstance(answer_data.get('question'), str):
+            question_text = answer_data['question']
         
-        # Load metadata.json
-        metadata_data = self.load_json_file(question_dir / "metadata.json")
-        if metadata_data:
-            # Filter out processing logs and status - keep only essential metadata
-            filtered_metadata = {}
-            
-            # Keep essential fields
-            essential_fields = [
-                'question_id', 'document_name', 'created_at', 'processing_time',
-                'provenance_count', 'processing_complete', 'question', 'max_provenances'
-            ]
-            
-            for field in essential_fields:
-                if field in metadata_data:
-                    filtered_metadata[field] = metadata_data[field]
-            
-            question_data['metadata'] = filtered_metadata
-        else:
-            logger.warning(f"No metadata.json found in {question_dir}")
-            question_data['metadata'] = {}
+        if isinstance(answer_data.get('answer'), list) and answer_data['answer']:
+            answer_text = answer_data['answer'][0]
+        elif isinstance(answer_data.get('answer'), str):
+            answer_text = answer_data['answer']
+        
+        question_data['question'] = question_text
+        question_data['answer'] = answer_text
+        
+        # Include processing time if available
+        if 'processing_time' in answer_data:
+            question_data['processing_time'] = answer_data['processing_time']
+        
+        # Process provenance with unique IDs
+        provenance_with_unique_ids = self.assign_unique_provenance_ids(best_candidate['provenance_data'])
+        question_data['provenance'] = provenance_with_unique_ids
+        
+        # Process metadata
+        metadata_data = best_candidate['metadata_data']
+        filtered_metadata = {}
+        
+        # Keep essential fields
+        essential_fields = [
+            'question_id', 'document_name', 'created_at', 'processing_time',
+            'provenance_count', 'processing_complete', 'question', 'max_provenances'
+        ]
+        
+        for field in essential_fields:
+            if field in metadata_data:
+                filtered_metadata[field] = metadata_data[field]
+        
+        question_data['metadata'] = filtered_metadata
+        
+        # Add source information
+        question_data['source_info'] = {
+            'selected_from': best_candidate['source_dir'],
+            'reason': selection_reason,
+            'sentence_count': best_sentence_count,
+            'provenance_count': len(provenance_with_unique_ids),
+            'alternatives': alternatives,
+            'selection_timestamp': datetime.now().isoformat()
+        }
+        
+        logger.debug(f"    ✅ Selected from {best_candidate['source_dir']} ({best_sentence_count} sentences)")
         
         return question_data
 
-    def consolidate_document(self, document_name: str) -> bool:
-        """Consolidate all questions for a single document"""
+    def consolidate_document(self, document_name: str, document_paths: List[Path]) -> bool:
+        """Consolidate all questions for a single document from multiple sources"""
         logger.info(f"🔄 Consolidating document: {document_name}")
+        source_names = [p.parent.name for p in document_paths]
+        logger.info(f"  📂 Sources: {', '.join(source_names)}")
         
-        document_dir = self.input_dir / document_name
+        # Find all questions across all sources
+        all_questions = self.find_questions_for_document(document_paths)
         
-        if not document_dir.exists():
-            logger.error(f"Document directory not found: {document_dir}")
+        if not all_questions:
+            logger.warning(f"  ❌ No questions found for {document_name}")
             return False
         
-        # Find all question directories
-        question_dirs = []
-        for item in document_dir.iterdir():
-            if item.is_dir():
-                question_dirs.append(item)
-        
-        if not question_dirs:
-            logger.warning(f"No question directories found in {document_dir}")
-            return False
-
-        # Sort question directories by name
-        question_dirs.sort(key=lambda x: x.name)
-        
-        logger.info(f"  📝 Found {len(question_dirs)} questions for {document_name}")
+        logger.info(f"  📝 Found {len(all_questions)} unique questions")
         
         # Process each question
         consolidated_data = []
         successful_questions = 0
         
-        for question_dir in question_dirs:
-            question_id = str(os.path.split(question_dir)[-1]).split('_')[-1]  # Get the "_<question_id>" part of the folder name
-            logger.debug(f"    Processing {question_id}")
+        # Sort questions by ID for consistent output
+        sorted_question_ids = sorted(all_questions.keys(), key=lambda x: (len(x), x))
+        
+        for question_id in sorted_question_ids:
+            question_candidates = all_questions[question_id]
+            logger.debug(f"  🔍 Processing question {question_id} ({len(question_candidates)} candidates)")
             
             try:
-                question_data = self.extract_question_data(question_dir)
+                question_data = self.select_best_question_data(question_candidates, question_id)
                 
                 if question_data:
                     # Create the structure: {question_id: {data}}
@@ -211,14 +377,14 @@ class TestSuiteConsolidator:
                     
                     logger.debug(f"    ✅ Consolidated {question_id}")
                 else:
-                    logger.warning(f"    ❌ Failed to extract data for {question_id}")
+                    logger.warning(f"    ❌ Failed to select best data for {question_id}")
                     
             except Exception as e:
                 logger.error(f"    ❌ Error processing {question_id}: {e}")
                 continue
         
         if not consolidated_data:
-            logger.warning(f"No valid questions found for {document_name}")
+            logger.warning(f"  ❌ No valid questions consolidated for {document_name}")
             return False
         
         # Save consolidated file
@@ -236,23 +402,24 @@ class TestSuiteConsolidator:
             return False
 
     def consolidate_all(self):
-        """Consolidate all documents"""
-        logger.info("🚀 Starting test suite consolidation...")
+        """Consolidate all documents from all input directories"""
+        logger.info("🚀 Starting enhanced test suite consolidation...")
         
-        document_names = self.find_document_directories()
+        # Find all documents across directories
+        all_documents = self.find_all_documents()
         
-        if not document_names:
+        if not all_documents:
             logger.error("❌ No documents found to consolidate!")
             return
         
-        logger.info(f"📁 Found {len(document_names)} documents to consolidate")
+        logger.info(f"📁 Found {len(all_documents)} unique documents across all input directories")
         
         # Process each document
-        for i, document_name in enumerate(document_names, 1):
-            logger.info(f"\n📄 Document {i}/{len(document_names)}: {document_name}")
+        for i, (document_name, document_paths) in enumerate(sorted(all_documents.items()), 1):
+            logger.info(f"\n📄 Document {i}/{len(all_documents)}: {document_name}")
             
             try:
-                success = self.consolidate_document(document_name)
+                success = self.consolidate_document(document_name, document_paths)
                 
                 if success:
                     self.stats['documents_processed'] += 1
@@ -277,11 +444,14 @@ class TestSuiteConsolidator:
         summary_data = {
             'consolidation_info': {
                 'created_at': datetime.now().isoformat(),
-                'input_directory': str(self.input_dir),
+                'input_directories': [str(d) for d in self.input_dirs],
                 'output_directory': str(self.output_dir),
                 'total_documents': self.stats['documents_processed'],
-                'total_questions': self.stats['total_questions']
+                'total_questions': self.stats['total_questions'],
+                'unique_provenances_assigned': self.stats['unique_provenances_assigned'],
+                'consolidation_strategy': 'shortest_provenance_preferred'
             },
+            'selection_statistics': dict(self.stats['provenance_selections']),
             'documents': []
         }
         
@@ -293,10 +463,33 @@ class TestSuiteConsolidator:
                 with open(consolidated_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                 
+                # Analyze source distribution
+                source_distribution = defaultdict(int)
+                total_provenances = 0
+                total_sentences = 0
+                
+                for item in data:
+                    question_id = list(item.keys())[0]
+                    question_data = item[question_id]
+                    
+                    source = question_data.get('source_info', {}).get('selected_from', 'unknown')
+                    source_distribution[source] += 1
+                    
+                    sentence_count = question_data.get('source_info', {}).get('sentence_count', 0)
+                    if sentence_count != 999999:
+                        total_sentences += sentence_count
+                    
+                    prov_count = len(question_data.get('provenance', []))
+                    total_provenances += prov_count
+                
                 summary_data['documents'].append({
                     'document_name': document_name,
                     'filename': consolidated_file.name,
                     'question_count': len(data),
+                    'total_provenances': total_provenances,
+                    'total_sentences': total_sentences,
+                    'avg_sentences_per_question': round(total_sentences / len(data), 2) if data else 0,
+                    'source_distribution': dict(source_distribution),
                     'file_size_kb': round(consolidated_file.stat().st_size / 1024, 2)
                 })
                 
@@ -316,21 +509,28 @@ class TestSuiteConsolidator:
 
     def print_statistics(self):
         """Print final statistics"""
-        logger.info("\n" + "="*60)
-        logger.info("📊 CONSOLIDATION COMPLETE")
-        logger.info("="*60)
+        logger.info("\n" + "="*70)
+        logger.info("📊 ENHANCED CONSOLIDATION COMPLETE")
+        logger.info("="*70)
         logger.info(f"Documents processed: {self.stats['documents_processed']}")
         logger.info(f"Documents skipped: {self.stats['documents_skipped']}")
         logger.info(f"Total questions consolidated: {self.stats['total_questions']}")
+        logger.info(f"Unique provenance IDs assigned: {self.stats['unique_provenances_assigned']}")
         logger.info(f"Successful consolidations: {self.stats['successful_consolidations']}")
         logger.info(f"Failed consolidations: {self.stats['failed_consolidations']}")
         
+        # Show selection statistics
+        if self.stats['provenance_selections']:
+            logger.info(f"\n📈 Provenance Selection Reasons:")
+            for reason, count in self.stats['provenance_selections'].items():
+                logger.info(f"  {reason}: {count}")
+        
         success_rate = (self.stats['successful_consolidations'] / 
-                       max(len(self.find_document_directories()), 1)) * 100
-        logger.info(f"Success rate: {success_rate:.1f}%")
+                       max(self.stats['successful_consolidations'] + self.stats['failed_consolidations'], 1)) * 100
+        logger.info(f"\nSuccess rate: {success_rate:.1f}%")
         
         logger.info(f"\n📁 Output directory: {self.output_dir.absolute()}")
-        logger.info("🎯 Consolidated files ready for use!")
+        logger.info("🎯 Enhanced consolidated files ready for use!")
         
         # List created files
         consolidated_files = list(self.output_dir.glob("*_test_suite.json"))
@@ -340,62 +540,14 @@ class TestSuiteConsolidator:
                 file_size = round(file_path.stat().st_size / 1024, 2)
                 logger.info(f"  {i}. {file_path.name} ({file_size} KB)")
 
-    def validate_consolidated_file(self, file_path: Path) -> bool:
-        """Validate a consolidated file structure"""
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            if not isinstance(data, list):
-                logger.error(f"Invalid structure in {file_path}: not a list")
-                return False
-            
-            for i, item in enumerate(data):
-                if not isinstance(item, dict):
-                    logger.error(f"Invalid item {i} in {file_path}: not a dict")
-                    return False
-                
-                if len(item) != 1:
-                    logger.error(f"Invalid item {i} in {file_path}: should have exactly one key")
-                    return False
-                
-                question_id = list(item.keys())[0]
-                question_data = item[question_id]
-                
-                required_fields = ['question', 'answer', 'provenance', 'metadata']
-                for field in required_fields:
-                    if field not in question_data:
-                        logger.warning(f"Missing field '{field}' in {question_id} of {file_path}")
-            
-            logger.info(f"✅ {file_path.name} structure is valid")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Error validating {file_path}: {e}")
-            return False
-
-    def validate_all_files(self):
-        """Validate all consolidated files"""
-        logger.info("🔍 Validating consolidated files...")
-        
-        consolidated_files = list(self.output_dir.glob("*_test_suite.json"))
-        valid_files = 0
-        
-        for file_path in consolidated_files:
-            if self.validate_consolidated_file(file_path):
-                valid_files += 1
-        
-        logger.info(f"📊 Validation complete: {valid_files}/{len(consolidated_files)} files are valid")
-
 
 def main():
     parser = argparse.ArgumentParser(description="Consolidate test suite files")
-    parser.add_argument("--input-dir", default="test_outputs",
-                       help="Input directory containing test outputs")
+    parser.add_argument("--input-dirs", nargs='+', 
+                       default=["test_outputs", "test_outputs_prev", "test_outputs_prev1"],
+                       help="Input directories containing test outputs")
     parser.add_argument("--output-dir", default="consolidated_test_suite",
                        help="Output directory for consolidated files")
-    parser.add_argument("--validate", action="store_true",
-                       help="Validate consolidated files after creation")
     parser.add_argument("--verbose", action="store_true",
                        help="Enable verbose logging")
     
@@ -406,15 +558,13 @@ def main():
     
     # Create consolidator and run
     consolidator = TestSuiteConsolidator(
-        input_dir=args.input_dir,
+        input_dirs=args.input_dirs,
         output_dir=args.output_dir
     )
     
     try:
         consolidator.consolidate_all()
         
-        if args.validate:
-            consolidator.validate_all_files()
             
     except KeyboardInterrupt:
         logger.info("\n🛑 Consolidation interrupted by user")

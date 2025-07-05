@@ -1,0 +1,82 @@
+{
+  "document": "2021-0002 Exh 2 Training Records (6)",
+  "generated_at": "2025-06-11T10:51:50.937828",
+  "questions_by_difficulty": {
+    "easy": {
+      "description": "Easy questions - direct extraction",
+      "questions": [
+        {
+          "id": "easy_1",
+          "question": "Who is the instructor mentioned in the document?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_2",
+          "question": "What is the employment status of Daniel P. Eldred?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_3",
+          "question": "When did Daniel P. Eldred complete the Firearms/Tactical Rifle 1st Responder course?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_4",
+          "question": "Where is the Fresno Police Department Regional Training Center located?",
+          "difficulty": "easy"
+        },
+        {
+          "id": "easy_5",
+          "question": "What subject did Daniel P. Eldred complete on 02/01/2021?",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    "medium": {
+      "description": "Medium questions - simple synthesis",
+      "questions": [
+        {
+          "id": "medium_1",
+          "question": "How many training modules did Daniel P. Eldred complete in 2020?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_2",
+          "question": "What training subjects did Daniel P. Eldred complete in 2018?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_3",
+          "question": "How does the total training time compare between 2019 and 2021 for Daniel P. Eldred?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_4",
+          "question": "What certifications were obtained by Daniel P. Eldred in 2017?",
+          "difficulty": "medium"
+        },
+        {
+          "id": "medium_5",
+          "question": "How do the training hours in 2018 compare to those in 2017 for Daniel P. Eldred?",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "base_name": "2021-0002 Exh 2 Training Records (6)",
+    "generated_at_iso": "2025-06-11 10:51:50",
+    "model": "gpt-4o",
+    "difficulty_levels": [
+      "easy",
+      "medium"
+    ],
+    "questions_per_difficulty": 5,
+    "original_text_length": 4293,
+    "processed_text_length": 4293,
+    "was_summarized": false,
+    "text_source": "app_sentences_file",
+    "script_version": "4.0_difficulty"
+  },
+  "total_questions": 10
+}

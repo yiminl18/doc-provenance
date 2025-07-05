@@ -2,13 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faBookOpen, faCloud, faDice, faSpinner, faFileText, faFolder,
+  faBookOpen, faFilter, faCheck, faCloud, faDice, faSpinner, faFileText, faFolder,
   faArrowLeft, faBuilding, faMapMarkerAlt, faUser, faCalendar, faIdCard,
   faTimes, faExclamationTriangle, faHashtag, faAlignLeft, faInfoCircle,
   faQuestionCircle, faClock, faChartBar, faDatabase
 } from '@fortawesome/free-solid-svg-icons';
 import { Tiktoken } from 'js-tiktoken/lite';
 import cl100k_base from "js-tiktoken/ranks/cl100k_base";
+
+import { filterDocuments, getFilteringStats, DEFAULT_THRESHOLDS, isGoodDocument } from '../utils/filteringUtils';
 
 import {
   getDocuments,
@@ -31,6 +33,22 @@ const UnifiedFileBrowser = ({
   // Common state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [showOnlyGoodDocuments, setShowOnlyGoodDocuments] = useState(false);
+  const [filteringStats, setFilteringStats] = useState(null);
+
+  // Add this function to calculate stats when documents change:
+  const calculateFilteringStats = (docs) => {
+    if (!docs || docs.length === 0) return null;
+
+    // Convert your document format to the expected format
+    const documentsWithQuestions = docs.map(doc => ({
+      ...doc,
+      questions: documentStats.get(doc.filename)?.questions || []
+    }));
+
+    return getFilteringStats(documentsWithQuestions);
+  };
 
   // Initialize Tiktoken for token counting
   const enc = new Tiktoken(cl100k_base);
@@ -66,7 +84,9 @@ const UnifiedFileBrowser = ({
 
         // Load provenance stats for each document if enabled
         if (showProvenanceStats) {
-          loadProvenanceStatsForDocuments(response.documents);
+          await loadProvenanceStatsForDocuments(response.documents);
+          // Calculate filtering stats after loading provenance data
+          setFilteringStats(calculateFilteringStats(response.documents));
         }
       } else {
         setDocuments([]);
@@ -79,6 +99,22 @@ const UnifiedFileBrowser = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  const getDisplayDocuments = () => {
+    if (!showOnlyGoodDocuments) return documents;
+
+    return documents.filter(doc => {
+      const stats = documentStats.get(doc.filename);
+      if (!stats || !stats.questions) return false;
+
+      const docWithQuestions = {
+        ...doc,
+        questions: stats.questions
+      };
+
+      return isGoodDocument(docWithQuestions);
+    });
   };
 
   const loadProvenanceStatsForDocuments = async (docs) => {
@@ -136,13 +172,13 @@ const UnifiedFileBrowser = ({
       if (question.provenance_data && question.provenance_data.length > 0) {
         questionsWithProvenances++;
         totalProvenances += question.provenance_data.length;
-        
+
         question.provenance_data.forEach(prov => {
           // Calculate per-provenance totals using TikToken
           const provenanceText = prov.provenance || '';
           const tokenCount = enc.encode(provenanceText).length;
           const sentenceCount = prov.provenance_ids ? prov.provenance_ids.length : 0;
-          
+
           totalSentences += sentenceCount;
           totalTokens += tokenCount;
         });
@@ -153,11 +189,11 @@ const UnifiedFileBrowser = ({
     const coverageScore = (questionsWithProvenances / questions.length) * 100;
     const avgProvenancesPerQuestion = questions.length > 0 ? totalProvenances / questions.length : 0;
     const avgSentencesPerQuestion = questions.length > 0 ? totalSentences / questions.length : 0;
-    
+
     // Quality factors: good coverage, reasonable provenance count, meaningful sentence count
     const qualityScore = Math.min(100, (
-      (coverageScore * 0.4) + 
-      (Math.min(avgProvenancesPerQuestion / 3, 1) * 30) + 
+      (coverageScore * 0.4) +
+      (Math.min(avgProvenancesPerQuestion / 3, 1) * 30) +
       (Math.min(avgSentencesPerQuestion / 10, 1) * 30)
     ));
 
@@ -180,238 +216,238 @@ const UnifiedFileBrowser = ({
   // =============================================================================
 
 
-const handleSmartSampling = async () => {
-  setSampling(true);
-  setError(null);
-  try {
-    // Use the updated sampling function
-    const result = await sampleExtractableDocuments({
-      target_count: 30,
-      prefer_diverse_cases: true,
-      min_pages: 2, 
-      allow_duplicates: false  // New parameter to prevent duplicates
-    });
-    
-    if (result.success) {
-      const stats = result.stats || {};
-      const newCount = stats.achieved_count || 0;
-      const existingCount = stats.existing_count || 0;
-      const totalCount = stats.total_count || 0;
-      const duplicatesSkipped = stats.duplicates_skipped || 0;
-      
-      if (newCount > 0) {
-        let message = `Successfully sampled ${newCount} new documents!`;
-        if (existingCount > 0) {
-          message += ` You now have ${totalCount} total documents.`;
-        }
-        if (duplicatesSkipped > 0) {
-          message += ` (${duplicatesSkipped} duplicates were skipped)`;
-        }
-        
-        alert(message);
-      } else if (stats.all_candidates_were_duplicates) {
-        alert(`All available documents have already been sampled. You have ${existingCount} documents in your collection.`);
-      } else {
-        alert(`No new documents were sampled. You have ${existingCount} existing documents.`);
-      }
-      
-      // Refresh the counties view to show newly sampled files
-      if (currentView === 'counties') {
-        fetchCounties();
-      }
-      
-    } else {
-      setError(`Sampling failed: ${result.error || 'Unknown error'}`);
-    }
-  } catch (error) {
-    console.error('Sampling failed:', error);
-    setError('Sampling failed. Please try again.');
-  } finally {
-    setSampling(false);
-  }
-};
-
-const fetchCounties = async () => {
-  setLoading(true);
-  setError(null);
-  try {
-    console.log('🔄 Fetching PVC sample counties...');
-    
-    // Use the new PVC sampling API
-    const data = await getPvcSampleCounties();
-    
-    console.log('📋 Counties API response:', data);
-    
-    if (data.success) {
-      console.log('✅ Setting counties:', data.counties);
-      setCounties(data.counties);
-    } else {
-      console.error('❌ Counties API returned error:', data.error);
-      setError('Failed to load sampled document counties: ' + (data.error || 'Unknown error'));
-    }
-  } catch (error) {
-    console.error('❌ Exception in fetchCounties:', error);
-    setError('Error fetching counties: ' + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
-const fetchAgencies = async (countyName) => {
-  setLoading(true);
-  setError(null);
-  try {
-    // Use the new PVC sampling API
-    const data = await getPvcSampleAgencies(countyName);
-    if (data.success) {
-      setAgencies(data.agencies);
-      setSelectedCounty(countyName);
-      setCurrentView('agencies');
-    } else {
-      setError('Failed to load document sources');
-    }
-  } catch (error) {
-    console.error('Error fetching agencies:', error);
-    setError(error.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
-const fetchFiles = async (county, agency) => {
-  setLoading(true);
-  setError(null);
-  try {
-    // Use the new PVC sampling API
-    const data = await getPvcSampleFiles(county, agency);
-    if (data.success) {
-      const enhancedFiles = data.files.map(file => ({
-        ...file,
-        truncatedId: file.file_id && file.file_id.length > 8 
-          ? '...' + file.file_id.slice(-8) 
-          : file.file_id || 'local'
-      }));
-      
-      setFiles(enhancedFiles);
-      setSelectedAgency(agency);
-      setCurrentView('files');
-    } else {
-      setError('Failed to load documents');
-    }
-  } catch (error) {
-    console.error('Error fetching files:', error);
-    setError(error.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
-const handleDriveFileSelect = async (file) => {
-  if (!file.file_id && !file.gdrive_id) {
-    if (file.path || file.full_path) {
-      const pdfUrl = file.provisional_case_name ? 
-        `/api/documents/pvc-sample/${file.provisional_case_name}/${file.name || file.displayName}` :
-        `/api/documents/${file.name || file.displayName}?source=pvc-sample`;
-      
-      onDocumentSelect({
-        success: true,
-        filename: file.name || file.displayName,
-        local_path: file.path || file.full_path,
-        provisional_case_name: file.provisional_case_name,
-        county: file.county,
-        agency: file.agency,
-        metadata: file.metadata,
-        pdf_url: pdfUrl,
-        source: 'pvc-sample'
-      });
-      onClose();
-      return;
-    } else {
-      setError('File missing ID and path');
-      return;
-    }
-  }
-
-  setDownloadingFile(file.path || file.name);
-  setError(null);
-  try {
-    // Use the new PVC sampling download API
-    const data = await downloadPvcSampleFile(file.file_id || file.gdrive_id);
-
-    if (data.success) {
-      onDocumentSelect({
-        ...data,
-        provisional_case_name: file.provisional_case_name,
-        county: file.county,
-        agency: file.agency
-      });
-      onClose();
-    } else {
-      setError(`Failed to access file: ${data.error}`);
-    }
-  } catch (error) {
-    console.error('Error accessing file:', error);
-    setError('Error accessing file');
-  } finally {
-    setDownloadingFile(null);
-  }
-};
-
-// Update the initialization logic in useEffect
-useEffect(() => {
-  if (isOpen) {
+  const handleSmartSampling = async () => {
+    setSampling(true);
     setError(null);
-    setLoading(false);
-    
-    if (mode === 'available') {
-      loadDocuments();
-    } else if (mode === 'drive') {
-      setCurrentView('counties');
-      setSelectedCounty(null);
-      setSelectedAgency(null);
-      // Initialize the sampler and fetch counties
-      initializePvcSampler();
-    }
-  }
-}, [isOpen, mode]);
-
-// Add this new function to initialize the PVC sampler
-const initializePvcSampler = async () => {
-  setLoading(true);
-  try {
-    // Try to initialize the sampler (this might already be done)
-    await initProvisionalSampler();
-    // Fetch counties after initialization
-    await fetchCounties();
-  } catch (error) {
-    console.warn('Sampler initialization warning:', error);
-    // Still try to fetch counties in case sampler is already initialized
     try {
-      await fetchCounties();
-    } catch (fetchError) {
-      setError('No sampled documents available. Try sampling some documents first.');
+      // Use the updated sampling function
+      const result = await sampleExtractableDocuments({
+        target_count: 30,
+        prefer_diverse_cases: true,
+        min_pages: 2,
+        allow_duplicates: false  // New parameter to prevent duplicates
+      });
+
+      if (result.success) {
+        const stats = result.stats || {};
+        const newCount = stats.achieved_count || 0;
+        const existingCount = stats.existing_count || 0;
+        const totalCount = stats.total_count || 0;
+        const duplicatesSkipped = stats.duplicates_skipped || 0;
+
+        if (newCount > 0) {
+          let message = `Successfully sampled ${newCount} new documents!`;
+          if (existingCount > 0) {
+            message += ` You now have ${totalCount} total documents.`;
+          }
+          if (duplicatesSkipped > 0) {
+            message += ` (${duplicatesSkipped} duplicates were skipped)`;
+          }
+
+          alert(message);
+        } else if (stats.all_candidates_were_duplicates) {
+          alert(`All available documents have already been sampled. You have ${existingCount} documents in your collection.`);
+        } else {
+          alert(`No new documents were sampled. You have ${existingCount} existing documents.`);
+        }
+
+        // Refresh the counties view to show newly sampled files
+        if (currentView === 'counties') {
+          fetchCounties();
+        }
+
+      } else {
+        setError(`Sampling failed: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Sampling failed:', error);
+      setError('Sampling failed. Please try again.');
+    } finally {
+      setSampling(false);
     }
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-// Update the getDisplayCountyName function to handle the new county structure
-const getDisplayCountyName = (countyName) => {
-  const county = counties.find(c => c.name === countyName || c.originalName === countyName);
-  return county ? county.displayName : countyName;
-};
+  const fetchCounties = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      console.log('🔄 Fetching PVC sample counties...');
 
-const getTitle = () => {
-  if (mode === 'available') {
-    return `${documents.length} Available Documents`;
-  } else if (mode === 'drive') {
-    if (currentView === 'counties') return 'Sampled Documents';
-    if (currentView === 'agencies') return `${getDisplayCountyName(selectedCounty)} Sources`;
-    if (currentView === 'files') return `${selectedAgency} Documents`;
-  }
-  return 'Document Browser';
-};
+      // Use the new PVC sampling API
+      const data = await getPvcSampleCounties();
+
+      console.log('📋 Counties API response:', data);
+
+      if (data.success) {
+        console.log('✅ Setting counties:', data.counties);
+        setCounties(data.counties);
+      } else {
+        console.error('❌ Counties API returned error:', data.error);
+        setError('Failed to load sampled document counties: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('❌ Exception in fetchCounties:', error);
+      setError('Error fetching counties: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAgencies = async (countyName) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Use the new PVC sampling API
+      const data = await getPvcSampleAgencies(countyName);
+      if (data.success) {
+        setAgencies(data.agencies);
+        setSelectedCounty(countyName);
+        setCurrentView('agencies');
+      } else {
+        setError('Failed to load document sources');
+      }
+    } catch (error) {
+      console.error('Error fetching agencies:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchFiles = async (county, agency) => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Use the new PVC sampling API
+      const data = await getPvcSampleFiles(county, agency);
+      if (data.success) {
+        const enhancedFiles = data.files.map(file => ({
+          ...file,
+          truncatedId: file.file_id && file.file_id.length > 8
+            ? '...' + file.file_id.slice(-8)
+            : file.file_id || 'local'
+        }));
+
+        setFiles(enhancedFiles);
+        setSelectedAgency(agency);
+        setCurrentView('files');
+      } else {
+        setError('Failed to load documents');
+      }
+    } catch (error) {
+      console.error('Error fetching files:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDriveFileSelect = async (file) => {
+    if (!file.file_id && !file.gdrive_id) {
+      if (file.path || file.full_path) {
+        const pdfUrl = file.provisional_case_name ?
+          `/api/documents/pvc-sample/${file.provisional_case_name}/${file.name || file.displayName}` :
+          `/api/documents/${file.name || file.displayName}?source=pvc-sample`;
+
+        onDocumentSelect({
+          success: true,
+          filename: file.name || file.displayName,
+          local_path: file.path || file.full_path,
+          provisional_case_name: file.provisional_case_name,
+          county: file.county,
+          agency: file.agency,
+          metadata: file.metadata,
+          pdf_url: pdfUrl,
+          source: 'pvc-sample'
+        });
+        onClose();
+        return;
+      } else {
+        setError('File missing ID and path');
+        return;
+      }
+    }
+
+    setDownloadingFile(file.path || file.name);
+    setError(null);
+    try {
+      // Use the new PVC sampling download API
+      const data = await downloadPvcSampleFile(file.file_id || file.gdrive_id);
+
+      if (data.success) {
+        onDocumentSelect({
+          ...data,
+          provisional_case_name: file.provisional_case_name,
+          county: file.county,
+          agency: file.agency
+        });
+        onClose();
+      } else {
+        setError(`Failed to access file: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Error accessing file:', error);
+      setError('Error accessing file');
+    } finally {
+      setDownloadingFile(null);
+    }
+  };
+
+  // Update the initialization logic in useEffect
+  useEffect(() => {
+    if (isOpen) {
+      setError(null);
+      setLoading(false);
+
+      if (mode === 'available') {
+        loadDocuments();
+      } else if (mode === 'drive') {
+        setCurrentView('counties');
+        setSelectedCounty(null);
+        setSelectedAgency(null);
+        // Initialize the sampler and fetch counties
+        initializePvcSampler();
+      }
+    }
+  }, [isOpen, mode]);
+
+  // Add this new function to initialize the PVC sampler
+  const initializePvcSampler = async () => {
+    setLoading(true);
+    try {
+      // Try to initialize the sampler (this might already be done)
+      await initProvisionalSampler();
+      // Fetch counties after initialization
+      await fetchCounties();
+    } catch (error) {
+      console.warn('Sampler initialization warning:', error);
+      // Still try to fetch counties in case sampler is already initialized
+      try {
+        await fetchCounties();
+      } catch (fetchError) {
+        setError('No sampled documents available. Try sampling some documents first.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update the getDisplayCountyName function to handle the new county structure
+  const getDisplayCountyName = (countyName) => {
+    const county = counties.find(c => c.name === countyName || c.originalName === countyName);
+    return county ? county.displayName : countyName;
+  };
+
+  const getTitle = () => {
+    if (mode === 'available') {
+      return `${documents.length} Available Documents`;
+    } else if (mode === 'drive') {
+      if (currentView === 'counties') return 'Sampled Documents';
+      if (currentView === 'agencies') return `${getDisplayCountyName(selectedCounty)} Sources`;
+      if (currentView === 'files') return `${selectedAgency} Documents`;
+    }
+    return 'Document Browser';
+  };
 
   const goBack = () => {
     setError(null);
@@ -475,6 +511,28 @@ const getTitle = () => {
             <FontAwesomeIcon icon={getIcon()} />
             <h3>{getTitle()}</h3>
 
+            <div className="header-content">
+              <FontAwesomeIcon icon={getIcon()} />
+              <h3>{getTitle()}</h3>
+
+              {/* Simple Quality Filter Toggle */}
+              {mode === 'available' && filteringStats && (
+                <div className="filter-toggle">
+                  <label className="toggle-label">
+                    <input
+                      type="checkbox"
+                      checked={showOnlyGoodDocuments}
+                      onChange={(e) => setShowOnlyGoodDocuments(e.target.checked)}
+                    />
+                    <FontAwesomeIcon icon={faFilter} />
+                    Show Quality Docs Only
+                    <span className="filter-stats">
+                      ({filteringStats.goodDocuments}/{filteringStats.totalDocuments})
+                    </span>
+                  </label>
+                </div>
+              )}
+            </div>
             {/* Breadcrumb for drive mode */}
             {mode === 'drive' && (currentView === 'agencies' || currentView === 'files') && (
               <div className="breadcrumb">
@@ -529,17 +587,29 @@ const getTitle = () => {
                 <>
                   {documents.length > 0 ? (
                     <div className="modal-grid document-selection">
-                      {documents.map(doc => {
+                      {getDisplayDocuments().map(doc => {
                         const stats = documentStats.get(doc.filename);
                         const isLoadingStats = loadingStats.has(doc.filename);
 
+                        // Add quality indicator
+                        const docWithQuestions = stats?.questions ? { ...doc, questions: stats.questions } : doc;
+                        const isHighQuality = isGoodDocument(docWithQuestions);
+
                         return (
-                          <div key={doc.filename} className="document-card-container">
+                          <div key={doc.filename} className={`document-card-container ${isHighQuality ? 'high-quality' : ''}`}>
                             <button
                               className="document-card"
                               onClick={() => handleDocumentClick(doc)}
                               disabled={loading}
                             >
+                              {/* Add quality badge */}
+                              {isHighQuality && (
+                                <div className="quality-badge">
+                                  <FontAwesomeIcon icon={faCheck} />
+                                </div>
+                              )}
+
+                              {/* Rest of your existing card content */}
                               <div className="document-main-info">
                                 <div className="doc-icon">
                                   <FontAwesomeIcon icon={faFileText} />
@@ -560,6 +630,8 @@ const getTitle = () => {
                                   </div>
                                 </div>
                               </div>
+
+
 
                               {showProvenanceStats && (
                                 <div className="provenance-stats-section">
@@ -832,7 +904,7 @@ const getTitle = () => {
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

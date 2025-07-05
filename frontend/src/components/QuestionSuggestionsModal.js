@@ -5,6 +5,8 @@ import {
   faQuestionCircle,
   faTimes,
   faRobot,
+  faCheck,
+  faFilter,
   faSpinner,
   faClock,
   faExclamationTriangle,
@@ -18,6 +20,7 @@ import {
 import { getGeneratedQuestions } from '../services/api';
 import { Tiktoken } from 'js-tiktoken/lite';
 import cl100k_base from "js-tiktoken/ranks/cl100k_base";
+import { isGoodQuestion, isGoodProvenance } from '../utils/filteringUtils';
 
 const QuestionSuggestionsModal = ({
   isOpen,
@@ -28,6 +31,7 @@ const QuestionSuggestionsModal = ({
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showOnlyGoodQuestions, setShowOnlyGoodQuestions] = useState(false);
 
   // Initialize Tiktoken for token counting
   const enc = new Tiktoken(cl100k_base);
@@ -69,6 +73,11 @@ const QuestionSuggestionsModal = ({
     return num.toString();
   };
 
+  const getDisplayQuestions = () => {
+    if (!showOnlyGoodQuestions) return questions;
+    return questions.filter(q => isGoodQuestion(q));
+  };
+
   // Calculate per-provenance totals
   const calculateProvenanceStats = (provenance) => {
     if (!provenance || !provenance.provenance) {
@@ -90,6 +99,22 @@ const QuestionSuggestionsModal = ({
           <div className="header-content">
             <FontAwesomeIcon icon={faQuestionCircle} />
             <h3>Suggested Questions</h3>
+            {questions.length > 0 && (
+              <div className="filter-toggle">
+                <label className="toggle-label">
+                  <input
+                    type="checkbox"
+                    checked={showOnlyGoodQuestions}
+                    onChange={(e) => setShowOnlyGoodQuestions(e.target.checked)}
+                  />
+                  <FontAwesomeIcon icon={faFilter} />
+                  Quality Questions Only
+                  <span className="filter-stats">
+                    ({questions.filter(q => isGoodQuestion(q)).length}/{questions.length})
+                  </span>
+                </label>
+              </div>
+            )}
           </div>
           <button className="win95-btn close" onClick={onClose}>
             <FontAwesomeIcon icon={faTimes} />
@@ -113,66 +138,84 @@ const QuestionSuggestionsModal = ({
           ) : questions.length > 0 ? (
             <>
               <div className="modal-grid">
-                {questions.map((question, index) => (
-                  <div key={question.question_id} className="question-card">
-                    <button
-                      className="question-item"
-                      onClick={() => handleQuestionClick(question)}
-                    >
-                      <div className="question-content">
-                        <div className="question-text">{question.question_text}</div>
+                {getDisplayQuestions().map((question, index) => {
+                  const isHighQuality = isGoodQuestion(question);
 
-                        <div className="provenance-summary-bar">
-                          {question.provenance_data && question.provenance_data.length > 0 ? (
-                            <div className="provenance-stats">
-                              {question.provenance_data.map((prov, idx) => {
-                                const stats = calculateProvenanceStats(prov);
-                                return (
-                                  <div key={`${question.question_id}_${prov.provenance_id}`}
-                                    className="stat-item"
-                                  >
-                                    {/* Provenance ID indicator */}
-                                    <div className="provenance-header">
-                                      <span className="provenance-label">Provenance {prov.provenance_id || idx + 1}</span>
-                                    </div>
+                  return (
+                    <div key={question.question_id} className={`question-card ${isHighQuality ? 'high-quality' : ''}`}>
+                      <button
+                        className="question-item"
+                        onClick={() => handleQuestionClick(question)}
+                      >
+                        {/* Add quality badge */}
+                        {isHighQuality && (
+                          <div className="quality-badge">
+                            <FontAwesomeIcon icon={faCheck} />
+                          </div>
+                        )}
 
-                                    {/* Sentences metric */}
-                                    <div className="metric-row">
-                                      <FontAwesomeIcon icon={faHashtag} className="metric-icon" />
-                                      <span className="metric-value">{stats.totalSentences}</span>
-                                      <div className="metric-label">sentences</div>
-                                    </div>
+                        <div className="question-content">
+                          <div className="question-text">{question.question_text}</div>
 
-                                    {/* Tokens metric */}
-                                    <div className="metric-row">
-                                      <FontAwesomeIcon icon={faAlignLeft} className="metric-icon" />
-                                      <span className="metric-value">{formatNumber(stats.totalTokens)}</span>
-                                      <div className="metric-label">tokens</div>
-                                    </div>
+                          <div className="provenance-summary-bar">
+                            {question.provenance_data && question.provenance_data.length > 0 ? (
+                              <div className="provenance-stats">
+                                {question.provenance_data.map((prov, idx) => {
+                                  const stats = calculateProvenanceStats(prov);
+                                  const isGoodProv = isGoodProvenance(prov);
 
-                                    {/* Processing time metric (optional) */}
-                                    {prov.time && (
-                                      <div className="metric-row">
-                                        <FontAwesomeIcon icon={faClock} className="metric-icon" />
-                                        <span className="metric-value">{prov.time.toFixed(1)}</span>
-                                        <div className="metric-label">seconds</div>
+                                  return (
+                                    <div key={`${question.question_id}_${prov.provenance_id}`}
+                                      className={`stat-item ${isGoodProv ? 'good-provenance' : ''}`}
+                                    >
+                                      {/* Add quality indicator */}
+                                      {isGoodProv && (
+                                        <div className="provenance-quality-indicator">
+                                          <FontAwesomeIcon icon={faCheck} />
+                                        </div>
+                                      )}
+
+                                      {/* Provenance ID indicator */}
+                                      <div className="provenance-header">
+                                        <span className="provenance-label">Provenance {prov.provenance_id || idx + 1}</span>
                                       </div>
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ) : (
-                            <div className="no-provenance">
-                              <FontAwesomeIcon icon={faFileText} />
-                              <span>No Provenance Data</span>
-                            </div>
-                          )}
+
+                                      {/* Your existing metrics */}
+                                      <div className="metric-row">
+                                        <FontAwesomeIcon icon={faHashtag} className="metric-icon" />
+                                        <span className="metric-value">{stats.totalSentences}</span>
+                                        <div className="metric-label">sentences</div>
+                                      </div>
+
+                                      <div className="metric-row">
+                                        <FontAwesomeIcon icon={faAlignLeft} className="metric-icon" />
+                                        <span className="metric-value">{formatNumber(stats.totalTokens)}</span>
+                                        <div className="metric-label">tokens</div>
+                                      </div>
+
+                                      {prov.time && (
+                                        <div className="metric-row">
+                                          <FontAwesomeIcon icon={faClock} className="metric-icon" />
+                                          <span className="metric-value">{prov.time.toFixed(1)}</span>
+                                          <div className="metric-label">seconds</div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <div className="no-provenance">
+                                <FontAwesomeIcon icon={faFileText} />
+                                <span>No Provenance Data</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                  </div>
-                ))}
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </>
           ) : (

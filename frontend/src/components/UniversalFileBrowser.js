@@ -20,9 +20,6 @@ import {
   getFilteringStats
 } from '../services/api';
 
-import { Tiktoken } from 'js-tiktoken/lite';
-import cl100k_base from 'js-tiktoken/ranks/cl100k_base';
-
 const UnifiedFileBrowser = ({
   isOpen,
   onClose,

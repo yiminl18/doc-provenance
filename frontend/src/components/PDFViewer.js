@@ -14,13 +14,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { useRenderManager } from '../utils/useRenderManager';
 import { getSentenceItemMappings } from '../services/api';
 import '../styles/pdf-viewer-render.css';
-import ExactMatchHighlighter from './DirectTextHighlighter';
-import CoordinateHighlighter from './CoordinateHighlighter';
-import HybridCoordinateHighlighter from './HybridCoordinateHighlighter';
 import Pylighter from './Pylighter';
-import SpatialConsumptionHighlighter from './SpatialConsumptionHighlighter';
-import NewWordOrderHighlighter from './NewWordOrderHighlighter';
-import NLPHighlighter from './NLPHighlighter';
 import { calculateProvenanceCost, formatCost } from '../utils/ProvenanceOutputsFormatting';
 
 const PDFViewer = ({

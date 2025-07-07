@@ -13,11 +13,6 @@ from werkzeug.utils import secure_filename
 import doc_provenance.base_strategies
 from pdfminer.high_level import extract_text
 
-from .preprocess_pdfs import save_compatible_sentence_data, extract_sentences_with_compatible_layout
-from .provenance_layout_mapper import ProvenanceLayoutMapper
-from .enhanced_text_matcher import get_enhanced_provenance_boxes
-from .utils import get_file_finder
-
 logger = logging.getLogger(__name__)
 
 class TextProcessingManager:
@@ -49,172 +44,13 @@ class TextProcessingManager:
             logger.error(f"Error saving sentences for {filename}: {e}")
             return False
     
-    def process_pdf_for_layout(self, pdf_path: str, force_reprocess: bool = False) -> Dict:
-        """
-        Process a PDF for sentence extraction and layout mapping
-        """
-        try:
-            if not os.path.exists(pdf_path):
-                return {
-                    "success": False,
-                    "error": f"PDF file not found: {pdf_path}"
-                }
-            
-            if not pdf_path.lower().endswith('.pdf'):
-                return {
-                    "success": False,
-                    "error": "File must be a PDF"
-                }
-            
-            logger.info(f"Processing PDF: {pdf_path}")
-            start_time = time.time()
-            
-            # Determine output directory (same as PDF)
-            output_dir = os.path.dirname(pdf_path)
-            base_name = os.path.splitext(os.path.basename(pdf_path))[0]
-            
-            sentences_file = os.path.join(output_dir, f"{base_name}_sentences.json")
-            layout_file = os.path.join(output_dir, f"{base_name}_layout.json")
-            
-            # Check if files already exist
-            if not force_reprocess and os.path.exists(sentences_file) and os.path.exists(layout_file):
-                logger.info(f"Files already exist for {base_name}, skipping processing")
-                
-                # Load existing statistics
-                with open(layout_file, 'r', encoding='utf-8') as f:
-                    layout_data = json.load(f)
-                
-                processing_time = time.time() - start_time
-                
-                return {
-                    "success": True,
-                    "message": "PDF already processed (files exist)",
-                    "files": {
-                        "sentences_file": sentences_file,
-                        "layout_file": layout_file
-                    },
-                    "statistics": layout_data.get('metadata', {}).get('statistics', {}),
-                    "processing_time": processing_time,
-                    "was_cached": True
-                }
-            
-            # Process the PDF
-            logger.info(f"Starting PDF processing for {base_name}")
-            sentences_file_path, layout_file_path, stats = save_compatible_sentence_data(
-                pdf_path, 
-                output_dir
-            )
-            
-            processing_time = time.time() - start_time
-            logger.info(f"PDF processing completed in {processing_time:.2f}s")
-            
-            # Initialize provenance mapper
-            provenance_mapper_ready = False
-            try:
-                mapper = ProvenanceLayoutMapper(layout_file_path, debug=False)
-                provenance_mapper_ready = True
-                logger.info("Provenance mapper initialized successfully")
-            except Exception as e:
-                logger.warning(f"Failed to initialize provenance mapper: {e}")
-            
-            return {
-                "success": True,
-                "message": "PDF processed successfully",
-                "files": {
-                    "sentences_file": sentences_file_path,
-                    "layout_file": layout_file_path
-                },
-                "statistics": stats,
-                "processing_time": processing_time,
-                "provenance_mapper_ready": provenance_mapper_ready,
-                "was_cached": False
-            }
-            
-        except Exception as e:
-            logger.error(f"Error processing PDF: {str(e)}")
-            return {
-                "success": False,
-                "error": f"Processing failed: {str(e)}"
-            }
-    
+
     def extract_pdf_text_and_sentences(self, pdf_path: str) -> Tuple[str, List[str]]:
         """Extract text and sentences from a PDF"""
         pdf_text = extract_text(pdf_path)
         sentences = doc_provenance.base_strategies.extract_sentences_from_pdf(pdf_text)
         return pdf_text, sentences
     
-    def get_provenance_highlighting_boxes(self, filename: str, sentence_ids: List[int], 
-                                        provenance_text: str, provenance_id: Optional[str] = None) -> Dict:
-        """
-        Get precise bounding boxes for provenance text using enhanced character-level matching
-        """
-        try:
-            if not sentence_ids:
-                return {'success': False, 'error': 'No sentence IDs provided'}
-            
-            if not provenance_text or len(provenance_text.strip()) < 5:
-                return {'success': False, 'error': 'No meaningful provenance text provided'}
-            
-            # Find layout file
-            layout_file = get_file_finder().find_file(filename, 'layout')
-            
-            if not layout_file:
-                return {'success': False, 'error': 'Layout data not available'}
-            
-            logger.info(f"🎯 Enhanced provenance matching for: '{provenance_text[:50]}...'")
-            logger.info(f"   Sentence IDs: {sentence_ids}")
-            
-            # Use the enhanced character-level matcher
-            bounding_boxes = get_enhanced_provenance_boxes(
-                layout_file['path'], 
-                sentence_ids, 
-                provenance_text
-            )
-            
-            if bounding_boxes:
-                # Calculate statistics
-                total_boxes = sum(len(boxes) for boxes in bounding_boxes.values())
-                all_boxes = [box for boxes in bounding_boxes.values() for box in boxes]
-                avg_confidence = sum(box['confidence'] for box in all_boxes) / len(all_boxes) if all_boxes else 0
-                
-                logger.info(f"✅ Enhanced matching successful: {len(bounding_boxes)} sentences, {total_boxes} boxes")
-                
-                return {
-                    'success': True,
-                    'bounding_boxes': bounding_boxes,
-                    'statistics': {
-                        'total_sentences': len(bounding_boxes),
-                        'mapped_sentences': len([boxes for boxes in bounding_boxes.values() if boxes]),
-                        'total_boxes': total_boxes,
-                        'avg_confidence': avg_confidence,
-                        'mapping_success_rate': len([boxes for boxes in bounding_boxes.values() if boxes]) / len(bounding_boxes) if bounding_boxes else 0,
-                        'match_types': list(set(box['match_type'] for box in all_boxes))
-                    },
-                    'sentence_ids': sentence_ids,
-                    'match_type': 'enhanced_character_level',
-                    'provenance_text': provenance_text[:100] + '...' if len(provenance_text) > 100 else provenance_text,
-                    'data_source': 'enhanced_character_matcher'
-                }
-            else:
-                # Fallback to existing sentence-level matching
-                logger.warning("Enhanced matching failed, falling back to sentence-level")
-                
-                mapper = ProvenanceLayoutMapper(layout_file['path'], debug=False)
-                fallback_boxes = mapper.get_provenance_bounding_boxes(sentence_ids)
-                fallback_stats = mapper.get_provenance_statistics(sentence_ids)
-                
-                return {
-                    'success': True,
-                    'bounding_boxes': fallback_boxes,
-                    'statistics': fallback_stats,
-                    'sentence_ids': sentence_ids,
-                    'match_type': 'sentence_level_fallback',
-                    'data_source': 'fallback_mapper'
-                }
-            
-        except Exception as e:
-            logger.error(f"Error in enhanced provenance matching for {filename}: {e}")
-            return {'success': False, 'error': str(e)}
     
     def generate_safe_question_id(self, pdf_filename: str, question_text: str = None) -> str:
         """

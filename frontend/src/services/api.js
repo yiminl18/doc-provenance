@@ -24,9 +24,11 @@ export const uploadFile = async (formData) => {
 };
 
 // Get documents
-export const getDocuments = async () => {
+export const getDocuments = async (includeFiltering = false) => {
+
   try {
-    const response = await axios.get(`${API_URL}/documents`);
+    const params = includeFiltering ? '?include_filtering=true' : '';
+    const response = await axios.get(`${API_URL}/documents${params}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching documents:', error);
@@ -677,35 +679,38 @@ export const checkProvisionalCaseSupport = async () => {
   }
 };
 
-// Get filtering analysis from backend
-export const getFilteringAnalysis = async (documents, thresholds = null) => {
+
+
+export const getFilteringStats = async (thresholds = null) => {
   try {
-    const response = await fetch(`${API_URL}/documents/filter-analysis`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        documents,
-        thresholds
-      })
-    });
+    let response;
+    
+    if (thresholds) {
+      response = await fetch(`${API_URL}/documents/filtering-stats`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ thresholds })
+      });
+    } else {
+      response = await fetch(`${API_URL}/documents/filtering-stats`);
+    }
     
     const data = await response.json();
     
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to get filtering analysis');
+      throw new Error(data.error || 'Failed to fetch filtering stats');
     }
     
     return data;
   } catch (error) {
-    console.error('Error getting filtering analysis:', error);
+    console.error('Error fetching filtering stats:', error);
     throw error;
   }
 };
 
-// Get filtered documents from backend
-export const getFilteredDocuments = async (documents, thresholds = null, onlyGoodDocuments = false) => {
+export const getFilteredDocuments = async (thresholds = null, onlyGoodDocuments = false) => {
   try {
     const response = await fetch(`${API_URL}/documents/filtered`, {
       method: 'POST',
@@ -713,7 +718,6 @@ export const getFilteredDocuments = async (documents, thresholds = null, onlyGoo
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        documents,
         thresholds,
         onlyGoodDocuments
       })
@@ -722,25 +726,46 @@ export const getFilteredDocuments = async (documents, thresholds = null, onlyGoo
     const data = await response.json();
     
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to get filtered documents');
+      throw new Error(data.error || 'Failed to fetch filtered documents');
     }
     
     return data;
   } catch (error) {
-    console.error('Error getting filtered documents:', error);
+    console.error('Error fetching filtered documents:', error);
     throw error;
   }
 };
 
 
 // Get pre-generated questions for a document
-export const getGeneratedQuestions = async (filename) => {
+export const getGeneratedQuestions = async (filename, options = {}) => {
   try {
-    const response = await axios.get(`${API_URL}/test-questions/${filename}`);
-    return response.data;
+     const { filter = false, ...otherOptions } = options;
+    
+    const params = new URLSearchParams();
+    if (filter) params.append('filter', 'true');
+    
+    // Add other filtering parameters
+    Object.keys(otherOptions).forEach(key => {
+      if (otherOptions[key] !== undefined) {
+        params.append(key, otherOptions[key]);
+      }
+    });
+    
+    const queryString = params.toString();
+    const url = `${API_URL}/documents/${encodeURIComponent(filename)}/questions${queryString ? '?' + queryString : ''}`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch questions');
+    }
+    
+    return data;
   } catch (error) {
-    console.error('Error getting generated questions:', error);
-    throw new Error(error.response?.data?.error || error.message);
+    console.error('Error fetching generated questions:', error);
+    throw error;
   }
 };
 

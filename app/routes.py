@@ -8,7 +8,16 @@ from threading import Thread
 from werkzeug.utils import secure_filename
 import doc_provenance.base_strategies
 from  functools import wraps
-from .utils.file_finder import DocumentFileFinder, find_document_file, get_file_finder, get_document_info
+from .utils.file_finder import (
+    DocumentFileFinder, 
+    find_document_file, 
+    get_file_finder, 
+    get_document_info, 
+    load_all_available_documents, 
+    load_single_document_data, 
+    load_documents_with_questions,
+    load_test_suite_data
+)
 from .google_drive_manager import GoogleDriveManager
 from .google_provisional_sampler import GoogleDriveProvisionalSampler
 from .text_processing_manager import TextProcessingManager
@@ -28,8 +37,10 @@ provisional_sampler = None
 # all other combinations are a process where the first step is sufficient and the second step is minimal
 
 DEFAULT_THRESHOLDS = {
-    'minTokensPerProvenance': 100,
-    'minSentencesPerProvenance': 2,
+    'maxTokensPerProvenance': 1000,
+    'maxSentencesPerProvenance': 20,
+    'maxTokenRatioPerProvenance': 0.3,
+    'maxSentenceRatioPerProvenance': 0.25,
     'minProvenancesPerQuestion': 1,
     'minGoodQuestionsPerDocument': 2,
     'minQuestionRatio': 0.3
@@ -65,7 +76,7 @@ SENTENCES_DIR = os.path.join(os.getcwd(), 'app/sentences')
 DOWNLOADS_DIR = os.path.join(os.getcwd(), 'app/gdrive_downloads')
 MAPPINGS_DIR = os.path.join(os.getcwd(), 'app/stable_mappings')
 TEST_SUITE_OUTPUT_DIR = os.path.join(os.getcwd(), 'app/test_outputs')
-CONOLIDATED_TEST_SUITE_DIR = os.path.join(os.getcwd(), 'app/consolidated_test_suite')
+CONSOLIDATED_TEST_SUITE_DIR = os.path.join(os.getcwd(), 'app/consolidated_test_suite')
 
 # =============================================================================
 
@@ -85,28 +96,6 @@ def init_tiktoken():
 
 enc = init_tiktoken()
 
-def is_good_provenance(provenance, thresholds=None):
-    """Check if a single provenance is good"""
-    if not provenance or not provenance.get('provenance'):
-        return False
-    
-    thresholds = thresholds or DEFAULT_THRESHOLDS
-    
-    token_count = len(enc.encode(provenance['provenance']))
-    sentence_count = len(provenance.get('provenance_ids', []))
-    
-    return (token_count >= thresholds['minTokensPerProvenance'] and 
-            sentence_count >= thresholds['minSentencesPerProvenance'])
-
-def is_good_question(question, thresholds=None):
-    """Check if a question is good"""
-    if not question or not question.get('provenance_data'):
-        return False
-    
-    thresholds = thresholds or DEFAULT_THRESHOLDS
-    
-    good_provenances = [p for p in question['provenance_data'] if is_good_provenance(p, thresholds)]
-    return len(good_provenances) >= thresholds['minProvenancesPerQuestion']
 
 def is_good_document(document, thresholds=None):
     """Check if a document is good"""
@@ -126,29 +115,349 @@ def is_good_document(document, thresholds=None):
     return (len(good_questions) >= thresholds['minGoodQuestionsPerDocument'] and
             good_question_ratio >= thresholds['minQuestionRatio'])
 
-def get_filtering_stats(documents, thresholds=None):
-    """Get filtering statistics"""
-    total_docs = len(documents)
-    good_docs = 0
-    total_questions = 0
-    good_questions = 0
-    
-    for doc in documents:
-        if doc.get('questions'):
-            total_questions += len(doc['questions'])
-            doc_good_questions = [q for q in doc['questions'] if is_good_question(q, thresholds)]
-            good_questions += len(doc_good_questions)
+# Replace these functions in your routes.py
+
+def is_good_provenance(provenance, document_total_tokens=None, document_total_sentences=None, thresholds=None):
+    """Check if a single provenance is good (not too long) - with debugging"""
+    try:
+        if not isinstance(provenance, dict):
+            logger.error(f"is_good_provenance: provenance is not dict: {type(provenance)}")
+            return False
             
-            if is_good_document(doc, thresholds):
-                good_docs += 1
+        if not provenance or not provenance.get('provenance'):
+            return False
+        
+        # Ensure thresholds is a dictionary
+        if thresholds is None:
+            thresholds = DEFAULT_THRESHOLDS
+        elif not isinstance(thresholds, dict):
+            logger.error(f"is_good_provenance: thresholds is not dict: {type(thresholds)} - {thresholds}")
+            thresholds = DEFAULT_THRESHOLDS
+        
+        provenance_text = provenance.get('provenance')
+        if not isinstance(provenance_text, str):
+            logger.error(f"is_good_provenance: provenance text is not string: {type(provenance_text)}")
+            return False
+        
+        try:
+            token_count = len(enc.encode(provenance_text))
+        except Exception as token_error:
+            logger.error(f"Error encoding provenance text: {token_error}")
+            token_count = len(provenance_text) // 4  # Rough estimate
+        
+        sentence_count = len(provenance.get('provenance_ids', []))
+        
+        # Check absolute maximums with safe access
+        max_tokens = thresholds.get('maxTokensPerProvenance', 1000)
+        max_sentences = thresholds.get('maxSentencesPerProvenance', 20)
+        max_token_ratio = thresholds.get('maxTokenRatioPerProvenance', 0.3)
+        max_sentence_ratio = thresholds.get('maxSentenceRatioPerProvenance', 0.25)
+        
+        if token_count > max_tokens:
+            return False
+        if sentence_count > max_sentences:
+            return False
+        
+        # Check ratios if document totals are provided
+        if document_total_tokens and document_total_tokens > 0:
+            token_ratio = token_count / document_total_tokens
+            if token_ratio > max_token_ratio:
+                return False
+        
+        if document_total_sentences and document_total_sentences > 0:
+            sentence_ratio = sentence_count / document_total_sentences
+            if sentence_ratio > max_sentence_ratio:
+                return False
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error in is_good_provenance: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return False
+
+def is_good_question(question, document_total_tokens=None, document_total_sentences=None, thresholds=None):
+    """Check if a question is good - with debugging"""
+    try:
+        if not isinstance(question, dict):
+            logger.error(f"is_good_question: question is not dict: {type(question)}")
+            return False
+            
+        if not question or not question.get('provenance_data'):
+            return False
+        
+        # Ensure thresholds is a dictionary
+        if thresholds is None:
+            thresholds = DEFAULT_THRESHOLDS
+        elif not isinstance(thresholds, dict):
+            logger.error(f"is_good_question: thresholds is not dict: {type(thresholds)} - {thresholds}")
+            thresholds = DEFAULT_THRESHOLDS
+        
+        provenance_data = question.get('provenance_data', [])
+        if not isinstance(provenance_data, list):
+            logger.error(f"is_good_question: provenance_data is not list: {type(provenance_data)}")
+            return False
+        
+        good_provenances = []
+        for prov in provenance_data:
+            if not isinstance(prov, dict):
+                logger.error(f"is_good_question: provenance is not dict: {type(prov)}")
+                continue
+            if is_good_provenance(prov, document_total_tokens, document_total_sentences, thresholds):
+                good_provenances.append(prov)
+        
+        min_provenances = thresholds.get('minProvenancesPerQuestion', 1)
+        return len(good_provenances) >= min_provenances
+        
+    except Exception as e:
+        logger.error(f"Error in is_good_question: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return False
+
+def is_good_document(document, thresholds=None):
+    """Check if a document is good"""
+    try:
+        if not isinstance(document, dict):
+            logger.error(f"is_good_document: document is not dict: {type(document)}")
+            return False
+            
+        if not document or not document.get('questions'):
+            return False
+        
+        # Ensure thresholds is a dictionary
+        if thresholds is None:
+            thresholds = DEFAULT_THRESHOLDS
+        elif not isinstance(thresholds, dict):
+            logger.error(f"is_good_document: thresholds is not dict: {type(thresholds)} - {thresholds}")
+            thresholds = DEFAULT_THRESHOLDS
+        
+        questions = document.get('questions', [])
+        if not isinstance(questions, list):
+            logger.error(f"is_good_document: questions is not list: {type(questions)}")
+            return False
+        
+        if not questions:
+            return False
+        
+        # Calculate document totals for context
+        doc_total_tokens = 0
+        doc_total_sentences = len(document.get('sentences', []))
+        
+        # Estimate total tokens
+        for question in questions:
+            if not isinstance(question, dict):
+                continue
+            for prov in question.get('provenance_data', []):
+                if isinstance(prov, dict) and prov.get('provenance'):
+                    try:
+                        doc_total_tokens += len(enc.encode(prov['provenance']))
+                    except:
+                        doc_total_tokens += len(prov['provenance']) // 4  # Rough estimate
+        
+        good_questions = []
+        for question in questions:
+            if is_good_question(question, doc_total_tokens, doc_total_sentences, thresholds):
+                good_questions.append(question)
+        
+        total_questions = len(questions)
+        good_question_ratio = len(good_questions) / total_questions if total_questions > 0 else 0
+        
+        min_good_questions = thresholds.get('minGoodQuestionsPerDocument', 2)
+        min_question_ratio = thresholds.get('minQuestionRatio', 0.3)
+        
+        return (len(good_questions) >= min_good_questions and
+                good_question_ratio >= min_question_ratio)
+        
+    except Exception as e:
+        logger.error(f"Error in is_good_document: {e}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        return False
+
+def calculate_document_stats(document, thresholds=None):
+    """Calculate detailed stats for a document - with debugging"""
+    try:
+        logger.info(f"Calculating stats for document type: {type(document)}")
+        
+        if not isinstance(document, dict):
+            logger.error(f"Document is not a dict: {type(document)} - {document}")
+            raise ValueError(f"Expected dict, got {type(document)}")
+        
+        # Ensure thresholds is a dictionary
+        if thresholds is None:
+            thresholds = DEFAULT_THRESHOLDS
+        elif not isinstance(thresholds, dict):
+            logger.error(f"calculate_document_stats: thresholds is not dict: {type(thresholds)} - {thresholds}")
+            thresholds = DEFAULT_THRESHOLDS
+        
+        questions = document.get('questions', [])
+        logger.info(f"Questions type: {type(questions)}, length: {len(questions) if isinstance(questions, list) else 'NOT_LIST'}")
+        
+        if not isinstance(questions, list):
+            logger.error(f"Questions is not a list: {type(questions)} - {questions}")
+            questions = []  # Fallback to empty list
+        
+        if not questions:
+            return {
+                'totalQuestions': 0,
+                'goodQuestions': 0,
+                'totalProvenances': 0,
+                'goodProvenances': 0,
+                'totalTokens': 0,
+                'totalSentences': 0,
+                'goodQuestionRatio': 0,
+                'isGoodDocument': False
+            }
+        
+        good_questions = []
+        total_provenances = 0
+        good_provenances = 0
+        total_tokens = 0
+        total_sentences = 0
+
+        # Calculate document totals first
+        doc_total_tokens = 0
+        doc_total_sentences = len(document.get('sentences', []))
+        
+        # Calculate total tokens from all provenances (approximation)
+        for i, question in enumerate(questions):
+            logger.info(f"Processing question {i}: type={type(question)}")
+            
+            if not isinstance(question, dict):
+                logger.error(f"Question {i} is not a dict: {type(question)} - {question}")
+                continue
+            
+            provenance_data = question.get('provenance_data', [])
+            logger.info(f"Question {i} provenance_data type: {type(provenance_data)}")
+            
+            if not isinstance(provenance_data, list):
+                logger.error(f"Question {i} provenance_data is not a list: {type(provenance_data)} - {provenance_data}")
+                continue
+            
+            for j, prov in enumerate(provenance_data):
+                logger.info(f"Question {i}, provenance {j}: type={type(prov)}")
+                
+                if not isinstance(prov, dict):
+                    logger.error(f"Question {i}, provenance {j} is not a dict: {type(prov)} - {prov}")
+                    continue
+                
+                if prov.get('provenance'):
+                    try:
+                        token_count = len(enc.encode(prov['provenance']))
+                        doc_total_tokens += token_count
+                    except Exception as token_error:
+                        logger.error(f"Error encoding provenance: {token_error}")
+                        doc_total_tokens += len(prov['provenance']) // 4  # Fallback estimate
+        
+        # Now process questions for quality assessment
+        for i, question in enumerate(questions):
+            if not isinstance(question, dict):
+                continue
+                
+            if is_good_question(question, doc_total_tokens, doc_total_sentences, thresholds):
+               good_questions.append(question)
+            
+            provenance_data = question.get('provenance_data', [])
+            if not isinstance(provenance_data, list):
+                continue
+                
+            for prov in provenance_data:
+                if not isinstance(prov, dict):
+                    continue
+                    
+                total_provenances += 1
+                if prov.get('provenance'):
+                    try:
+                        total_tokens += len(enc.encode(prov['provenance']))
+                        total_sentences += len(prov.get('provenance_ids', []))
+                    except Exception as e:
+                        logger.error(f"Error processing provenance: {e}")
+                        total_tokens += len(prov['provenance']) // 4  # Fallback
+                        total_sentences += 5   # Fallback
+                
+                if is_good_provenance(prov, doc_total_tokens, doc_total_sentences, thresholds):
+                    good_provenances += 1
+        
+        good_question_ratio = len(good_questions) / len(questions) if len(questions) > 0 else 0
+        
+        return {
+            'totalQuestions': len(questions),
+            'goodQuestions': len(good_questions),
+            'totalProvenances': total_provenances,
+            'goodProvenances': good_provenances,
+            'totalTokens': total_tokens,
+            'totalSentences': total_sentences,
+            'goodQuestionRatio': good_question_ratio,
+            'isGoodDocument': is_good_document(document, thresholds)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in calculate_document_stats: {e}")
+        logger.error(f"Document causing error: {document}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        raise
+
+def calculate_document_stats(document, thresholds=None):
+    """Calculate detailed stats for a document"""
+    questions = document.get('questions', [])
+    
+    if not questions:
+        return {
+            'totalQuestions': 0,
+            'goodQuestions': 0,
+            'totalProvenances': 0,
+            'goodProvenances': 0,
+            'totalTokens': 0,
+            'totalSentences': 0,
+            'goodQuestionRatio': 0,
+            'isGoodDocument': False
+        }
+    
+    good_questions = []
+    total_provenances = 0
+    good_provenances = 0
+    total_tokens = 0
+    total_sentences = 0
+
+    questions = document.get('questions', [])
+    
+    # Calculate document totals first
+    doc_total_tokens = 0
+    doc_total_sentences = len(document.get('sentences', []))
+    
+    # Calculate total tokens from all provenances (approximation)
+    for question in questions:
+        for prov in question.get('provenance_data', []):
+            if prov.get('provenance'):
+                doc_total_tokens += len(enc.encode(prov['provenance']))
+    
+    for question in questions:
+        if is_good_question(question, doc_total_tokens, doc_total_sentences, thresholds):
+           good_questions.append(question)
+        
+        for prov in question.get('provenance_data', []):
+            total_provenances += 1
+            if prov.get('provenance'):
+                total_tokens += len(enc.encode(prov['provenance']))
+                total_sentences += len(prov.get('provenance_ids', []))
+            
+            if is_good_provenance(prov, doc_total_tokens, doc_total_sentences, thresholds):
+                good_provenances += 1
+    
+    good_question_ratio = len(good_questions) / len(questions)
     
     return {
-        'totalDocuments': total_docs,
-        'goodDocuments': good_docs,
-        'totalQuestions': total_questions,
-        'goodQuestions': good_questions,
-        'documentPassRate': (good_docs / total_docs * 100) if total_docs > 0 else 0,
-        'questionPassRate': (good_questions / total_questions * 100) if total_questions > 0 else 0
+        'totalQuestions': len(questions),
+        'goodQuestions': len(good_questions),
+        'totalProvenances': total_provenances,
+        'goodProvenances': good_provenances,
+        'totalTokens': total_tokens,
+        'totalSentences': total_sentences,
+        'goodQuestionRatio': good_question_ratio,
+        'isGoodDocument': is_good_document(document, thresholds)
     }
 
 # In routes.py - Add this at the top to debug routing
@@ -651,21 +960,47 @@ def scan_folder_for_pdfs(folder_path):
 def get_available_documents():
     """Get all available documents from upload, and batch folders"""
     try:
-        all_documents = get_all_available_pdfs()
-        
-        # Separate by source for UI organization (optional)
-        uploaded_docs = [doc for doc in all_documents if doc.get('source_folder') == 'uploads']
-        batch_docs = [doc for doc in all_documents if doc.get('source_folder') == 'downloads']
-        
-        return jsonify({
-            'success': True,
-            'documents': all_documents,
-            'total_documents': len(all_documents),
-            'breakdown': {
-                'uploaded': len(uploaded_docs),
-                'batch_processed': len(batch_docs)
-            }
-        })
+
+         # Check if we should include filtering info
+        include_filtering = request.args.get('include_filtering', 'false').lower() == 'true'
+        logger.info(f"Include filtering: {include_filtering}")
+
+        if include_filtering:
+            # Load full document data for filtering
+            documents = load_documents_with_questions()
+            
+            # Add filtering analysis to each document
+            result_docs = []
+            for doc in documents:
+                doc_stats = calculate_document_stats(doc)
+                result_docs.append({
+                    'filename': doc['filename'],
+                    'exists': doc['exists'],
+                    'file_info': doc.get('file_info', {}),
+                    'filtering_stats': doc_stats,
+                    'has_questions': len(doc.get('questions', [])) > 0
+                })
+            
+            return jsonify({
+                'success': True,
+                'documents': result_docs
+            })
+        else:
+            all_documents = get_all_available_pdfs()
+
+            # Separate by source for UI organization (optional)
+            uploaded_docs = [doc for doc in all_documents if doc.get('source_folder') == 'uploads']
+            batch_docs = [doc for doc in all_documents if doc.get('source_folder') == 'downloads']
+
+            return jsonify({
+                'success': True,
+                'documents': all_documents,
+                'total_documents': len(all_documents),
+                'breakdown': {
+                    'uploaded': len(uploaded_docs),
+                    'batch_processed': len(batch_docs)
+                }
+            })
         
     except Exception as e:
         logger.error(f"Error getting available documents: {e}")
@@ -3493,97 +3828,178 @@ def get_downloaded_summary():
             'traceback': traceback.format_exc()
         }), 500
     
-@main.route('/documents/filter-analysis', methods=['POST'])
-def filter_analysis():
-    """
-    Analyze documents for filtering without actually filtering them
-    Just returns which documents/questions are good
-    """
+@main.route('/documents/<filename>/questions', methods=['GET'])
+def get_document_questions(filename):
+    """Get questions for a specific document, with optional filtering"""
     try:
-        data = request.json
-        documents = data.get('documents', [])
-        thresholds = data.get('thresholds', DEFAULT_THRESHOLDS)
+        # Get filtering parameters
+        apply_filters = request.args.get('filter', 'false').lower() == 'true'
         
-        # Analyze each document
-        analysis = {}
-        for doc in documents:
-            filename = doc.get('filename')
-            if not filename:
-                continue
-                
-            analysis[filename] = {
-                'isGoodDocument': is_good_document(doc, thresholds),
-                'goodQuestions': [q.get('question_id') for q in doc.get('questions', []) if is_good_question(q, thresholds)],
-                'totalQuestions': len(doc.get('questions', [])),
-                'goodQuestionCount': len([q for q in doc.get('questions', []) if is_good_question(q, thresholds)])
-            }
+        # Load document data
+        doc_data = load_single_document_data(filename)
         
-        # Get overall stats
-        stats = get_filtering_stats(documents, thresholds)
+        if not doc_data['exists']:
+            return jsonify({
+                'success': False,
+                'error': 'Document not found'
+            }), 404
+        
+        questions = doc_data.get('questions', [])
+        
+        if apply_filters:
+            # Filter questions
+            thresholds = DEFAULT_THRESHOLDS.copy()
+            
+            # Allow custom thresholds from query params
+            if request.args.get('minTokens'):
+                thresholds['minTokensPerProvenance'] = int(request.args.get('minTokens'))
+            if request.args.get('minSentences'):
+                thresholds['minSentencesPerProvenance'] = int(request.args.get('minSentences'))
+            
+            filtered_questions = [q for q in questions if is_good_question(q, thresholds)]
+            questions = filtered_questions
         
         return jsonify({
             'success': True,
-            'analysis': analysis,
-            'stats': stats
+            'questions': questions,
+            'metadata': doc_data.get('metadata'),
+            'total_questions': len(doc_data.get('questions', [])),
+            'filtered_questions': len(questions) if apply_filters else None
         })
         
     except Exception as e:
+        logger.error(f"Error getting questions for {filename}: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
         }), 500
 
-@main.route('/documents/filtered', methods=['POST'])
-def get_filtered_documents():
-    """
-    Filter documents on the backend
-    """
+@main.route('/documents/filtering-stats', methods=['GET', 'POST'])
+def get_filtering_stats():
+    """Get filtering statistics for all documents"""
     try:
-        data = request.json
-        documents = data.get('documents', [])
-        thresholds = data.get('thresholds', DEFAULT_THRESHOLDS)
-        only_good_documents = data.get('onlyGoodDocuments', False)
+        if request.method == 'POST':
+            # Custom thresholds provided
+            data = request.json
+            thresholds = data.get('thresholds', DEFAULT_THRESHOLDS)
+        else:
+            # Use default thresholds
+            thresholds = DEFAULT_THRESHOLDS
+        
+        # Load all documents with questions
+        documents = load_documents_with_questions()
+        
+        # Calculate overall stats
+        total_docs = len(documents)
+        good_docs = 0
+        total_questions = 0
+        good_questions = 0
+        total_provenances = 0
+        good_provenances = 0
+        
+        document_analyses = {}
+        
+        for doc in documents:
+            doc_stats = calculate_document_stats(doc, thresholds)
+            document_analyses[doc['filename']] = doc_stats
+            
+            total_questions += doc_stats['totalQuestions']
+            good_questions += doc_stats['goodQuestions']
+            total_provenances += doc_stats['totalProvenances']
+            good_provenances += doc_stats['goodProvenances']
+            
+            if doc_stats['isGoodDocument']:
+                good_docs += 1
+        
+        overall_stats = {
+            'totalDocuments': total_docs,
+            'goodDocuments': good_docs,
+            'totalQuestions': total_questions,
+            'goodQuestions': good_questions,
+            'totalProvenances': total_provenances,
+            'goodProvenances': good_provenances,
+            'documentPassRate': (good_docs / total_docs * 100) if total_docs > 0 else 0,
+            'questionPassRate': (good_questions / total_questions * 100) if total_questions > 0 else 0,
+            'provenancePassRate': (good_provenances / total_provenances * 100) if total_provenances > 0 else 0
+        }
+        
+        return jsonify({
+            'success': True,
+            'stats': overall_stats,
+            'document_analyses': document_analyses,
+            'thresholds_used': thresholds
+        })
+        
+    except Exception as e:
+        logger.error(f"Error calculating filtering stats: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@main.route('/documents/filtered', methods=['GET', 'POST'])
+def get_filtered_documents():
+    """Get filtered documents and questions"""
+    try:
+        if request.method == 'POST':
+            data = request.json
+            thresholds = data.get('thresholds', DEFAULT_THRESHOLDS)
+            only_good_documents = data.get('onlyGoodDocuments', False)
+        else:
+            thresholds = DEFAULT_THRESHOLDS
+            only_good_documents = request.args.get('onlyGood', 'false').lower() == 'true'
+        
+        # Load all documents with questions
+        documents = load_documents_with_questions()
         
         filtered_documents = []
         
         for doc in documents:
-            # Filter questions within each document
+            # Filter questions within the document
             filtered_questions = [q for q in doc.get('questions', []) if is_good_question(q, thresholds)]
+            
+            # Calculate document stats
+            doc_stats = calculate_document_stats(doc, thresholds)
             
             # Create filtered document
             filtered_doc = {
-                **doc,
+                'filename': doc['filename'],
+                'exists': doc['exists'],
+                'file_info': doc.get('file_info', {}),
                 'questions': filtered_questions,
-                'filteringAnalysis': {
-                    'totalQuestions': len(doc.get('questions', [])),
-                    'goodQuestions': len(filtered_questions),
-                    'goodQuestionRatio': len(filtered_questions) / len(doc.get('questions', [])) if doc.get('questions') else 0,
-                    'isGoodDocument': is_good_document(doc, thresholds)
-                }
+                'metadata': doc.get('metadata'),
+                'filtering_analysis': doc_stats
             }
             
-            # Only include if it passes document filter (if requested)
+            # Include document if it passes filters (or if we're not filtering at document level)
             if only_good_documents:
-                if filtered_doc['filteringAnalysis']['isGoodDocument']:
+                if doc_stats['isGoodDocument']:
                     filtered_documents.append(filtered_doc)
             else:
                 filtered_documents.append(filtered_doc)
         
-        # Get overall stats
-        stats = get_filtering_stats(documents, thresholds)
+        # Calculate overall stats
+        overall_stats = {
+            'totalDocuments': len(documents),
+            'returnedDocuments': len(filtered_documents),
+            'totalQuestions': sum(len(doc.get('questions', [])) for doc in documents),
+            'returnedQuestions': sum(len(doc['questions']) for doc in filtered_documents),
+            'thresholds': thresholds
+        }
         
         return jsonify({
             'success': True,
             'documents': filtered_documents,
-            'stats': stats
+            'stats': overall_stats
         })
         
     except Exception as e:
+        logger.error(f"Error filtering documents: {e}")
         return jsonify({
             'success': False,
             'error': str(e)
         }), 500
-
+    
 # Replace your enhance_file_summary_with_metadata function with this debug version:
 
 def enhance_file_summary_with_metadata(sampler, summary):

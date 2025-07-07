@@ -1,4 +1,3 @@
-// UnifiedDocumentBrowserModal.js - Combined DocumentSelectionModal and DriveFileBrowser
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -18,7 +17,7 @@ import {
   downloadPvcSampleFile,
   sampleExtractableDocuments,
   initProvisionalSampler,
-  getFilteringAnalysis
+  getFilteringStats
 } from '../services/api';
 
 import { Tiktoken } from 'js-tiktoken/lite';
@@ -35,18 +34,15 @@ const UnifiedFileBrowser = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [showOnlyGoodDocuments, setShowOnlyGoodDocuments] = useState(false);
-  const [filteringStats, setFilteringStats] = useState(null);
-  const [backendAnalysis, setBackendAnalysis] = useState(null);
-  const [analysisLoading, setAnalysisLoading] = useState(false);
-
-
-  // Initialize Tiktoken for token counting
-
   // Available documents state
   const [documents, setDocuments] = useState([]);
   const [documentStats, setDocumentStats] = useState(new Map());
   const [loadingStats, setLoadingStats] = useState(new Set());
+  
+  // Backend filtering state
+  const [showOnlyGoodDocuments, setShowOnlyGoodDocuments] = useState(false);
+  const [filteringStats, setFilteringStats] = useState(null);
+  const [backendFilteringData, setBackendFilteringData] = useState(null);
 
   // Drive browser state
   const [currentView, setCurrentView] = useState('counties'); // counties -> agencies -> files
@@ -58,7 +54,6 @@ const UnifiedFileBrowser = ({
   const [sampling, setSampling] = useState(false);
   const [downloadingFile, setDownloadingFile] = useState(null);
 
-  const enc = new Tiktoken(cl100k_base);
   // =============================================================================
   // Available Documents Functions
   // =============================================================================
@@ -68,16 +63,42 @@ const UnifiedFileBrowser = ({
     setError(null);
 
     try {
-      const response = await getDocuments();
+      const response = await getDocuments(true);
 
       if (response.success && response.documents) {
         setDocuments(response.documents);
 
+       // Extract filtering stats
+        if (response.documents.length > 0) {
+          const totalDocs = response.documents.length;
+          const goodDocs = response.documents.filter(doc => 
+            doc.filtering_stats?.isGoodDocument
+          ).length;
+          const totalQuestions = response.documents.reduce((sum, doc) => 
+            sum + (doc.filtering_stats?.totalQuestions || 0), 0
+          );
+          const goodQuestions = response.documents.reduce((sum, doc) => 
+            sum + (doc.filtering_stats?.goodQuestions || 0), 0
+          );
+
+          setFilteringStats({
+            totalDocuments: totalDocs,
+            goodDocuments: goodDocs,
+            totalQuestions,
+            goodQuestions
+          });
+
+          // Store backend filtering data for quick access
+          const filteringData = {};
+          response.documents.forEach(doc => {
+            filteringData[doc.filename] = doc.filtering_stats;
+          });
+          setBackendFilteringData(filteringData);
+        }
+
         // Load provenance stats for each document if enabled
         if (showProvenanceStats) {
-          await loadProvenanceStatsForDocuments(response.documents);
-          // Calculate filtering stats after loading provenance data
-          //setFilteringStats(calculateFilteringStats(response.documents));
+          loadProvenanceStatsForDocuments(response.documents);
         }
       } else {
         setDocuments([]);
@@ -92,39 +113,7 @@ const UnifiedFileBrowser = ({
     }
   };
 
-  const loadFilteringAnalysis = async (docs) => {
-    if (!docs || docs.length === 0) return;
-
-    setAnalysisLoading(true);
-    try {
-      // Prepare documents with their questions for backend
-      const documentsWithQuestions = docs.map(doc => {
-        const stats = documentStats.get(doc.filename);
-        return {
-          filename: doc.filename,
-          questions: stats?.questions || []
-        };
-      });
-
-      const analysis = await getFilteringAnalysis(documentsWithQuestions);
-      setBackendAnalysis(analysis);
-      setFilteringStats(analysis.stats);
-    } catch (error) {
-      console.error('Error loading filtering analysis:', error);
-    } finally {
-      setAnalysisLoading(false);
-    }
-  };
-
-  const getDisplayDocuments = () => {
-    if (!showOnlyGoodDocuments || !backendAnalysis) return documents;
-
-    return documents.filter(doc => {
-      const analysis = backendAnalysis.analysis[doc.filename];
-      return analysis?.isGoodDocument || false;
-    });
-  };
-
+ 
   const loadProvenanceStatsForDocuments = async (docs) => {
     const statsPromises = docs.map(async (doc) => {
       try {
@@ -156,8 +145,6 @@ const UnifiedFileBrowser = ({
     });
 
     await Promise.allSettled(statsPromises);
-
-    await loadFilteringAnalysis(docs);
   };
 
   const calculateDocumentStats = (questions, metadata) => {
@@ -182,13 +169,12 @@ const UnifiedFileBrowser = ({
       if (question.provenance_data && question.provenance_data.length > 0) {
         questionsWithProvenances++;
         totalProvenances += question.provenance_data.length;
-
+        
         question.provenance_data.forEach(prov => {
-          // Calculate per-provenance totals using TikToken
-          const provenanceText = prov.provenance || '';
-          const tokenCount = enc.encode(provenanceText).length;
+          // Use backend filtering data if available, otherwise fallback to frontend calculation
           const sentenceCount = prov.provenance_ids ? prov.provenance_ids.length : 0;
-
+          const tokenCount = prov.output_token_size || 0; 
+          
           totalSentences += sentenceCount;
           totalTokens += tokenCount;
         });
@@ -199,11 +185,11 @@ const UnifiedFileBrowser = ({
     const coverageScore = (questionsWithProvenances / questions.length) * 100;
     const avgProvenancesPerQuestion = questions.length > 0 ? totalProvenances / questions.length : 0;
     const avgSentencesPerQuestion = questions.length > 0 ? totalSentences / questions.length : 0;
-
+    
     // Quality factors: good coverage, reasonable provenance count, meaningful sentence count
     const qualityScore = Math.min(100, (
-      (coverageScore * 0.4) +
-      (Math.min(avgProvenancesPerQuestion / 3, 1) * 30) +
+      (coverageScore * 0.4) + 
+      (Math.min(avgProvenancesPerQuestion / 3, 1) * 30) + 
       (Math.min(avgSentencesPerQuestion / 10, 1) * 30)
     ));
 
@@ -403,23 +389,22 @@ const UnifiedFileBrowser = ({
     }
   };
 
-  // Update the initialization logic in useEffect
   useEffect(() => {
-    if (isOpen) {
-      setError(null);
-      setLoading(false);
-
-      if (mode === 'available') {
-        loadDocuments();
-      } else if (mode === 'drive') {
-        setCurrentView('counties');
-        setSelectedCounty(null);
-        setSelectedAgency(null);
-        // Initialize the sampler and fetch counties
-        initializePvcSampler();
-      }
+  if (isOpen) {
+    setError(null);
+    setLoading(false);
+    
+    if (mode === 'available') {
+      loadDocuments();
+    } else if (mode === 'drive') {
+      setCurrentView('counties');
+      setSelectedCounty(null);
+      setSelectedAgency(null);
+      // Initialize the sampler and fetch counties
+      initializePvcSampler();
     }
-  }, [isOpen, mode]);
+  }
+}, [isOpen, mode]);
 
   // Add this new function to initialize the PVC sampler
   const initializePvcSampler = async () => {
@@ -457,6 +442,15 @@ const UnifiedFileBrowser = ({
       if (currentView === 'files') return `${selectedAgency} Documents`;
     }
     return 'Document Browser';
+  };
+
+  const getDisplayDocuments = () => {
+    if (!showOnlyGoodDocuments || !backendFilteringData) return documents;
+    
+    return documents.filter(doc => {
+      const filteringStats = backendFilteringData[doc.filename];
+      return filteringStats?.isGoodDocument || false;
+    });
   };
 
   const goBack = () => {
@@ -521,29 +515,26 @@ const UnifiedFileBrowser = ({
             <FontAwesomeIcon icon={getIcon()} />
             <h3>{getTitle()}</h3>
 
-            <div className="header-content">
-              <FontAwesomeIcon icon={getIcon()} />
-              <h3>{getTitle()}</h3>
+          
 
               {/* Simple Quality Filter Toggle */}
-              {mode === 'available' && filteringStats && (
-                <div className="filter-toggle">
-                  <label className="toggle-label">
-                    <input
-                      type="checkbox"
-                      checked={showOnlyGoodDocuments}
-                      onChange={(e) => setShowOnlyGoodDocuments(e.target.checked)}
-                      disabled={analysisLoading}
-                    />
-                    <FontAwesomeIcon icon={analysisLoading ? faSpinner : faFilter} spin={analysisLoading} />
-                    Show Quality Docs Only
-                    <span className="filter-stats">
-                      ({filteringStats.goodDocuments}/{filteringStats.totalDocuments})
-                    </span>
-                  </label>
-                </div>
-              )}
-            </div>
+             {mode === 'available' && filteringStats && (
+              <div className="filter-toggle">
+                <label className="toggle-label">
+                  <input
+                    type="checkbox"
+                    checked={showOnlyGoodDocuments}
+                    onChange={(e) => setShowOnlyGoodDocuments(e.target.checked)}
+                  />
+                  <FontAwesomeIcon icon={faFilter} />
+                  Show Quality Docs Only
+                  <span className="filter-stats">
+                    ({filteringStats.goodDocuments}/{filteringStats.totalDocuments})
+                  </span>
+                </label>
+              </div>
+            )}
+
             {/* Breadcrumb for drive mode */}
             {mode === 'drive' && (currentView === 'agencies' || currentView === 'files') && (
               <div className="breadcrumb">
@@ -596,15 +587,15 @@ const UnifiedFileBrowser = ({
               {/* Available Documents Mode */}
               {mode === 'available' && (
                 <>
-                  {documents.length > 0 ? (
+                  {getDisplayDocuments().length > 0 ? (
                     <div className="modal-grid document-selection">
                       {getDisplayDocuments().map(doc => {
                         const stats = documentStats.get(doc.filename);
                         const isLoadingStats = loadingStats.has(doc.filename);
 
-                        // Add quality indicator
-                        const docWithQuestions = stats?.questions ? { ...doc, questions: stats.questions } : doc;
-                        const isHighQuality = backendAnalysis?.analysis[doc.filename]?.isGoodDocument || false;
+                        const isHighQuality = backendFilteringData?.[doc.filename]?.isGoodDocument || false;
+                        const filteringInfo = backendFilteringData?.[doc.filename];
+
 
                         return (
                           <div key={doc.filename} className={`document-card-container ${isHighQuality ? 'high-quality' : ''}`}>
